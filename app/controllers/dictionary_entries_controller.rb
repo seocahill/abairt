@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class DictionaryEntriesController < ApplicationController
-  before_action :set_dictionary_entry, only: %i[ show edit update destroy ]
+  before_action :set_dictionary_entry, only: %i[show edit update destroy]
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
@@ -7,8 +9,7 @@ class DictionaryEntriesController < ApplicationController
   end
 
   # GET /dictionary_entries/1 or /dictionary_entries/1.json
-  def show
-  end
+  def show; end
 
   # GET /dictionary_entries/new
   def new
@@ -16,8 +17,7 @@ class DictionaryEntriesController < ApplicationController
   end
 
   # GET /dictionary_entries/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
@@ -25,7 +25,8 @@ class DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
-        format.html { redirect_to @dictionary_entry, notice: "Dictionary entry was successfully created." }
+        format.turbo_stream
+        format.html { redirect_to dictionary_entries_path, notice: 'Dictionary entry was successfully created.' }
         format.json { render :show, status: :created, location: @dictionary_entry }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +39,7 @@ class DictionaryEntriesController < ApplicationController
   def update
     respond_to do |format|
       if @dictionary_entry.update(dictionary_entry_params)
-        format.html { redirect_to @dictionary_entry, notice: "Dictionary entry was successfully updated." }
+        format.html { redirect_to @dictionary_entry, notice: 'Dictionary entry was successfully updated.' }
         format.json { render :show, status: :ok, location: @dictionary_entry }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -51,19 +52,20 @@ class DictionaryEntriesController < ApplicationController
   def destroy
     @dictionary_entry.destroy
     respond_to do |format|
-      format.html { redirect_to dictionary_entries_url, notice: "Dictionary entry was successfully destroyed." }
+      format.html { redirect_to dictionary_entries_url, notice: 'Dictionary entry was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_dictionary_entry
-      @dictionary_entry = DictionaryEntry.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def dictionary_entry_params
-      params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_dictionary_entry
+    @dictionary_entry = DictionaryEntry.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def dictionary_entry_params
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes)
+  end
 end
