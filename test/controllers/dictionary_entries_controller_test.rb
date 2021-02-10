@@ -17,7 +17,7 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create dictionary_entry" do
     assert_difference('DictionaryEntry.count') do
-      post dictionary_entries_url, params: { dictionary_entry: { translation: @dictionary_entry.translation, word_or_phrase: @dictionary_entry.word_or_phrase } }
+      post dictionary_entries_url, params: { dictionary_entry: { notes: @dictionary_entry.notes, translation: @dictionary_entry.translation, word_or_phrase: @dictionary_entry.word_or_phrase } }
     end
 
     assert_redirected_to dictionary_entry_url(DictionaryEntry.last)
@@ -34,7 +34,7 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update dictionary_entry" do
-    patch dictionary_entry_url(@dictionary_entry), params: { dictionary_entry: { translation: @dictionary_entry.translation, word_or_phrase: @dictionary_entry.word_or_phrase } }
+    patch dictionary_entry_url(@dictionary_entry), params: { dictionary_entry: { notes: @dictionary_entry.notes, translation: @dictionary_entry.translation, word_or_phrase: @dictionary_entry.word_or_phrase } }
     assert_redirected_to dictionary_entry_url(@dictionary_entry)
   end
 

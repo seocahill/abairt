@@ -14,6 +14,7 @@ class DictionaryEntriesTest < ApplicationSystemTestCase
     visit dictionary_entries_url
     click_on "New Dictionary Entry"
 
+    fill_in "Notes", with: @dictionary_entry.notes
     fill_in "Translation", with: @dictionary_entry.translation
     fill_in "Word or phrase", with: @dictionary_entry.word_or_phrase
     click_on "Create Dictionary entry"
@@ -26,6 +27,7 @@ class DictionaryEntriesTest < ApplicationSystemTestCase
     visit dictionary_entries_url
     click_on "Edit", match: :first
 
+    fill_in "Notes", with: @dictionary_entry.notes
     fill_in "Translation", with: @dictionary_entry.translation
     fill_in "Word or phrase", with: @dictionary_entry.word_or_phrase
     click_on "Update Dictionary entry"

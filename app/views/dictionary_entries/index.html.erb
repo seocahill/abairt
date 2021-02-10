@@ -7,6 +7,7 @@
     <tr>
       <th>Word or phrase</th>
       <th>Translation</th>
+      <th>Notes</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -16,6 +17,7 @@
       <tr>
         <td><%= dictionary_entry.word_or_phrase %></td>
         <td><%= dictionary_entry.translation %></td>
+        <td><%= dictionary_entry.notes %></td>
         <td><%= link_to 'Show', dictionary_entry %></td>
         <td><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %></td>
         <td><%= link_to 'Destroy', dictionary_entry, method: :delete, data: { confirm: 'Are you sure?' } %></td>

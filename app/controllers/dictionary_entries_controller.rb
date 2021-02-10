@@ -64,6 +64,6 @@ class DictionaryEntriesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def dictionary_entry_params
-      params.require(:dictionary_entry).permit(:word_or_phrase, :translation)
+      params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes)
     end
 end

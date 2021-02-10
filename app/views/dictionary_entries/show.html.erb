@@ -10,5 +10,10 @@
   <%= @dictionary_entry.translation %>
 </p>
 
+<p>
+  <strong>Notes:</strong>
+  <%= @dictionary_entry.notes %>
+</p>
+
 <%= link_to 'Edit', edit_dictionary_entry_path(@dictionary_entry) %> |
 <%= link_to 'Back', dictionary_entries_path %>

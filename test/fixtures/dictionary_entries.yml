@@ -3,7 +3,9 @@
 one:
   word_or_phrase: MyString
   translation: MyString
+  notes: MyString
 
 two:
   word_or_phrase: MyString
   translation: MyString
+  notes: MyString
