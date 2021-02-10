@@ -1,8 +1,7 @@
-<%= form_with(model: dictionary_entry) do |form| %>
+<%= form_with(model: dictionary_entry, data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
   <% if dictionary_entry.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(dictionary_entry.errors.count, "error") %> prohibited this dictionary_entry from being saved:</h2>
-
       <ul>
         <% dictionary_entry.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -10,22 +9,18 @@
       </ul>
     </div>
   <% end %>
-
   <div class="field">
     <%= form.label :word_or_phrase %>
     <%= form.text_field :word_or_phrase %>
   </div>
-
   <div class="field">
     <%= form.label :translation %>
     <%= form.text_field :translation %>
   </div>
-
   <div class="field">
     <%= form.label :notes %>
     <%= form.text_field :notes %>
   </div>
-
   <div class="actions">
     <%= form.submit %>
   </div>
