@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Word or phrase:</strong>
+  <%= @dictionary_entry.word_or_phrase %>
+</p>
+
+<p>
+  <strong>Translation:</strong>
+  <%= @dictionary_entry.translation %>
+</p>
+
+<%= link_to 'Edit', edit_dictionary_entry_path(@dictionary_entry) %> |
+<%= link_to 'Back', dictionary_entries_path %>

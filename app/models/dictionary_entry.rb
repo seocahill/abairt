@@ -1,0 +1,2 @@
+class DictionaryEntry < ApplicationRecord
+end

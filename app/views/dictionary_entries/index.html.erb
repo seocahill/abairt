@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Dictionary Entries</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Word or phrase</th>
+      <th>Translation</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @dictionary_entries.each do |dictionary_entry| %>
+      <tr>
+        <td><%= dictionary_entry.word_or_phrase %></td>
+        <td><%= dictionary_entry.translation %></td>
+        <td><%= link_to 'Show', dictionary_entry %></td>
+        <td><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %></td>
+        <td><%= link_to 'Destroy', dictionary_entry, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Dictionary Entry', new_dictionary_entry_path %>
