@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # rails:
+  #   image: seocahill/abairt
+  #   environment:
+  #     REDIS_URL: redis://redis:6379
+  #   ports:
+  #     - 3000:3000
+  #   working_dir: /workspace
+  #   command:
+  #     - /bin/bash
+  #     - -c
+  #     - |
+  #       until pg_isready -h postgres -U postgres; do echo "pg not found..."; sleep 2; done;
+  #       bin/rails db:prepare
+  #       rm -f tmp/pids/server.pid
+  #       if [ "$DEBUG" == "true" ]; then
+  #         rdebug-ide --host 0.0.0.0 --port 3001 -- bin/rails s -p 3000 -b 0.0.0.0
+  #       else
+  #         bin/rails s -p 3000 -b 0.0.0.0
+  #       fi
+
+  postgres:
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
