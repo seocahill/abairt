@@ -12,7 +12,7 @@
     <strong>Notes:</strong>
     <%= @dictionary_entry.notes %>
   </p>
-  <% if @dictionary_entry.media.attached? && @dictionary_entry.media.video? %>
+  <% if @dictionary_entry.media.attached? && @dictionary_entry.media.audio? %>
     <%= tag :audio, src: url_for(@dictionary_entry.media), controls: true %>
   <% end %>
   <%= link_to 'Edit', edit_dictionary_entry_path(@dictionary_entry) %> |

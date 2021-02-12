@@ -1,5 +1,4 @@
 import { Controller } from "stimulus"
-// import { DirectUpload } from "@rails/activestorage"
 import { DirectUpload } from 'https://cdn.skypack.dev/@rails/activestorage';
 
 export default class extends Controller {
