@@ -54,3 +54,5 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "hotwire-rails", "~> 0.1.3"
 
 gem "pg_search", "~> 2.3"
+
+gem "pagy", "~> 3.10"

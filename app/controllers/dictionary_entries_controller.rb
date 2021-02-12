@@ -5,11 +5,18 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    @dictionary_entries = if params[:search].present?
-                            DictionaryEntry.search_translation(params[:search])
-                          else
-                            DictionaryEntry.all
+    records = if params[:search].present?
+                DictionaryEntry.search_translation(params[:search])
+              else
+                DictionaryEntry.all
                           end
+
+    @pagy, @dictionary_entries = pagy(records)
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data @dictionary_entries.to_csv, filename: "dictionary-#{Date.today}.csv" }
+    end
   end
 
   # GET /dictionary_entries/1 or /dictionary_entries/1.json
