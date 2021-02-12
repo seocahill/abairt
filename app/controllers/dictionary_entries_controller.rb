@@ -5,7 +5,11 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    @dictionary_entries = DictionaryEntry.all
+    @dictionary_entries = if params[:search].present?
+                            DictionaryEntry.search_translation(params[:search])
+                          else
+                            DictionaryEntry.all
+                          end
   end
 
   # GET /dictionary_entries/1 or /dictionary_entries/1.json
@@ -66,6 +70,6 @@ class DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search)
   end
 end

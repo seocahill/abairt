@@ -1,6 +1,12 @@
 <p id="notice"><%= notice %></p>
-<h1>Dictionary Entries</h1>
+<h1>Abairt</h1>
 <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
+<%= form_with(url: dictionary_entries_path, class: "form-inline", method: :get) do |form| %>
+  <div class="field">
+    <%= form.label :search %>
+    <%= form.text_field :search %>
+  </div>
+<% end %>
 <table>
   <thead>
     <tr>
