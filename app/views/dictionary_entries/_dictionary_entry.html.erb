@@ -2,6 +2,9 @@
   <td><%= dictionary_entry.word_or_phrase %></td>
   <td><%= dictionary_entry.translation %></td>
   <td><%= dictionary_entry.notes %></td>
+  <% if dictionary_entry.media.attached? && dictionary_entry.media.video? %>
+    <%= tag :audio, src: url_for(dictionary_entry.media), controls: true %>
+  <% end %>
   <td><%= link_to 'Show', dictionary_entry %></td>
   <td><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %></td>
   <td><%= link_to 'Destroy', dictionary_entry, method: :delete, data: { confirm: 'Are you sure?' } %></td>
