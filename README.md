@@ -14,6 +14,8 @@ A simple application to share, search and download irish sentences, translations
 
 * Docker https://www.docker.com/
 
+* Amazon simple object storage https://aws.amazon.com/s3/
+
 ## Development setup
 
 * install docker and start the daemon
