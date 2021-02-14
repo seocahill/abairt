@@ -31,4 +31,5 @@ amazon:
 # mirror:
 #   service: Mirror
 #   primary: local
-#   mirrors: [ amazon, google, microsoft ]
+#   mirrors: [ amazon ]
+  # mirrors: [ amazon, google, microsoft ]
