@@ -1,24 +1,31 @@
-# README
+# Abairt
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+https://abairt.herokuapp.com
 
-Things you may want to cover:
+A simple application to share, search and download irish sentences, translations and pronunciations. 
 
-* Ruby version
+* Ruby 2.7 https://www.ruby-lang.org/en/
 
-* System dependencies
+* Rails 6.1 https://guides.rubyonrails.org/index.html
 
-* Configuration
+* Hotwire https://hotwire.dev/
 
-* Database creation
+* Postgresql 13 https://www.postgresql.org/
 
-* Database initialization
+* Docker https://www.docker.com/
 
-* How to run the test suite
+## Development setup
 
-* Services (job queues, cache servers, search engines, etc.)
+* install docker and start the daemon
 
-* Deployment instructions
+* git clone this repo && cd abairt
 
-* ...
+* bundle install 
+
+* docker-compose up -d
+
+* rails db:prepare
+
+* rails server
+
+The application will be accessible on http://localhost:3000
