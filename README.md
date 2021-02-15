@@ -16,6 +16,8 @@ A simple application to share, search and download irish sentences, translations
 
 * Amazon simple object storage https://aws.amazon.com/s3/
 
+* Deployed on Heroku PAAS https://www.heroku.com/
+
 ## Development setup
 
 * install docker and start the daemon
