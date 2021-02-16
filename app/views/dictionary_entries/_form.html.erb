@@ -21,8 +21,8 @@
     <%= form.label :notes %>
     <%= form.text_field :notes %>
   </div>
-  <%= content_tag :div, data: { controller: 'recorder' } do %>
-    <%= form.label :media %>
+  <%= content_tag :div, data: { controller: 'recorder' }, class: "field" do %>
+    <%= form.label :record %>
     <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
     <p>
       <%= content_tag :div, 'RECORD',
@@ -33,7 +33,11 @@
                       data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
     </p>
   <% end %>
+  <div class="field">
+    <%= form.label :upload %>
+    <%= form.file_field :media %>
+  </div>
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit "+" %>
   </div>
 <% end %>

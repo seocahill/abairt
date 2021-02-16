@@ -1,0 +1,6 @@
+<%= form_with(url: dictionary_entries_path, class: "form-inline", method: :get) do |form| %>
+  <div class="field">
+    <%= form.label :search %>
+    <%= form.text_field :search %>
+  </div>
+<% end %>
