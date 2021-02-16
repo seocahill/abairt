@@ -1,5 +1,6 @@
 <p id="notice"><%= notice %></p>
 <h1>Abairt</h1>
+<%= turbo_stream_from "dictionary_entries" %>
 <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
 <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
 <%= form_with(url: dictionary_entries_path, class: "form-inline", method: :get) do |form| %>
@@ -18,7 +19,9 @@
     </tr>
   </thead>
   <tbody id="dictionary_entries">
-    <%= render @dictionary_entries %>
+    <%= turbo_frame_tag "dictionary_entries" do %>
+      <%= render @dictionary_entries %>
+    <% end %>
   </tbody>
 </table>
 <%== pagy_nav(@pagy) %>

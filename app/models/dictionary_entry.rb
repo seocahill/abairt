@@ -4,6 +4,8 @@ require 'csv'
 class DictionaryEntry < ApplicationRecord
   has_one_attached :media
 
+  after_create_commit { broadcast_prepend_to 'dictionary_entries' }
+
   include PgSearch::Model
   pg_search_scope :search_translation, against: :translation, using: { tsearch: { dictionary: 'english' } }
 
@@ -22,6 +24,6 @@ class DictionaryEntry < ApplicationRecord
   end
 
   def media_url
-      Rails.application.routes.url_helpers.rails_blob_path(self.media, only_path: true)
+    Rails.application.routes.url_helpers.rails_blob_path(media, only_path: true)
     end
 end
