@@ -24,10 +24,11 @@
 
 /* Style the submit button */
 .form-inline button, div.btn {
-  padding: 10px 20px;
+  padding: 10px 10px;
   background-color: dodgerblue;
   border: 1px solid #ddd;
   color: white;
+  margin-top: 10px;
 }
 
 .form-inline button:hover {
