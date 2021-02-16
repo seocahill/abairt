@@ -63,6 +63,7 @@ class DictionaryEntriesController < ApplicationController
   def destroy
     @dictionary_entry.destroy
     respond_to do |format|
+      format.turbo_stream
       format.html { redirect_to dictionary_entries_url, notice: 'Dictionary entry was successfully destroyed.' }
       format.json { head :no_content }
     end
