@@ -5,7 +5,15 @@
   <% if dictionary_entry.media.attached? && dictionary_entry.media.audio? %>
     <td><%= tag :audio, src: url_for(dictionary_entry.media), controls: true %></td>
   <% end %>
-  <td><%= link_to 'Show', dictionary_entry %></td>
-  <td><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %></td>
+  <%= form_with(model: dictionary_entry, class: "form-inline", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
+  <% end %>
+  <td>
+    <%= content_tag :button, 'RECORD',
+                      class: 'btn btn-primary',
+                      data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
+    <%= content_tag :button, 'STOP',
+                      class: 'btn btn-primary',
+                      data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
+  </td>
   <td><%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete %></td>
 </tr>
