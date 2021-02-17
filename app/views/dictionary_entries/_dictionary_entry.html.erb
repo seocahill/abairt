@@ -5,16 +5,5 @@
   <% if dictionary_entry.media.attached? && dictionary_entry.media.audio? %>
     <td><%= tag :audio, src: url_for(dictionary_entry.media), controls: true %></td>
   <% end %>
-  <%= form_with(model: dictionary_entry, class: "form-inline", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
-    <%= content_tag :td, data: { controller: 'recorder' } do %>
-      <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-      <%= content_tag :div, 'RECORD',
-                        class: 'btn btn-primary',
-                        data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
-      <%= content_tag :div, 'STOP',
-                        class: 'btn btn-primary',
-                        data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
-    <% end %>
-  <% end %>
   <td><%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete %></td>
 </tr>
