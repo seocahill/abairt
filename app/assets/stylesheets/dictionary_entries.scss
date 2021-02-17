@@ -31,8 +31,20 @@
   margin-top: 10px;
 }
 
-.form-inline button:hover {
-  background-color: royalblue;
+// .form-inline button:hover {
+//   background-color: rgb(225, 65, 132);
+// }
+
+.form-inline .field {
+  margin-right: 10px;
+}
+
+.form-inline .btn-record {
+  margin-top: 20px;
+}
+
+.btn-record:hover {
+  background-color: rgb(225, 65, 132);
 }
 
 /* Add responsiveness - display the form controls vertically instead of horizontally on screens that are less than 800px wide */
