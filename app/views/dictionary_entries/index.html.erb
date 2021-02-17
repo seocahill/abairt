@@ -13,9 +13,7 @@
     </tr>
   </thead>
   <tbody id="dictionary_entries">
-    <%= turbo_frame_tag "dictionary_entries" do %>
-      <%= render @dictionary_entries %>
-    <% end %>
+    <%= render @dictionary_entries %>
   </tbody>
 </table>
 <%== pagy_nav(@pagy) %>

@@ -5,6 +5,7 @@ class DictionaryEntry < ApplicationRecord
   has_one_attached :media
 
   after_create_commit { broadcast_prepend_to 'dictionary_entries' }
+  after_destroy_commit { broadcast_remove_to 'dictionary_entries' }
 
   include PgSearch::Model
   pg_search_scope :search_translation, against: :translation, using: { tsearch: { dictionary: 'english' } }
