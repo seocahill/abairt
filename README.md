@@ -12,6 +12,8 @@ A simple application to share, search and download irish sentences, translations
 
 * Postgresql 13 https://www.postgresql.org/
 
+* Redis https://redis.io/
+
 * Docker https://www.docker.com/
 
 * Amazon simple object storage https://aws.amazon.com/s3/
