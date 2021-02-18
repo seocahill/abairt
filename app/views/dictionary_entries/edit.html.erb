@@ -1,6 +1,6 @@
 <h1>Editing Dictionary Entry</h1>
 <%= turbo_frame_tag dom_id(@dictionary_entry) do %>
   <%= render 'form', dictionary_entry: @dictionary_entry %>
+  <%= link_to 'Back', dictionary_entries_path, target: "_top"  %>
 <% end %>
 <%= link_to 'Show', @dictionary_entry %> |
-<%= link_to 'Back', dictionary_entries_path %>
