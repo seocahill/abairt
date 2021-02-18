@@ -5,6 +5,6 @@
   <% if dictionary_entry.media.attached? && dictionary_entry.media.audio? %>
     <td><%= tag :audio, src: url_for(dictionary_entry.media), controls: true %></td>
   <% end %>
-  <td><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %></td>
+  <td><%= turbo_frame_tag dom_id(dictionary_entry) do %><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %><% end %></td>
   <td><%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete %></td>
 </tr>
