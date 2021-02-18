@@ -25,6 +25,8 @@ class DictionaryEntry < ApplicationRecord
   end
 
   def media_url
+    return '' unless media.attached?
+
     Rails.application.routes.url_helpers.rails_blob_path(media, only_path: true)
-    end
+  end
 end
