@@ -2,7 +2,7 @@
   <td><%= dictionary_entry.word_or_phrase %></td>
   <td><%= dictionary_entry.translation %></td>
   <td><%= dictionary_entry.notes %></td>
-  <% if dictionary_entry.media.attached? && dictionary_entry.media.audio? %>
+  <% if dictionary_entry.media.attached? && (dictionary_entry.media.audio? ||  dictionary_entry.media.video?) %>
     <td><%= tag :audio, src: url_for(dictionary_entry.media), controls: true %></td>
   <% end %>
   <td><%= turbo_frame_tag dom_id(dictionary_entry) do %><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %><% end %></td>
