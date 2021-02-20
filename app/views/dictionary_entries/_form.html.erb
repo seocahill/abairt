@@ -1,4 +1,4 @@
-<%= form_with(model: dictionary_entry, class: "form-inline", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
+<%= form_with(model: dictionary_entry, class: "container form-inline", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
   <% if dictionary_entry.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(dictionary_entry.errors.count, "error") %> prohibited this dictionary_entry from being saved:</h2>

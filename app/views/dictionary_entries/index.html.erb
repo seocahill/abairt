@@ -3,19 +3,19 @@
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
 <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
-<table>
-  <thead>
-    <tr>
-      <th>Word or phrase</th>
-      <th>Translation</th>
-      <th>Notes</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-  <tbody id="dictionary_entries">
+<div class="data-table">
+  <div class="theader container">
+    <div><b>Word or phrase</b></div>
+    <div><b>Translation</b></div>
+    <div><b>Notes</b></div>
+    <div><b>Media</b></div>
+    <div></div>
+    <div></div>
+  </div>
+  <div id="dictionary_entries">
     <%= render @dictionary_entries %>
-  </tbody>
-</table>
+  </div>
+</div>
 <%== pagy_nav(@pagy) %>
 <br>
 <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>

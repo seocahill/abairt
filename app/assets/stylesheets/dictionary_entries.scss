@@ -3,8 +3,6 @@
 // You can use Sass (SCSS) here: https://sass-lang.com/
  /* Style the form - display items horizontally */
 .form-inline {
-  display: flex;
-  flex-flow: row wrap;
   align-items: center;
 }
 
@@ -47,18 +45,14 @@
   background-color: rgb(225, 65, 132);
 }
 
-/* Add responsiveness - display the form controls vertically instead of horizontally on screens that are less than 800px wide */
-@media (max-width: 800px) {
-  .form-inline input {
-    margin: 10px 0;
-  }
-
-  .form-inline {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
 .hidden {
    display: none;
  }
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  grid-auto-rows: minmax(25px, auto);
+}
+
