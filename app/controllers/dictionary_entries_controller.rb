@@ -8,8 +8,8 @@ class DictionaryEntriesController < ApplicationController
     records = if params[:search].present?
                 DictionaryEntry.search_translation(params[:search])
               else
-                DictionaryEntry.all
-                          end
+                DictionaryEntry.order('id DESC')
+              end
 
     @pagy, @dictionary_entries = pagy(records)
 
