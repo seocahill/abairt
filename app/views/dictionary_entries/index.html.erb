@@ -2,7 +2,9 @@
 <h1>Abairt</h1>
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
-<%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
+<% if current_user %>
+  <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
+<% end %>
 <div class="data-table">
   <div class="theader container">
     <div><b>Word or phrase</b></div>
