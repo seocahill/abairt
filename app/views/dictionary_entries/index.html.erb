@@ -1,8 +1,9 @@
 <p id="notice"><%= notice %></p>
 <h1>Abairt</h1>
+<%= link_to current_user.email, user_path(current_user) if current_user %>
 <%=
    link_to_if(current_user.nil?, "Login", { controller: "sessions", action: "new" }) do
-     button_to "Log out", logout_path, method: :delete, class: "link"
+    button_to "Log out", logout_path, method: :delete, class: "link"
    end
 %>
 <%= render "search" %>
