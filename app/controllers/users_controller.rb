@@ -60,7 +60,7 @@ class UsersController < ApplicationController
   private
 
   def authorize
-    return if current_user.id.to_s == params[:id].to_s
+    return if current_user && (current_user.id.to_s == params[:id].to_s)
 
     redirect_to root_path
   end
