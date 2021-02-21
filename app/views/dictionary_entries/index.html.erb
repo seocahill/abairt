@@ -1,5 +1,10 @@
 <p id="notice"><%= notice %></p>
 <h1>Abairt</h1>
+<%=
+   link_to_if(@current_user.nil?, "Login", { controller: "sessions", action: "new" }) do
+     link_to(@current_user.login, { controller: "accounts", action: "show", id: @current_user })
+   end
+%>
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
 <% if current_user %>
