@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :rangs
   resources :users
   get 'login', to: 'sessions#new'
   post 'login', to: 'sessions#create'
