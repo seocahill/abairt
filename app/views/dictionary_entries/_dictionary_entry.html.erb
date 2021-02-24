@@ -7,7 +7,7 @@
       <%= tag :audio, src: url_for(dictionary_entry.media), controls: true, preload: :none %>
     <% end %>
   </div>
-  <% if current_user %>
+  <% if current_user_can_edit %>
     <div class="cell"><%= link_to 'Edit', edit_dictionary_entry_path(dictionary_entry) %></div>
     <div class="cell"><%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete %></div>
   <% end %>
