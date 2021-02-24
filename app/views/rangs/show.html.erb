@@ -7,10 +7,10 @@
   <%= link_to 'Edit', edit_rang_path(@rang) %> |
   <%= link_to 'Back', rangs_path %>
 </p>
+<%= turbo_stream_from "dictionary_entries" %>
+<% if current_user %>
+  <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
+<% end %>
 <div id="dictionary_entries">
   <%= render @rang.dictionary_entries %>
 </div>
-<%= turbo_stream_from "dictionary_entries" %>
-<% if current_user %>
-  <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
-<% end %>
