@@ -4,7 +4,7 @@
   <%= @rang.name %> <%= @rang.created_at.to_s(:short) %>
 </p>
 <p>
-  <% if is_rang_admin %>
+  <% if current_user %>
     <%= link_to 'Edit', edit_rang_path(@rang)%> |
   <% end %>
   <%= link_to 'Back', rangs_path %>
