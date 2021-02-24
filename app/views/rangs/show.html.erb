@@ -1,7 +1,7 @@
 <p id="notice"><%= notice %></p>
 <p>
   <strong>Name:</strong>
-  <%= @rang.name %>
+  <%= @rang.name %> <%= @rang.created_at.to_s(:short) %>
 </p>
 <p>
   <%= link_to 'Edit', edit_rang_path(@rang) %> |
