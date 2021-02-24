@@ -36,7 +36,7 @@ class DictionaryEntriesController < ApplicationController
     @rang.dictionary_entries.create!(dictionary_entry_params)
 
     respond_to do |format|
-      format.turbo_stream
+      # format.turbo_stream
       format.html { redirect_to @rang, notice: 'Dictionary entry was successfully created.' }
     end
   end
