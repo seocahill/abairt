@@ -1,9 +1,13 @@
 <p id="notice"><%= notice %></p>
-
 <p>
   <strong>Name:</strong>
   <%= @rang.name %>
 </p>
-
-<%= link_to 'Edit', edit_rang_path(@rang) %> |
-<%= link_to 'Back', rangs_path %>
+<p>
+  <%= link_to 'Edit', edit_rang_path(@rang) %> |
+  <%= link_to 'Back', rangs_path %>
+</p>
+<div id="dictionary_entries">
+  <%= render @rang.dictionary_entries %>
+</div>
+<%= link_to "New entry", new_rang_dictionary_entry_path(@rang) %>
