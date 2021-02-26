@@ -36,21 +36,17 @@ class DictionaryEntriesController < ApplicationController
     @rang.dictionary_entries.create!(dictionary_entry_params)
 
     respond_to do |format|
-      # format.turbo_stream
+      format.turbo_stream
       format.html { redirect_to @rang, notice: 'Dictionary entry was successfully created.' }
     end
   end
 
   # PATCH/PUT /dictionary_entries/1 or /dictionary_entries/1.json
   def update
+    @dictionary_entry.update(dictionary_entry_params)
+    @rang = Rang.find(params[:id])
     respond_to do |format|
-      if @dictionary_entry.update(dictionary_entry_params)
-        format.html { redirect_to @dictionary_entry, notice: 'Dictionary entry was successfully updated.' }
-        format.json { render :show, status: :ok, location: @dictionary_entry }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @dictionary_entry.errors, status: :unprocessable_entity }
-      end
+      format.html { redirect_to @rang, notice: 'Dictionary entry was successfully updated.' }
     end
   end
 
