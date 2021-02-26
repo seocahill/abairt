@@ -6,8 +6,8 @@ class DictionaryEntry < ApplicationRecord
   has_many :rang_entries, dependent: :destroy
   has_many :rangs, through: :rang_entries
 
-  after_create_commit { broadcast_prepend_to('dictionary_entries', locals: { current_user: User.first, dictionary_entry: self }) }
-  after_update_commit { broadcast_replace_later_to('dictionary_entries', locals: { current_user: User.first, dictionary_entry: self }) }
+  after_create_commit { broadcast_prepend_to 'dictionary_entries' }
+  after_update_commit { broadcast_replace_later_to 'dictionary_entries' }
   after_destroy_commit { broadcast_remove_to 'dictionary_entries' }
 
   include PgSearch::Model

@@ -2,6 +2,8 @@
 
 class ApplicationController < ActionController::Base
   include Pagy::Backend
+  include Authentication
+  include SetCurrentRequestDetails
 
   helper_method :current_user
 

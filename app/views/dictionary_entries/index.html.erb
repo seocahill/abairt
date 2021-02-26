@@ -1,5 +1,5 @@
 <p id="notice"><%= notice %></p>
-<h1>Abairt</h1>
+<h1><a href="/">Abairt</a></h1>
 <nav>
   <% if current_user %>
     <li><%= link_to current_user.email, user_path(current_user) %></li>
@@ -15,9 +15,6 @@
 </nav>
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
-<% if current_user %>
-  <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
-<% end %>
 <div class="data-table">
   <div class="theader container">
     <div><b>Word or phrase</b></div>

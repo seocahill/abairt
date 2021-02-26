@@ -1,7 +1,7 @@
 <%= turbo_frame_tag dom_id(dictionary_entry), class: "container" do %>
   <div class="cell"><%= dictionary_entry.word_or_phrase %></div>
   <div class="cell"><%= dictionary_entry.translation %></div>
-  <div class="cell"><%= dictionary_entry.notes %> <%= current_user.id %></div>
+  <div class="cell"><%= dictionary_entry.notes %></div>
   <div class="cell">
     <% if dictionary_entry.media.attached? && (dictionary_entry.media.audio? ||  dictionary_entry.media.video?) %>
       <%= tag :audio, src: url_for(dictionary_entry.media), controls: true, preload: :none %>
