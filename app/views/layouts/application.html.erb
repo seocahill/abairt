@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
+    <%= stylesheet_link_tag "inter-font" %>
+    <%= stylesheet_link_tag "tailwind" %>
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= stimulus_include_tags %>
     <%= javascript_include_tag "turbo", type: "module-shim" %>
     <%= yield :head %>
   </head>
-
   <body>
-    <%= yield %>
+    <main class="md:container md:mx-auto"><%= yield %></main>
   </body>
 </html>
