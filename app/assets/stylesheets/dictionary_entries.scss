@@ -1,58 +1,58 @@
-// Place all the styles related to the dictionary_entries controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: https://sass-lang.com/
- /* Style the form - display items horizontally */
-.form-inline {
-  align-items: center;
-}
+// // Place all the styles related to the dictionary_entries controller here.
+// // They will automatically be included in application.css.
+// // You can use Sass (SCSS) here: https://sass-lang.com/
+//  /* Style the form - display items horizontally */
+// .form-inline {
+//   align-items: center;
+// }
 
-/* Add some margins for each label */
-.form-inline label {
-  margin: 5px 10px 5px 0;
-}
+// /* Add some margins for each label */
+// .form-inline label {
+//   margin: 5px 10px 5px 0;
+// }
 
-/* Style the input fields */
-.form-inline input {
-  vertical-align: middle;
-  margin: 5px 10px 5px 0;
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-}
+// /* Style the input fields */
+// .form-inline input {
+//   vertical-align: middle;
+//   margin: 5px 10px 5px 0;
+//   padding: 10px;
+//   background-color: #fff;
+//   border: 1px solid #ddd;
+// }
 
-/* Style the submit button */
-.form-inline button, div.btn {
-  padding: 10px 10px;
-  background-color: dodgerblue;
-  border: 1px solid #ddd;
-  color: white;
-  margin-top: 10px;
-}
+// /* Style the submit button */
+// .form-inline button, div.btn {
+//   padding: 10px 10px;
+//   background-color: dodgerblue;
+//   border: 1px solid #ddd;
+//   color: white;
+//   margin-top: 10px;
+// }
 
-// .form-inline button:hover {
+// // .form-inline button:hover {
+// //   background-color: rgb(225, 65, 132);
+// // }
+
+// .form-inline .field {
+//   margin-right: 10px;
+// }
+
+// .form-inline .btn-record {
+//   margin-top: 20px;
+// }
+
+// .btn-record:hover {
 //   background-color: rgb(225, 65, 132);
 // }
 
-.form-inline .field {
-  margin-right: 10px;
-}
+// .hidden {
+//    display: none;
+//  }
 
-.form-inline .btn-record {
-  margin-top: 20px;
-}
-
-.btn-record:hover {
-  background-color: rgb(225, 65, 132);
-}
-
-.hidden {
-   display: none;
- }
-
-.container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
-  grid-auto-rows: minmax(25px, auto);
-}
+// // .container {
+// //   display: grid;
+// //   grid-template-columns: repeat(6, 1fr);
+// //   gap: 10px;
+// //   grid-auto-rows: minmax(25px, auto);
+// // }
 
