@@ -14,7 +14,7 @@
     <%= render @rang.dictionary_entries %>
   </div>
 <% else %>
-  <%= turbo_stream_from "current_user_dictionary_entries" %>
+  <%= turbo_stream_from "dictionary_entries" %>
   <div id="dictionary_entries">
     <%= render @rang.dictionary_entries %>
   </div>
