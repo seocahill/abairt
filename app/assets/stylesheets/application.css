@@ -13,3 +13,18 @@
  *= require_tree .
  *= require_self
  */
+
+ nav > li {
+  display: inline;
+}
+
+.link{
+   background: none;
+   border: none;
+   /* color: red */
+}
+
+.link:hover{
+   background: none;
+   text-decoration: underline;
+}

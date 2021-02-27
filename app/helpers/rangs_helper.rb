@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-module ApplicationHelper
-  include Pagy::Frontend
-
+module RangsHelper
   def current_user_can_edit
-    current_user
+    current_user&.rangs&.include?(@rang)
   end
 end

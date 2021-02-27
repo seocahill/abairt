@@ -1,0 +1,27 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Rangs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @rangs.each do |rang| %>
+      <tr>
+        <td><%= rang.name %></td>
+        <td><%= link_to 'Show', rang %></td>
+        <td><%= link_to 'Edit', edit_rang_path(rang) %></td>
+        <td><%= link_to 'Destroy', rang, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Rang', new_rang_path %>

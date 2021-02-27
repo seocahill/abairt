@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+<h1><a href="/">Abairt</a></h1>
+<p>
+  <strong>Name:</strong>
+  <%= @rang.name %> <%= @rang.created_at.to_s(:short) %>
+</p>
+<p>
+  <%= link_to 'Edit', edit_rang_path(@rang) %> |
+  <%= link_to 'Back', rangs_path %>
+</p>
+<% if current_user %>
+  <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
+  <div id="current_user_dictionary_entries">
+    <%= render @rang.dictionary_entries %>
+  </div>
+<% else %>
+  <%= turbo_stream_from "dictionary_entries" %>
+  <div id="dictionary_entries">
+    <%= render @rang.dictionary_entries %>
+  </div>
+<% end %>
