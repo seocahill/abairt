@@ -1,16 +1,20 @@
 <p id="notice"><%= notice %></p>
-<h1>Abairt</h1>
-<%= link_to current_user.email, user_path(current_user) if current_user %>
-<%=
-   link_to_if(current_user.nil?, "Login", { controller: "sessions", action: "new" }) do
-    button_to "Log out", logout_path, method: :delete, class: "link"
-   end
-%>
+<h1><a href="/">Abairt</a></h1>
+<nav>
+  <% if current_user %>
+    <li><%= link_to current_user.email, user_path(current_user) %></li>
+    <li><%= link_to "New rang", new_rang_path %></li>
+  <% end %>
+  <li>
+    <%=
+    link_to_if(current_user.nil?, "Login", { controller: "sessions", action: "new" }) do
+      button_to "Log out", logout_path, method: :delete, class: "link"
+    end
+  %>
+  </li>
+</nav>
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
-<% if current_user %>
-  <%= turbo_frame_tag "new_dictionary_entry", src: new_dictionary_entry_path, target: "_top" %>
-<% end %>
 <div class="data-table">
   <div class="theader container">
     <div><b>Word or phrase</b></div>

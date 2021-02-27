@@ -1,2 +1,3 @@
-<%#= turbo_stream.prepend "dictionary_entries", @dictionary_entry %>
-<%# return now handled by cable %>
+<%= turbo_stream.prepend "current_user_dictionary_entries" do %>
+  <%= render partial: "dictionary_entry", locals: { dictionary_entry: @dictionary_entry, current_user: current_user } %>
+<% end %>
