@@ -7,6 +7,9 @@
   <strong>Name:</strong>
   <%= @user.name %>
 </p>
+<p>
+  <%= link_to "Add new rang", new_rang_path %>
+</p>
 <h3>Your rangs:</h3>
 <ul>
   <%= render @user.rangs %>
