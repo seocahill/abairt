@@ -2,8 +2,7 @@
 <h1><a href="/">Abairt</a></h1>
 <nav>
   <% if current_user %>
-    <li><%= link_to current_user.email, user_path(current_user) %></li>
-    <li><%= link_to "New rang", new_rang_path %></li>
+    <li><%= link_to "Admin", user_path(current_user) %></li>
   <% end %>
   <li>
     <%=
