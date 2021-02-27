@@ -33,11 +33,11 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    @rang.dictionary_entries.create!(dictionary_entry_params)
+    @dictionary_entry = @rang.dictionary_entries.create!(dictionary_entry_params)
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_to @rang, notice: 'Dictionary entry was successfully created.' }
+      # format.html { redirect_to @rang, notice: 'Dictionary entry was successfully created.' }
     end
   end
 
