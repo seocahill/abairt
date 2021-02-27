@@ -46,6 +46,7 @@ export default class extends Controller {
           that.hiddenInput.value = blob.signed_id
           that.inputTarget.parentNode.insertBefore(that.hiddenInput, that.inputTarget.nextSibling)
         })
+        that._stream = null;
       }
     }
     return this._recorder
