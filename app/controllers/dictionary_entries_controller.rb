@@ -44,9 +44,8 @@ class DictionaryEntriesController < ApplicationController
   # PATCH/PUT /dictionary_entries/1 or /dictionary_entries/1.json
   def update
     @dictionary_entry.update(dictionary_entry_params)
-    @rang = Rang.find(params[:id])
     respond_to do |format|
-      format.html { redirect_to @rang, notice: 'Dictionary entry was successfully updated.' }
+      format.turbo_stream
     end
   end
 
