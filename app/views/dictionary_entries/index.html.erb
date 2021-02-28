@@ -1,31 +1,19 @@
-<p id="notice"><%= notice %></p>
-<h1><a href="/">Abairt</a></h1>
-<nav>
-  <% if current_user %>
-    <li><%= link_to "Admin", user_path(current_user) %></li>
-  <% end %>
-  <li>
-    <%=
-    link_to_if(current_user.nil?, "Login", { controller: "sessions", action: "new" }) do
-      button_to "Log out", logout_path, method: :delete, class: "link"
-    end
-  %>
-  </li>
-</nav>
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
-<div class="data-table">
-  <div class="theader container">
-    <div><b>Word or phrase</b></div>
-    <div><b>Translation</b></div>
-    <div><b>Notes</b></div>
-    <div><b>Media</b></div>
-    <div></div>
-    <div></div>
+<div class="table w-full">
+  <div class="table-header-group">
+    <div class="table-row"></div>
+    <div class="table-cell"><b>Word or phrase</b></div>
+    <div class="table-cell"><b>Translation</b></div>
+    <div class="table-cell"><b>Notes</b></div>
+    <div class="table-cell"><b>Media</b></div>
+    <div class="table-cell"></div>
+    <div class="table-cell"></div>
   </div>
-  <div id="dictionary_entries">
-    <%= render @dictionary_entries %>
-  </div>
+</div>
+<div id="dictionary_entries" class="table-row-group">
+  <%= render @dictionary_entries %>
+</div>
 </div>
 <%== pagy_nav(@pagy) %>
 <br>
