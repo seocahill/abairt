@@ -1,10 +1,8 @@
 <p>
   <strong>Name:</strong>
-  <%= @rang.name %> <%= @rang.created_at.to_s(:short) %>
-</p>
-<p>
-  <%= link_to 'Edit', edit_rang_path(@rang) %> |
+  <%= @rang.name %> <%= @rang.created_at.to_s(:short) %> |
   <%= link_to 'Back', rangs_path %>
+  <%= link_to 'Edit', edit_rang_path(@rang) if current_user %>
 </p>
 <% if current_user %>
   <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
