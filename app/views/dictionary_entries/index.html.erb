@@ -2,19 +2,20 @@
 <%= turbo_stream_from "dictionary_entries" %>
 <div class="table w-full">
   <div class="table-header-group">
-    <div class="table-row"></div>
-    <div class="table-cell"><b>Word or phrase</b></div>
-    <div class="table-cell"><b>Translation</b></div>
-    <div class="table-cell"><b>Notes</b></div>
-    <div class="table-cell"><b>Media</b></div>
-    <div class="table-cell"></div>
-    <div class="table-cell"></div>
+    <div class="table-row">
+      <div class="table-cell"><b>Word or phrase</b></div>
+      <div class="table-cell"><b>Translation</b></div>
+      <div class="table-cell"><b>Notes</b></div>
+      <div class="table-cell"><b>Media</b></div>
+      <div class="table-cell"></div>
+      <div class="table-cell"></div>
+    </div>
   </div>
 </div>
 <div id="dictionary_entries" class="table-row-group">
   <%= render @dictionary_entries %>
 </div>
+<div class="table-footer-group">
+  <%== pagy_nav(@pagy) %>
+  <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
 </div>
-<%== pagy_nav(@pagy) %>
-<br>
-<%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
