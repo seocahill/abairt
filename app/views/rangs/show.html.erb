@@ -1,13 +1,18 @@
-<p>
-  <strong>Name:</strong>
-  <%= @rang.name %> <%= @rang.created_at.to_s(:short) %> |
-  <%= link_to 'Back', rangs_path %>
-  <%= link_to 'Edit', edit_rang_path(@rang) if current_user %>
-</p>
-<% if current_user %>
-  <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
-<% end %>
-<div class="table w-full">
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Rang: <%= @rang.name %>
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      created <%= @rang.created_at.to_s(:short) %>
+      <%= link_to 'Edit rang', edit_rang_path(@rang) if current_user %>
+    </p>
+    <% if current_user %>
+      <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
+    <% end %>
+  </div>
+</div>
+<div class="table w-full mt-10">
   <div class="table-header-group">
     <div class="table-row">
       <div class="table-cell"><b>Word or phrase</b></div>
