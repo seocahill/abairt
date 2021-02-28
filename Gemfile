@@ -58,3 +58,5 @@ gem "pg_search", "~> 2.3"
 gem "pagy", "~> 3.10"
 
 gem "aws-sdk-s3", "~> 1.88"
+
+gem "tailwindcss-rails", "~> 0.3.3"

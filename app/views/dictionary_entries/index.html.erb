@@ -1,32 +1,29 @@
-<p id="notice"><%= notice %></p>
-<h1><a href="/">Abairt</a></h1>
-<nav>
-  <% if current_user %>
-    <li><%= link_to "Admin", user_path(current_user) %></li>
-  <% end %>
-  <li>
-    <%=
-    link_to_if(current_user.nil?, "Login", { controller: "sessions", action: "new" }) do
-      button_to "Log out", logout_path, method: :delete, class: "link"
-    end
-  %>
-  </li>
-</nav>
 <%= render "search" %>
 <%= turbo_stream_from "dictionary_entries" %>
-<div class="data-table">
-  <div class="theader container">
-    <div><b>Word or phrase</b></div>
-    <div><b>Translation</b></div>
-    <div><b>Notes</b></div>
-    <div><b>Media</b></div>
-    <div></div>
-    <div></div>
-  </div>
-  <div id="dictionary_entries">
-    <%= render @dictionary_entries %>
+<div class="flex flex-col">
+  <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <div class="table min-w-full divide-y divide-gray-200">
+          <div class="table-header-group bg-gray-50">
+            <div class="table-row">
+              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Word or phrase</b></div>
+              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Translation</b></div>
+              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Notes</b></div>
+              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Media</b></div>
+              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></div>
+              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></div>
+            </div>
+          </div>
+          <div id="dictionary_entries" class="table-row-group bg-white divide-y divide-gray-200">
+            <%= render @dictionary_entries %>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<%== pagy_nav(@pagy) %>
-<br>
-<%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
+<div class="footer">
+  <%== pagy_nav(@pagy) %>
+  <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
+</div>

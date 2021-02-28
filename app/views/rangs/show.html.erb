@@ -1,21 +1,36 @@
-<p id="notice"><%= notice %></p>
-<h1><a href="/">Abairt</a></h1>
-<p>
-  <strong>Name:</strong>
-  <%= @rang.name %> <%= @rang.created_at.to_s(:short) %>
-</p>
-<p>
-  <%= link_to 'Edit', edit_rang_path(@rang) %> |
-  <%= link_to 'Back', rangs_path %>
-</p>
-<% if current_user %>
-  <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
-  <div id="current_user_dictionary_entries">
-    <%= render @rang.dictionary_entries %>
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Rang: <%= @rang.name %>
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      created <%= @rang.created_at.to_s(:short) %>
+      <%= link_to 'Edit rang', edit_rang_path(@rang) if current_user %>
+    </p>
+    <% if current_user %>
+      <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
+    <% end %>
   </div>
-<% else %>
-  <%= turbo_stream_from "dictionary_entries" %>
-  <div id="dictionary_entries">
-    <%= render @rang.dictionary_entries %>
+</div>
+<div class="table w-full mt-10">
+  <div class="table-header-group">
+    <div class="table-row">
+      <div class="table-cell"><b>Word or phrase</b></div>
+      <div class="table-cell"><b>Translation</b></div>
+      <div class="table-cell"><b>Notes</b></div>
+      <div class="table-cell"><b>Media</b></div>
+      <div class="table-cell"></div>
+      <div class="table-cell"></div>
+    </div>
   </div>
-<% end %>
+  <% if current_user %>
+    <div id="current_user_dictionary_entries" class="table-row-group">
+      <%= render @rang.dictionary_entries %>
+    </div>
+  <% else %>
+    <%= turbo_stream_from "dictionary_entries" %>
+    <div id="dictionary_entries" class="table-row-group">
+      <%= render @rang.dictionary_entries %>
+    </div>
+  <% end %>
+</div>
