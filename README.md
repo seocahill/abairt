@@ -8,6 +8,8 @@ A simple application to share, search and download irish sentences, translations
 
 * Rails 6.1 https://guides.rubyonrails.org/index.html
 
+* Tailwind CSS 2.x https://tailwindcss.com/
+
 * Hotwire https://hotwire.dev/
 
 * Postgresql 13 https://www.postgresql.org/
