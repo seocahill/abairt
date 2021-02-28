@@ -11,11 +11,11 @@
       <div class="table-cell"></div>
     </div>
   </div>
-</div>
-<div id="dictionary_entries" class="table-row-group">
-  <%= render @dictionary_entries %>
-</div>
-<div class="table-footer-group">
-  <%== pagy_nav(@pagy) %>
-  <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
+  <div id="dictionary_entries" class="table-row-group">
+    <%= render @dictionary_entries %>
+  </div>
+  <div class="table-footer-group">
+    <%== pagy_nav(@pagy) %>
+    <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
+  </div>
 </div>
