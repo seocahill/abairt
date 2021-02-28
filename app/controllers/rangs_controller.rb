@@ -2,11 +2,11 @@
 
 class RangsController < ApplicationController
   before_action :set_rang, only: %i[show edit update destroy]
-  before_action :authorize, except: %i[show]
+  before_action :authorize, except: %i[show index]
 
   # GET /rangs or /rangs.json
   def index
-    @rangs = current_user.rangs.all
+    @rangs = Rang.all
   end
 
   # GET /rangs/1 or /rangs/1.json
