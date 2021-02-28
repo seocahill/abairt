@@ -24,7 +24,7 @@
     </div>
     <%= content_tag :div, data: { controller: 'recorder' }, class: "" do %>
       <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-      <%= content_tag :div, "Record",
+      <%= content_tag :div, "Record voice",
                         class: 'bg-blue-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
                         data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
       <%= content_tag :div, "Stop",
