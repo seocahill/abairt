@@ -22,6 +22,8 @@ A simple application to share, search and download irish sentences, translations
 
 * Deployed on Heroku PAAS https://www.heroku.com/
 
+* bug tracking https://sentry.io/organizations/seo-cahill/issues/?project=5656899
+
 ## Development setup
 
 * install docker and start the daemon
