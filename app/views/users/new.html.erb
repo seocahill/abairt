@@ -1,5 +1,13 @@
-<h1>New User</h1>
-
-<%= render 'form', user: @user %>
-
-<%= link_to 'Back', users_path %>
+<div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">New User</h2>
+      <%= render 'form', user: @user %>
+      <div class="flex items-center justify-between mt-10">
+        <div class="text-sm">
+          <%= link_to 'Back', users_path %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
