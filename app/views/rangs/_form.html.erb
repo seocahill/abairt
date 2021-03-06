@@ -13,6 +13,10 @@
     <%= form.label :name %>
     <%= form.text_field :name %>
   </div>
+  <div class="field">
+    <%= form.label :media, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.file_field :media, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" %>
+  </div>
   <div class="actions">
     <%= form.submit %>
   </div>
