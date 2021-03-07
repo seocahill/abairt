@@ -9,7 +9,7 @@ class DictionaryEntriesController < ApplicationController
     records = if params[:search].present?
                 DictionaryEntry.search_translation(params[:search])
               else
-                DictionaryEntry.order('id DESC')
+                DictionaryEntry.where.not("(word_or_phrase <> '') IS NOT TRUE").order('id DESC')
               end
 
     @pagy, @dictionary_entries = pagy(records)
