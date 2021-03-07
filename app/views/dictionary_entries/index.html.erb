@@ -11,12 +11,10 @@
               <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Translation</b></div>
               <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Notes</b></div>
               <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Media</b></div>
-              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></div>
-              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></div>
             </div>
           </div>
           <div id="dictionary_entries" class="table-row-group bg-white divide-y divide-gray-200">
-            <%= render @dictionary_entries %>
+            <%= render partial: "dictionary_entry", collection: @dictionary_entries, as: :dictionary_entry, locals: { current_user: nil } %>
           </div>
         </div>
       </div>

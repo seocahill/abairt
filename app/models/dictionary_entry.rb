@@ -13,7 +13,7 @@ class DictionaryEntry < ApplicationRecord
   include PgSearch::Model
   pg_search_scope :search_translation, against: :translation, using: { tsearch: { dictionary: 'english' } }
 
-  validates :word_or_phrase, presence: true, uniqueness: { case_sensitive: false }
+  validates :word_or_phrase, uniqueness: { case_sensitive: false }
 
   class << self
     def to_csv

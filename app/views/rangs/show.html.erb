@@ -6,6 +6,9 @@
     <p class="mt-1 max-w-2xl text-sm text-gray-500">
       created <%= @rang.created_at.to_s(:short) %>
       <%= link_to 'Edit rang', edit_rang_path(@rang) if current_user %>
+      <% if @rang.media.attached? && (@rang.media.audio? ||  @rang.media.video?) %>
+        <%= tag :audio, src: url_for(@rang.media), controls: true, preload: :none, class: 'mt-3' %>
+      <% end %>
     </p>
     <% if current_user %>
       <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
