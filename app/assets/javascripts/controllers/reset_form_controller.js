@@ -2,7 +2,8 @@ import { Controller } from "stimulus"
 
 export default class extends Controller {
   reset() {
-    this.element.elements[5].remove()
+    //Fixme
+    // this.element.elements[4].remove()
     this.element.reset()
   }
 }
