@@ -64,3 +64,7 @@ gem "tailwindcss-rails", "~> 0.3.3"
 gem "sentry-ruby", "~> 4.2"
 
 gem "sentry-rails", "~> 4.2"
+
+gem "pry-rails", "~> 0.3.9"
+
+gem "pry-byebug", "~> 3.8"
