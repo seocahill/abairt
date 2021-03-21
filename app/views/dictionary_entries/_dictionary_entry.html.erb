@@ -1,6 +1,6 @@
 <%= turbo_frame_tag dom_id(dictionary_entry), class: "table-row" do %>
-  <div data-target="rang.cell" class="table-cell px-6 py-4 whitespace-nowrap"><%= dictionary_entry.word_or_phrase %></div>
-  <div class="table-cell px-6 py-4 whitespace-nowrap"><%= dictionary_entry.translation %></div>
+  <div class="table-cell px-6 py-4 whitespace-nowrap"><%= dictionary_entry.word_or_phrase %></div>
+  <div data-target="rang.cell" class="table-cell px-6 py-4 whitespace-nowrap"><%= dictionary_entry.translation %></div>
   <div data-target="rang.cell" class="table-cell px-6 py-4 whitespace-nowrap"><%= dictionary_entry.notes %></div>
   <div data-target="rang.cell" class="table-cell px-6 py-4 whitespace-nowrap">
     <% if dictionary_entry.media.attached? && (dictionary_entry.media.audio? ||  dictionary_entry.media.video?) %>
