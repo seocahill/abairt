@@ -10,6 +10,7 @@ export default class extends Controller {
   upload() {
     const that = this
     const file = this.inputTarget.files[0]
+    this.element.querySelector('.file-name').innerHTML = "Uploading..."
     const url = this.inputTarget.getAttribute('data-direct-upload-url')
     const upload = new DirectUpload(file, url, this)
     upload.create((error, blob) => {
@@ -21,6 +22,7 @@ export default class extends Controller {
         that.hiddenInput.name = that.inputTarget.name
         that.hiddenInput.value = blob.signed_id
         that.inputTarget.parentNode.insertBefore(that.hiddenInput, that.inputTarget.nextSibling)
+        this.inputTarget.value = null
       }
     })
   }
@@ -30,10 +32,14 @@ export default class extends Controller {
   }
 
   directUploadDidProgress(event) {
-    const progress = (event.loaded / event.total) * 100;
+    const progress = Math.round((event.loaded / event.total) * 100);
     console.log('progress is...', progress)
     const root = this.element;
-    root.querySelector('.progress .progress-bar').style.width = `${event.loaded * 100 / event.total}%`;
+    root.querySelector('.progress .progress-bar').style.width = `${progress}%`;
+    root.querySelector('.percentage-uploaded').innerHTML = `${progress}%`;
+    if (progress > 99) {
+      this.element.querySelector('.file-name').innerHTML = `${this.inputTarget.files[0].name} uploaded successfully`;
+    }
   }
 
 }
