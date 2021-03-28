@@ -66,3 +66,5 @@ gem "tailwindcss-rails", "~> 0.3.3"
 gem "sentry-ruby", "~> 4.2"
 
 gem "sentry-rails", "~> 4.2"
+
+gem "rack-cors", "~> 1.1"
