@@ -189,6 +189,7 @@ GEM
       ffi (~> 1.0)
     redis (4.2.1)
     regexp_parser (2.0.3)
+    repetition (2.1.0)
     ruby2_keywords (0.0.4)
     rubyzip (2.3.0)
     sass-rails (6.0.0)
@@ -269,6 +270,7 @@ DEPENDENCIES
   rack-cors (~> 1.1)
   rails (~> 6.1.2)
   redis (~> 4.0)
+  repetition (~> 2.1)
   sass-rails (>= 6)
   selenium-webdriver
   sentry-rails (~> 4.2)
