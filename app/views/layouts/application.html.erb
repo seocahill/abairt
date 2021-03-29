@@ -28,7 +28,10 @@
                   <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
                   <a href=<%= rangs_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Ranganna</a>
                   <a href=<%= users_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Úsáideoirí</a>
-                  <%= link_to 'Mise', user_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" if current_user %>
+                  <%  if current_user  %>
+                    <a href='/ceist'  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Trá na gCeist</a>
+                    <%= link_to 'Mise', user_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <% end %>
                 </div>
               </div>
             </div>

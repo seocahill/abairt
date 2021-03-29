@@ -12,7 +12,8 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   root to: 'dictionary_entries#index'
 
-  post 'ceist', to: 'ceist#new'
+  get 'ceist', to: 'ceist#new'
+  post 'ceist', to: 'ceist#create'
 
   namespace :api do
     namespace :v1 do
