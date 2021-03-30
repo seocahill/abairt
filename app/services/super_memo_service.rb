@@ -12,53 +12,62 @@
 # Find out more here: https://www.supermemo.com/english/ol/sm2.htm
 #
 
-require 'date'
+require "date"
 
 class SuperMemoService
-  attr_reader :easiness_factor, :interval, :repetitions
-  attr_reader :due_at, :due_on
+  def initialize(quality_response, prev_interval = 0, prev_ef = 2.5)
+    @prev_ef = prev_ef
+    @prev_interval = prev_interval
+    @quality_response = quality_response
 
-  def initialize(easiness_factor: 2.5, interval: 0, repetitions: 0)
-    @easiness_factor = easiness_factor
-    @interval = interval
-    @repetitions = repetitions
+    @calculated_interval = nil
+    @calculated_ef = nil
+    @repetition_date = nil
+
+    #if quality_response is below 3 start repetition from the begining, but without changing easiness_factor
+    if @quality_response < 3
+      @calculated_ef = @prev_ef
+      @calculated_interval = 0
+    else
+      calculate_easiness_factor
+      calculate_interval
+    end
+    calculate_date
   end
 
-  def recall(quality)
-    unless (0..5).cover?(quality)
-      raise ArgumentError, 'Invalid quality of recall. Should be in range from 0 to 5.'
-    end
+  def interval
+    @calculated_interval
+  end
 
-    if quality < 3
-      # An incorrect recall is reset back to the beginning
-      @repetitions = 0
-      @interval = 0
-    elsif quality == 3
-      # The item was correctly recalled but should be tested again quickly
-      @interval = 0
-    else
-      # The item was correctly recalled and we can review later on
-      @repetitions += 1
+  def easiness_factor
+    @calculated_ef
+  end
 
-      case @repetitions
-      when 1
-        @interval = 1
-      when 2
-        @interval = 6
-      else
-        @easiness_factor = calculate_easiness_factor(@easiness_factor, quality)
-        @interval *= @easiness_factor
-      end
-    end
-
-    @due_at = DateTime.now + @interval
-    @due_on = Date.today + @interval
+  def next_repetition_date
+    @repetition_date
   end
 
   private
 
-  def calculate_easiness_factor(easiness_factor, quality)
-    result = easiness_factor - 0.8 + (0.28 * quality) - (0.02 * quality * quality)
-    result < 1.3 ? 1.3 : result
+  def calculate_interval
+    if @prev_interval == 0
+      @calculated_interval = 1
+    elsif @prev_interval == 1
+      @calculated_interval = 6
+    else
+      @calculated_interval = (@prev_interval * @prev_ef).to_i
+    end
+  end
+
+  def calculate_easiness_factor
+    @calculated_ef = @prev_ef + (0.1 - (5 - @quality_response) * (0.08 + (5 - @quality_response) * 0.02))
+    if @calculated_ef < 1.3
+      @calculated_ef = 1.3
+    end
+    @calculated_ef
+  end
+
+  def calculate_date
+    @repetition_date = Date.today + @calculated_interval
   end
 end
