@@ -6,11 +6,8 @@ class Api::V1::DictionaryEntriesController < ApplicationController
     rang = Rang.where(user_id: current_user.id, url: params[:url]).first_or_create do |new_rang|
       new_rang.name = "Alt: #{params[:url]}"
     end
-    if rang.dictionary_entries.create(word_or_phrase: params[:text], translation: params[:translation])
-      head :ok
-    else
-      head :unprocessible_entity
-    end
+    rang.dictionary_entries.create(word_or_phrase: params[:text], translation: params[:translation])
+    render json: "{}"
   end
 
   private
