@@ -19,7 +19,7 @@ class CeistController < ApplicationController
       dictionary_entry.update(
         recall_date: super_memo.next_repetition_date,
         previous_inteval: super_memo.interval,
-        previous_inteval: super_memo.easiness_factor,
+        previous_easiness_factor: super_memo.easiness_factor,
       )
     end
     redirect_to ceist_path
