@@ -21,7 +21,7 @@ class CeistController < ApplicationController
         previous_inteval: super_memo.interval,
         previous_inteval: super_memo.easiness_factor,
       )
-      en
+    end
     redirect_to ceist_path
   end
 
