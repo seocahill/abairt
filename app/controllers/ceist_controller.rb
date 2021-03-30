@@ -12,7 +12,7 @@ class CeistController < ApplicationController
 
   def create
     dictionary_entry = DictionaryEntry.find(params[:entry_id])
-    if params[:quality_of_recall].to_i == 5 && @dictionary_entry.next_repetition_date.nil?
+    if params[:quality_of_recall].to_i == 5 && @dictionary_entry.recall_date.nil?
       dictionary_entry.update(committed_to_memory: true)
     else
       super_memo = SuperMemoService.new(params[:quality_of_recall].to_i, dictionary_entry.previous_inteval, dictionary_entry.previous_easiness_factor)
