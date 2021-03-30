@@ -1,24 +1,36 @@
-<h1>Trá na gCeist</h1>
-<p>An chuimhin leat?</p>
 <div class="mt-10 mb-10">
-  <h3>Abairt: "<%= @dictionary_entry.word_or_phrase %>"</h3>
-  <% if @dictionary_entry.media.attached? %>
-    <p><audio controls="true"><%= @dictionary_entry.media %></audio></p>
-  <% end %>
-  <div data-controller="ceist">
-    <h3 data-target="ceist.answer" class="hidden">Freagair: "<%= @dictionary_entry.translation %>"</h3>
-    <button data-action="click->ceist#show" class="bg-blue-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold">Show answer</button>
-  </div>
-  <%= form_with(url: '/ceist', class: "md:grid md:grid-cols-4 md:gap-4", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do %>
-    <div class="">
-      <%= hidden_field_tag :entry_id, @dictionary_entry.id %>
-      <%= submit_tag 'Complete blank', name: :quality_of_recall, value: 0, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
-      <%= submit_tag 'Incorrect answer, but correct one is at least familiar', name: :quality_of_recall, value: 1, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
-      <%= submit_tag 'Incorrect answer but correct one seems quite easy to get next time', name: :quality_of_recall, value: 2, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
-      <%= submit_tag 'Correct but recalled with serious difficulty', name: :quality_of_recall, value: 3, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
-      <%= submit_tag 'Correct with hesitation', name: :quality_of_recall, value: 4, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
-      <%= submit_tag 'Perfect recall', name: :quality_of_recall, value: 5, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+  <% if @dictionary_entry %>
+    <h3>Abairt: "<%= @dictionary_entry.word_or_phrase %>"</h3>
+    <% if @dictionary_entry.media.attached? %>
+      <p>
+        <%= tag :audio, src: url_for(@dictionary_entry.media), controls: true, preload: :none %>
+      </p>
+    <% end %>
+    <div data-controller="ceist">
+      <h3 data-target="ceist.answer" class="hidden">Freagair: "<%= @dictionary_entry.translation %>"</h3>
+      <button data-action="click->ceist#show" class="bg-blue-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold">Taspáin freagair</button>
     </div>
+    <h3>Deacracht</h3>
+    <ul>
+      <li>0: Complete blank</li>
+      <li>1: Incorrect but answer seems familiar</li>
+      <li>2: Incorrect but shoudl be easy next time</li>
+      <li>3: Correct but recalled with serious difficulty</li>
+      <li>4: Correct with hesitation</li>
+      <li>5: Perfect recall</li>
+    </ul>
+    <%= form_with(url: '/ceist', class: "md:grid md:grid-cols-4 md:gap-4", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do %>
+      <div class="">
+        <%= hidden_field_tag :entry_id, @dictionary_entry.id %>
+        <%= submit_tag 'Complete blank', name: :quality_of_recall, value: 0, class: "bg-red-700 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+        <%= submit_tag 'Incorrect answer, but correct one is at least familiar', name: :quality_of_recall, value: 1, class: "bg-red-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+        <%= submit_tag 'Incorrect answer but correct one seems quite easy to get next time', name: :quality_of_recall, value: 2, class: "bg-red-200 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+        <%= submit_tag 'Correct but recalled with serious difficulty', name: :quality_of_recall, value: 3, class: "bg-green-100 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+        <%= submit_tag 'Correct with hesitation', name: :quality_of_recall, value: 4, class: "bg-green-200 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+        <%= submit_tag 'Perfect recall', name: :quality_of_recall, value: 5, class: "bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+      </div>
+    <% end %>
+  <% else %>
+      <h3> Níl dada le déanamh agat!</h3>
   <% end %>
 </div>
-
