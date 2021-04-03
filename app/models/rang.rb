@@ -9,11 +9,11 @@ class Rang < ApplicationRecord
 
   has_one_attached :media
 
-  private
+  # private
 
   def generate_meeting_id
     begin
-      self.token = SecureRandom.hex
+      self.meeting_id = SecureRandom.hex
     end while self.class.exists?(meeting_id: meeting_id)
   end
 end
