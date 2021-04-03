@@ -2,9 +2,10 @@ import { Controller } from "stimulus"
 
 export default class extends Controller {
   static targets = ["cell"]
+  static values = { meetingId: String }
 
-  connect() {
-    // this.startMeeting()
+  initialize() {
+    console.log("meeting id is", this.meetingIdValue)
   }
 
   hide() {
@@ -16,7 +17,7 @@ export default class extends Controller {
   startMeeting() {
     const domain = 'meet.jit.si';
     const options = {
-      roomName: `abairt-${Math.random().toString(16).substr(2, 8)}`,
+      roomName: this.meetingIdValue,
       height: 700,
       parentNode: document.querySelector('#meet')
     };
