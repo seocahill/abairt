@@ -25,6 +25,11 @@ class CeistController < ApplicationController
     redirect_to ceist_path
   end
 
+  def update
+    @dictionary_entry = DictionaryEntry.find(params[:id])
+    @dictionary_entry.ceist!
+  end
+
   private
 
   def authorize

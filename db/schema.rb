@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_04_211139) do
+ActiveRecord::Schema.define(version: 2021_04_05_125825) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 2021_04_04_211139) do
     t.integer "previous_inteval", default: 0, null: false
     t.decimal "previous_easiness_factor", default: "2.5", null: false
     t.boolean "committed_to_memory", default: false, null: false
+    t.integer "status", default: 0, null: false
   end
 
   create_table "rang_entries", force: :cascade do |t|

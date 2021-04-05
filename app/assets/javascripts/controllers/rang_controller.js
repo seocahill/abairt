@@ -2,7 +2,7 @@ import { Controller } from "stimulus"
 import WaveSurfer from 'https://cdn.skypack.dev/wavesurfer.js';
 
 export default class extends Controller {
-  static targets = ["cell"]
+  static targets = ["cell", "dropdown"]
   static values = { meetingId: String, media: String }
 
   connect() {
@@ -38,6 +38,10 @@ export default class extends Controller {
     this.cellTargets.forEach((cellTarget) => {
       cellTarget.classList.toggle("hidden")
     })
+  }
+
+  show() {
+    this.dropdownTarget.classList.toggle("hidden")
   }
 
   play(event) {
