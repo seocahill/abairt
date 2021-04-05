@@ -21,7 +21,7 @@
           <div class="py-1" role="none">
             <%= link_to "Edit", edit_dictionary_entry_path(dictionary_entry), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
             <%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
-            <%= button_to 'Ceist?', ceist_path(dictionary_entry), method: :patch, remote: true, params: { id: dictionary_entry.id }, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
+            <%= button_to 'Ceist?', patch_ceisteanna_path(dictionary_entry.id), method: :patch, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
           </div>
         </div>
       </div>
