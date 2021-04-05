@@ -28,6 +28,11 @@ export default class extends Controller {
     }
   }
 
+  teardown() {
+    this.waveSurfer = null;
+    this.meeting = null;
+  }
+
   hide() {
     this.cellTargets.forEach((cellTarget) => {
       cellTarget.classList.toggle("hidden")
