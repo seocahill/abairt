@@ -27,15 +27,6 @@ export default class extends Controller {
     this.waveSurfer.playPause()
   }
 
-  loadWave() {
-    let ws = WaveSurfer.create({
-      container: '#waveform',
-      waveColor: 'violet',
-      progressColor: 'purple'
-    })
-    ws.load(this.mediaValue);
-  }
-
   startMeeting() {
     const domain = 'meet.jit.si';
     const options = {
@@ -43,6 +34,6 @@ export default class extends Controller {
       height: 700,
       parentNode: document.querySelector('#meet')
     };
-    const api = new JitsiMeetExternalAPI(domain, options);
+    this.meeting = new JitsiMeetExternalAPI(domain, options);
   }
 }
