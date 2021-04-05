@@ -21,7 +21,8 @@
     </div>
   </div>
 </div>
-<div class="footer">
-  <%== pagy_nav(@pagy) %>
-  <%= link_to "Download CSV for anki", dictionary_entries_path(@dictionary_entries, format: :csv) %>
+<div class="container mx-auto px-6 py-8 h-full flex-grow">
+  <div class="flex flex-col sm:flex-row sm:items-center mb-6">
+    <%== pagy_nav(@pagy) %>
+  </div>
 </div>
