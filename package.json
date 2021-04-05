@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.2.0",
+    "@tailwindcss/forms": "^0.2.1",
+    "@tailwindcss/typography": "^0.4.0",
+    "autoprefixer": "^10.2.1",
+    "tailwindcss": "^2.0.2",
+    "tailwindcss-cli": "^0.1.2"
+  },
+  "scripts": {
+    "tailwindcss:build": "tailwindcss-cli build ./app/assets/tailwind/tailwind_custom_base.css -o ./app/assets/stylesheets/tailwind_custom.css"
+  }
+}
