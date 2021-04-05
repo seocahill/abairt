@@ -19,9 +19,12 @@ export default class extends Controller {
         if (progress && progress < 99) {
           playButton.innerHTML = `loading ${progress}%`;
         } else {
-          playButton.innerHTML = "Play / Pause";
+          playButton.innerHTML = "Preparing wave....";
         }
-      });
+      })
+      this.waveSurfer.on('ready', function() {
+        playButton.innerHTML = "Play / Pause"
+      })
     }
   }
 
