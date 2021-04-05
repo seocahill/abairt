@@ -5,15 +5,16 @@ Rails.application.routes.draw do
     resources :dictionary_entries
   end
   resources :users
-  get 'login', to: 'sessions#new'
-  post 'login', to: 'sessions#create'
-  delete 'logout', to: 'sessions#destroy'
+  get "login", to: "sessions#new"
+  post "login", to: "sessions#create"
+  delete "logout", to: "sessions#destroy"
   resources :dictionary_entries
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  root to: 'dictionary_entries#index'
+  root to: "dictionary_entries#index"
 
-  get 'ceist', to: 'ceist#new'
-  post 'ceist', to: 'ceist#create'
+  get "ceist", to: "ceist#new"
+  post "ceist", to: "ceist#create"
+  patch "ceist", to: "ceist#update"
 
   namespace :api do
     namespace :v1 do
