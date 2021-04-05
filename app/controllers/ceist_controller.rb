@@ -1,6 +1,17 @@
 class CeistController < ApplicationController
   before_action :authorize
 
+  # GET /dictionary_entries or /dictionary_entries.json
+  def index
+    records = DictionaryEntry.joins(:rangs).where(rangs: { user_id: current_user.daltaí.pluck(:id) + [current_user.id] }).ceist
+
+    @pagy, @dictionary_entries = pagy(records)
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def new
     @dictionary_entry = DictionaryEntry
       .joins(:rangs)

@@ -30,6 +30,7 @@
                   <a href=<%= rangs_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Ranganna</a>
                   <a href=<%= users_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Úsáideoirí</a>
                   <%  if current_user  %>
+                    <%= link_to 'Ceisteanna', ceisteanna_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
                     <a href='/ceist'  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Trá na gCeist</a>
                     <%= link_to 'Mise', user_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
                   <% end %>

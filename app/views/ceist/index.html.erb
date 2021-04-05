@@ -1,0 +1,21 @@
+<%= turbo_stream_from "dictionary_entries" %>
+<div class="table w-full mt-10">
+    <div class="table-header-group">
+      <div class="table-row">
+        <div class="table-cell"><b>Focal nó abairt</b></div>
+        <div data-target="rang.cell" class="table-cell"><b>Aistriúchán</b></div>
+        <div data-target="rang.cell" class="table-cell"><b>Notaí</b></div>
+        <div data-target="rang.cell" class="table-cell"><b>Meáin</b></div>
+        <div data-target="rang.cell" class="table-cell"></div>
+        <div data-target="rang.cell" class="table-cell"></div>
+      </div>
+    </div>
+    <div id="current_user_dictionary_entries" class="table-row-group">
+      <%= render @dictionary_entries %>
+    </div>
+  </div>
+<div class="container mx-auto px-6 py-8 h-full flex-grow">
+  <div class="flex flex-col sm:flex-row sm:items-center mb-6">
+    <%== pagy_nav(@pagy) %>
+  </div>
+</div>
