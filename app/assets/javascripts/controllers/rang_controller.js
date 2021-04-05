@@ -29,6 +29,7 @@ export default class extends Controller {
   }
 
   teardown() {
+    this.waveSurfer.destroy()
     this.waveSurfer = null;
     this.meeting = null;
   }
