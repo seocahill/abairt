@@ -6,13 +6,22 @@ export default class extends Controller {
   static values = { meetingId: String, media: String }
 
   connect() {
+    let playButton = this.element.querySelector('#play-pause-button');
     if (this.mediaValue) {
       this.waveSurfer = WaveSurfer.create({
         container: '#waveform',
         waveColor: 'violet',
-        progressColor: 'purple'
+        progressColor: 'purple',
+        partialRender: true
       })
       this.waveSurfer.load(this.mediaValue);
+      this.waveSurfer.on('loading', function (progress) {
+        if (progress && progress < 99) {
+          playButton.innerHTML = `loading ${progress}%`;
+        } else {
+          playButton.innerHTML = "Play / Pause";
+        }
+      });
     }
   }
 
