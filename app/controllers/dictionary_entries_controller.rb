@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DictionaryEntriesController < ApplicationController
-  before_action :set_dictionary_entry, only: %i[show edit update destroy]
+  before_action :set_dictionary_entry, only: %i[show edit update destroy update_all]
   before_action :set_rang, only: %i[new create]
 
   # GET /dictionary_entries or /dictionary_entries.json
@@ -43,6 +43,13 @@ class DictionaryEntriesController < ApplicationController
 
   # PATCH/PUT /dictionary_entries/1 or /dictionary_entries/1.json
   def update
+    @dictionary_entry.update(dictionary_entry_params)
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
+  def update_all
     @dictionary_entry.update(dictionary_entry_params)
     respond_to do |format|
       format.turbo_stream
