@@ -1,4 +1,27 @@
 <%= turbo_frame_tag dom_id(@dictionary_entry) do %>
-  <%= render 'form', dictionary_entry: @dictionary_entry %>
-  <%= link_to 'Cancel', :back  %>
+  <%= hidden_field_tag :id, @dictionary_entry.id %>
+  <%= fields_for :dictionary_entry, @dictionary_entry do |form| %>
+    <div class="table-cell px-6 py-4">
+      <%= form.text_area :word_or_phrase, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
+    </div>
+    <div class="table-cell px-6 py-4">
+      <%= form.text_area :translation, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
+    </div>
+    <div class="table-cell px-6 py-4">
+      <%= form.text_area :notes, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
+    </div>
+    <%= content_tag :div, data: { controller: 'recorder' }, class: "table-cell px-6 py-4" do %>
+      <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
+      <%= content_tag :div, "Record voice",
+                        class: 'bg-blue-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                        data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
+      <%= content_tag :div, "Stop",
+                        class: 'bg-red-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                        data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
+    <% end %>
+    <div class="table-cell px-6 py-4">
+      <button class="bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold">Save entry</button>
+      <%= link_to 'Cancel', :back  %>
+    </div>
+  <% end %>
 <% end %>
