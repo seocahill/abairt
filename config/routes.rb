@@ -18,7 +18,7 @@ Rails.application.routes.draw do
 
   get "ceist", to: "ceist#new"
   post "ceist", to: "ceist#create"
-  patch "ceist", to: "ceist#update"
+  patch "/ceisteanna/:id", to: "ceist#update", as: "patch_ceisteanna"
   get "ceisteanna", to: "ceist#index"
 
   namespace :api do

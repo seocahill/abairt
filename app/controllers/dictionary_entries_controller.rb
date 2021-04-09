@@ -33,11 +33,14 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    @dictionary_entry = @rang.dictionary_entries.create!(dictionary_entry_params)
+    @dictionary_entry = @rang.dictionary_entries.new(dictionary_entry_params)
 
     respond_to do |format|
-      format.turbo_stream
-      # format.html { redirect_to @rang, notice: 'Dictionary entry was successfully created.' }
+      if @dictionary_entry.save
+        format.turbo_stream
+      else
+        format.html { render :new, status: :unprocessable_entity }
+      end
     end
   end
 
