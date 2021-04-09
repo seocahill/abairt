@@ -38,7 +38,10 @@ class CeistController < ApplicationController
 
   def update
     @dictionary_entry = DictionaryEntry.find(params[:id])
-    @dictionary_entry.ceist!
+    @dictionary_entry.ceist? ? @dictionary_entry.normal! : @dictionary_entry.ceist!
+    respond_to do |format|
+      format.turbo_stream
+    end
   end
 
   private
