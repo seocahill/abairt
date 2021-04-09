@@ -9,5 +9,8 @@
   },
   "scripts": {
     "tailwindcss:build": "tailwindcss-cli build ./app/assets/tailwind/tailwind_custom_base.css -o ./app/assets/stylesheets/tailwind_custom.css"
+  },
+  "dependencies": {
+    "wavesurfer": "^1.3.4"
   }
 }

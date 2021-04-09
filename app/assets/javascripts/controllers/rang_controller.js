@@ -1,6 +1,4 @@
 import { Controller } from "stimulus"
-import WaveSurfer from 'https://cdn.skypack.dev/wavesurfer.js';
-
 export default class extends Controller {
   static targets = ["cell", "dropdown"]
   static values = { meetingId: String, media: String }
