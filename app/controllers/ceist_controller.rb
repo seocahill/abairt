@@ -19,7 +19,7 @@ class CeistController < ApplicationController
       .where(committed_to_memory: false)
       .where("translation is not null")
       .where("date_trunc('day', recall_date) = date_trunc('day', current_date) OR recall_date IS NULL")
-      .take
+      .sample
   end
 
   def create
