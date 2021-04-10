@@ -23,7 +23,9 @@ export default class extends Controller {
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
     })
-    console.log(response)
+    if (response.ok) {
+      this.element.parentNode.removeChild(this.element);
+    }
   }
 
   play(e) {
