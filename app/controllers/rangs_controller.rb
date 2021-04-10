@@ -6,7 +6,8 @@ class RangsController < ApplicationController
 
   # GET /rangs or /rangs.json
   def index
-    @rangs = Rang.all
+    records = Rang.all
+    @pagy, @rangs = pagy(records)
   end
 
   # GET /rangs/1 or /rangs/1.json
