@@ -4,15 +4,17 @@ export default class extends Controller {
   static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media"]
   static values = { url: String }
 
-  deanta(e) {
+  async deanta(e) {
     e.preventDefault()
     let formData = new FormData()
     formData.append("dictionary_entry[word_or_phrase]", this.abairtTarget.innerText)
     formData.append("dictionary_entry[translation]", this.translationTarget.innerText)
     formData.append("dictionary_entry[notes]", this.notesTarget.innerText)
-    formData.append("dictionary_entry[media]", this.mediaTarget.value)
-    // formData.append("dictionary_entry[status]", "normal")
-    fetch(this.urlValue, {
+    if (this.hasMediaTarget) {
+      formData.append("dictionary_entry[media]", this.mediaTarget.value)
+    }
+    formData.append("dictionary_entry[status]", "normal")
+    let response = await fetch(this.urlValue, {
       body: formData,
       method: 'PATCH',
       credentials: "include",
@@ -21,6 +23,7 @@ export default class extends Controller {
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
     })
+    console.log(response)
   }
 
   play(e) {
