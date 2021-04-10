@@ -4,14 +4,16 @@ export default class extends Controller {
   static targets = ["dropdown"]
 
   connect() {
-    console.log('hello fro entry')
   }
 
   teardown() {
-    console.log('goodby fro entry')
   }
 
   show() {
-    this.dropdownTarget.classList.toggle("hidden")
+    this.dropdownTarget.classList.remove("hidden")
+  }
+
+  hide() {
+    this.dropdownTarget.classList.add("hidden")
   }
 }
