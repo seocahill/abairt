@@ -1,13 +1,17 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = ["dropdown", "audio", "translation"]
+  static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media"]
   static values = { url: String }
 
   deanta(e) {
     e.preventDefault()
     let formData = new FormData()
+    formData.append("dictionary_entry[word_or_phrase]", this.abairtTarget.innerText)
     formData.append("dictionary_entry[translation]", this.translationTarget.innerText)
+    formData.append("dictionary_entry[notes]", this.notesTarget.innerText)
+    formData.append("dictionary_entry[media]", this.mediaTarget.value)
+    // formData.append("dictionary_entry[status]", "normal")
     fetch(this.urlValue, {
       body: formData,
       method: 'PATCH',

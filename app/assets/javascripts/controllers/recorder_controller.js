@@ -46,6 +46,7 @@ export default class extends Controller {
           that.hiddenInput.type = 'hidden'
           that.hiddenInput.name = that.inputTarget.name
           that.hiddenInput.value = blob.signed_id
+          that.hiddenInput.setAttribute("data-target", "entry.media");
           that.inputTarget.parentNode.insertBefore(that.hiddenInput, that.inputTarget.nextSibling)
         })
         that._stream = null;
