@@ -5,7 +5,7 @@ class CeistController < ApplicationController
   def index
     records = DictionaryEntry.joins(:rangs).where(rangs: { user_id: current_user.daltaí.pluck(:id) + [current_user.id] }).ceist
 
-    @pagy, @dictionary_entries = pagy(records)
+    @pagy, @ceisteanna = pagy(records)
 
     respond_to do |format|
       format.html
