@@ -37,6 +37,7 @@ class DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
+        @rang.dictionary_entries << @dictionary_entry
         format.turbo_stream
       else
         format.html { render :new, status: :unprocessable_entity }
