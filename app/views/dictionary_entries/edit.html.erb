@@ -12,12 +12,17 @@
     </div>
     <%= content_tag :div, data: { controller: 'recorder' }, class: "table-cell px-6 py-4" do %>
       <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-      <%= content_tag :div, "Record voice",
-                        class: 'bg-blue-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
-                        data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
-      <%= content_tag :div, "Stop",
-                        class: 'bg-red-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
-                        data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
+      <button data-action="recorder#record" data-target="recorder.recordButton" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow inline-flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        </svg>
+      </button>
+      <button data-action="recorder#stop" data-target="recorder.stopButton" class="bg-white hover:bg-red-100 text-red-800 font-semibold py-2 px-4 border border-red-400 rounded shadow inline-flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+        </svg>
+      </button>
     <% end %>
     <div class="table-cell px-6 py-4">
       <button class="bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold">Save entry</button>
