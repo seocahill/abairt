@@ -20,8 +20,8 @@
         <div data-action="click->entry#show mouseleave->entry#hide" data-target="entry.dropdown" class="hidden origin-top-right absolute right-20 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
           <div class="py-1" role="none">
             <%= link_to "Edit", edit_dictionary_entry_path(dictionary_entry), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
-            <%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete, remote: true, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
             <%= button_to (dictionary_entry.normal? ? "Cur ceist" : "Freagair déanta"), patch_ceisteanna_path(dictionary_entry), method: :patch, remote: true, params: { id: dictionary_entry.id }, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
+            <%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete, remote: true, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
           </div>
         </div>
       </div>
