@@ -8,7 +8,8 @@ export default class extends Controller {
     this.stopButtonTarget.classList.toggle('hidden')
   }
 
-  record() {
+  record(event) {
+    event.preventDefault()
     this.chunks = []
     this.stream().then(stream => {
       this._stream = stream
@@ -17,7 +18,8 @@ export default class extends Controller {
     })
   }
 
-  stop() {
+  stop(event) {
+    event.preventDefault()
     this.flipButtons()
     this.recorder().stop()
   }
