@@ -4,6 +4,6 @@ class SandboxEmailInterceptor
   end
 end
 
-if ENV['SANDBOX'] == true
+if ENV['SANDBOX'] == "true"
   ActionMailer::Base.register_interceptor(SandboxEmailInterceptor)
 end
