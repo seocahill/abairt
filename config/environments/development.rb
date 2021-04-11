@@ -75,14 +75,15 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
-  config.smtp_settings = {
-    :port           => ENV['MAILGUN_SMTP_PORT'],
-    :address        => ENV['MAILGUN_SMTP_SERVER'],
-    :user_name      => ENV['MAILGUN_SMTP_LOGIN'],
-    :password       => ENV['MAILGUN_SMTP_PASSWORD'],
-    :domain         => 'abairt.herokuapp.com',
+  config.action_mailer.smtp_settings = {
+    :user_name      => 'apikey',
+    :password       => ENV['SENDGRID_PASSWORD'],
+    :domain         => 'abairt.com',
+    :address        => 'smtp.sendgrid.net',
+    :port           => 587,
     :authentication => :plain,
+    :enable_starttls_auto => true
   }
   config.delivery_method = :smtp
-  config.action_mailer.default_url_options = { host: "abairt.herokuapp.com" }
+  config.action_mailer.default_url_options = { host: "abairt.com" }
 end
