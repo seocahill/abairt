@@ -48,6 +48,9 @@ export default class extends Controller {
           that.hiddenInput.value = blob.signed_id
           that.hiddenInput.setAttribute("data-target", "entry.media");
           that.inputTarget.parentNode.insertBefore(that.hiddenInput, that.inputTarget.nextSibling)
+          if (that.element.parentNode.querySelector('audio')) {
+            that.element.parentNode.querySelector('audio').setAttribute('src', `/rails/active_storage/blobs/redirect/${blob.signed_id}/audio.ogg`)
+          }
         })
         that._stream = null;
       }
