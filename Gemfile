@@ -40,7 +40,8 @@ group :development do
   gem "listen", "~> 3.3"
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem "spring"
-  gem "dotenv", "~> 2.7"
+  gem "dotenv-rails", "~> 2.7"
+
 end
 
 group :test do
@@ -69,4 +70,5 @@ gem "sentry-ruby", "~> 4.2"
 gem "sentry-rails", "~> 4.2"
 
 gem "rack-cors", "~> 1.1"
+
 
