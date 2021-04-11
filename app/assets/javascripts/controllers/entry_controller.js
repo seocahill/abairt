@@ -1,8 +1,8 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media"]
-  static values = { url: String }
+  static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media", "status"]
+  static values = { url: String, id: Number }
 
   async deanta(e) {
     e.preventDefault()
@@ -17,6 +17,40 @@ export default class extends Controller {
     let response = await fetch(this.urlValue, {
       body: formData,
       method: 'PATCH',
+      credentials: "include",
+      dataType: "script",
+      headers: {
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+      },
+    })
+    if (response.ok) {
+      this.element.parentNode.removeChild(this.element);
+    }
+  }
+
+  async ceist(e, status = "ceist") {
+    e.preventDefault()
+    let formData = new FormData()
+    formData.append("dictionary_entry[status]", status)
+    let response = await fetch(`/dictionary_entries/${this.idValue}`, {
+      body: formData,
+      method: 'PATCH',
+      credentials: "include",
+      dataType: "script",
+      headers: {
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+      },
+    })
+    if (response.ok) {
+      this.statusTarget.innerText = status;
+      this.statusTarget.parentNode.classList.remove('invisible');
+    }
+  }
+
+  async scrios(e) {
+    e.preventDefault()
+    let response = await fetch(`/dictionary_entries/${this.idValue}`, {
+      method: 'DELETE',
       credentials: "include",
       dataType: "script",
       headers: {

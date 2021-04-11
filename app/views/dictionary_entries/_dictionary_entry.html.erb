@@ -1,4 +1,4 @@
-<%= turbo_frame_tag dom_id(dictionary_entry), class: "table-row", data: { controller: "entry"} do %>
+<%= turbo_frame_tag dom_id(dictionary_entry), class: "table-row", data: { controller: "entry", "entry-id-value": dictionary_entry.id } do %>
   <div class="table-cell px-6 py-4"><%= dictionary_entry.word_or_phrase %></div>
   <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.translation %></div>
   <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.notes %></div>
@@ -26,11 +26,20 @@
         <div data-action="click->entry#show mouseleave->entry#hide" data-target="entry.dropdown" class="hidden origin-top-right absolute right-20 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
           <div class="py-1" role="none">
             <%= link_to "Edit", edit_dictionary_entry_path(dictionary_entry), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
-            <%= button_to (dictionary_entry.normal? ? "Cur ceist" : "Freagair déanta"), patch_ceisteanna_path(dictionary_entry), method: :patch, remote: true, params: { id: dictionary_entry.id }, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
-            <%= button_to 'Destroy', dictionary_entry_path(dictionary_entry), method: :delete, remote: true, class: "block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
+            <button data-action="click->entry#ceist" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+              Ceist
+            </button>
+            <button data-action="click->entry#scrios" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+              Scrios
+            </button>
           </div>
         </div>
       </div>
+    </div>
+    <div class="table-cell px-6 py-4 whitespace-nowrap <%= "invisible" if dictionary_entry.normal? %>">
+      <span data-target="entry.status" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-pink-100 text-pink-800">
+        <%= dictionary_entry.status %>
+      </span>
     </div>
   <% end %>
 <% end %>
