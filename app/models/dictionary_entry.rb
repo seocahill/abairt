@@ -7,7 +7,7 @@ class DictionaryEntry < ApplicationRecord
   has_many :rang_entries, dependent: :destroy
   has_many :rangs, through: :rang_entries
 
-  enum status: [:normal, :ceist]
+  enum status: [:normal, :ceist, :foghraíocht]
 
   after_create_commit { broadcast_prepend_to "dictionary_entries" }
   after_update_commit { broadcast_replace_later_to "dictionary_entries" }
