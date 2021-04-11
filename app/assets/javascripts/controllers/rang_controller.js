@@ -1,10 +1,11 @@
 import { Controller } from "stimulus"
 export default class extends Controller {
-  static targets = ["cell", "dropdown"]
+  static targets = ["cell", "dropdown", "time"]
   static values = { meetingId: String, media: String }
 
   connect() {
     let playButton = this.element.querySelector('#play-pause-button');
+    let that = this;
     if (this.mediaValue) {
       this.waveSurfer = WaveSurfer.create({
         container: '#waveform',
@@ -23,7 +24,23 @@ export default class extends Controller {
       this.waveSurfer.on('ready', function() {
         playButton.innerHTML = "Play / Pause"
       })
+      this.waveSurfer.on('audioprocess', function () {
+        if (that.waveSurfer.isPlaying()) {
+          that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+        }
+      })
+      this.waveSurfer.on('seek', function() {
+        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+      })
     }
+  }
+
+  format(n) {
+    let mil_s = String(n % 1000).padStart(3, '0');
+    n = Math.trunc(n / 1000);
+    let sec_s = String(n % 60).padStart(2, '0');
+    n = Math.trunc(n / 60);
+    return String(n) + ' m ' + sec_s + ' s ' + mil_s + ' ms';
   }
 
   teardown() {
