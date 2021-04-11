@@ -29,6 +29,9 @@
             <button data-action="click->entry#ceist" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
               Ceist
             </button>
+            <button data-action="click->entry#foghraíocht" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+              Foghraíocht
+            </button>
             <button data-action="click->entry#scrios" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
               Scrios
             </button>
@@ -37,7 +40,7 @@
       </div>
     </div>
     <div class="table-cell px-6 py-4 whitespace-nowrap <%= "invisible" if dictionary_entry.normal? %>">
-      <span data-target="entry.status" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-pink-100 text-pink-800">
+      <span data-target="entry.status" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-gray-600">
         <%= dictionary_entry.status %>
       </span>
     </div>

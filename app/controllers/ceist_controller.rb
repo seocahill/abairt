@@ -3,7 +3,10 @@ class CeistController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.joins(:rangs).where(rangs: { user_id: current_user.daltaí.pluck(:id) + [current_user.id] }).ceist
+    records = DictionaryEntry
+      .joins(:rangs)
+      .where(rangs: { user_id: current_user.daltaí.pluck(:id) + [current_user.id] })
+      .not_normal
 
     @pagy, @ceisteanna = pagy(records)
 
