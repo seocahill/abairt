@@ -126,9 +126,9 @@ Rails.application.configure do
     :address        => ENV['MAILGUN_SMTP_SERVER'],
     :user_name      => ENV['MAILGUN_SMTP_LOGIN'],
     :password       => ENV['MAILGUN_SMTP_PASSWORD'],
-    :domain         => 'abairt.heroku.com',
+    :domain         => 'abairt.herokuapp.com',
     :authentication => :plain,
   }
   config.delivery_method = :smtp
-  config.action_mailer.default_url_options = { :host => "https://abairt.heroku.com" }
+  config.action_mailer.default_url_options = { :host => "https://abairt.herokuapp.com" }
 end
