@@ -9,7 +9,7 @@ namespace :cron do
   task cead_rang_eile: :environment do
     # Rangs happening tomorrow
     Rang.where("date_trunc('day', rangs.time) = date_trunc('day', current_date + interval '1' day)").each do |rang|
-      NotificationsMailer.with(rang: rang).ceád_rang_eile
+      NotificationsMailer.with(rang: rang).ceád_rang_eile.deliver
     end
   end
 end

@@ -32,6 +32,6 @@ class Rang < ApplicationRecord
   def send_notification
     return unless time
 
-    NotificationsMailer.with(rang: self).ceád_rang_eile
+    NotificationsMailer.with(rang: self).ceád_rang_eile.deliver
   end
 end
