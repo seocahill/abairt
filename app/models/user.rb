@@ -10,6 +10,12 @@ class User < ApplicationRecord
   has_many :daltaí, class_name: 'User', foreign_key: :master_id
   belongs_to :máistir, class_name: 'User', foreign_key: :master_id, optional: true
 
+  class << self
+    def with_unanswered_ceisteanna
+      joins(daltaí: { rangs: :dictionary_entries }).where.not(dictionary_entries: { status: :normal} ).distinct
+    end
+  end
+
   private
 
   def generate_token
