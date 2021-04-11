@@ -3,7 +3,7 @@
   <div data-target="entry.translation" class="table-cell px-6 py-4"  contenteditable="true"><%= ceist.translation %></div>
   <div data-target="entry.notes" class="table-cell px-6 py-4" contenteditable="true"><%= ceist.notes %></div>
   <div class="table-cell px-6 py-4 whitespace-nowrap">
-    <span data-target="entry.status" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-gray-600">
+    <span data-target="entry.status" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<%= ceist_color(ceist) %>-100 text-gray-600">
       <%= ceist.status %>
     </span>
   </div>
