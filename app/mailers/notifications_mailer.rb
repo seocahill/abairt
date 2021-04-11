@@ -16,6 +16,6 @@ class NotificationsMailer < ApplicationMailer
   #   en.notifications_mailer.ceád_rang_eile.subject
   #
   def ceád_rang_eile
-    mail(to: @user.email, subject: 'An chéad rang eile')
+    mail(to: @rang.participants, subject: 'An chéad rang eile')
   end
 end

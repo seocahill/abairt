@@ -67,7 +67,7 @@ class RangsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def rang_params
-    params.require(:rang).permit(:name, :user_id, :media)
+    params.require(:rang).permit(:name, :user_id, :media, :time)
   end
 
   def authorize
