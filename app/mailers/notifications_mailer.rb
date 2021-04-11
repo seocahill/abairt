@@ -7,6 +7,7 @@ class NotificationsMailer < ApplicationMailer
   #   en.notifications_mailer.ceisteanna.subject
   #
   def ceisteanna
+    @user = params[:user]
     mail(to: @user.email, subject: 'Tá ceisteanna ag fanacht duit')
   end
 
@@ -16,6 +17,7 @@ class NotificationsMailer < ApplicationMailer
   #   en.notifications_mailer.ceád_rang_eile.subject
   #
   def ceád_rang_eile
+    @rang = params[:rang]
     mail(to: @rang.participants, subject: 'An chéad rang eile')
   end
 end
