@@ -14,6 +14,7 @@
         <button data-action="click->rang#hide" class="h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800">Modh léitheoireachta ar / as</button>
         <button data-action="click->rang#startMeeting" class="h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-gray-800">Tosaigh cruinniú</button>
         <div id="waveform"></div>
+        <p data-target="rang.time"></p>
       </p>
       <% if @rang.media.attached? && (@rang.media.audio? ||  @rang.media.video?) %>
           <button id="play-pause-button" data-action="click->rang#play" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Play / Pause</button>
