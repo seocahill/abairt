@@ -3,9 +3,12 @@ class CeistController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.joins(:rangs).where(rangs: { user_id: current_user.daltaí.pluck(:id) + [current_user.id] }).ceist
+    records = DictionaryEntry
+      .joins(:rangs)
+      .where(rangs: { user_id: current_user.daltaí.pluck(:id) + [current_user.id] })
+      .not_normal
 
-    @pagy, @dictionary_entries = pagy(records)
+    @pagy, @ceisteanna = pagy(records)
 
     respond_to do |format|
       format.html
@@ -48,6 +51,8 @@ class CeistController < ApplicationController
   private
 
   def authorize
-    current_user.present?
+    return if current_user
+
+    redirect_to root_path
   end
 end
