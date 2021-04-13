@@ -26,7 +26,7 @@
             </label>
             <div class="mt-1">
               <textarea rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="you@example.com">
-                <%= @dictionary_entry.word_or_phrase || "Níl dada le déanamh agat!" %>
+                <%= @dictionary_entry&.word_or_phrase || "Níl dada le déanamh agat!" %>
               </textarea>
             </div>
           </div>
