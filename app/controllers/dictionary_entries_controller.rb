@@ -9,7 +9,8 @@ class DictionaryEntriesController < ApplicationController
     records = DictionaryEntry.where.not("(word_or_phrase <> '') IS NOT TRUE")
 
     if params[:search].present?
-      records = records.where("like(?, translation)", params[:search])
+      results = Appli
+      records = records.where("translation MATCH ?", params[:search])
     end
 
     records.order('id DESC')

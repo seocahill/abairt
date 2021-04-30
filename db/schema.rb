@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_30_214138) do
+ActiveRecord::Schema.define(version: 2021_04_30_225908) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", limit: 255, null: false
@@ -53,23 +53,6 @@ ActiveRecord::Schema.define(version: 2021_04_30_214138) do
     t.integer "status", default: 0, null: false
   end
 
-# Could not dump table "fts_idx" because of following StandardError
-#   Unknown type '' for column 'translation'
-
-# Could not dump table "fts_idx_config" because of following StandardError
-#   Unknown type '' for column 'k'
-
-  create_table "fts_idx_data", force: :cascade do |t|
-    t.binary "block"
-  end
-
-  create_table "fts_idx_docsize", force: :cascade do |t|
-    t.binary "sz"
-  end
-
-# Could not dump table "fts_idx_idx" because of following StandardError
-#   Unknown type '' for column 'segid'
-
   create_table "rang_entries", force: :cascade do |t|
     t.bigint "rang_id", null: false
     t.bigint "dictionary_entry_id", null: false
@@ -81,7 +64,7 @@ ActiveRecord::Schema.define(version: 2021_04_30_214138) do
 
   create_table "rangs", force: :cascade do |t|
     t.string "name", limit: 255
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "url", limit: 255
@@ -89,6 +72,23 @@ ActiveRecord::Schema.define(version: 2021_04_30_214138) do
     t.datetime "time"
     t.index ["user_id"], name: "index_rangs_on_user_id"
   end
+
+# Could not dump table "search" because of following StandardError
+#   Unknown type '' for column 'translation'
+
+# Could not dump table "search_config" because of following StandardError
+#   Unknown type '' for column 'k'
+
+  create_table "search_data", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "search_docsize", force: :cascade do |t|
+    t.binary "sz"
+  end
+
+# Could not dump table "search_idx" because of following StandardError
+#   Unknown type '' for column 'segid'
 
   create_table "users", force: :cascade do |t|
     t.string "email", limit: 255
