@@ -72,3 +72,5 @@ gem "sentry-rails", "~> 4.2"
 gem "rack-cors", "~> 1.1"
 
 
+
+gem "sqlite3", "~> 1.4"

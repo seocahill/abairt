@@ -12,14 +12,11 @@
 
 ActiveRecord::Schema.define(version: 2021_04_11_102011) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
-    t.bigint "record_id", null: false
-    t.bigint "blob_id", null: false
+    t.integer "record_id", null: false
+    t.integer "blob_id", null: false
     t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
@@ -38,7 +35,7 @@ ActiveRecord::Schema.define(version: 2021_04_11_102011) do
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
+    t.integer "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
@@ -57,8 +54,8 @@ ActiveRecord::Schema.define(version: 2021_04_11_102011) do
   end
 
   create_table "rang_entries", force: :cascade do |t|
-    t.bigint "rang_id", null: false
-    t.bigint "dictionary_entry_id", null: false
+    t.integer "rang_id", null: false
+    t.integer "dictionary_entry_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["dictionary_entry_id"], name: "index_rang_entries_on_dictionary_entry_id"
@@ -67,7 +64,7 @@ ActiveRecord::Schema.define(version: 2021_04_11_102011) do
 
   create_table "rangs", force: :cascade do |t|
     t.string "name"
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "url"
