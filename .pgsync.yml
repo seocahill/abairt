@@ -1,0 +1,36 @@
+# source database URL
+# database URLs take the format of:
+#   postgres://user:password@host:port/dbname
+#
+# we recommend a command which outputs a database URL
+# so sensitive information is not included in this file
+#
+# we *highly recommend* you use sslmode=verify-full when possible
+# see https://ankane.org/postgres-sslmode-explained for more info
+from: $(heroku config:get DATABASE_URL)?sslmode=require
+
+# destination database URL
+to: postgres://postgres@localhost:5432/abairt_development
+
+# exclude tables
+exclude:
+  - ar_internal_metadata
+  - schema_migrations
+
+# define groups
+# groups:
+#   group1:
+#     - table1
+#     - table2
+
+# sync specific schemas
+# schemas:
+#   - public
+
+# protect sensitive information
+# data_rules:
+  # email: unique_email
+  # phone: unique_phone
+  # last_name: random_letter
+  # birthday: random_date
+  # encrypted_*: null
