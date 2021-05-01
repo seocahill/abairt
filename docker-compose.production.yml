@@ -19,7 +19,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379
     volumes:
-      - db:/app/db/production.sqlite3
+      - db:/app/db
     ports:
       - 3000:3000
     working_dir: /workspace
@@ -27,6 +27,10 @@ services:
 
   litestream:
     image: litestream/litestream
+    env_file: .env
+    volume:
+      - db:/data
+    command: replicate /data/production.sqlite3 s3://$LITESTREAM_BUCKET_NAME/db
 
   redis:
     image: redis:alpine
