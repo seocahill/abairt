@@ -2,7 +2,7 @@
 
 https://abairt.herokuapp.com
 
-A simple application to share, search and download irish sentences, translations and pronunciations. 
+A simple application to share, search and download irish sentences, translations and pronunciations.
 
 * Ruby 2.7 https://www.ruby-lang.org/en/
 
@@ -30,7 +30,7 @@ A simple application to share, search and download irish sentences, translations
 
 * git clone this repo && cd abairt
 
-* bundle install 
+* bundle install
 
 * docker-compose up -d
 
@@ -39,3 +39,14 @@ A simple application to share, search and download irish sentences, translations
 * rails server
 
 The application will be accessible on http://localhost:3000
+
+## Note on db backup / swithing
+
+To back up remote heroku postgres to local postgres execute `pgsync`
+
+To export pg data to sqlite db execute
+
+```
+gem install sequel
+sequel -C postgres://postgres@localhost:5432/abairt_development sqlite://db/development.sqlite3
+```
