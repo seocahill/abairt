@@ -33,3 +33,5 @@ secrets
 node_modules
 
 .env
+
+*.sqlite3
