@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  web:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  rails:
+    image: seocahill/abairt
+    environment:
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - db:/app/db/production.sqlite3
+    ports:
+      - 3000:3000
+    working_dir: /workspace
+    command: bin/rails s -p 3000 -b 0.0.0.0
+
+  litestream:
+    image: litestream/litestream
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+volumes:
+  db:
+  caddy_data:
+  caddy_config:
+
+configs:
+  caddyfile:
+    file: ./Caddyfile
