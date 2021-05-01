@@ -9,10 +9,10 @@ class DictionaryEntriesController < ApplicationController
     records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
 
     if params[:search].present?
-      records = records.joins(:searches).where("search.translation match ?", params[:search]).distinct
+      records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
     end
 
-    records.order('id DESC')
+    records
 
     @pagy, @dictionary_entries = pagy(records)
 

@@ -6,16 +6,13 @@ class DictionaryEntry < ApplicationRecord
   has_one_attached :media
   has_many :rang_entries, dependent: :destroy
   has_many :rangs, through: :rang_entries
-  has_many :searches, class_name: "Search", foreign_key: "rowid"
+  has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
 
   enum status: [:normal, :ceist, :foghraíocht]
 
   after_create_commit { broadcast_prepend_to "dictionary_entries" }
   after_update_commit { broadcast_replace_later_to "dictionary_entries" }
   after_destroy_commit { broadcast_remove_to "dictionary_entries" }
-
-  # include PgSearch::Model
-  # pg_search_scope :search_translation, against: :translation, using: { tsearch: { dictionary: "english" } }
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true
 
