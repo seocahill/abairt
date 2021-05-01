@@ -6,11 +6,10 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.where.not("(word_or_phrase <> '') IS NOT TRUE")
+    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
 
     if params[:search].present?
-      results = Appli
-      records = records.where("translation MATCH ?", params[:search])
+      records = records.joins(:searches).where("search.translation match ?", params[:search]).distinct
     end
 
     records.order('id DESC')
