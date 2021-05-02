@@ -1,0 +1,21 @@
+image: docker:stable
+
+stages:
+- build
+
+variables:
+  CI_DEPLOY_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+
+build deploy image:
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker pull $CI_DEPLOY_IMAGE || true
+    - docker build
+      --cache-from $CI_DEPLOY_IMAGE
+      --tag $CI_DEPLOY_IMAGE
+      --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+      --build-arg BUNDLE_DEPLOYMENT=1
+      --build-arg BUNDLE_WITHOUT="development:test"
+      --build-arg RAILS_ENV=production
+    - docker push ${CI_REGISTRY_IMAGE}
