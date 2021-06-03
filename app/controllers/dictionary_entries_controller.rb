@@ -6,11 +6,13 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = if params[:search].present?
-                DictionaryEntry.search_translation(params[:search])
-              else
-                DictionaryEntry.where.not("(word_or_phrase <> '') IS NOT TRUE").order('id DESC')
-              end
+    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
+
+    if params[:search].present?
+      records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
+    end
+
+    records
 
     @pagy, @dictionary_entries = pagy(records)
 
