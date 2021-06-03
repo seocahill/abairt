@@ -21,7 +21,7 @@ class CeistController < ApplicationController
       .where(rangs: { user_id: current_user.id })
       .where(committed_to_memory: false)
       .where("translation is not null")
-      .where("date_trunc('day', recall_date) = date_trunc('day', current_date) OR recall_date IS NULL")
+      .where("strftime('%m-%d-%Y', recall_date) = strftime('%m-%d-%Y', 'now') OR recall_date IS NULL")
       .sample
   end
 
