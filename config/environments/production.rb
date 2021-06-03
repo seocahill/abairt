@@ -123,7 +123,7 @@ Rails.application.configure do
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
   config.action_mailer.smtp_settings = {
     :user_name      => 'apikey',
-    :password       => ENV['SENDGRID_PASSWORD'],
+    :password       => Rails.application.credentials.dig(:sendgrid, :password),
     :domain         => 'abairt.com',
     :address        => 'smtp.sendgrid.net',
     :port           => 587,

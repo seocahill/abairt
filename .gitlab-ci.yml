@@ -1,9 +1,14 @@
 image: docker:stable
 
+services:
+  - docker:stable-dind
+
 stages:
-- build
+  - build
 
 variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
   CI_DEPLOY_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
 
 build deploy image:
@@ -14,8 +19,5 @@ build deploy image:
     - docker build
       --cache-from $CI_DEPLOY_IMAGE
       --tag $CI_DEPLOY_IMAGE
-      --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
-      --build-arg BUNDLE_DEPLOYMENT=1
-      --build-arg BUNDLE_WITHOUT="development:test"
-      --build-arg RAILS_ENV=production
+      --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
     - docker push ${CI_REGISTRY_IMAGE}

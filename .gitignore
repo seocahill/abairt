@@ -33,3 +33,7 @@ secrets
 node_modules
 
 .env
+
+*.sqlite3
+
+litestream.yml

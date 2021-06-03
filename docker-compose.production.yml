@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  web:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    configs:
+      - source: caddyfile_v3
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  rails:
+    image: registry.gitlab.com/abairt/web-application:4b033520663151bb2ea3658c0e0966036f16c925
+    environment:
+      REDIS_URL: redis://redis:6379
+      RAILS_SERVE_STATIC_FILES: "true"
+    secrets:
+      - source: master_key
+        target: /app/config/master.key
+    volumes:
+      - db:/app/db
+    command:
+      - /bin/bash
+      - -c
+      - |
+        bin/rails db:create db:migrate
+        bin/rails s -p 3000 -b 0.0.0.0
+
+  litestream:
+    image: litestream/litestream
+    deploy:
+      replicas: 1
+    secrets:
+      - source: litestream_v4
+        target: /etc/litestream.yml
+    volumes:
+      - db:/data
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        litestream restore -if-replica-exists -v /data/production.sqlite3
+        litestream replicate
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+volumes:
+  db:
+  caddy_data:
+  caddy_config:
+
+configs:
+  caddyfile_v3:
+    file: ./Caddyfile
+
+secrets:
+  litestream_v4:
+    file: ./litestream.yml
+  master_key:
+    file: ./config/master.key
