@@ -1,3 +1,4 @@
+<%= content_for(:page_title, "Rang") %>
 <div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= url_for(@rang.media) if @rang.media.attached? %>">
   <div id="meet"></div>
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
