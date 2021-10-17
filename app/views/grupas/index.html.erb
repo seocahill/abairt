@@ -13,6 +13,10 @@
               </th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               </th>
+               <% if current_user %>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                </th>
+              <% end %>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -27,8 +31,10 @@
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <%= link_to 'Uile Ranganna', grupa, class: "text-indigo-600 hover:text-indigo-900" %>
                 </td>
+                <% if current_user %>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"> <%= link_to "Edit", edit_grupa_path(grupa) %></td>
+              <% end %>
               </tr>
-              <!-- More items... -->
             <% end %>
           </tbody>
         </table>
