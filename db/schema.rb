@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_30_225908) do
+ActiveRecord::Schema.define(version: 2021_10_17_103800) do
+
+  create_table "_litestream_lock", id: false, force: :cascade do |t|
+    t.integer "id"
+  end
+
+  create_table "_litestream_seq", force: :cascade do |t|
+    t.integer "seq"
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", limit: 255, null: false
@@ -70,6 +78,12 @@ ActiveRecord::Schema.define(version: 2021_04_30_225908) do
 # Could not dump table "fts_dictionary_entries_idx" because of following StandardError
 #   Unknown type '' for column 'segid'
 
+  create_table "grupas", force: :cascade do |t|
+    t.string "ainm"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "rang_entries", force: :cascade do |t|
     t.bigint "rang_id", null: false
     t.bigint "dictionary_entry_id", null: false
@@ -87,6 +101,8 @@ ActiveRecord::Schema.define(version: 2021_04_30_225908) do
     t.string "url", limit: 255
     t.string "meeting_id", limit: 255
     t.datetime "time"
+    t.string "grupa_id"
+    t.index ["grupa_id"], name: "index_rangs_on_grupa_id"
     t.index ["user_id"], name: "index_rangs_on_user_id"
   end
 
