@@ -5,16 +5,17 @@ Rails.application.routes.draw do
     resources :dictionary_entries
   end
   resources :users
+  resources :grupas
+
   get "login", to: "sessions#new"
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
+
   resources :dictionary_entries do
     collection do
       patch :update_all
     end
   end
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  root to: "dictionary_entries#index"
 
   get "ceist", to: "ceist#new"
   post "ceist", to: "ceist#create"
@@ -26,4 +27,6 @@ Rails.application.routes.draw do
       resources :dictionary_entries, only: :create
     end
   end
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  root to: "dictionary_entries#index"
 end
