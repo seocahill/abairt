@@ -10,6 +10,8 @@ class Rang < ApplicationRecord
 
   has_one_attached :media
 
+  validates :grupa_id, presence: true
+
   def next_time
     return  "aon am" unless time
     return "críochnaithe" unless time > Time.now
