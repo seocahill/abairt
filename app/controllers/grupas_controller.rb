@@ -1,5 +1,5 @@
 class GrupasController < ApplicationController
-  before_action :authorize, except: %i[index]
+  before_action :authorize, except: %i[index show]
 
   def index
     @grupai = Grupa.all
