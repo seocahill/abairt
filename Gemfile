@@ -74,3 +74,7 @@ gem "rack-cors", "~> 1.1"
 
 
 gem "sqlite3", "~> 1.4"
+
+gem "simple_calendar", "~> 2.4"
+
+gem "rufus-scheduler", "~> 3.8"

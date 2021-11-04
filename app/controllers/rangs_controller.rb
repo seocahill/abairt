@@ -11,7 +11,9 @@ class RangsController < ApplicationController
   end
 
   # GET /rangs/1 or /rangs/1.json
-  def show; end
+  def show
+    @muinteoir = @rang.grupa.muinteoir
+  end
 
   # GET /rangs/new
   def new
@@ -25,8 +27,21 @@ class RangsController < ApplicationController
   def create
     @rang = Rang.new(rang_params.merge(user_id: current_user.id))
 
+    if @rang.name.blank? && @rang.grupa_id.present?
+      @rang.name = [@rang.grupa.ainm, @rang.time.to_s(:short)].join("-")
+    end
+
+    if @rang.start_time.nil?
+      @rang.start_time = @rang.time
+    end
+
+    if @rang.end_time.nil?
+      @rang.end_time = @rang.time + 1.hour
+    end
+
     respond_to do |format|
       if @rang.save
+        @rang.send_notification
         format.html { redirect_to @rang, notice: 'Rang was successfully created.' }
         format.json { render :show, status: :created, location: @rang }
       else
@@ -40,6 +55,7 @@ class RangsController < ApplicationController
   def update
     respond_to do |format|
       if @rang.update(rang_params)
+        @rang.send_notification
         format.html { redirect_to @rang, notice: 'Rang was successfully updated.' }
         format.json { render :show, status: :ok, location: @rang }
       else
@@ -73,6 +89,6 @@ class RangsController < ApplicationController
   def authorize
     return if current_user
 
-    redirect_to root_path
+    redirect_back(fallback_location: root_path, alert: "Tá ort a bheith sínithe isteach!")
   end
 end

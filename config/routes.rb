@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+
   resources :rangs do
     resources :dictionary_entries
   end
+
   resources :users
+
+  resources :muinteoirs, only: %i[index show]
+
   resources :grupas
 
   get "login", to: "sessions#new"

@@ -17,6 +17,9 @@
     <%= yield :head %>
   </head>
   <body>
+    <% if flash.present? %>
+      <%= render 'flash' %>
+    <% end %>
     <!-- This example requires Tailwind CSS v2.0+ -->
     <div>
       <nav class="bg-gray-800">
@@ -31,7 +34,7 @@
                   <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                   <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
                   <a href=<%= grupas_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Grúpaí</a>
-                  <a href=<%= users_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Úsáideoirí</a>
+                  <a href=<%= muinteoirs_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Múinteoirí</a>
                   <%  if current_user  %>
                     <a href=<%= rangs_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Ranganna</a>
                     <%= link_to 'Rang nua', new_rang_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
