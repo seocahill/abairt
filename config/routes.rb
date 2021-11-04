@@ -10,7 +10,10 @@ Rails.application.routes.draw do
 
   resources :muinteoirs, only: %i[index show]
 
-  resources :grupas
+  resources :grupas do
+    get "scrios_dalta", to: "grupas#scrios_dalta"
+    post "dalta_nua", to: "grupas#dalta_nua"
+  end
 
   get "login", to: "sessions#new"
   post "login", to: "sessions#create"

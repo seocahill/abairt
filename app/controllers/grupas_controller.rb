@@ -1,4 +1,6 @@
 class GrupasController < ApplicationController
+  before_action :authorize, except: %i[index]
+
   def index
     @grupai = Grupa.all
   end
@@ -42,7 +44,35 @@ class GrupasController < ApplicationController
     end
   end
 
+  def scrios_dalta
+    user = User.find(params[:user_id])
+    user.grupa_id = nil
+    user.save!
+
+    redirect_back(fallback_location: grupas_path, info: "Tá an jab déanta")
+  end
+
+  def dalta_nua
+    grupa = Grupa.find(params[:grupa_id])
+
+    user = User.where(email: params[:email]).first_or_create do |new_user|
+      new_user.password = SecureRandom.alphanumeric
+    end
+
+    grupa.users << user
+
+    redirect_to edit_grupa_path(grupa), info: "Dalta nua curtha leis"
+  end
+
   def grupa_params
     params.require(:grupa).permit(:ainm)
+  end
+
+  private
+
+  def authorize
+    return if current_user
+
+    redirect_back(fallback_location: root_path, alert: "Tá ort a bheith sínithe isteach!")
   end
 end
