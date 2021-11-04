@@ -31,32 +31,11 @@
               </div>
               <div class="flex flex-col">
                 <label class="leading-loose">Ainm</label>
-                <%= form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+                <%= form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Group-Date-Time by default" %>
               </div>
               <div class="flex flex-col">
-                <label class="leading-loose">Am</label>
+                <label class="leading-loose">Dáta agus Am</label>
                 <%= form.datetime_select :time, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
-              </div>
-              <div class="flex flex-col">
-                <label class="leading-loose">Media upload</label>
-                <%= form.file_field :media, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "optional", direct_upload: true, data: { target: "direct-upload.input", action: "direct-upload#upload" } %>
-              </div>
-              <div class="relative pt-1 uploader">
-                <div class="flex mb-2 items-center justify-between">
-                  <div>
-                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200 file-name">
-                      No file selected
-                    </span>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-xs font-semibold inline-block text-blue-600 percentage-uploaded">
-                      0%
-                    </span>
-                  </div>
-                </div>
-                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200 progress">
-                  <div style="width:0%" class="progress-bar shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
-                </div>
               </div>
             </div>
             <div class="pt-4 flex items-center space-x-4">

@@ -14,7 +14,7 @@ services:
       - caddy_config:/config
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:4b033520663151bb2ea3658c0e0966036f16c925
+    image: registry.gitlab.com/abairt/web-application:0d193fbdec20793fee00544014a77291e02701db
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
