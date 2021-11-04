@@ -10,10 +10,8 @@
         <% end %>
       </h3>
       <p class="mt-1 max-w-2xl text-sm text-gray-500">
-        created <%= @rang.created_at.to_s(:short) %>
+        múinteoir: <%= link_to @muinteoir.name, muinteoir_path(@muinteoir) %>
         <%= link_to 'Edit rang', edit_rang_path(@rang), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800" if current_user %>
-        <button data-action="click->rang#hide" class="h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800">Modh léitheoireachta ar / as</button>
-        <button data-action="click->rang#startMeeting" class="h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-gray-800">Tosaigh cruinniú</button>
         <div id="waveform"></div>
         <p data-target="rang.time"></p>
       </p>
