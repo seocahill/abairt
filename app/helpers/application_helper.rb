@@ -7,6 +7,14 @@ module ApplicationHelper
     current_user
   end
 
+  def flash_class(type)
+    if type == "alert"
+      "red"
+    else
+      "green"
+    end
+  end
+
   def user_gravatar(user)
     return 'http://secure.gravatar.com/avatar/' unless user
 

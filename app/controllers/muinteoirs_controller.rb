@@ -2,10 +2,10 @@ class MuinteoirsController < ApplicationController
   def show
     @user = User.find(params[:id])
     start_date = params.fetch(:start_date, Date.today).to_date
-    @rangs = current_user.muinteoir_rangs.or(current_user.rangs)
+    @rangs = @user.muinteoir_rangs.or(@user.rangs)
   end
 
   def index
-    @users = User.where(master_id: nil)
+    @users = User.joins(:muinteoir_grupas).distinct
   end
 end
