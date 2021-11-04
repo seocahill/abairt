@@ -17,7 +17,7 @@ class RangsController < ApplicationController
 
   # GET /rangs/new
   def new
-    @rang = Rang.new(name: )
+    @rang = Rang.new(name: "Cómhrá #{Date.today.to_s(:short)}")
   end
 
   # GET /rangs/1/edit
