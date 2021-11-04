@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_17_103800) do
+ActiveRecord::Schema.define(version: 2021_11_04_180311) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -82,6 +82,8 @@ ActiveRecord::Schema.define(version: 2021_10_17_103800) do
     t.string "ainm"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "muinteoir_id"
+    t.index ["muinteoir_id"], name: "index_grupas_on_muinteoir_id"
   end
 
   create_table "rang_entries", force: :cascade do |t|
@@ -102,6 +104,8 @@ ActiveRecord::Schema.define(version: 2021_10_17_103800) do
     t.string "meeting_id", limit: 255
     t.datetime "time"
     t.string "grupa_id"
+    t.datetime "start_time"
+    t.datetime "end_time"
     t.index ["grupa_id"], name: "index_rangs_on_grupa_id"
     t.index ["user_id"], name: "index_rangs_on_user_id"
   end
@@ -115,6 +119,8 @@ ActiveRecord::Schema.define(version: 2021_10_17_103800) do
     t.boolean "confirmed", default: false, null: false
     t.string "token", limit: 255
     t.bigint "master_id"
+    t.bigint "grupa_id"
+    t.index ["grupa_id"], name: "index_users_on_grupa_id"
     t.index ["master_id"], name: "index_users_on_master_id"
     t.index ["token"], name: "index_users_on_token"
   end

@@ -84,6 +84,7 @@ Rails.application.configure do
     :authentication => :plain,
     :enable_starttls_auto => true
   }
-  config.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = false
+  config.delivery_method = :test
   config.action_mailer.default_url_options = { host: "abairt.com" }
 end

@@ -12,4 +12,11 @@ namespace :cron do
       NotificationsMailer.with(rang: rang).ceád_rang_eile.deliver
     end
   end
+
+  task ranganna_inniu: :environment do
+    # Rangs happening today
+    Rang.where("strftime('%m-%d-%Y', rangs.time) = strftime('%m-%d-%Y', 'now')").each do |rang|
+      NotificationsMailer.with(rang: rang).ceád_rang_eile.deliver
+    end
+  end
 end
