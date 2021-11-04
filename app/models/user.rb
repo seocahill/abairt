@@ -6,7 +6,7 @@ class User < ApplicationRecord
   before_create :generate_token
 
   belongs_to :máistir, class_name: 'User', foreign_key: :master_id, optional: true
-  belongs_to :grupa
+  belongs_to :grupa, optional: true
 
   has_many :daltaí, class_name: 'User', foreign_key: :master_id
   has_many :muinteoir_grupas, class_name: 'Grupa', foreign_key: :muinteoir_id

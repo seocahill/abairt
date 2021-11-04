@@ -17,7 +17,7 @@ class RangsController < ApplicationController
 
   # GET /rangs/new
   def new
-    @rang = Rang.new
+    @rang = Rang.new(name: )
   end
 
   # GET /rangs/1/edit
