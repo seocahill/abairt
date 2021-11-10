@@ -54,7 +54,14 @@ class RangsController < ApplicationController
   # PATCH/PUT /rangs/1 or /rangs/1.json
   def update
     respond_to do |format|
-      if @rang.update(rang_params)
+      @rang.assign_attributes(rang_params)
+
+      if @rang.time_changed?
+        @rang.start_time = @rang.time
+        @rang.end_time = @rang.time + 1.hour
+      end
+
+      if @rang.save
         @rang.send_notification
         format.html { redirect_to @rang, notice: 'Rang was successfully updated.' }
         format.json { render :show, status: :ok, location: @rang }
