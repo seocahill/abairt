@@ -1,15 +1,20 @@
 <div class="container mx-auto px-6 py-8 h-full flex-grow">
   <div class="flex flex-col sm:flex-row sm:items-center mb-6">
-    <div class="text-secondary font-bold flex-1">
-      <%= link_to dictionary_entries_path(@dictionary_entries, format: :csv), class: "bg-transparent text-gray-600 font-semibold py-2 px-4 border border-gray-600 rounded inline-flex items-center" do %>
-        <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
-        <span>Íoslódáil CSV</span>
-      <% end %>
-    </div>
     <form action="/dictionary_entries" class="relative flex-1"><input type="search" name="search" placeholder="focail i mBearla nó i nGaeilge" class="p-4 text-gray-700 w-full bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400">
       <button type="submit" class="bg-green-400 text-white rounded font-lg absolute top-0 right-0 bottom-0 mt-1 mr-1 mb-1 px-8 font-semibold">Cuardaigh</button>
     </form>
   </div>
-  <div class="flex flex-col sm:flex-row sm:items-center mb-1">
+  <div class="flex flex-row items-center flex-wrap content-start">
+    <% tag_cloud(@tags, %w(css1 css2 css3 css4)) do |tag, css_class| %>
+      <div class="p-2">
+        <%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded" %>
+      </div>
+    <% end %>
+    <div class="p-2">
+      <%= link_to "foghraíocht", dictionary_entries_path(media: true), class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded" %>
+    </div>
+    <div class="p-2">
+      <%= link_to "uile", dictionary_entries_path, class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded" %>
+    </div>
   </div>
 </div>
