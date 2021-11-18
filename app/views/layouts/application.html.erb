@@ -32,7 +32,7 @@
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
                   <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                  <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
+                  <a href="/" class="text-gray-300 hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
                   <a href=<%= grupas_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Grúpaí</a>
                   <a href=<%= muinteoirs_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Múinteoirí</a>
                   <%  if current_user  %>
@@ -87,16 +87,9 @@
         <div class="md:hidden" id="mobile-menu">
           <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="#" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
-          </div>
-          <div class="pt-4 pb-3 border-t border-gray-700">
-            <div class="flex items-center px-5">
-              <div class="flex-shrink-0">
-                <img class="h-10 w-10 rounded-full" src="" alt="">
-              </div>
-            </div>
+            <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
+            <a href=<%= grupas_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Grúpaí</a>
+            <a href=<%= muinteoirs_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Múinteoirí</a>
           </div>
         </div>
       </nav>

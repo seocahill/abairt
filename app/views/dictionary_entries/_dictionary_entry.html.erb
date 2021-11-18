@@ -3,6 +3,11 @@
   <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.translation %></div>
   <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.notes %></div>
   <div data-target="rang.cell" class="table-cell px-6 py-4">
+    <% dictionary_entry.tag_list.each do |tag| %>
+      <%= link_to tag, dictionary_entries_path(tag: tag), target: "_top" %>
+    <% end %>
+  </div>
+  <div data-target="rang.cell" class="table-cell px-6 py-4">
     <% if dictionary_entry.media.attached? && (dictionary_entry.media.audio? ||  dictionary_entry.media.video?) %>
       <audio src="<%= url_for(dictionary_entry.media) %>" preload=true data-target="entry.audio"></audio>
       <button data-action="click->entry#play" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow inline-flex items-center">

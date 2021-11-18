@@ -10,6 +10,9 @@
     <div class="table-cell px-6 py-4">
       <%= form.text_area :notes, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
     </div>
+    <div class="table-cell px-6 py-4">
+      <%= form.text_area :tag_list, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", placeholder: "comma,separated,list,of,tags" %>
+    </div>
     <%= content_tag :div, data: { controller: 'recorder' }, class: "table-cell px-6 py-4" do %>
       <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
       <button data-action="recorder#record" data-target="recorder.recordButton" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow inline-flex items-center">

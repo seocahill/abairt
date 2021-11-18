@@ -14,6 +14,10 @@ class DictionaryEntry < ApplicationRecord
   after_update_commit { broadcast_replace_later_to "dictionary_entries" }
   after_destroy_commit { broadcast_remove_to "dictionary_entries" }
 
+  acts_as_taggable_on :tags
+
+  scope :has_recording, -> { joins(:media_attachment) }
+
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true
 
   class << self
