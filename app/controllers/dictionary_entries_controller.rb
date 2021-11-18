@@ -6,11 +6,21 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
+    records = DictionaryEntry.joins(:rangs).where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").where("rangs.url is null")
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
     end
+
+    if params[:tag].present?
+      records = records.tagged_with(params[:tag])
+    end
+
+    if params["media"].present?
+      records = records.has_recording
+    end
+
+    @tags = ActsAsTaggableOn::Tag.most_used(15)
 
     records
 
@@ -18,7 +28,7 @@ class DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_data @dictionary_entries.to_csv, filename: "dictionary-#{Date.today}.csv" }
+      format.csv { send_data records.to_csv, filename: "dictionary-#{Date.today}.csv" }
     end
   end
 
@@ -83,6 +93,6 @@ class DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :rang_id, :status)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :rang_id, :status, :tag_list)
   end
 end

@@ -78,3 +78,5 @@ gem "sqlite3", "~> 1.4"
 gem "simple_calendar", "~> 2.4"
 
 gem "rufus-scheduler", "~> 3.8"
+
+gem "acts-as-taggable-on", "~> 8.1"
