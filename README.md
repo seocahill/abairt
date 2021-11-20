@@ -50,3 +50,11 @@ To export pg data to sqlite db execute
 gem install sequel
 sequel -C postgres://postgres@localhost:5432/abairt_development sqlite://db/development.sqlite3
 ```
+
+## NB
+
+Migration path (FIXME)
+
+I've moved it out of 'db' because of the enclosing folder is mounted (db data) and that overwrites migrations in image.
+
+Changed in 672f4759beaa7412089dc0d842be252eace66871, should revert and fix properly. Should have stored dbs in their own folder I guess but this was the easiest way to fix for now.
