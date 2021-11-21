@@ -6,7 +6,7 @@ export default class extends Controller {
   connect() {
     let playButton = this.element.querySelector('#play-pause-button');
     let that = this;
-    if (this.mediaValue) {
+    if (this.element.querySelector('#waveform')) {
       this.waveSurfer = WaveSurfer.create({
         container: '#waveform',
         waveColor: 'violet',
