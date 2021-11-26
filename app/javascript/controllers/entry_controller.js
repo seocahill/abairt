@@ -1,7 +1,7 @@
-import { Controller } from "stimulus"
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media", "status"]
+  static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media", "status", "word", "template"]
   static values = { url: String, id: Number }
 
   async deanta(e) {
@@ -70,7 +70,8 @@ export default class extends Controller {
 
   async scrios(e) {
     e.preventDefault()
-    let response = await fetch(`/dictionary_entries/${this.idValue}`, {
+    const rangId = location.pathname.split('/')[2];
+    let response = await fetch(`/rangs/${rangId}/dictionary_entries/${this.idValue}`, {
       method: 'DELETE',
       credentials: "include",
       dataType: "script",
