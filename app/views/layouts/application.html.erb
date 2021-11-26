@@ -8,13 +8,9 @@
     <%= stylesheet_link_tag "inter-font" %>
     <%= stylesheet_link_tag "tailwind_custom" %>
     <%= stylesheet_link_tag 'application', media: 'all' %>
-    <%= javascript_include_tag "application" %>
-    <%= stimulus_include_tags %>
-    <%= javascript_include_tag "turbo", type: "module-shim" %>
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://www.teanglann.ie/cab/cab.js"></script>
-    <script type="text/javascript">jQuery(document).ready(function(){ cab.clickify(); });</script>
+
     <%= yield :head %>
+    <%= javascript_importmap_tags %>
   </head>
   <body>
     <% if flash.present? %>

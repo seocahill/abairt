@@ -2,9 +2,12 @@
 
 Rails.application.routes.draw do
 
+
   resources :rangs do
     resources :dictionary_entries
   end
+
+  resources :tags
 
   resources :users
 
