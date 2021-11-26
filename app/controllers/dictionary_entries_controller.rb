@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DictionaryEntriesController < ApplicationController
-  before_action :set_dictionary_entry, only: %i[show edit update destroy update_all]
+  before_action :set_dictionary_entry, only: %i[show edit update update_all destroy]
   before_action :set_rang, only: %i[new create]
 
   # GET /dictionary_entries or /dictionary_entries.json
@@ -29,6 +29,7 @@ class DictionaryEntriesController < ApplicationController
     respond_to do |format|
       format.html
       format.csv { send_data records.to_csv, filename: "dictionary-#{Date.today}.csv" }
+      format.json { render json: records }
     end
   end
 
@@ -45,7 +46,12 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    @dictionary_entry = @rang.dictionary_entries.new(dictionary_entry_params)
+    if params[:dictionary_entry][:dictionary_entry_id].present?
+       @dictionary_entry = DictionaryEntry.find(params[:dictionary_entry][:dictionary_entry_id])
+       @dictionary_entry.assign_attributes(dictionary_entry_params)
+    else
+      @dictionary_entry = @rang.dictionary_entries.new(dictionary_entry_params)
+    end
 
     respond_to do |format|
       if @dictionary_entry.save
@@ -74,7 +80,8 @@ class DictionaryEntriesController < ApplicationController
 
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
-    @dictionary_entry.destroy
+    @entry = RangEntry.find_by(rang_id: params[:rang_id], dictionary_entry_id: params[:id])
+    @entry.destroy!
     respond_to do |format|
       format.turbo_stream
     end

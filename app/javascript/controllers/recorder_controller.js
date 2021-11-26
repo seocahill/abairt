@@ -1,5 +1,5 @@
-import { Controller } from "stimulus"
-import { DirectUpload } from 'https://cdn.skypack.dev/@rails/activestorage';
+import { Controller } from "@hotwired/stimulus"
+import { DirectUpload } from "@rails/activestorage";
 
 export default class extends Controller {
   static targets = ["input", "recordButton", "stopButton"]

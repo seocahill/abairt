@@ -10,50 +10,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_15_211538) do
-
-  create_table "_litestream_lock", id: false, force: :cascade do |t|
-    t.integer "id"
-  end
-
-  create_table "_litestream_seq", force: :cascade do |t|
-    t.integer "seq"
-  end
+ActiveRecord::Schema.define(version: 2021_11_24_121026) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
-    t.string "name", limit: 255, null: false
-    t.string "record_type", limit: 255, null: false
-    t.bigint "record_id", null: false
-    t.bigint "blob_id", null: false
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.integer "record_id", null: false
+    t.integer "blob_id", null: false
     t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.string "key", limit: 255, null: false
-    t.string "filename", limit: 255, null: false
-    t.string "content_type", limit: 255
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
     t.text "metadata"
-    t.string "service_name", limit: 255, null: false
+    t.string "service_name", null: false
     t.bigint "byte_size", null: false
-    t.string "checksum", limit: 255, null: false
+    t.string "checksum", null: false
     t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
-    t.string "variation_digest", limit: 255, null: false
+    t.integer "blob_id", null: false
+    t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "dictionary_entries", force: :cascade do |t|
-    t.string "word_or_phrase", limit: 255
-    t.string "translation", limit: 255
-    t.string "notes", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "word_or_phrase"
+    t.string "translation"
+    t.string "notes"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.datetime "recall_date"
     t.integer "previous_inteval", default: 0, null: false
     t.decimal "previous_easiness_factor", default: "2.5", null: false
@@ -78,6 +70,23 @@ ActiveRecord::Schema.define(version: 2021_11_15_211538) do
 # Could not dump table "fts_dictionary_entries_idx" because of following StandardError
 #   Unknown type '' for column 'segid'
 
+# Could not dump table "fts_tags" because of following StandardError
+#   Unknown type '' for column 'name'
+
+# Could not dump table "fts_tags_config" because of following StandardError
+#   Unknown type '' for column 'k'
+
+  create_table "fts_tags_data", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "fts_tags_docsize", force: :cascade do |t|
+    t.binary "sz"
+  end
+
+# Could not dump table "fts_tags_idx" because of following StandardError
+#   Unknown type '' for column 'segid'
+
   create_table "grupas", force: :cascade do |t|
     t.string "ainm"
     t.datetime "created_at", precision: 6, null: false
@@ -87,21 +96,21 @@ ActiveRecord::Schema.define(version: 2021_11_15_211538) do
   end
 
   create_table "rang_entries", force: :cascade do |t|
-    t.bigint "rang_id", null: false
-    t.bigint "dictionary_entry_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer "rang_id", null: false
+    t.integer "dictionary_entry_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["dictionary_entry_id"], name: "index_rang_entries_on_dictionary_entry_id"
     t.index ["rang_id"], name: "index_rang_entries_on_rang_id"
   end
 
   create_table "rangs", force: :cascade do |t|
-    t.string "name", limit: 255
-    t.bigint "user_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "url", limit: 255
-    t.string "meeting_id", limit: 255
+    t.string "name"
+    t.integer "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "url"
+    t.string "meeting_id"
     t.datetime "time"
     t.string "grupa_id"
     t.datetime "start_time"
@@ -140,13 +149,13 @@ ActiveRecord::Schema.define(version: 2021_11_15_211538) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email", limit: 255
-    t.string "name", limit: 255
-    t.string "password_digest", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "email"
+    t.string "name"
+    t.string "password_digest"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.boolean "confirmed", default: false, null: false
-    t.string "token", limit: 255
+    t.string "token"
     t.bigint "master_id"
     t.bigint "grupa_id"
     t.index ["grupa_id"], name: "index_users_on_grupa_id"
