@@ -14,22 +14,23 @@
         </div>
       </div>
     <% end %>
-    <div class="">
-      <%= form.label :word_or_phrase, class: "block text-sm font-medium text-gray-700 " %>
-      <%= form.text_area :word_or_phrase, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
+    <div class="" data-rang-target="wordSearch">
+      <%= form.label :word_or_phrase, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :word_or_phrase, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "autoComplete" %>
     </div>
     <div class="">
       <%= form.label :translation, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_area :translation, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
+      <%= form.text_area :translation, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "translation" %>
     </div>
     <div class="">
       <%= form.label :notes, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_area :notes, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md" %>
+      <%= form.text_area :notes, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "notes" %>
     </div>
-    <div class="">
+    <div class="" data-rang-target="tagSearch">
       <%= form.label :tag_list, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_area :tag_list, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", placeholder: "comma,separated,list,of,tags" %>
+      <%= form.text_area :tag_list, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "autoCompleteTags" %>
     </div>
+    <%= form.hidden_field :dictionary_entry_id, id: "dictionary_entry_id" %>
     <%= content_tag :div, data: { controller: 'recorder' }, class: "w-full text-center mx-auto" do %>
       <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
       <%= content_tag :div, "Record voice",

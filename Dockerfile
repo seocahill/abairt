@@ -10,7 +10,7 @@ RUN \
   bundle config set without 'development test'
 RUN \
   bundle install && \
-  SECRET_KEY_BASE=1 bundle exec rake assets:precompile
+  SECRET_KEY_BASE=1 bin/rails assets:precompile
 
 # second stage
 FROM bitnami/ruby:3.0-prod as prod

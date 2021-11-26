@@ -12,7 +12,7 @@
         <%= link_to 'Edit rang', edit_rang_path(@rang), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800" if current_user %>
       </p>
       <% if @rang.media.attached? && (@rang.media.audio? ||  @rang.media.video?) %>
-          <div id="waveform"></div>
+          <div id="waveform" data-rang-target="waveform"></div>
           <p data-target="rang.time"></p>
           <button id="play-pause-button" data-action="click->rang#play" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Play / Pause</button>
         <% end %>
