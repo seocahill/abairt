@@ -42,25 +42,29 @@ export default class extends Controller {
       ]
     })
     this.waveSurfer.load(this.mediaValue);
-    // this.waveSurfer.on('loading', function (progress) {
-    //   if (progress && progress < 99) {
-    //     playButton.innerHTML = `loading ${progress}%`;
-    //   } else {
-    //     playButton.innerHTML = "Preparing wave....";
-    //   }
-    // })
-    this.waveSurfer.on('ready', function() {
-      // playButton.innerHTML = "Play / Pause";
-      // that.waveSurfer.enableDragSelection();
+    this.waveSurfer.on('loading', function (progress) {
+      if (progress && progress < 99) {
+        playButton.innerHTML = `loading ${progress}%`;
+      } else {
+        playButton.innerHTML = "Preparing wave....";
+      }
     })
-    // this.waveSurfer.on('audioprocess', function () {
-    //   if (that.waveSurfer.isPlaying()) {
-    //     that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-    //   }
-    // })
-    // this.waveSurfer.on('seek', function() {
-    //   that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-    // })
+    this.waveSurfer.on('ready', function() {
+      playButton.innerHTML = "Play / Pause";
+    })
+    this.waveSurfer.on('audioprocess', function () {
+      if (that.waveSurfer.isPlaying()) {
+        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+      }
+    })
+    this.waveSurfer.on('seek', function() {
+      that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+    })
+    this.waveSurfer.on('region-click', function (region, e) {
+      e.stopPropagation();
+      // // Play on click, loop on shift click
+      e.shiftKey ? region.playLoop() : region.play();
+    })
   }
 
   wordSearchTargetConnected() {
