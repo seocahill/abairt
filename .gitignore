@@ -37,3 +37,4 @@ node_modules
 *.sqlite3*
 
 litestream.yml
+vendor/javascript/annotation.example.js
