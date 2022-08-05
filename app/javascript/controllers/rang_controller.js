@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import  WaveSurfer from "wavesurferjs"
+import  { addRegion } from "wavesurferregionsjs"
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
@@ -10,6 +11,7 @@ export default class extends Controller {
     addEventListener("turbo:submit-end", ({ target }) => {
       this.resetForm(target)
     })
+    addRegion()
   }
 
   resetForm(target) {
