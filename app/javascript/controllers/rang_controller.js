@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import  WaveSurfer from "wavesurferjs"
-import  { addRegion } from "wavesurferregionsjs"
+import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
@@ -11,7 +11,6 @@ export default class extends Controller {
     addEventListener("turbo:submit-end", ({ target }) => {
       this.resetForm(target)
     })
-    addRegion()
   }
 
   resetForm(target) {
@@ -32,7 +31,12 @@ export default class extends Controller {
       container: '#waveform',
       waveColor: 'violet',
       progressColor: 'purple',
-      partialRender: true
+      partialRender: true,
+      plugins: [
+        RegionsPlugin.create({
+          // plugin options ...
+        })
+      ]
     })
     this.waveSurfer.load(this.mediaValue);
     this.waveSurfer.on('loading', function (progress) {
