@@ -14,6 +14,7 @@
       <% if @rang.media.attached? && (@rang.media.audio? ||  @rang.media.video?) %>
           <div id="waveform" data-rang-target="waveform"></div>
           <p data-target="rang.time"></p>
+          <p data-target="rang.transcription"></p>
           <button id="play-pause-button" data-action="click->rang#play" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Play / Pause</button>
         <% end %>
       <% if current_user %>
