@@ -49,6 +49,7 @@ export default class extends Controller {
         playButton.innerHTML = "Preparing wave....";
       }
     })
+
     this.waveSurfer.on('ready', function() {
       playButton.innerHTML = "Play / Pause";
       that.regionsValue.forEach((region) => {
@@ -56,9 +57,14 @@ export default class extends Controller {
           id: region.region_id,
           start: region.region_start,
           end: region.region_end,
+          data: { transcription: region.word_or_phrase }
         });
       })
     })
+
+    this.waveSurfer.on('region-in', (region) => {
+      console.log(region.data.transcription)
+    });
 
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying()) {
