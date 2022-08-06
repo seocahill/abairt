@@ -13,6 +13,7 @@ class RangsController < ApplicationController
   # GET /rangs/1 or /rangs/1.json
   def show
     @muinteoir = @rang.grupa.muinteoir
+    @regions = @rang.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end) }.to_json
   end
 
   # GET /rangs/new

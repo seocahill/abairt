@@ -61,7 +61,7 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.integer "status", default: 0, null: false
     t.decimal "region_start"
     t.decimal "region_end"
-    t.integer "region_id"
+    t.string "region_id"
   end
 
 # Could not dump table "fts_dictionary_entries" because of following StandardError

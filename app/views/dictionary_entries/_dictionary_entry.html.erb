@@ -1,4 +1,4 @@
-<%= turbo_frame_tag dom_id(dictionary_entry), class: "table-row", data: { controller: "entry", "entry-id-value": dictionary_entry.id } do %>
+<%= turbo_frame_tag dom_id(dictionary_entry), class: "table-row", data: { controller: "entry", "entry-id-value": dictionary_entry.id, rang_region_value:  dictionary_entry.slice(:id, :region_id, :region_start, :region_end) } do %>
   <div class="table-cell px-6 py-4" data-controller="word">
     <% dictionary_entry.word_or_phrase.split.each do |word| %>
       <span data-controller="word">

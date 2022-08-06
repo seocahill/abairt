@@ -4,8 +4,8 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion"]
-  static values = { meetingId: String, media: String }
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId"]
+  static values = { meetingId: String, media: String, regions: Array }
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
@@ -51,7 +51,15 @@ export default class extends Controller {
     })
     this.waveSurfer.on('ready', function() {
       playButton.innerHTML = "Play / Pause";
+      that.regionsValue.forEach((region) => {
+        that.waveSurfer.addRegion({
+          id: region.region_id,
+          start: region.region_start,
+          end: region.region_end,
+        });
+      })
     })
+
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying()) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
@@ -65,9 +73,11 @@ export default class extends Controller {
       // // Play on click, loop on shift click
       e.shiftKey ? region.playLoop() : region.play();
     })
+
     this.waveSurfer.on('region-click', function (region) {
       that.startRegionTarget.children[1].value = Math.round(region.start * 10) / 10
       that.endRegionTarget.children[1].value = Math.round(region.end * 10) / 10
+      that.regionIdTarget.children[1].value = region.id
     })
   }
 
