@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId"]
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription"]
   static values = { meetingId: String, media: String, regions: Array }
 
   initialize() {
@@ -63,7 +63,7 @@ export default class extends Controller {
     })
 
     this.waveSurfer.on('region-in', (region) => {
-      console.log(region.data.transcription)
+      that.transcriptionTarget.innerText= region.data.transcription
     });
 
     this.waveSurfer.on('audioprocess', function () {
