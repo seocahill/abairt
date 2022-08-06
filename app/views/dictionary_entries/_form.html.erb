@@ -30,6 +30,14 @@
       <%= form.label :tag_list, class: "block text-sm font-medium text-gray-700" %>
       <%= form.text_area :tag_list, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "autoCompleteTags" %>
     </div>
+    <div class="" data-rang-target="startRegion">
+      <%= form.label :start_region, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :start_region, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "startRegion" %>
+    </div>
+    <div class="" data-rang-target="endRegion">
+      <%= form.label :end_region, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :end_region, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "endRegion" %>
+    </div>
     <%= form.hidden_field :dictionary_entry_id, id: "dictionary_entry_id" %>
     <%= content_tag :div, data: { controller: 'recorder' }, class: "w-full text-center mx-auto" do %>
       <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>

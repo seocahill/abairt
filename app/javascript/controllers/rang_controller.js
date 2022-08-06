@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform"]
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion"]
   static values = { meetingId: String, media: String }
 
   initialize() {
@@ -64,6 +64,10 @@ export default class extends Controller {
       e.stopPropagation();
       // // Play on click, loop on shift click
       e.shiftKey ? region.playLoop() : region.play();
+    })
+    this.waveSurfer.on('region-click', function (region) {
+      that.startRegionTarget.children[1].value = Math.round(region.start * 10) / 10
+      that.endRegionTarget.children[1].value = Math.round(region.end * 10) / 10
     })
   }
 
