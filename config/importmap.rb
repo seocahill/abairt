@@ -15,3 +15,4 @@ pin "@rails/actioncable", to: "https://ga.jspm.io/npm:@rails/actioncable@6.1.4-1
 pin "jitsi" # @2.1.5
 pin "popper", to: "https://cdn.skypack.dev/@popperjs/core"
 pin "autocomplete", to: "https://ga.jspm.io/npm:@tarekraafat/autocomplete.js@10.2.6/dist/autoComplete.js"
+pin "soundtouchjs", to: "https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/soundtouch.js"
