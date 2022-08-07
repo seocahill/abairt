@@ -10,4 +10,9 @@ class ApplicationController < ActionController::Base
   def current_user
     User.find_by(id: session[:user_id], confirmed: true)
   end
+
+  before_action do
+    current_host = request.url || "http://localhost:3000"
+    ActiveStorage::Current.host = current_host
+  end
 end
