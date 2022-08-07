@@ -1,5 +1,5 @@
 <%= content_for(:page_title, "Rang: #{truncate(@rang.name, length: 50)}") %>
-<div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= url_for(@rang.media) if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>"  >
+<div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>"  >
   <div id="meet"></div>
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">

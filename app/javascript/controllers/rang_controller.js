@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import  WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
-import { SoundTouch } from "soundtouchjs";
+// import { SoundTouch } from "soundtouchjs";
 
 export default class extends Controller {
   static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription"]
@@ -27,12 +27,14 @@ export default class extends Controller {
 
   waveformTargetConnected() {
     let playButton = this.element.querySelector('#play-pause-button');
+    playButton.innerHTML = "Preparing wave....";
     let that = this;
     this.waveSurfer = WaveSurfer.create({
+      backend: 'MediaElement',
       container: '#waveform',
       // waveColor: 'violet',
       // progressColor: 'purple',
-      partialRender: true,
+      partialRender: false,
       pixelRatio: 1,
       scrollParent: true,
       // normalize: true,
@@ -42,13 +44,11 @@ export default class extends Controller {
         })
       ]
     })
+
     this.waveSurfer.load(this.mediaValue);
+
     this.waveSurfer.on('loading', function (progress) {
-      if (progress && progress < 99) {
-        playButton.innerHTML = `loading ${progress}%`;
-      } else {
-        playButton.innerHTML = "Preparing wave....";
-      }
+      playButton.innerHTML = `loading ${progress}%`;
     })
 
     this.waveSurfer.on('ready', function() {
@@ -72,9 +72,11 @@ export default class extends Controller {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
       }
     })
+
     this.waveSurfer.on('seek', function() {
       that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
     })
+
     this.waveSurfer.on('region-click', function (region, e) {
       e.stopPropagation();
       // // Play on click, loop on shift click
