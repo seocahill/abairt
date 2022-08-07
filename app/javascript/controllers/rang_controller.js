@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import  WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
+import { SoundTouch } from "soundtouchjs";
 
 export default class extends Controller {
   static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription"]
@@ -186,6 +187,16 @@ export default class extends Controller {
 
   show() {
     this.dropdownTarget.classList.toggle("hidden")
+  }
+
+  slower(event) {
+    event.preventDefault()
+    let currentSpeed = this.waveSurfer.getPlaybackRate()
+    if (currentSpeed <= 0.33) {
+      this.waveSurfer.setPlaybackRate(1)
+    } else {
+      this.waveSurfer.setPlaybackRate((currentSpeed * 0.75))
+    }
   }
 
   play(event) {
