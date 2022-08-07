@@ -22,6 +22,12 @@ export default class extends Controller {
         }
       })
     }
+    let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
+    let regionId = target.elements["regionId"].value;
+    if (regionId) {
+      let region = this.waveSurfer.regions.list[regionId];
+      region.update({ data: { transcription: transcription } })
+    }
     target.reset()
   }
 
