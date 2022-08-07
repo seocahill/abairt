@@ -31,6 +31,11 @@ export default class extends Controller {
     target.reset()
   }
 
+  zoom(event) {
+    event.preventDefault()
+    this.waveSurfer.zoom(Number(event.target.value));
+  }
+
   waveformTargetConnected() {
     let playButton = this.element.querySelector('#play-pause-button');
     playButton.innerHTML = "Preparing wave....";

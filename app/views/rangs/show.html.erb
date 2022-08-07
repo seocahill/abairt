@@ -17,6 +17,7 @@
           <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
           <button id="play-pause-button" data-action="click->rang#play" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Play / Pause</button>
           <button id="play-slower-button" data-action="click->rang#slower" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Slower</button>
+          <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0" style="width: 100%">
         <% end %>
       <% if current_user %>
         <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
