@@ -12,7 +12,8 @@ class ApplicationController < ActionController::Base
   end
 
   before_action do
-    current_host = request.url || "http://localhost:3000"
-    ActiveStorage::Current.host = current_host
+    if Rails.env.development?
+      ActiveStorage::Current.host = (request.url || "http://localhost:3000")
+    end
   end
 end
