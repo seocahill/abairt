@@ -3,6 +3,7 @@
 Rails.application.routes.draw do
 
 
+  resources :comhras
   resources :rangs do
     resources :dictionary_entries
   end
