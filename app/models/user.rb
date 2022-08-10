@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_many :muinteoir_grupas, class_name: 'Grupa', foreign_key: :muinteoir_id
   has_many :muinteoir_rangs, through: :muinteoir_grupas, source: :rangs
   has_many :rangs, through: :grupa
+  has_many :comhras
 
   class << self
     def with_unanswered_ceisteanna

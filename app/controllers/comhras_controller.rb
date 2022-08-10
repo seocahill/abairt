@@ -21,7 +21,7 @@ class ComhrasController < ApplicationController
 
   # POST /comhras or /comhras.json
   def create
-    @comhra = Comhra.new(comhra_params)
+    @comhra = current_user.comhras.new(comhra_params)
 
     respond_to do |format|
       if @comhra.save
@@ -64,6 +64,6 @@ class ComhrasController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def comhra_params
-      params.fetch(:comhra, {})
+      params.fetch(:comhra).permit(:name, :user_id, :media, :grupa_id, :lat_lang)
     end
 end
