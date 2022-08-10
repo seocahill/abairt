@@ -15,11 +15,15 @@ export default class extends Controller {
 
     // debugger
     this.comhrasValue.forEach((comhra) => {
-      L.marker(comhra.lat_lang.split(',')).addTo(this.map);
+      let marker = L.marker(comhra.lat_lang.split(','))
+      let content = `<a href="/comhras/${comhra.id}">${comhra.name}</a><audio controls src="${comhra.media_url}"></audio>`;
+      marker.bindPopup(content).openPopup();
+      marker.addTo(this.map);
     });
 
-    // let marker = L.marker([53.91, -9.4527]).addTo(map);
-    this.map.on('click', (e) => { this.showLatLang(e) });
+    if (document.getElementById("comhra_lat_lang")) {
+      this.map.on('click', (e) => { this.showLatLang(e) });
+    }
   }
 
   showLatLang(e) {
