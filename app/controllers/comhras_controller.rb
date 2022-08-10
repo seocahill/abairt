@@ -3,7 +3,7 @@ class ComhrasController < ApplicationController
 
   # GET /comhras or /comhras.json
   def index
-    @comhras = Comhra.all
+    @comhras = Comhra.all.map { |c| c.slice(:id, :name, :lat_lang).merge(media_url: Rails.application.routes.url_helpers.rails_blob_url(c.media)) }
   end
 
   # GET /comhras/1 or /comhras/1.json
