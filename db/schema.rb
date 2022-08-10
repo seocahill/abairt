@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_06_112054) do
+ActiveRecord::Schema.define(version: 2022_08_09_153702) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -46,6 +46,17 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", limit: 255, null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "comhras", force: :cascade do |t|
+    t.string "name"
+    t.string "lat_lang"
+    t.integer "user_id", null: false
+    t.integer "grupa_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["grupa_id"], name: "index_comhras_on_grupa_id"
+    t.index ["user_id"], name: "index_comhras_on_user_id"
   end
 
   create_table "dictionary_entries", force: :cascade do |t|
@@ -176,6 +187,8 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "comhras", "grupas"
+  add_foreign_key "comhras", "users"
   add_foreign_key "rang_entries", "dictionary_entries"
   add_foreign_key "rang_entries", "rangs"
   add_foreign_key "rangs", "users"

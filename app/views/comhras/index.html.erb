@@ -3,12 +3,11 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <div class="flex justify-between items-center">
-    <h1 class="text-lg font-bold text-4xl">Comhras</h1>
-    <%= link_to 'New comhra', new_comhra_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
+  <div class="min-w-full" >
+    <div data-controller="map" id="map" style="height:600px"></div>
   </div>
-
-  <div id="comhras" class="min-w-full">
-    <%= render @comhras %>
+  <br>
+  <div class="flex justify-between items-center">
+    <%= link_to 'New comhra', new_comhra_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
   </div>
 </div>
