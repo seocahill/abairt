@@ -2,6 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 import L from 'leaflet'
 
 export default class extends Controller {
+  static values = { comhras: Array }
+
+
   connect() {
     this.map = L.map('map').setView([53.9110, -9.4527], 9);
 
@@ -9,6 +12,11 @@ export default class extends Controller {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
+
+    // debugger
+    this.comhrasValue.forEach((comhra) => {
+      L.marker(comhra.lat_lang.split(',')).addTo(this.map);
+    });
 
     // let marker = L.marker([53.91, -9.4527]).addTo(map);
     this.map.on('click', (e) => { this.showLatLang(e) });
