@@ -21,7 +21,7 @@ export default class extends Controller {
       marker.addTo(this.map);
     });
 
-    if (document.getElementById("comhra_lat_lang")) {
+    if (document.getElementById("grupa_lat_lang")) {
       this.map.on('click', (e) => { this.showLatLang(e) });
     }
   }
@@ -31,6 +31,6 @@ export default class extends Controller {
       this.marker.remove()
     }
     this.marker = L.marker(e.latlng).addTo(this.map);
-    document.getElementById("comhra_lat_lang").value = `${e.latlng.lat},${e.latlng.lng}`;
+    document.getElementById("grupa_lat_lang").value = `${e.latlng.lat},${e.latlng.lng}`;
   }
 }
