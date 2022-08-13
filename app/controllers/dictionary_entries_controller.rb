@@ -4,6 +4,8 @@ class DictionaryEntriesController < ApplicationController
   before_action :set_dictionary_entry, only: %i[show edit update update_all destroy]
   before_action :set_rang, only: %i[new create]
 
+  belongs_to :comhra, optiona: true
+
   # GET /dictionary_entries or /dictionary_entries.json
   def index
     records = DictionaryEntry.joins(:rangs).where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").where("rangs.url is null")

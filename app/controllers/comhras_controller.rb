@@ -8,6 +8,7 @@ class ComhrasController < ApplicationController
 
   # GET /comhras/1 or /comhras/1.json
   def show
+    @regions = @comhra.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
   end
 
   # GET /comhras/new

@@ -4,5 +4,7 @@ class Comhra < ApplicationRecord
   belongs_to :user
   belongs_to :grupa
 
+  has_many :dictionary_entries
+
   has_one_attached :media
 end
