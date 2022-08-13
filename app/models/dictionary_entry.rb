@@ -7,6 +7,7 @@ class DictionaryEntry < ApplicationRecord
   has_many :rang_entries, dependent: :destroy
   has_many :rangs, through: :rang_entries
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
+  belongs_to :comhra, optional: true
 
   enum status: [:normal, :ceist, :foghraíocht]
 

@@ -1,0 +1,5 @@
+<h1>New Dictionary Entry</h1>
+<%= turbo_frame_tag "new_dictionary_entry", target: "_top" do %>
+  <%= render 'form', dictionary_entry: @dictionary_entry %>
+<% end %>
+<%= link_to 'Back', dictionary_entries_path %>
