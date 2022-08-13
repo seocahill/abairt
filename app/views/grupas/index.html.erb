@@ -32,13 +32,17 @@
                   <div class="text-sm text-gray-900"><%= truncate(grupa.ainm, length: 50) %></div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= grupa.muinteoir.name %></div>
+                  <div class="text-sm text-gray-900"><%= grupa.muinteoir&.name || "ceann ar bith" %></div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900"><%= grupa.users.size %></div>
                 </td>
                 <td class="px-6 whitespace-nowrap text-right text-sm font-medium">
+                <% if grupa.rangs.present? %>
                   <%= link_to 'An Chead Rang eile', rang_path(grupa.rangs.last.id), class: "text-indigo-600 hover:text-indigo-900" %>
+                <% else %>
+                  rang ar bith
+                <% end %>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <%= link_to 'Uile Ranganna', grupa, class: "text-indigo-600 hover:text-indigo-900" %>

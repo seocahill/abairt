@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_09_153702) do
+ActiveRecord::Schema.define(version: 2022_08_13_144613) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -114,6 +114,7 @@ ActiveRecord::Schema.define(version: 2022_08_09_153702) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "muinteoir_id"
+    t.string "lat_lang"
     t.index ["muinteoir_id"], name: "index_grupas_on_muinteoir_id"
   end
 

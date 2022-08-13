@@ -11,6 +11,10 @@ class GrupasController < ApplicationController
     @pagy, @rangs = pagy(records)
   end
 
+  def new
+    @grupa = Grupa.new
+  end
+
   # GET /Grupas/1/edit
   def edit
     @grupa = Grupa.find(params[:id])
@@ -22,7 +26,7 @@ class GrupasController < ApplicationController
 
     respond_to do |format|
       if @Grupa.save
-        format.html { redirect_to @grupa, notice: 'Grupa was successfully created.' }
+        format.html { redirect_back(fallback_location: grupas_path, info: "Tá an jab déanta") }
         format.json { render :show, status: :created, location: @grupa }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -65,7 +69,7 @@ class GrupasController < ApplicationController
   end
 
   def grupa_params
-    params.require(:grupa).permit(:ainm)
+    params.require(:grupa).permit(:ainm, :lat_lang)
   end
 
   private
