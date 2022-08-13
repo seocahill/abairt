@@ -1,0 +1,59 @@
+<div class="mt-10 mb-10">
+  <%= form_with(model: [@rang, dictionary_entry], class: "md:grid md:grid-cols-4 md:gap-4", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
+    <% if dictionary_entry.errors.any? %>
+      <div role="alert">
+        <div class="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+          <h2><%= pluralize(dictionary_entry.errors.count, "error") %> prohibited this dictionary_entry from being saved:</h2>
+        </div>
+        <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+          <ul>
+            <% dictionary_entry.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+    <div class="" data-rang-target="wordSearch">
+      <%= form.label :word_or_phrase, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :word_or_phrase, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "autoComplete" %>
+    </div>
+    <div class="">
+      <%= form.label :translation, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :translation, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "translation" %>
+    </div>
+    <div class="">
+      <%= form.label :notes, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :notes, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "notes" %>
+    </div>
+    <div class="" data-rang-target="tagSearch">
+      <%= form.label :tag_list, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :tag_list, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "autoCompleteTags" %>
+    </div>
+    <div class="" data-rang-target="startRegion">
+      <%= form.label :region_start, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :region_start, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "startRegion", readonly: true %>
+    </div>
+    <div class="" data-rang-target="endRegion">
+      <%= form.label :region_end, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :region_end, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "endRegion", readonly: true %>
+    </div>
+    <div class="" data-rang-target="regionId">
+      <%= form.label :region_id, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :region_id, class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md", id: "regionId", readonly: true %>
+    </div>
+    <%= form.hidden_field :dictionary_entry_id, id: "dictionary_entry_id" %>
+    <%= content_tag :div, data: { controller: 'recorder' }, class: "w-full text-center mx-auto" do %>
+      <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
+      <%= content_tag :div, "Record voice",
+                        class: 'bg-blue-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                        data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
+      <%= content_tag :div, "Stop",
+                        class: 'bg-red-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                        data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
+    <% end %>
+    <div class="">
+      <button class="bg-green-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold">Save entry</button>
+    </div>
+  <% end %>
+</div>
