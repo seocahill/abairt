@@ -6,5 +6,11 @@
         <div id="map" style="height:600px"></div>
       </div>
     </div>
+    <% if current_user.maistir %>
+
+    <% end %>
+    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+      <%= link_to 'Grúpa nua', new_grupa_path, class: "bg-blue-400 text-white rounded font-lg mt-5 mr-1 mb-1 px-2 py-2 font-semibold" %>
+    </div>
   </div>
 </div>
