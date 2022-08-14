@@ -58,7 +58,11 @@ export default class extends Controller {
     this.waveSurfer.load(this.mediaValue);
 
     this.waveSurfer.on('loading', function (progress) {
-      playButton.innerHTML = `loading ${progress}%`;
+      if (progress < 99) {
+        playButton.innerHTML = `loading ${progress}%`;
+      } else {
+        playButton.innerHTML = "Play / Pause";
+      }
     })
 
     this.waveSurfer.on('ready', function() {
@@ -213,7 +217,7 @@ export default class extends Controller {
 
   play(event) {
     event.preventDefault()
-    const regionId = event.target.dataset.regionId;
+    const regionId = event.currentTarget.dataset.regionId;
     const region = this.waveSurfer.regions.list[regionId]
     if (region) {
       region.play()

@@ -42,6 +42,6 @@ class DictionaryEntry < ApplicationRecord
   end
 
   def transcription?
-    rangs.first.media.audio?
+    rangs.first&.media&.audio?
   end
 end
