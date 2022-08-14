@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :comhras  do
-    resources :dictionary_entries, module: :comhras
-  end
-
   resources :rangs do
     resources :dictionary_entries
   end
