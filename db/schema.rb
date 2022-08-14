@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_13_204710) do
+ActiveRecord::Schema.define(version: 2022_08_13_144613) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -73,8 +73,6 @@ ActiveRecord::Schema.define(version: 2022_08_13_204710) do
     t.decimal "region_start"
     t.decimal "region_end"
     t.string "region_id"
-    t.integer "comhra_id"
-    t.index ["comhra_id"], name: "index_dictionary_entries_on_comhra_id"
   end
 
 # Could not dump table "fts_dictionary_entries" because of following StandardError
