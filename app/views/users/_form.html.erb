@@ -22,6 +22,13 @@
       <%= form.label :password, class: "sr-only" %>
       <%= form.password_field :password, class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm", placeholder: "Password" %>
     </div>
+    <div class="field">
+      <%= form.label "Áit", class: "sr-only" %>
+      <div data-controller="map"  class="flex flex-col">
+        <div id="map" style="height:600px"></div>
+        <%= form.text_field :lat_lang, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Áit" %>
+      </div>
+    </div>
   </div>
   <div class="mt-10">
     <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
