@@ -48,17 +48,6 @@ ActiveRecord::Schema.define(version: 2022_08_13_144613) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "comhras", force: :cascade do |t|
-    t.string "name"
-    t.string "lat_lang"
-    t.integer "user_id", null: false
-    t.integer "grupa_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["grupa_id"], name: "index_comhras_on_grupa_id"
-    t.index ["user_id"], name: "index_comhras_on_user_id"
-  end
-
   create_table "dictionary_entries", force: :cascade do |t|
     t.string "word_or_phrase", limit: 255
     t.string "translation", limit: 255
@@ -179,8 +168,8 @@ ActiveRecord::Schema.define(version: 2022_08_13_144613) do
     t.datetime "updated_at", null: false
     t.boolean "confirmed", default: false, null: false
     t.string "token", limit: 255
-    t.bigint "master_id"
-    t.bigint "grupa_id"
+    t.integer "master_id"
+    t.integer "grupa_id"
     t.index ["grupa_id"], name: "index_users_on_grupa_id"
     t.index ["master_id"], name: "index_users_on_master_id"
     t.index ["token"], name: "index_users_on_token"
@@ -188,8 +177,6 @@ ActiveRecord::Schema.define(version: 2022_08_13_144613) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "comhras", "grupas"
-  add_foreign_key "comhras", "users"
   add_foreign_key "rang_entries", "dictionary_entries"
   add_foreign_key "rang_entries", "rangs"
   add_foreign_key "rangs", "users"
