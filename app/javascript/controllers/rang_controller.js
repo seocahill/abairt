@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus"
 import  WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
-// import { SoundTouch } from "soundtouchjs";
 
 export default class extends Controller {
   static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription"]
@@ -214,7 +213,13 @@ export default class extends Controller {
 
   play(event) {
     event.preventDefault()
-    this.waveSurfer.playPause()
+    const regionId = event.target.dataset.regionId;
+    const region = this.waveSurfer.regions.list[regionId]
+    if (region) {
+      region.play()
+    } else {
+      this.waveSurfer.playPause()
+    }
   }
 
   startMeeting() {
