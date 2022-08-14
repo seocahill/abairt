@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import L from 'leaflet'
 
 export default class extends Controller {
-  static values = { comhras: Array }
+  static values = { pins: Array }
 
 
   connect() {
@@ -13,10 +13,9 @@ export default class extends Controller {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    // debugger
-    this.comhrasValue.forEach((comhra) => {
-      let marker = L.marker(comhra.lat_lang.split(','))
-      let content = `<a href="/comhras/${comhra.id}">${comhra.name}</a><audio controls src="${comhra.media_url}"></audio>`;
+    this.pinsValue.forEach((rang) => {
+      let marker = L.marker(rang.lat_lang.split(','))
+      let content = `<a href="/rangs/${rang.id}">${rang.ainm}</a><audio controls src="${rang.media_url}"></audio>`;
       marker.bindPopup(content).openPopup();
       marker.addTo(this.map);
     });

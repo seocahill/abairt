@@ -4,8 +4,10 @@
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
       <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      <% if @muinteoir %>
         múinteoir: <%= link_to @muinteoir.name, muinteoir_path(@muinteoir) %>
         <button data-action="click->rang#startMeeting" class="h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-gray-800">Cruinniú</button>
+      <% end %>
         <% if @rang.media.attached? && !@rang.media.audio? %>
           <%= link_to "Ábhar ranga Íoslódáil", rails_blob_path(@rang.media, disposition: "attachment"), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-gray-800" %>
         <% end %>
