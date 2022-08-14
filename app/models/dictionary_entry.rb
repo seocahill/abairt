@@ -40,4 +40,8 @@ class DictionaryEntry < ApplicationRecord
 
     Rails.application.routes.url_helpers.url_for(media)
   end
+
+  def transcription?
+    rangs.first.media.audio?
+  end
 end
