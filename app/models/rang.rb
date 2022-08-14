@@ -13,6 +13,8 @@ class Rang < ApplicationRecord
 
   validates :grupa_id, presence: true
 
+  scope :has_recording, -> { joins(:media_attachment) }
+
   def next_time
     return  "aon am" unless time
     return "críochnaithe" unless time > Time.now
