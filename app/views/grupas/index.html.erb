@@ -2,58 +2,8 @@
 <div class="flex flex-col">
   <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
     <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ainm
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Múinteoir
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Líon na Daltaí
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              </th>
-               <% if current_user %>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                </th>
-              <% end %>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <% @grupai.each do |grupa| %>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= truncate(grupa.ainm, length: 50) %></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= grupa.muinteoir&.name || "ceann ar bith" %></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= grupa.users.size %></div>
-                </td>
-                <td class="px-6 whitespace-nowrap text-right text-sm font-medium">
-                <% if grupa.rangs.present? %>
-                  <%= link_to 'An Chead Rang eile', rang_path(grupa.rangs.last.id), class: "text-indigo-600 hover:text-indigo-900" %>
-                <% else %>
-                  rang ar bith
-                <% end %>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <%= link_to 'Uile Ranganna', grupa, class: "text-indigo-600 hover:text-indigo-900" %>
-                </td>
-                <% if current_user %>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"> <%= link_to "Edit", edit_grupa_path(grupa) %></td>
-              <% end %>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <div data-controller="map" class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <div id="map" style="height:600px"></div>
       </div>
     </div>
   </div>
