@@ -29,11 +29,11 @@ class GrupasController < ApplicationController
 
   # POST /Grupas or /Grupas.json
   def create
-    @Grupa = Grupa.new(grupa_params)
-
+    @grupa = Grupa.new(grupa_params)
+    @grupa.muinteoir = current_user
     respond_to do |format|
-      if @Grupa.save
-        format.html { redirect_back(fallback_location: grupas_path, info: "Tá an jab déanta") }
+      if @grupa.save
+        format.html { redirect_to @grupa }
         format.json { render :show, status: :created, location: @grupa }
       else
         format.html { render :new, status: :unprocessable_entity }
