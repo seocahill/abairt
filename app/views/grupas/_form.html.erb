@@ -1,19 +1,14 @@
-<!-- component -->
-<!--
-  UI Design Prototype
-  Link : https://dribbble.com/shots/10452538-React-UI-Components
--->
 <div class="min-h-screen py-6 flex flex-col justify-center sm:py-12">
   <div class="relative py-3 sm:max-w-xl sm:mx-auto">
     <div class="relative px-4 py-10 bg-gray-50 mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
-      <div class="max-w-md mx-auto">
+      <div class="max-w-xl mx-auto">
         <div class="flex items-center space-x-5">
           <div class="block pl-2 font-semibold text-xl self-start">
             <h2 class="leading-relaxed">Grúpa Nua</h2>
           </div>
         </div>
         <div class="divide-y">
-          <%= form_with(model: Grupa) do |form| %>
+          <%= form_with(model: grupa) do |form| %>
             <% if grupa.errors.any? %>
               <div id="error_explanation">
                 <h2><%= pluralize(grupa.errors.count, "error") %> prohibited this comhrá from being saved:</h2>
@@ -27,13 +22,13 @@
             <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
               <div class="flex flex-col">
                 <label class="leading-loose">Ainm</label>
-                <%= form.text_field :aimn, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Aimn an Taifead" %>
+                <%= form.text_field :ainm, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Ainm" %>
               </div>
             </div>
             <div data-controller="map"  class="flex flex-col">
               <label class="leading-loose">Ait</label>
-              <div id="map" style="height:600px"></div>
-              <%= form.text_field :lat_lang, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "54.050924,-9.585591" %>
+              <div id="map" style="height:600px;width:500px;"></div>
+              <%= form.text_field :lat_lang, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Dada" %>
             </div>
             <div class="pt-4 flex items-center space-x-4">
               <button class="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none">Save</button>

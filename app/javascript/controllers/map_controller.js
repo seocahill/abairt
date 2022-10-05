@@ -15,7 +15,7 @@ export default class extends Controller {
 
     this.pinsValue.forEach((rang) => {
       let marker = L.marker(rang.lat_lang.split(','))
-      let content = `<a href="/rangs/${rang.id}">${rang.ainm}</a><audio controls src="${rang.media_url}"></audio>`;
+      let content = `<a href="/grupas/${rang.id}">${rang.ainm}</a><audio controls src="${rang.media_url}"></audio>`;
       marker.bindPopup(content).openPopup();
       marker.addTo(this.map);
     });
