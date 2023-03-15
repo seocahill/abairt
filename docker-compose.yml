@@ -35,5 +35,5 @@ services:
     ports:
       - 6379:6379
 
-volumes:
-  db:
+# volumes:
+#   db:
