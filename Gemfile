@@ -63,7 +63,7 @@ gem "pagy", "~> 5.2.1"
 
 gem "aws-sdk-s3", "~> 1.88"
 
-gem "tailwindcss-rails", "~> 0.5.1"
+gem "tailwindcss-rails"
 
 gem "sentry-ruby", "~> 4.2"
 
