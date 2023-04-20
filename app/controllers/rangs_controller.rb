@@ -3,6 +3,7 @@
 class RangsController < ApplicationController
   before_action :set_rang, only: %i[show edit update destroy]
   before_action :authorize, except: %i[show index]
+  layout "chat"
 
   # GET /rangs or /rangs.json
   def index

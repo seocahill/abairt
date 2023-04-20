@@ -13,12 +13,6 @@
     <% end %>
   </div>
   <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.translation %></div>
-  <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.notes %></div>
-  <div data-target="rang.cell" class="table-cell px-6 py-4">
-    <% dictionary_entry.tag_list.each do |tag| %>
-      <%= link_to tag, dictionary_entries_path(tag: tag), target: "_top" %>
-    <% end %>
-  </div>
   <div data-target="rang.cell" class="table-cell px-6 py-4">
     <% if dictionary_entry.media.audio? %>
       <audio src="<%= url_for(dictionary_entry.media) %>" preload=true data-target="entry.audio"></audio>
