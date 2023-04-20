@@ -1,66 +1,61 @@
-<%= content_for(:page_title, "Ranganna") %>
-
-<div class="flex flex-col">
-  <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Am
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Owner
-              </th>
-              <th scope="col" class="relative px-6 py-3">
-                <span class="sr-only">View</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <% @rangs.each do |rang| %>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= truncate(rang.name, length: 50) %></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= rang.next_time %></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<%= type(rang).last %>-100 text-<%= type(rang).last %>-800">
-                    <%= type(rang).first %>
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div class="flex items-center">
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        <%= rang.user.name %>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <%= link_to 'Show', rang, class: "text-indigo-600 hover:text-indigo-900" %>
-                </td>
-              </tr>
-              <!-- More items... -->
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+<div class="bg-gray-100 flex h-screen">
+  <!-- Sidebar -->
+  <div class="bg-gray-800 text-white w-1/4 flex flex-col">
+    <div class="p-4 border-b border-gray-700">
+      <h1 class="text-2xl font-bold">Signal Chat</h1>
+      <p class="text-gray-400 mt-1">Online</p>
+    </div>
+    <div class="p-4 flex-grow overflow-y-auto">
+      <ul class="space-y-4">
+        <li class="flex items-center space-x-2">
+          <img src="https://i.pravatar.cc/40?u=1" alt="User Avatar" class="w-8 h-8 rounded-full" />
+          <div>
+            <h2 class="font-bold">John Doe</h2>
+            <p class="text-gray-400">Hey there, how are you?</p>
+          </div>
+        </li>
+        <li class="flex items-center space-x-2">
+          <img src="https://i.pravatar.cc/40?u=2" alt="User Avatar" class="w-8 h-8 rounded-full" />
+          <div>
+            <h2 class="font-bold">Jane Smith</h2>
+            <p class="text-gray-400">I'm good, thanks for asking. What about you?</p>
+          </div>
+        </li>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mt-4 focus:outline-none focus:shadow-outline">
+        Start Video Call
+      </button>
+      </ul>
     </div>
   </div>
-</div>
-<div class="container mx-auto px-6 py-8 h-full flex-grow">
-  <div class="flex flex-col sm:flex-row sm:items-center mb-6">
-    <%== pagy_nav(@pagy) %>
+
+  <!-- Main Chat Area -->
+  <div class="flex-grow">
+    <div class="p-4 flex justify-end items-center border-b border-gray-300 bg-white">
+      <img src="https://i.pravatar.cc/40?u=1" alt="User Avatar" class="w-8 h-8 rounded-full" />
+      <h2 class="font-bold ml-2">John Doe</h2>
+    </div>
+    <div class="p-4 flex-grow overflow-y-auto">
+      <div class="flex items-end justify-end">
+        <div class="max-w-md mx-auto my-4 bg-gray-200 p-3 rounded-full text-sm">
+          <p>Hey there, how are you?</p>
+        </div>
+      </div>
+      <div class="flex items-start">
+        <img src="https://i.pravatar.cc/40?u=2" alt="User Avatar" class="w-8 h-8 rounded-full" />
+        <div class="max-w-md mx-auto my-4 bg-gray-200 p-3 rounded-full text-sm">
+          <p>I'm good, thanks for asking. What about you?</p>
+        </div>
+      </div>
+      <!-- ... -->
+    </div>
+    <div class="p-4 bg-white">
+      <form class="flex">
+        <input type="text" placeholder="Type a message..." class="flex-grow border border-gray-300 rounded-full p-2 mr-2 focus:outline-none" />
+        <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
+          Send
+        </button>
+      </form>
+    </div>
   </div>
 </div>
