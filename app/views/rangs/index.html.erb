@@ -1,10 +1,10 @@
 <div class="bg-gray-100 flex h-screen">
   <!-- Sidebar -->
   <div class="bg-gray-800 text-white w-1/4 flex flex-col">
-    <div class="p-4 border-b border-gray-700">
+    <%# <div class="p-4 border-b border-gray-700">
       <h1 class="text-2xl font-bold">Signal Chat</h1>
       <p class="text-gray-400 mt-1">Online</p>
-    </div>
+    </div> %>
     <div class="p-4 flex-grow overflow-y-auto">
       <ul class="space-y-4">
         <li class="flex items-center space-x-2">
@@ -49,12 +49,32 @@
       <!-- ... -->
     </div>
     <div class="p-4 bg-white">
-      <form class="flex">
-        <input type="text" placeholder="Type a message..." class="flex-grow border border-gray-300 rounded-full p-2 mr-2 focus:outline-none" />
-        <button type="submit"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline">
-          Send
-        </button>
+      <form class="flex mt-4 flex-col justify-end">
+        <div class="flex-grow flex flex-col">
+          <input
+            type="text"
+            placeholder="Type a message"
+            class="flex-grow border rounded-full p-2 mb-2"
+          />
+          <input
+            type="text"
+            placeholder="Translation"
+            class="flex-grow border rounded-full p-2 mb-2"
+          />
+          <div class="flex">
+            <button
+              type="button"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 focus:outline-none focus:shadow-outline"
+            >
+              Record Audio
+            </button>
+            <button
+              type="submit"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+            >
+              Send
+            </button>
+          </div>
       </form>
     </div>
   </div>
