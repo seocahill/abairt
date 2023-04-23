@@ -14,3 +14,8 @@
  *= require_self
  *= require simple_calendar
  */
+
+ @font-face {
+   font-family: 'CelticKnots';
+   src: url('CelticKnots-Bq55.ttf') format('truetype');
+ }
