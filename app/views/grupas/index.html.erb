@@ -5,7 +5,7 @@
       <div>
         <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
         <div class="mt-1">
-          <input type="text" id="search" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+          <input type="text" id="search" placeholder="Name or Place" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
         </div>
       </div>
       <div>
@@ -18,33 +18,53 @@
           </select>
         </div>
       </div>
+      <div>
+        <label for="voice" class="block text-sm font-medium text-gray-700">Dialect</label>
+        <div class="mt-1">
+          <select id="voice" name="voice" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            <option value="">All</option>
+            <option value="">Acaill</option>
+            <option value="male">Du Chaocháin</option>
+            <option value="female">Túar Mhic Éadaigh</option>
+            <option value="female">An Fód Dubh</option>
+          </select>
+        </div>
+      </div>
       <div class="text-right">
         <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
       </div>
+      <aside>
+        <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
+        <ul class="flex flex-wrap -mx-1">
+          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300">Sea</a></li>
+          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-300 hover:bg-gray-400">Home</a></li>
+          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-400 hover:bg-gray-500">Pub</a></li>
+          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-500 hover:bg-gray-600">Family</a></li>
+          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-600 hover:bg-gray-700">Football</a></li>
+        </ul>
+      </aside>
     </form>
   </div>
   <div class="flex-grow p-4">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">Table</h2>
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Speakers</h2>
     <table class="w-full table-fixed">
       <thead>
-        <tr class="bg-gray-100">
-          <th class="w-1/4 py-2 px-4 border-gray-200">Gaelic</th>
-          <th class="w-1/4 py-2 px-4 border-gray-200">English</th>
-          <th class="w-1/4 py-2 px-4 border-gray-200">Voice</th>
+        <tr class="bg-gray-100 text-left">
+          <th class="w-1/4 py-2 px-4 border-gray-200">Speaker</th>
+          <th class="w-1/4 py-2 px-4 border-gray-200">Dialect</th>
+          <th class="w-1/4 py-2 px-4 border-gray-200">Media</th>
+          <th class="w-1/4 py-2 px-4 border-gray-200 text-center">Transcription</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="bg-white">
-          <td class="py-2 px-4 border-gray-200">Gaelic 1</td>
-          <td class="py-2 px-4 border-gray-200">English 1</td>
-          <td class="py-2 px-4 border-gray-200">Male</td>
-        </tr>
-        <tr class="bg-gray-100">
-          <td class="py-2 px-4 border-gray-200">Gaelic 2</td>
-          <td class="py-2 px-4 border-gray-200">English 2</td>
-          <td class="py-2 px-4 border-gray-200">Female</td>
-        </tr>
-        <!-- Add more rows here -->
+        <% ActiveStorage::Attachment.all.each do |file| %>
+          <tr class="bg-white">
+            <td class="py-2 px-4 border-gray-200"><%= %w[Muchchu Maoilruaidh Gallochobair].sample %></td>
+            <td class="py-2 px-4 border-gray-200"><%= %w[DuChoicain FodhDubh TuarMhicEadaigh Acaill].sample %></td>
+            <td class="py-2 px-4 border-gray-200"><%= audio_tag file.url, controls: true %></td>
+            <td class="text-center"><%= link_to "view", rang_path(file.record_id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>
