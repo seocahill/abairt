@@ -10,6 +10,7 @@ export default class extends Controller {
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
+      minZoom: 9,
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
