@@ -2,14 +2,8 @@ class GrupasController < ApplicationController
   before_action :authorize, except: %i[index show]
 
   def index
-    @grupai = Grupa.all
-    @pins = @grupai.where.not(lat_lang: nil).joins(:rangs).map do |g|
-      g.slice(:id, :ainm, :lat_lang).tap do |c|
-        if (sample = g.rangs.detect { |r| r.media.audio? }&.media)
-          c[:media_url] = Rails.application.routes.url_helpers.rails_blob_url(sample)
-        end
-      end
-    end
+    @rang = Rang.with_attached_media.find(56)
+    @regions = @rang.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
   end
 
   def show
