@@ -1,3 +1,6 @@
+<%= content_for :page_title do %>
+  Native Speakers
+<% end %>
 <div class="flex flex-row">
   <div class="flex-shrink-0 w-64 bg-gray-100 p-4">
     <h2 class="text-lg font-medium text-gray-900 mb-4">Search and Filter</h2>
@@ -36,11 +39,9 @@
       <aside>
         <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
         <ul class="flex flex-wrap -mx-1">
-          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300">Sea</a></li>
-          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-300 hover:bg-gray-400">Home</a></li>
-          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-400 hover:bg-gray-500">Pub</a></li>
-          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-500 hover:bg-gray-600">Family</a></li>
-          <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-600 hover:bg-gray-700">Football</a></li>
+          <% @tags.each do |tag| %>
+            <li class="my-1 mx-1"><a href="#" class="inline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300"><%= tag %></a></li>
+          <% end %>
         </ul>
       </aside>
     </form>
@@ -97,7 +98,7 @@
           </tr>
         </thead>
         <tbody>
-          <% ActiveStorage::Attachment.all.each do |file| %>
+          <% @files.each do |file| %>
             <tr class="bg-white">
               <td class="py-2 px-4 border-gray-200"><%= %w[Muchchu Maoilruaidh Gallochobair].sample %></td>
               <td class="py-2 px-4 border-gray-200"><%= %w[DuChoicain FodhDubh TuarMhicEadaigh Acaill].sample %></td>
@@ -107,6 +108,7 @@
           <% end %>
         </tbody>
       </table>
+      <%== pagy_nav(@pagy) %>
     </div>
   </div>
 </div>
