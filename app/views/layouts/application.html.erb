@@ -37,7 +37,9 @@
               <div class="ml-10 flex items-baseline space-x-4">
                 <%= link_to 'Speakers', grupas_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
                 <%= link_to 'Dictionary', dictionary_entries_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                <a href=<%= rangs_path(current_user) %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Chat</a>
+                <% if current_user.present? %>
+                  <%= link_to "Chat", rangs_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                <% end %>
               </div>
             </div>
           </div>
