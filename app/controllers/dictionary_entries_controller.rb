@@ -24,7 +24,7 @@ class DictionaryEntriesController < ApplicationController
 
     records
 
-    @pagy, @dictionary_entries = pagy(records)
+    @pagy, @dictionary_entries = pagy(records, items: 12)
 
     respond_to do |format|
       format.html

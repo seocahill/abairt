@@ -1,39 +1,58 @@
-<%= content_for(:page_title, "Foclóir") %>
-<%= render "search" %>
-<%= turbo_stream_from "dictionary_entries" %>
-<div class="flex flex-col">
-  <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-        <div class="table min-w-full divide-y divide-gray-200">
-          <div class="table-header-group bg-gray-50">
-            <div class="table-row">
-              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Abairt</b></div>
-              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Aistreacháin</b></div>
-              <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-          <div id="dictionary_entries" class="table-row-group bg-white divide-y divide-gray-200">
-            <%= render partial: "dictionary_entry", collection: @dictionary_entries, as: :dictionary_entry, locals: { current_user: nil } %>
-          </div>
+<%= content_for(:page_title, "Dictionary of Words and Phrases") %>
+<div class="flex flex-row">
+  <div class="flex-shrink-0 w-64 bg-gray-100 p-4">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Search and Filter</h2>
+    <form class="space-y-4" action="/dictionary_entries">
+      <div>
+        <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+        <div class="mt-1">
+          <input type="search" id="search" placeholder="Irish or English words" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
         </div>
       </div>
+      <div class="flex items-center">
+        <input id="checkbox" type="checkbox" name="media" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
+        <label for="checkbox" class="ml-2 block text-sm leading-5 text-gray-900">
+          Only results with audio
+        </label>
+      </div>
+      <div class="text-right">
+        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
+      </div>
+      <aside>
+        <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
+        <ul class="flex flex-wrap -mx-1">
+          <% @tags.each do |tag| %>
+            <li class="my-1 mx-1"><%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "nline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300" %></li>
+          <% end %>
+        </ul>
+      </aside>
+    </form>
+  </div>
+  <div class="flex-grow p-4">
+    <%# begin wave display %>
+    <div class="flex flex-col space-y-4">
+      <table class="w-full table-fixed">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Audio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @dictionary_entries.each do |entry| %>
+            <tr class="bg-white">
+              <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
+              <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
+              <td class="text-center py-2 px-4 border-gray-200">
+              <% if entry.media.attached? %>
+                <%= audio_tag entry.media.url, controls: true %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%== pagy_nav(@pagy) %>
     </div>
-  </div>
-</div>
-<div class="container mx-auto px-6 py-8 h-full flex-grow">
-  <div class="flex flex-col sm:flex-row sm:items-center mb-6">
-    <%= link_to dictionary_entries_path(@dictionary_entries, format: :csv), class: "bg-transparent text-gray-600 font-semibold py-2 px-4 mr-4 border border-gray-600 rounded inline-flex items-center" do %>
-      <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
-      <span>Íoslódáil</span>
-    <% end %>
-    <%== pagy_nav(@pagy) %>
-  </div>
-  <div class="flex flex-col sm:flex-row sm:items-center mb-2">
-
   </div>
 </div>
