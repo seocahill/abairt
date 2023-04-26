@@ -81,3 +81,5 @@ gem "rufus-scheduler", "~> 3.8"
 
 gem "acts-as-taggable-on", "~> 8.1"
 gem "importmap-rails", "~> 0.8.2"
+
+gem "groupdate", "~> 6.2"

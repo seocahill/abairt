@@ -135,6 +135,8 @@ GEM
       raabro (~> 1.4)
     globalid (1.1.0)
       activesupport (>= 5.0)
+    groupdate (6.2.1)
+      activesupport (>= 5.2)
     hotwire-rails (0.1.3)
       rails (>= 6.0.0)
       stimulus-rails
@@ -315,6 +317,7 @@ DEPENDENCIES
   byebug
   capybara (>= 3.26)
   dotenv-rails (~> 2.7)
+  groupdate (~> 6.2)
   hotwire-rails (~> 0.1.3)
   importmap-rails (~> 0.8.2)
   jbuilder (~> 2.7)
