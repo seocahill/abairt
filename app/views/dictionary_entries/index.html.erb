@@ -20,7 +20,6 @@
     </div>
     <div class="tab-content">
       <div class="tab-pane" id="tab1">
-        <%# <h2 class="text-lg font-medium text-gray-900 mb-4">Search and Filter</h2> %>
         <form class="space-y-4" action="/dictionary_entries">
           <div>
             <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
@@ -41,7 +40,6 @@
       </div>
       <% if current_user %>
         <div class="tab-pane hidden" id="tab2">
-          <%# <h2 class="text-lg font-medium text-gray-900 mb-4">New Item</h2> %>
           <form>
             <div>
               <label for="search" class="block text-sm font-medium text-gray-700">Irish</label>
@@ -53,6 +51,12 @@
               <label for="search" class="block text-sm font-medium text-gray-700">English</label>
               <div class="mt-1">
                 <textarea class="w-full"></textarea>
+              </div>
+            </div>
+            <div data-controller="tag" data-tag-target="tagSearch">
+              <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
+              <div class="mt-1">
+                 <textarea class="w-full" id= "autoCompleteTags"></textarea>
               </div>
             </div>
             <%= content_tag :div, data: { controller: 'recorder' }, class: "w-full text-center mx-auto" do %>
@@ -71,7 +75,6 @@
         </div>
       <% end %>
       <div class="tab-pane hidden" id="tab3">
-        <%# <h2 class="text-lg font-medium text-gray-900 mb-4">Tags</h2> %>
         <aside>
             <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
             <ul class="flex flex-wrap -mx-1">
