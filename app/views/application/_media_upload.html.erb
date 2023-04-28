@@ -1,6 +1,6 @@
 <div class="flex flex-col">
   <label class="leading-loose">Media upload</label>
-  <%= form.file_field :media, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "optional", direct_upload: true, data: { target: "direct-upload.input", action: "direct-upload#upload" } %>
+  <%= file_field_tag :media, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "optional", direct_upload: true, data: { target: "direct-upload.input", action: "direct-upload#upload" } %>
 </div>
 <div class="relative pt-1 uploader">
   <div class="flex mb-2 items-center justify-between">
