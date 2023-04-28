@@ -59,14 +59,14 @@
       <% if current_user %>
         <div class="tab-pane hidden" id="tab2">
           <form>
-            <div>
+            <div class="mt-1">
               <label for="search" class="block text-sm font-medium text-gray-700">Speaker</label>
               <div class="mt-1">
                 <input type="search" class="w-full" placeholder="Search for Speakers"/>
               </div>
             </div>
-            <div>
-            <label for="voice" class="block text-sm font-medium text-gray-700">Dialect</label>
+            <div class="mt-1">
+              <label for="voice" class="block text-sm font-medium text-gray-700">Dialect</label>
               <div class="mt-1">
                 <select id="voice" name="voice" class="py-2 px-3 border border-gray-300 rounded-md w-full">
                   <option value="">All</option>
@@ -77,14 +77,16 @@
                 </select>
               </div>
             </div>
-            <div data-controller="tag" data-tag-target="tagSearch">
+            <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
               <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
               <div class="mt-1">
                 <textarea class="w-full" id= "autoCompleteTags"></textarea>
               </div>
             </div>
-            <%= render "media_upload" %>
-            <div class="w-full text-center mx-auto">
+            <div class="mt-1">
+              <%= render "media_upload" %>
+            </div>
+            <div class="mt-1 w-full text-center mx-auto">
               <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
             </div>
           </form>
