@@ -22,6 +22,12 @@ class DictionaryEntriesController < ApplicationController
 
     @tags = ActsAsTaggableOn::Tag.most_used(15)
 
+    @lists = []
+    if current_user
+      @lists += ["Chat history", "Starred"]
+    end
+    @lists += ["Pap", "Seán Kileen", "Darren", "Patchy"]
+
     records
 
     @pagy, @dictionary_entries = pagy(records, items: 12)

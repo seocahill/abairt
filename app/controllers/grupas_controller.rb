@@ -2,7 +2,7 @@ class GrupasController < ApplicationController
   before_action :authorize, except: %i[index show]
 
   def index
-    @pagy, @files = pagy(ActiveStorage::Attachment.all, items: 12)
+    @pagy, @files = pagy(ActiveStorage::Attachment.where(record_type: "Rang"), items: 12)
     @rang = Rang.with_attached_media.find(56)
     @regions = @rang.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
     @tags = ActsAsTaggableOn::Tag.most_used(15)
