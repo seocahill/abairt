@@ -1,58 +1,95 @@
-<%= content_for(:page_title, "Rang: #{truncate(@rang.name, length: 50)}") %>
-<div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>"  >
-  <div id="meet"></div>
-  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6">
-      <p class="mt-1 max-w-2xl text-sm text-gray-500">
-      <% if @muinteoir %>
-        múinteoir: <%= link_to @muinteoir.name, muinteoir_path(@muinteoir) %>
-        <button data-action="click->rang#startMeeting" class="h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-gray-800">Cruinniú</button>
-      <% end %>
-        <% if @rang.media.attached? && !@rang.media.audio? %>
-          <%= link_to "Ábhar ranga Íoslódáil", rails_blob_path(@rang.media, disposition: "attachment"), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-gray-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-gray-800" %>
-        <% end %>
-        <%= link_to 'Edit rang', edit_rang_path(@rang), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-gray-700 rounded-lg focus:shadow-outline hover:bg-gray-800" if current_user %>
-      </p>
-      <% if @rang.media.attached? && (@rang.media.audio? ||  @rang.media.video?) %>
-          <div id="waveform" data-rang-target="waveform"></div>
-          <p data-target="rang.time"></p>
-          <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
-          <button id="play-pause-button" data-action="click->rang#play" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Play / Pause</button>
-          <button id="play-slower-button" data-action="click->rang#slower" class="h-8 px-4 m-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-700 rounded-lg focus:shadow-outline hover:bg-blue-800">Slower</button>
-          <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0" style="width: 100%">
-        <% end %>
-      <% if current_user %>
-        <%= turbo_frame_tag "new_dictionary_entry", src: new_rang_dictionary_entry_path(@rang), target: "_top" %>
-      <% end %>
-    </div>
-  </div>
-  <%= form_with(url: update_all_dictionary_entries_path, method: :patch, multipart: true, data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
-    <div class="table w-full mt-10">
-      <div class="table-header-group">
-        <div class="table-row">
-          <div class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Focal nó abairt</b></div>
-          <div data-target="rang.cell" class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Aistriúchán</b></div>
-          <div data-target="rang.cell" class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Notaí</b></div>
-          <div data-target="rang.cell" class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><b>Clibeanna</b></div>
-          <div data-target="rang.cell" class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-            </svg>
-          </div>
-          <div data-target="rang.cell" class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></div>
-          <div data-target="rang.cell" class="table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></div>
+<%= content_for :page_title do %>
+  "Transcription of Media: <%= truncate(@rang.name, length: 50) %>"
+<% end %>
+<%# player %>
+<div class="flex items-center space-x-4 p-4" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>">
+  <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+  <div class="flex flex-col space-y-4">
+    <div class="flex items-center space-x-4">
+      <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
+        Play
+      </button>
+      <label class="flex items-center space-x-2">
+        <input id="toggle-english" type="checkbox" class="form-checkbox" checked>
+        <span class="ml-2 text-gray-700">English Subtitles</span>
+      </label>
+      <label class="flex items-center space-x-2">
+        <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
+        <span class="ml-2 text-gray-700">Irish Subtitles</span>
+      </label>
+      <div class="relative">
+        <select id="playback-speed" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+          <option value="1">1x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="1.75">1.75x</option>
+          <option value="2">2x</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+            <path fill-rule="evenodd" d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h7l4 4V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>
+          </svg>
         </div>
       </div>
-      <% if current_user %>
-        <div id="current_user_dictionary_entries" class="table-row-group">
-          <%= render @rang.dictionary_entries %>
-        </div>
-      <% else %>
-        <%= turbo_stream_from "dictionary_entries" %>
-        <div id="dictionary_entries" class="table-row-group">
-          <%= render @rang.dictionary_entries %>
-        </div>
-      <% end %>
     </div>
-  <% end %>
+    <div id="subtitles" class="flex items-center space-x-4">
+      <p data-target="rang.time"></p>
+      <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-row">
+  <%# sidebar %>
+  <div class="flex-shrink-0 w-100 bg-gray-100 p-4"  data-controller="sidebar">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2>
+    <form class="space-y-4">
+      <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
+      <div class="mt-1">
+        <textarea id="word_or_phrase" placeholder="Gaeilge anseo" name="word_or_phrase" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
+      </div>
+      <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
+      <div class="mt-1">
+        <textarea id="translation" placeholder="Translation" name="translation" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
+      </div>
+      <label for="start_region" class="block text-sm font-medium text-gray-700">Region start</label>
+      <div class="mt-1">
+        <input type="number" id="start_region" name="start_region" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+      </div>
+      <label for="end_region" class="block text-sm font-medium text-gray-700">Region end</label>
+      <div class="mt-1">
+        <input type="number" id="end_region" name="end_region" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+      </div>
+      <div class="text-right">
+        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add</button>
+      </div>
+    </form>
+  </div>
+  <%# transcript %>
+  <div class="flex-grow p-4">
+    <div class="flex flex-col space-y-4">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Transcript</h2>
+      <table class="w-full table-fixed">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Start time</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">End time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @rang.dictionary_entries.each do |entry| %>
+            <tr class="bg-white">
+              <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
+              <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
+              <td class="text-center py-2 px-4 border-gray-200"><%= entry.region_start %></td>
+              <td class="text-center"><%= entry.region_end %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
