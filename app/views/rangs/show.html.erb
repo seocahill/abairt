@@ -32,6 +32,7 @@
           </svg>
         </div>
       </div>
+      <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0">
     </div>
     <div id="subtitles" class="flex items-center space-x-4">
       <p data-target="rang.time"></p>
@@ -42,34 +43,35 @@
 
 <div class="flex flex-row">
   <%# sidebar %>
-  <div class="flex-shrink-0 w-100 bg-gray-100 p-4"  data-controller="sidebar">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2>
-    <form class="space-y-4">
-      <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
-      <div class="mt-1">
-        <textarea id="word_or_phrase" placeholder="Gaeilge anseo" name="word_or_phrase" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
-      </div>
-      <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
-      <div class="mt-1">
-        <textarea id="translation" placeholder="Translation" name="translation" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
-      </div>
-      <label for="start_region" class="block text-sm font-medium text-gray-700">Region start</label>
-      <div class="mt-1">
-        <input type="number" id="start_region" name="start_region" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-      </div>
-      <label for="end_region" class="block text-sm font-medium text-gray-700">Region end</label>
-      <div class="mt-1">
-        <input type="number" id="end_region" name="end_region" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-      </div>
-      <div class="text-right">
-        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add</button>
-      </div>
-    </form>
+  <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
+    <div class="flex flex-col space-y-4">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Add transcription</h2>
+      <form class="space-y-4">
+        <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
+        <div class="mt-1">
+          <textarea id="word_or_phrase" placeholder="Gaeilge anseo" name="word_or_phrase" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
+        </div>
+        <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
+        <div class="mt-1">
+          <textarea id="translation" placeholder="Translation" name="translation" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
+        </div>
+        <label for="start_region" class="block text-sm font-medium text-gray-700">Region start</label>
+        <div class="mt-1">
+          <input type="number" id="start_region" name="start_region" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+        </div>
+        <label for="end_region" class="block text-sm font-medium text-gray-700">Region end</label>
+        <div class="mt-1">
+          <input type="number" id="end_region" name="end_region" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+        </div>
+        <div class="text-right">
+          <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add</button>
+        </div>
+      </form>
+    </div>
   </div>
   <%# transcript %>
   <div class="flex-grow p-4">
     <div class="flex flex-col space-y-4">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Transcript</h2>
       <table class="w-full table-fixed">
         <thead>
           <tr class="bg-gray-100 text-left">
