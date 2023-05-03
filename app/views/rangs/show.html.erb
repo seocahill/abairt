@@ -5,6 +5,8 @@
 <div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>">
   <div class="flex items-center space-x-4 p-4">
     <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+  </div>
+  <div class="flex items-center space-x-4 p-4">
     <div class="flex flex-col space-y-4">
       <div class="flex items-center space-x-4">
         <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
@@ -18,26 +20,18 @@
           <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
           <span class="ml-2 text-gray-700">Irish Subtitles</span>
         </label>
-        <div class="relative">
-          <select id="playback-speed" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-            <option value="1">1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="1.75">1.75x</option>
-            <option value="2">2x</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-              <path fill-rule="evenodd" d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h7l4 4V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>
-            </svg>
-          </div>
-        </div>
-        <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0">
-      </div>
-      <div id="subtitles" class="flex items-center space-x-4">
+        <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#slower">
+          Slow down
+        </button>
+        <label class="flex items-center space-x-2">
+          <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0">
+          <span class="ml-2 text-gray-700">Zoom in/out</span>
+        </label>
         <p data-target="rang.time"></p>
-        <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
+      </div>
+      <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-50">
+        <p class="prose lg:prose-2xl" data-target="rang.transcription">Transcript</p>
+        <i class="prose lg:prose" data-target="rang.translation">Translation</i>
       </div>
     </div>
   </div>
