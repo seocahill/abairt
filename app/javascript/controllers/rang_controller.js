@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import  WaveSurfer from "wavesurferjs"
+import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
@@ -98,9 +98,9 @@ export default class extends Controller {
     })
 
     this.waveSurfer.on('region-click', function (region) {
-      that.startRegionTarget.children[1].value = Math.round(region.start * 10) / 10
-      that.endRegionTarget.children[1].value = Math.round(region.end * 10) / 10
-      that.regionIdTarget.children[1].value = region.id
+      that.startRegionTarget.children[0].value = Math.round(region.start * 10) / 10
+      that.endRegionTarget.children[0].value = Math.round(region.end * 10) / 10
+      that.regionIdTarget.children[0].value = region.id
     })
   }
 
