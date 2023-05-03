@@ -43,7 +43,7 @@
     <%# sidebar %>
     <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
       <div class="flex flex-col space-y-4">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Add transcription</h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2>
         <form class="space-y-4">
           <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
           <div class="mt-1">
@@ -53,12 +53,10 @@
           <div class="mt-1">
             <textarea id="translation" placeholder="Translation" name="translation" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
           </div>
-          <label for="region_start" class="block text-sm font-medium text-gray-700">Region start</label>
-          <div class="mt-1" data-rang-target="startRegion">
+          <div class="hidden" data-rang-target="startRegion">
             <input type="number" id="region_start" name="region_start" class="py-2 px-3 border border-gray-300 rounded-md w-full">
           </div>
-          <label for="region_end" class="block text-sm font-medium text-gray-700">Region end</label>
-          <div class="mt-1" data-rang-target="endRegion">
+          <div class="hidden" data-rang-target="endRegion">
             <input type="number" id="region_end" name="region_end" class="py-2 px-3 border border-gray-300 rounded-md w-full">
           </div>
           <div class="hidden" data-rang-target="regionId">
@@ -80,6 +78,7 @@
               <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
               <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Start time</th>
               <th class="w-1/5 py-2 px-4 border-gray-200 text-center">End time</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -89,6 +88,7 @@
                 <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
                 <td class="text-center py-2 px-4 border-gray-200"><%= entry.region_start %></td>
                 <td class="text-center"><%= entry.region_end %></td>
+                <td><a href="#">X</a></td>
               </tr>
             <% end %>
           </tbody>
