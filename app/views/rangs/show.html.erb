@@ -12,6 +12,9 @@
         <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
           Play
         </button>
+        <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#slower">
+          Slow down
+        </button>
         <label class="flex items-center space-x-2">
           <input id="toggle-english" type="checkbox" class="form-checkbox" checked>
           <span class="ml-2 text-gray-700">English Subtitles</span>
@@ -20,14 +23,14 @@
           <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
           <span class="ml-2 text-gray-700">Irish Subtitles</span>
         </label>
-        <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#slower">
-          Slow down
-        </button>
         <label class="flex items-center space-x-2">
+          <span class="ml-2 text-gray-700">Zoom:</span>
           <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0">
-          <span class="ml-2 text-gray-700">Zoom in/out</span>
         </label>
-        <p data-target="rang.time"></p>
+        <label class="flex items-center space-x-2">
+          <span class="ml-2 text-gray-700">Playhead:</span>
+          <p data-target="rang.time">0.0 </p>
+        </label>
       </div>
       <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-50">
         <p class="prose lg:prose-2xl" data-target="rang.transcription">Transcript</p>
