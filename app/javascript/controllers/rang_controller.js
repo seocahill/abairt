@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription"]
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation"]
   static values = { meetingId: String, media: String, regions: Array }
 
   initialize() {
@@ -22,10 +22,11 @@ export default class extends Controller {
       })
     }
     let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
+    let translation = target.elements['dictionary_entry[translation]'].value;
     let regionId = target.elements["regionId"].value;
     if (regionId) {
       let region = this.waveSurfer.regions.list[regionId];
-      region.update({ data: { transcription: transcription } })
+      region.update({ data: { transcription: transcription, translation: translation } })
     }
     target.reset()
   }
@@ -72,13 +73,14 @@ export default class extends Controller {
           id: region.region_id,
           start: region.region_start,
           end: region.region_end,
-          data: { transcription: region.word_or_phrase }
+          data: { transcription: region.word_or_phrase, translation: region.translation }
         });
       })
     })
 
     this.waveSurfer.on('region-in', (region) => {
       that.transcriptionTarget.innerText= region.data.transcription
+      that.translationTarget.innerText = region.data.translation
     });
 
     this.waveSurfer.on('audioprocess', function () {
