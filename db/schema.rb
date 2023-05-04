@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_13_144613) do
+ActiveRecord::Schema.define(version: 2023_05_04_202847) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -48,6 +48,15 @@ ActiveRecord::Schema.define(version: 2022_08_13_144613) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "voice_recording_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_conversations_on_user_id"
+    t.index ["voice_recording_id"], name: "index_conversations_on_voice_recording_id"
+  end
+
   create_table "dictionary_entries", force: :cascade do |t|
     t.string "word_or_phrase", limit: 255
     t.string "translation", limit: 255
@@ -62,6 +71,8 @@ ActiveRecord::Schema.define(version: 2022_08_13_144613) do
     t.decimal "region_start"
     t.decimal "region_end"
     t.string "region_id"
+    t.integer "voice_recording_id"
+    t.index ["voice_recording_id"], name: "index_dictionary_entries_on_voice_recording_id"
   end
 
 # Could not dump table "fts_dictionary_entries" because of following StandardError
@@ -175,8 +186,17 @@ ActiveRecord::Schema.define(version: 2022_08_13_144613) do
     t.index ["token"], name: "index_users_on_token"
   end
 
+  create_table "voice_recordings", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "conversations", "users"
+  add_foreign_key "conversations", "voice_recordings"
   add_foreign_key "rang_entries", "dictionary_entries"
   add_foreign_key "rang_entries", "rangs"
   add_foreign_key "rangs", "users"

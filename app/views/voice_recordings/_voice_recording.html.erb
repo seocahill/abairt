@@ -1,0 +1,17 @@
+<div id="<%= dom_id voice_recording %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= voice_recording.title %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= voice_recording.description %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this voice recording", voice_recording, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to 'Edit this voice recording', edit_voice_recording_path(voice_recording), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>
