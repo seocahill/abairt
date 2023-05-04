@@ -63,9 +63,9 @@ Changed in 672f4759beaa7412089dc0d842be252eace66871, should revert and fix prope
 
 The basic unit is the dictionary_entry, which always belongs to the user that created it.
 
-Dictionary_entry also has and can belong to one or more rangs (to avoid repetition)
+Dictionary_entry also has and can belong to one or more rangs (to avoid repetition), through rang_entries
 A 'rang' is a classroom where a teacher user interacts with one or more student users.
-Rangs can have multiple users and vice versa
+Rangs can have multiple users and vice versa through seomras.
 
 Dictionary_entry can also optionally belong to a voice_recording.
 
