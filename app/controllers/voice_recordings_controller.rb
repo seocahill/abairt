@@ -3,15 +3,16 @@ class VoiceRecordingsController < ApplicationController
   before_action :authorize, except: %i[index show]
 
   def index
-    @pagy, @files = pagy(ActiveStorage::Attachment.where(record_type: "Rang"), items: 12)
-    @rang = Rang.with_attached_media.find(56)
-    @regions = @rang.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
+    if @recording = VoiceRecording.first
+      @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    end
     @tags = ActsAsTaggableOn::Tag.most_used(15)
   end
 
   def show
-    records = Rang.where(grupa_id: params[:id])
-    @pagy, @rangs = pagy(records)
+    # records = VoiceRecording.find(params[:id])
+    # @pagy, @entrie = pagy(records)
   end
 
   # GET /voice_recordings/new
