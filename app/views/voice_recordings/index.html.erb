@@ -107,43 +107,45 @@
   <div class="flex-grow p-4">
     <%# begin wave display %>
     <div class="flex flex-col space-y-4">
-      <div class="flex items-center space-x-4" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>">
-        <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
-        <div class="flex flex-col space-y-4">
-          <div class="flex items-center space-x-4">
-            <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
-              Play
-            </button>
-            <label class="flex items-center space-x-2">
-              <input id="toggle-english" type="checkbox" class="form-checkbox" checked>
-              <span class="ml-2 text-gray-700">English Subtitles</span>
-            </label>
-            <label class="flex items-center space-x-2">
-              <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
-              <span class="ml-2 text-gray-700">Irish Subtitles</span>
-            </label>
-            <div class="relative">
-              <select id="playback-speed" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="1.75">1.75x</option>
-                <option value="2">2x</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                  <path fill-rule="evenodd" d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h7l4 4V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>
-                </svg>
+      <% if @recording %>
+        <div class="flex items-center space-x-4" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @recording.meeting_id %>" data-rang-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-rang-regions-value="<%= @regions %>">
+          <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+          <div class="flex flex-col space-y-4">
+            <div class="flex items-center space-x-4">
+              <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
+                Play
+              </button>
+              <label class="flex items-center space-x-2">
+                <input id="toggle-english" type="checkbox" class="form-checkbox" checked>
+                <span class="ml-2 text-gray-700">English Subtitles</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
+                <span class="ml-2 text-gray-700">Irish Subtitles</span>
+              </label>
+              <div class="relative">
+                <select id="playback-speed" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                  <option value="1">1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="1.75">1.75x</option>
+                  <option value="2">2x</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                    <path fill-rule="evenodd" d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h7l4 4V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
-          <div id="subtitles" class="flex items-center space-x-4">
-            <p data-target="rang.time"></p>
-            <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
+            <div id="subtitles" class="flex items-center space-x-4">
+              <p data-target="rang.time"></p>
+              <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
       <%# begin table %>
       <h2 class="text-lg font-medium text-gray-900 mb-4">Voice recordings</h2>
       <table class="w-full table-fixed">
@@ -157,13 +159,13 @@
           </tr>
         </thead>
         <tbody>
-          <% @files.each do |file| %>
+          <% @recordings.each do |recording| %>
             <tr class="bg-white">
-              <td class="py-2 px-4 border-gray-200"><%= file.filename %></td>
-              <td class="py-2 px-4 border-gray-200"><%= %w[Muchchu Maoilruaidh Gallochobair].sample(2).join(', ') %></td>
-              <td class="py-2 px-4 border-gray-200"><%= %w[DuChoicain FodhDubh TuarMhicEadaigh Acaill].sample %></td>
-              <td class="text-center py-2 px-4 border-gray-200"><%= rand(99).to_s + "%" %></td>
-              <td class="text-center"><%= link_to "view", rang_path(file.record_id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
+              <td class="py-2 px-4 border-gray-200"><%= recording.title %></td>
+              <td class="py-2 px-4 border-gray-200"><%= recording.users.pluck(:name).join(', ') %></td>
+              <td class="py-2 px-4 border-gray-200"><%= recording.users.plucl(:dialect).join(', ') %></td>
+              <td class="text-center py-2 px-4 border-gray-200"><%= recording.percentage_complete %></td>
+              <td class="text-center"><%= link_to "view", voice_recording_path(recording.id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
             </tr>
           <% end %>
         </tbody>
