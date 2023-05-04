@@ -3,17 +3,12 @@
 class Rang < ApplicationRecord
   has_many :rang_entries, dependent: :destroy
   has_many :dictionary_entries, through: :rang_entries
-  belongs_to :user
-  belongs_to :grupa
+
+  has_many :seomras
+  has_many :users, through: :seomras
 
   before_create :generate_meeting_id
-  # after_commit :send_notification
-
-  has_one_attached :media
-
-  validates :grupa_id, presence: true
-
-  scope :has_recording, -> { joins(:media_attachment) }
+  after_commit :send_notification, if: -> { ENV['NOTIFICATIONS_ENABLED'] == "true" }
 
   def next_time
     return  "aon am" unless time
@@ -23,7 +18,7 @@ class Rang < ApplicationRecord
   end
 
   def participants
-    ([grupa.muinteoir.email] + grupa.users.pluck(:email)).compact
+    users.pluck(:email)
   end
 
   def send_notification

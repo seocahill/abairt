@@ -5,16 +5,12 @@ class User < ApplicationRecord
 
   before_create :generate_token
 
-  belongs_to :máistir, class_name: 'User', foreign_key: :master_id, optional: true
-  belongs_to :grupa, optional: true
-
-  has_many :daltaí, class_name: 'User', foreign_key: :master_id
-  has_many :muinteoir_grupas, class_name: 'Grupa', foreign_key: :muinteoir_id
-  has_many :muinteoir_rangs, through: :muinteoir_grupas, source: :rangs
-  has_many :rangs, through: :grupa
+  has_many :seomras
+  has_many :rangs, through: :seomras
 
   has_many :conversations
   has_many :voice_recordings, through: :conversations
+
 
   class << self
     def with_unanswered_ceisteanna
