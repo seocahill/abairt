@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_04_214031) do
+ActiveRecord::Schema.define(version: 2023_05_04_215105) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -190,6 +190,10 @@ ActiveRecord::Schema.define(version: 2023_05_04_214031) do
     t.string "token", limit: 255
     t.integer "master_id"
     t.integer "grupa_id"
+    t.string "lat_lang"
+    t.integer "role", default: 0, null: false
+    t.integer "voice", default: 0, null: false
+    t.integer "dialect", default: 0, null: false
     t.index ["grupa_id"], name: "index_users_on_grupa_id"
     t.index ["master_id"], name: "index_users_on_master_id"
     t.index ["token"], name: "index_users_on_token"
