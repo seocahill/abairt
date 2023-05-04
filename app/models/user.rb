@@ -13,6 +13,9 @@ class User < ApplicationRecord
   has_many :muinteoir_rangs, through: :muinteoir_grupas, source: :rangs
   has_many :rangs, through: :grupa
 
+  has_many :conversations
+  has_many :voice_recordings, through: :conversations
+
   class << self
     def with_unanswered_ceisteanna
       joins(daltaí: { rangs: :dictionary_entries }).where.not(dictionary_entries: { status: :normal} ).distinct

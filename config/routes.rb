@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :voice_recordings
   get 'pages/faq'
   resources :rangs do
     resources :dictionary_entries

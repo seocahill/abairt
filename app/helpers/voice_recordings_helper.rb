@@ -1,0 +1,2 @@
+module VoiceRecordingsHelper
+end
