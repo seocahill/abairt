@@ -8,8 +8,8 @@
           <ul class="flex flex-col" data-controller="accordian">
             <li class="bg-white my-2 shadow-lg">
               <h2
-                data-action="click->accordian#toggle"
-                data-idx="1"
+                data-action="click->accordian#showHide"
+                data-accordian-pane-param="#pane1"
                 class="flex flex-row justify-between items-center font-semibold p-3 cursor-pointer"
               >
                 <span>When will my order arrive?</span>
@@ -21,7 +21,7 @@
                 </svg>
               </h2>
               <div
-                id="accordian-1"
+                id="pane1"
                 class="border-l-2 border-purple-600 overflow-hidden max-h-0 duration-500 transition-all"
               >
                 <p class="p-3 text-gray-900">
@@ -31,7 +31,8 @@
             </li>
             <li class="bg-white my-2 shadow-lg">
               <h2
-                data-action="accordian#toggle"
+                data-action="click->accordian#showHide"
+                data-accordian-pane-param="#pane2"
                 class="flex flex-row justify-between items-center font-semibold p-3 cursor-pointer"
               >
                 <span>How do I track my order?</span>
@@ -43,8 +44,8 @@
                 </svg>
               </h2>
               <div
+                id="pane2"
                 class="border-l-2 border-purple-600 overflow-hidden max-h-0 duration-500 transition-all"
-                x-ref="tab"
               >
                 <p class="p-3 text-gray-900">
                   Once shipped, you’ll get a confirmation email that includes a tracking number and additional information regarding tracking your order.
