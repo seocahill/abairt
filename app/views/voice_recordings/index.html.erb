@@ -14,7 +14,7 @@
           </li>
           <% if current_user %>
             <li>
-              <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab2">Upload Audio or Video</a>
+              <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab2">Upload Audio</a>
             </li>
           <% end %>
         </ul>
@@ -63,18 +63,6 @@
               <label for="search" class="block text-sm font-medium text-gray-700">Speaker</label>
               <div class="mt-1">
                 <input type="search" class="w-full" placeholder="Search for Speakers"/>
-              </div>
-            </div>
-            <div class="mt-1">
-              <label for="voice" class="block text-sm font-medium text-gray-700">Dialect</label>
-              <div class="mt-1">
-                <select id="voice" name="voice" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-                  <option value="">All</option>
-                  <option value="">Acaill</option>
-                  <option value="male">Du Chaocháin</option>
-                  <option value="female">Túar Mhic Éadaigh</option>
-                  <option value="female">An Fód Dubh</option>
-                </select>
               </div>
             </div>
             <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">

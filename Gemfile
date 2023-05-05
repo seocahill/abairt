@@ -83,3 +83,5 @@ gem "acts-as-taggable-on", "~> 8.1"
 gem "importmap-rails", "~> 0.8.2"
 
 gem "groupdate", "~> 6.2"
+
+gem "geocoder", "~> 1.8"
