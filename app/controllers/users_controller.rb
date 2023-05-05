@@ -6,7 +6,18 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @users = User.all
+    records = User.all
+
+    if params[:search].present?
+      records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
+    end
+
+    @pagy, @users = pagy(records, items: 12)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: records }
+    end
   end
 
   # GET /users/1 or /users/1.json
