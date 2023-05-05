@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_04_215105) do
+ActiveRecord::Schema.define(version: 2023_05_05_221350) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -107,6 +107,23 @@ ActiveRecord::Schema.define(version: 2023_05_04_215105) do
   end
 
 # Could not dump table "fts_tags_idx" because of following StandardError
+#   Unknown type '' for column 'segid'
+
+# Could not dump table "fts_users" because of following StandardError
+#   Unknown type '' for column 'name'
+
+# Could not dump table "fts_users_config" because of following StandardError
+#   Unknown type '' for column 'k'
+
+  create_table "fts_users_data", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "fts_users_docsize", force: :cascade do |t|
+    t.binary "sz"
+  end
+
+# Could not dump table "fts_users_idx" because of following StandardError
 #   Unknown type '' for column 'segid'
 
   create_table "grupas", force: :cascade do |t|
