@@ -21,6 +21,13 @@ class User < ApplicationRecord
     end
   end
 
+  def address
+    return "no address provided" if lat_lang.nil?
+
+    results = Geocoder.search(lat_lang.split(','))
+    address = results.first.data.dig("address", "city_district")
+  end
+
   private
 
   def generate_token
