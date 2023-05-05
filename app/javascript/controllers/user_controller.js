@@ -9,7 +9,7 @@ export default class extends Controller {
   }
 
   userSearchTargetConnected() {
-    const tagsSearch = new autoComplete({
+    const usersSearch = new autoComplete({
       selector: "#autoCompleteUsers",
       placeHolder: "Déan cuardach ar user...",
       debounce: 300,
@@ -38,7 +38,7 @@ export default class extends Controller {
         input: {
           selection: (event) => {
             const selection = event.detail.selection.value['name'];
-            tagsSearch.input.value = selection;
+            usersSearch.input.value = selection;
           }
         }
       }
