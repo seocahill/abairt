@@ -16,6 +16,12 @@ class VoiceRecordingsController < ApplicationController
     # @pagy, @entrie = pagy(records)
   end
 
+  def preview
+    @recording = VoiceRecording.find(params[:id])
+    @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    render partial: 'waveform', locals: { recording:  @recording, regions: @regions }
+  end
+
   # GET /voice_recordings/new
   def new
     @voice_recording = VoiceRecording.new

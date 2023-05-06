@@ -88,13 +88,15 @@ export default class extends Controller {
     });
 
     this.waveSurfer.on('audioprocess', function () {
-      if (that.waveSurfer.isPlaying()) {
+      if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
       }
     })
 
     this.waveSurfer.on('seek', function() {
-      that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+      if (that.hasTimeTarget) {
+        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+      }
     })
 
     this.waveSurfer.on('region-click', function (region, e) {

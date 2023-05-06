@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :voice_recordings
+  resources :voice_recordings do
+    member do
+      get :preview
+    end
+  end
+
   get 'pages/faq'
   resources :rangs do
     resources :dictionary_entries
