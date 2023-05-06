@@ -60,9 +60,12 @@
         <div class="tab-pane hidden" id="tab2">
           <form>
             <div class="mt-1" data-controller="user" data-user-target="userSearch">
-              <label for="search" class="block text-sm font-medium text-gray-700">Speaker</label>
+              <label for="search" class="block text-sm font-medium text-gray-700">Add a Speaker</label>
               <div class="mt-1">
                 <input id="autoCompleteUsers" type="search" class="w-full"/>
+              </div>
+              <div class="mt-1">
+                <ul id="selectedUsers"></ul>
               </div>
             </div>
             <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
