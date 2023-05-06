@@ -38,7 +38,7 @@ export default class extends Controller {
       events: {
         input: {
           selection: (event) => {
-            const selection = event.detail.selection.value['name'];
+            const selection = event.detail.selection.value;
             usersSearch.input.value = selection;
             selectedUsers.push(selection);
             this.updateSelectedUsersDisplay(selectedUsers);
@@ -63,7 +63,7 @@ export default class extends Controller {
 
         // Create a span for the user name
         const span = document.createElement('span');
-        span.innerText = user;
+        span.innerText = user.name;
 
         // Create a button to remove the user
         const button = document.createElement('button');
