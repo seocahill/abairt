@@ -75,6 +75,14 @@
               </div>
             </div>
             <div class="mt-1">
+              <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+              <%= form.text_field :title, required: true, class: "w-full" %>
+            </div>
+            <div class="mt-1">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <%= form.text_area :title, required: false, class: "w-full" %>
+            </div>
+            <div class="mt-1">
               <%= render "media_upload", form: form %>
             </div>
             <div class="mt-1 w-full text-center mx-auto">
@@ -154,7 +162,7 @@
             <tr class="bg-white">
               <td class="py-2 px-4 border-gray-200"><%= recording.title %></td>
               <td class="py-2 px-4 border-gray-200"><%= recording.users.pluck(:name).join(', ') %></td>
-              <td class="py-2 px-4 border-gray-200"><%= recording.users.plucl(:dialect).join(', ') %></td>
+              <td class="py-2 px-4 border-gray-200"><%= recording.users.pluck(:dialect).join(', ') %></td>
               <td class="text-center py-2 px-4 border-gray-200"><%= recording.percentage_complete %></td>
               <td class="text-center"><%= link_to "view", voice_recording_path(recording.id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
             </tr>

@@ -71,6 +71,12 @@ class VoiceRecordingsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def voice_recording_params
-      params.require(:voice_recording).permit(:title, :description)
+      params.require(:voice_recording).permit(:title, :description, :media, user_ids: [])
+    end
+
+    def authorize
+      return if current_user
+
+      redirect_back(fallback_location: root_path, alert: "Caithfidh tú a bheith sínithe isteach!")
     end
 end
