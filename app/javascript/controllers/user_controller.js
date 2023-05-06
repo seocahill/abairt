@@ -57,6 +57,7 @@ export default class extends Controller {
       selectedUsersContainer.innerHTML = ''; // Clear the container
 
       // Create a new list item for each selected user
+      // <input name="voice_recording[conversation][user_id][]" id="voice_recording_conversation_user_id"/>
       users.forEach(user => {
         const li = document.createElement('li');
         li.classList.add('flex', 'justify-between', 'items-center', 'px-3', 'py-2', 'mb-2', 'rounded', 'bg-gray-200');
@@ -83,6 +84,15 @@ export default class extends Controller {
 
         // Append the list item to the container
         selectedUsersContainer.appendChild(li);
+      });
+
+      // update hidden value
+      users.forEach((user) => {
+        let field = document.createElement('input');
+        field.type = "hidden";
+        field.name = "voice_recording[user_ids][]";
+        field.value = user.id;
+        selectedUsersContainer.append(field);
       });
     };
 
