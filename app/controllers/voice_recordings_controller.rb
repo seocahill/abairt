@@ -3,6 +3,7 @@ class VoiceRecordingsController < ApplicationController
   before_action :authorize, except: %i[index show]
 
   def index
+    @new_voice_recording = VoiceRecording.new
     @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
     if @recording = VoiceRecording.first
       @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json

@@ -58,7 +58,7 @@
       </div>
       <% if current_user %>
         <div class="tab-pane hidden" id="tab2">
-          <form>
+          <%= form_with(model: @new_voice_recording) do %>
             <div class="mt-1" data-controller="user" data-user-target="userSearch">
               <label for="search" class="block text-sm font-medium text-gray-700">Add a Speaker</label>
               <div class="mt-1">
@@ -80,7 +80,7 @@
             <div class="mt-1 w-full text-center mx-auto">
               <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
             </div>
-          </form>
+          <% end %>
         </div>
       <% end %>
       <div class="tab-pane hidden" id="tab3">
