@@ -9,6 +9,7 @@ export default class extends Controller {
   }
 
   userSearchTargetConnected() {
+    const selectedUsers = []; // array to hold selected users
     const usersSearch = new autoComplete({
       selector: "#autoCompleteUsers",
       placeHolder: "Déan cuardach ar user...",
@@ -39,19 +40,30 @@ export default class extends Controller {
           selection: (event) => {
             const selection = event.detail.selection.value['name'];
             usersSearch.input.value = selection;
+            selectedUsers.push(selection);
+            this.updateSelectedUsersDisplay(selectedUsers);
+            if (!usersSearch.options.multiple) {
+              usersSearch.input.value = '';
+            }
           }
-        }
+        },
       }
-    })
+    });
+
+    // Function to update the display of selected users
+    this.updateSelectedUsersDisplay = (users) => {
+      const selectedUsersContainer = document.getElementById('selectedUsers');
+      selectedUsersContainer.innerHTML = ''; // Clear the container
+
+      // Create a new list item for each selected user
+      users.forEach(user => {
+        const li = document.createElement('li');
+        li.innerText = user;
+        selectedUsersContainer.appendChild(li);
+      });
+    };
   }
 
-  format(n) {
-    let mil_s = String(n % 1000).padStart(3, '0');
-    n = Math.trunc(n / 1000);
-    let sec_s = String(n % 60).padStart(2, '0');
-    n = Math.trunc(n / 60);
-    return String(n) + ' m ' + sec_s + ' s ' + mil_s + ' ms';
-  }
 
   teardown() {
     console.log('good luck!')
