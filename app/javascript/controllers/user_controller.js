@@ -51,6 +51,7 @@ export default class extends Controller {
     });
 
     // Function to update the display of selected users
+    // Function to update the display of selected users
     this.updateSelectedUsersDisplay = (users) => {
       const selectedUsersContainer = document.getElementById('selectedUsers');
       selectedUsersContainer.innerHTML = ''; // Clear the container
@@ -58,10 +59,33 @@ export default class extends Controller {
       // Create a new list item for each selected user
       users.forEach(user => {
         const li = document.createElement('li');
-        li.innerText = user;
+        li.classList.add('flex', 'justify-between', 'items-center', 'px-3', 'py-2', 'mb-2', 'rounded', 'bg-gray-200');
+
+        // Create a span for the user name
+        const span = document.createElement('span');
+        span.innerText = user;
+
+        // Create a button to remove the user
+        const button = document.createElement('button');
+        button.classList.add('ml-2', 'px-2', 'py-1', 'rounded', 'bg-red-500', 'text-white', 'hover:bg-red-600', 'focus:outline-none');
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 11.414l4.95-4.95a1 1 0 011.414 1.414L11.414 12l4.95 4.95a1 1 0 01-1.414 1.414L10 13.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 12 3.636 7.05a1 1 0 011.414-1.414L10 10.586z" clip-rule="evenodd"/></svg>';
+        button.addEventListener('click', () => {
+          const index = selectedUsers.indexOf(user);
+          if (index > -1) {
+            selectedUsers.splice(index, 1);
+            this.updateSelectedUsersDisplay(selectedUsers);
+          }
+        });
+
+        // Append the span and button to the list item
+        li.appendChild(span);
+        li.appendChild(button);
+
+        // Append the list item to the container
         selectedUsersContainer.appendChild(li);
       });
     };
+
   }
 
 
