@@ -5,7 +5,7 @@ class VoiceRecordingsController < ApplicationController
   def index
     @new_voice_recording = VoiceRecording.new
     @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
-    if @recording = VoiceRecording.first
+    if @recording = VoiceRecording.find(params[:preview] ||= VoiceRecording.last.id)
       @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
     end
     @tags = ActsAsTaggableOn::Tag.most_used(15)
