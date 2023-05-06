@@ -1,0 +1,26 @@
+
+ <turbo-frame id="wave_display">
+  <div class="flex items-center space-x-4" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @recording.meeting_id %>" data-rang-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-rang-regions-value="<%= @regions %>">
+    <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+    <p><small><%= @recording.media.filename %></small></p>
+    <div class="flex flex-col space-y-4">
+      <div class="flex items-center space-x-4">
+        <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
+          Play
+        </button>
+        <label class="flex items-center space-x-2">
+          <input id="toggle-english" type="checkbox" class="form-checkbox" checked>
+          <span class="ml-2 text-gray-700">English Subtitles</span>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
+          <span class="ml-2 text-gray-700">Irish Subtitles</span>
+        </label>
+      </div>
+      <div id="subtitles" class="flex items-center space-x-4">
+        <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
+        <i class="prose" data-target="rang.translation"></i>
+      </div>
+    </div>
+  </div>
+</turbo-frame>
