@@ -6,6 +6,8 @@ class VoiceRecording < ApplicationRecord
 
   accepts_nested_attributes_for :conversations
 
+  acts_as_taggable_on :tags
+
   def meeting_id
     SecureRandom.uuid
   end
