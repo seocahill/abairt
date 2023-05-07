@@ -30,7 +30,7 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    @user = User.new
+    @user = User.new(role: :speaker)
   end
 
   # GET /users/1/edit
@@ -38,7 +38,9 @@ class UsersController < ApplicationController
 
   # POST /users or /users.json
   def create
-    @user = User.new(user_params)
+    password = SecureRandom.uuid
+    email = user_params[:name].split.join + "@abairt.com"
+    @user = User.new(user_params.merge(password: password, email: email, role: :speaker))
 
     respond_to do |format|
       if @user.save
@@ -88,6 +90,6 @@ class UsersController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def user_params
-    params.require(:user).permit(:email, :name, :password)
+    params.require(:user).permit(:email, :name, :password, :dialect, :voice, :lat_lang)
   end
 end
