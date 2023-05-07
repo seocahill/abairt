@@ -7,9 +7,9 @@ class RangsController < ApplicationController
 
   # GET /rangs or /rangs.json
   def index
-    @contacts = User.all
-    @contact = User.first
-    records = DictionaryEntry.limit(100)
+    @contacts = current_user.rangs
+    @contact = @contacts.first
+    records = @contact.dictionary_entries
     @pagy, @messages = pagy(records)
   end
 

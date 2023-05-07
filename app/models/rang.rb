@@ -4,8 +4,10 @@ class Rang < ApplicationRecord
   has_many :rang_entries, dependent: :destroy
   has_many :dictionary_entries, through: :rang_entries
 
-  has_many :seomras
+  has_many :seomras, dependent: :destroy
   has_many :users, through: :seomras
+
+  belongs_to :teacher, class_name: "User", foreign_key: "user_id"
 
   before_create :generate_meeting_id
   after_commit :send_notification, if: -> { ENV['NOTIFICATIONS_ENABLED'] == "true" }
