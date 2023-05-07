@@ -20,9 +20,9 @@ Rails.application.routes.draw do
   resources :users
 
   scope controller: :sessions do
-    get "login", to: "new"
-    post "login", to: "create"
-    delete "logout", to: "destroy"
+    get "login" => :new
+    post "login" => :create
+    delete "logout" => :destroy
   end
 
   resources :dictionary_entries do
