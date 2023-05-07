@@ -6,20 +6,20 @@ class VoiceRecordingsController < ApplicationController
     @new_voice_recording = VoiceRecording.new
     @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
     if @recording = VoiceRecording.find(params[:preview] ||= VoiceRecording.last.id)
-      @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+      @regions = set_regions
     end
     @tags = ActsAsTaggableOn::Tag.most_used(15)
   end
 
   def show
     @recording = VoiceRecording.find(params[:id])
-    @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    @regions = set_regions
     @new_dictionary_entry = @recording.dictionary_entries.build
   end
 
   def preview
     @recording = VoiceRecording.find(params[:id])
-    @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    @regions = set_regions
     render partial: 'waveform', locals: { recording:  @recording, regions: @regions }
   end
 
@@ -74,6 +74,10 @@ class VoiceRecordingsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_voice_recording
       @voice_recording = VoiceRecording.find(params[:id])
+    end
+
+    def set_regions
+      @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase, :translation)}.to_json
     end
 
     # Only allow a list of trusted parameters through.
