@@ -86,7 +86,8 @@ export default class extends Controller {
 
   play(e) {
     e.preventDefault()
-    this.audioTarget.play()
+    this.element.getElementsByTagName("audio")[0].play()
+    // this.audioTarget.play()
   }
 
   show() {
