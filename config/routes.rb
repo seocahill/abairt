@@ -7,7 +7,10 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'pages/faq'
+  scope controller: :pages do
+    get :faq
+  end
+
   resources :rangs do
     resources :dictionary_entries
   end
@@ -16,16 +19,11 @@ Rails.application.routes.draw do
 
   resources :users
 
-  resources :muinteoirs, only: %i[index show]
-
-  resources :grupas do
-    get "scrios_dalta", to: "grupas#scrios_dalta"
-    post "dalta_nua", to: "grupas#dalta_nua"
+  scope controller: :sessions do
+    get "login", to: "new"
+    post "login", to: "create"
+    delete "logout", to: "destroy"
   end
-
-  get "login", to: "sessions#new"
-  post "login", to: "sessions#create"
-  delete "logout", to: "sessions#destroy"
 
   resources :dictionary_entries do
     collection do
