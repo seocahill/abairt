@@ -33,9 +33,9 @@
         <div class="tab-pane hidden" id="tab2">
           <%= form_with(model: @new_speaker) do |form| %>
             <div class="mt-1">
-              <label for="search" class="block text-sm font-medium text-gray-700">Name</label>
+              <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
               <div class="mt-1">
-                <input type="text" class="w-full">
+                <%= form.text_field :name,  class: "w-full"%>
               </div>
             </div>
             <div class="mt-1">
@@ -44,12 +44,12 @@
             </div>
             <div class="mt-1">
               <label for="search" class="block text-sm font-medium text-gray-700">Dialect</label>
-              <%= form.select :dialect, User.dialects, :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+              <%= form.select :dialect, User.dialects.keys, :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
             </div>
             <div class="mt-1" data-controller="location" data-location-target="locationSearch">
               <label class="block text-sm font-medium text-gray-700">Location</label>
               <div class="mb-1">
-                <input id="autoCompleteLocation" type="search" class="w-full">
+                <textarea id="autoCompleteLocation" type="search" class="w-full"></textarea>
                 <%= form.hidden_field :lat_lang, id: "user-lat-lang" %>
               </div>
             </div>

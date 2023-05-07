@@ -13,7 +13,7 @@ class User < ApplicationRecord
   has_many :conversations
   has_many :voice_recordings, through: :conversations
 
-  enum role: [:reader, :editor, :admin]
+  enum role: [:student, :speaker, :teacher, :admin]
   enum voice: [:male, :female]
   enum dialect: [:an_muirthead, :dún_chaocháin, :acaill, :tuar_mhic_éadaigh]
 
