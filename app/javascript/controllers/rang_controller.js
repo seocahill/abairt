@@ -23,7 +23,7 @@ export default class extends Controller {
     }
     let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
     let translation = target.elements['dictionary_entry[translation]'].value;
-    let regionId = target.elements["regionId"].value;
+    let regionId = target.elements['dictionary_entry[region_id]'].value;
     if (regionId) {
       let region = this.waveSurfer.regions.list[regionId];
       region.update({ data: { transcription: transcription, translation: translation } })
