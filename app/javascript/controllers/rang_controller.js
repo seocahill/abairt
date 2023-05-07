@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus"
 import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
-import Mp3Encoder from "lamejs"
 
 export default class extends Controller {
   static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs"]

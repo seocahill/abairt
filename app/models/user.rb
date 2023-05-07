@@ -5,6 +5,8 @@ class User < ApplicationRecord
 
   before_create :generate_token
 
+  has_many :dictionary_entries, foreign_key: :speaker_id
+
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
   has_many :seomras

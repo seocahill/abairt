@@ -6,7 +6,7 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.joins(:rangs).where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").where("rangs.url is null")
+    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
@@ -19,6 +19,8 @@ class DictionaryEntriesController < ApplicationController
     if params["media"].present?
       records = records.has_recording
     end
+
+    @new_dictionary_entry = current_user.dictionary_entries.build
 
     @tags = ActsAsTaggableOn::Tag.most_used(15)
 
@@ -52,12 +54,7 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    if params[:dictionary_entry][:dictionary_entry_id].present?
-       @dictionary_entry = DictionaryEntry.find(params[:dictionary_entry][:dictionary_entry_id])
-       @dictionary_entry.assign_attributes(dictionary_entry_params)
-    else
-      @dictionary_entry = DictionaryEntry.new(dictionary_entry_params)
-    end
+    @dictionary_entry = current_user.dictionary_entries.build(dictionary_entry_params)
 
     respond_to do |format|
       if @dictionary_entry.save

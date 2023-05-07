@@ -42,28 +42,28 @@
         </form>
       </div>
       <% if current_user %>
-        <div class="tab-pane hidden" id="tab2">
-          <form>
+        <div class="tab-pane hidden" id="tab2" data-controller="dictionary-entry">
+          <%= form_with(model: @new_dictionary_entry, class: "", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
             <div class="mt-1">
               <label for="search" class="block text-sm font-medium text-gray-700">Irish</label>
               <div class="mt-1">
-                <textarea class="w-full"></textarea>
+                <%= form.text_area :word_or_phrase, class: "w-full" %>
               </div>
             </div>
             <div class="mt-1">
               <label for="search" class="block text-sm font-medium text-gray-700">English</label>
               <div class="mt-1">
-                <textarea class="w-full"></textarea>
+                <%= form.text_area :translation, class: "w-full" %>
               </div>
             </div>
             <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
               <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
               <div class="mt-1">
-                 <textarea class="w-full" id= "autoCompleteTags"></textarea>
+                 <%= form.text_area :tag_list, class: "w-full", id: "autoCompleteTags" %>
               </div>
             </div>
             <%= content_tag :div, data: { controller: 'recorder' }, class: "mt-1 w-full text-center mx-auto" do %>
-              <%= file_field_tag :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
+              <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
               <%= content_tag :div, "Record voice",
                                 class: 'bg-green-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
                                 data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
@@ -74,7 +74,7 @@
             <div class="w-full text-center mx-auto mt-1">
               <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
             </div>
-          </form>
+          <% end %>
         </div>
       <% end %>
       <div class="tab-pane hidden" id="tab3">
@@ -117,6 +117,7 @@
             <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
             <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
             <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Audio</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center"></th>
           </tr>
         </thead>
         <tbody>
@@ -124,10 +125,21 @@
             <tr class="bg-white">
               <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
               <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
-              <td class="text-center py-2 px-4 border-gray-200">
-              <% if entry.media.attached? %>
-                <%= audio_tag entry.media.url, controls: true %></td>
-              <% end %>
+              <td data-controller="entry" class="text-center py-2 px-4 border-gray-200">
+                <% if entry.media.attached? %>
+                  <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <audio src="<%= entry.media.url %>"></audio>
+                    play
+                  </a>
+                <% else %>
+                  <span>no media</span>
+                <% end %>
+              </td>
+              <td class="py-2 px-4 text-center border-gray-200">
+                <% if entry.speaker_id == current_user.id %>
+                  <%= link_to 'Delete', dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, confirm: 'Are you sure?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
+                <% end %>
+              </td>
             </tr>
           <% end %>
         </tbody>
