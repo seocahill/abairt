@@ -86,8 +86,7 @@ class DictionaryEntriesController < ApplicationController
 
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
-    @entry = RangEntry.find_by(rang_id: params[:rang_id], dictionary_entry_id: params[:id])
-    @entry.destroy!
+    @dictionary_entry.destroy!
     respond_to do |format|
       format.turbo_stream
     end
