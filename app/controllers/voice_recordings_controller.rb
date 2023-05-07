@@ -14,6 +14,7 @@ class VoiceRecordingsController < ApplicationController
   def show
     @recording = VoiceRecording.find(params[:id])
     @regions = @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    @new_dictionary_entry = @recording.dictionary_entries.build
   end
 
   def preview

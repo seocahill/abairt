@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_05_221350) do
+ActiveRecord::Schema.define(version: 2023_05_07_101133) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -72,6 +72,8 @@ ActiveRecord::Schema.define(version: 2023_05_05_221350) do
     t.decimal "region_end"
     t.string "region_id"
     t.integer "voice_recording_id"
+    t.integer "speaker_id"
+    t.index ["speaker_id"], name: "index_dictionary_entries_on_speaker_id"
     t.index ["voice_recording_id"], name: "index_dictionary_entries_on_voice_recording_id"
   end
 

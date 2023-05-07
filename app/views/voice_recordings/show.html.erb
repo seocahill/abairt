@@ -43,28 +43,44 @@
     <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
       <div class="flex flex-col space-y-4">
         <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2>
-        <form class="space-y-4">
+        <%= form_with(model: @new_dictionary_entry, class: "space-y-4") do |form| %>
+          <% if @new_dictionary_entry.errors.any? %>
+            <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+              <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>
+              <ul>
+                <% @new_dictionary_entry.errors.each do |error| %>
+                  <li><%= error.full_message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <%= form.label :user_ids, "Speaker" %>
+          <div class="mt-1">
+            <%= form.collection_select :speaker_id, @recording.users, :id, :name, {}, {} %>
+          </div>
           <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
           <div class="mt-1">
-            <textarea id="word_or_phrase" placeholder="Gaeilge anseo" name="word_or_phrase" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
+            <%= form.text_area :word_or_phrase, placeholder: "Gaeilge anseo", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
           </div>
           <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
           <div class="mt-1">
-            <textarea id="translation" placeholder="Translation" name="translation" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
+            <%= form.text_area :translation, placeholder: "Translation", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
           </div>
           <div class="hidden" data-rang-target="startRegion">
-            <input type="number" id="region_start" name="region_start" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            <%= form.hidden_field :region_start %>
+            <input type="hidden" id="region_start" name="region_start">
           </div>
           <div class="hidden" data-rang-target="endRegion">
-            <input type="number" id="region_end" name="region_end" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            <%= form.hidden_field :region_end %>
           </div>
           <div class="hidden" data-rang-target="regionId">
-            <input type="text" id="region_id" name="region_id" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            <%= form.hidden_field :region_id %>
           </div>
+          <%= form.hidden_field :voice_recording_id, value: @recording.id %>
           <div class="text-right">
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add</button>
           </div>
-        </form>
+        <% end %>
       </div>
     </div>
     <%# transcript %>
@@ -73,21 +89,21 @@
         <table class="w-full table-fixed">
           <thead>
             <tr class="bg-gray-100 text-left">
+              <th class="w-1/5 py-2 px-4 border-gray-200">Speaker</th>
+              <th class="w-1/5 py-2 px-4 border-gray-200">Position</th>
               <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
               <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
-              <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Start time</th>
-              <th class="w-1/5 py-2 px-4 border-gray-200 text-center">End time</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <% @recording.dictionary_entries.each do |entry| %>
+            <% @recording.dictionary_entries.where.not(id: nil).each do |entry| %>
               <tr class="bg-white">
+                <td class="py-2 px-4 border-gray-200"><%= entry.speaker.name %></td>
+                <td class="py-2 px-4 border-gray-200"><%= entry.region_start %>:<%= entry.region_end %></td>
                 <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
                 <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
-                <td class="text-center py-2 px-4 border-gray-200"><%= entry.region_start %></td>
-                <td class="text-center"><%= entry.region_end %></td>
-                <td><a href="#">X</a></td>
+                <td><a href="#">remove</a></td>
               </tr>
             <% end %>
           </tbody>
