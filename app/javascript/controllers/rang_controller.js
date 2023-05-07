@@ -110,35 +110,7 @@ export default class extends Controller {
       that.startRegionTarget.children[0].value = Math.round(region.start * 10) / 10
       that.endRegionTarget.children[0].value = Math.round(region.end * 10) / 10
       that.regionIdTarget.children[0].value = region.id
-      that.createSnippet(that.waveSurfer, region)
     })
-  }
-
-  createSnippet(waveSurfer, region) {
-    // Export the selected region's audio data
-    var audioData = waveSurfer.exportPCM(region.start, region.end, true);
-
-    // Convert the PCM data to an MP3 file using lamejs
-    var mp3Encoder = new Mp3Encoder(2, 44100, 128);
-    var mp3Data = [];
-    var sampleBlockSize = 1152;
-    for (var i = 0; i < audioData.length; i += sampleBlockSize) {
-      var sampleChunk = audioData.subarray(i, i + sampleBlockSize);
-      var mp3Chunk = mp3Encoder.encodeBuffer(sampleChunk);
-      mp3Data.push(mp3Chunk);
-    }
-    var finalMp3Chunk = mp3Encoder.flush();
-    if (finalMp3Chunk.length > 0) {
-      mp3Data.push(finalMp3Chunk);
-    }
-    var mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
-
-    // Persist the new MP3 file to disk or upload it to a server
-    var url = URL.createObjectURL(mp3Blob);
-    var link = document.createElement('a');
-    link.href = url;
-    link.download = 'newfile.mp3';
-    document.body.appendChild(link);
   }
 
   wordSearchTargetConnected() {
