@@ -71,7 +71,7 @@
             <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
               <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
               <div class="mt-1">
-                <textarea class="w-full" id= "autoCompleteTags"></textarea>
+                <%= form.text_area :tag_list, class: "w-full", id: "autoCompleteTags" %>
               </div>
             </div>
             <div class="mt-1">
