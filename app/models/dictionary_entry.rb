@@ -48,4 +48,24 @@ class DictionaryEntry < ApplicationRecord
   def transcription?
     rangs.first&.media&.audio?
   end
+
+  def create_audio_snippet
+    require 'open3'
+
+    # Select the region you want to extract
+    duration = region_end - region_start
+
+    # Set the output file path and delete cache
+    output_path = "/tmp/#{region_id}.mp3"
+    File.delete output_path
+    voice_recording.media.open do |file|
+
+      # Extract the selected region and save it as a new MP3 file using ffmpeg
+      stdout, stderr, status = Open3.capture3("ffmpeg -ss #{region_start} -i #{file.path} -t #{duration} -c:a copy #{output_path}")
+
+      # Attach the new file to a Recording model using Active Storage
+      self.media.attach(io: File.open(output_path), filename: "#{region_id}.mp3")
+      save
+    end
+  end
 end
