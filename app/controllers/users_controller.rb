@@ -6,11 +6,13 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    records = User.all
+    records = User.where.not(id: nil)
 
     if params[:search].present?
       records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
     end
+
+    @new_speaker = User.new
 
     @pagy, @users = pagy(records, items: 12)
 
