@@ -21,7 +21,7 @@
                 </a>
               </div>
               <div class="ml-3">
-                <%= link_to contact.name, user_path(contact), class: "text-base font-medium text-gray-900" %>
+                <%= link_to contact.teacher.name, rang_path(contact), class: "text-base font-medium text-gray-900" %> (<%= @contact.dictionary_entries.count %>)
               </div>
             </li>
           <% end %>
@@ -60,24 +60,24 @@
               <hr>
               <h3 class="text-lg font-medium text-gray-900 mb-4"><%= day %></h3>
               <% (groups[index..(index + count)] || []).each_with_index do |message, idx| %>
-                <div class="flex <%= idx.odd? ? 'justify-end' : 'justify-start' %> mb-6">
+                <div class="flex <%= current_user.id == message.speaker_id ? 'justify-end' : 'justify-start' %> mb-6">
                   <div class="flex">
                     <div class="bg-white rounded-lg shadow-md p-6 max-w-sm mx-auto">
                       <div class="flex items-center mb-2">
                         <h4 class="text-sm font-medium">
-                          <%= idx.odd? ? "Seo" : "Pap" %>
+                          <%= message.speaker.name  %>
                         </h4>
                         <p class="text-sm text-gray-500 ml-2">
                           <%= message.created_at.strftime("%l:%M %p") %>
                         </p>
                       </div>
                       <% if message.word_or_phrase.present? %>
-                        <p class="<%= idx.odd? ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+                        <p class="<%= current_user.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
                           <%= message.word_or_phrase%>
                         </p>
                       <% end %>
                       <% if message.translation.present? %>
-                        <p class="<%= idx.odd? ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+                        <p class="<%= current_user.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
                           <%= message.translation %>
                         </p>
                       <% end %>
