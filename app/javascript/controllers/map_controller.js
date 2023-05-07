@@ -4,8 +4,8 @@ import L from 'leaflet'
 export default class extends Controller {
   static values = { pins: Array }
 
-
   connect() {
+    console.log("hello map")
     this.map = L.map('map').setView([53.9110, -9.4527], 9);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -14,16 +14,16 @@ export default class extends Controller {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    this.pinsValue.forEach((rang) => {
-      let marker = L.marker(rang.lat_lang.split(','))
-      let content = `<a href="/grupas/${rang.id}">${rang.ainm}</a><audio controls src="${rang.media_url}"></audio>`;
-      marker.bindPopup(content).openPopup();
-      marker.addTo(this.map);
-    });
+    // this.pinsValue.forEach((rang) => {
+    //   let marker = L.marker(rang.lat_lang.split(','))
+    //   let content = `<a href="/grupas/${rang.id}">${rang.ainm}</a><audio controls src="${rang.media_url}"></audio>`;
+    //   marker.bindPopup(content).openPopup();
+    //   marker.addTo(this.map);
+    // });
 
-    if (document.getElementById("grupa_lat_lang")) {
-      this.map.on('click', (e) => { this.showLatLang(e) });
-    }
+    // if (document.getElementById("grupa_lat_lang")) {
+    //   this.map.on('click', (e) => { this.showLatLang(e) });
+    // }
   }
 
   showLatLang(e) {
