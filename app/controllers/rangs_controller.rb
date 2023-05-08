@@ -9,7 +9,7 @@ class RangsController < ApplicationController
   def index
     @contacts = current_user.rangs
     @contact = @contacts.first
-    records = @contact.dictionary_entries
+    records = @contact.dictionary_entries.order(:updated_at)
     @pagy, @messages = pagy(records)
   end
 
