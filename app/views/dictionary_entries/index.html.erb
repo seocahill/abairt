@@ -136,7 +136,7 @@
                 <% end %>
               </td>
               <td class="py-2 px-4 text-center border-gray-200">
-                <% if entry.speaker_id == current_user.id %>
+                <% if current_user && entry.speaker_id == current_user.id %>
                   <%= link_to 'Delete', dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, confirm: 'Are you sure?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
                 <% end %>
               </td>
