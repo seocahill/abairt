@@ -8,9 +8,12 @@ class RangsController < ApplicationController
   # GET /rangs or /rangs.json
   def index
     @contacts = current_user.rangs
-    @contact = @contacts.first
-    records = @contact.dictionary_entries.order(:updated_at)
-    @pagy, @messages = pagy(records)
+    @contact = Rang.find(2)
+    @messages = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
+    if current_user
+      @new_dictionary_entry = @contact.dictionary_entries.build(speaker_id: current_user.id)
+    end
+    # @pagy, @messages = pagy(records)
   end
 
   # GET /rangs/1 or /rangs/1.json

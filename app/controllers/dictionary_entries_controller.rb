@@ -32,8 +32,6 @@ class DictionaryEntriesController < ApplicationController
     end
     @lists += ["Pap", "Seán Kileen", "Darren", "Patchy"]
 
-    records
-
     @pagy, @dictionary_entries = pagy(records, items: 12)
 
     respond_to do |format|
@@ -106,6 +104,6 @@ class DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :rang_id, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, rang_ids: [])
   end
 end
