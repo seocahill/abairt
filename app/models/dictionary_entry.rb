@@ -22,6 +22,7 @@ class DictionaryEntry < ApplicationRecord
   after_destroy_commit { broadcast_remove_to "dictionary_entries" }
 
   acts_as_taggable_on :tags
+  accepts_nested_attributes_for :rang_entries
 
   scope :has_recording, -> { joins(:media_attachment) }
 
@@ -48,7 +49,7 @@ class DictionaryEntry < ApplicationRecord
   end
 
   def transcription?
-    rangs.first&.media&.audio?
+    false
   end
 
   def create_audio_snippet
