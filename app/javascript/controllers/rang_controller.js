@@ -14,21 +14,24 @@ export default class extends Controller {
   }
 
   resetForm(target) {
-    if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
-      target.elements['dictionary_entry[media]'].forEach((item) => {
-        if (item.type === "hidden") {
-          item.remove()
-        }
-      })
+    try {
+      if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
+        target.elements['dictionary_entry[media]'].forEach((item) => {
+          if (item.type === "hidden") {
+            item.remove()
+          }
+        })
+      }
+      let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
+      let translation = target.elements['dictionary_entry[translation]'].value;
+      let regionId = target.elements['dictionary_entry[region_id]'].value;
+      if (regionId) {
+        let region = this.waveSurfer.regions.list[regionId];
+        region.update({ data: { transcription: transcription, translation: translation } })
+      }
+    } finally {
+      target.reset()
     }
-    let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
-    let translation = target.elements['dictionary_entry[translation]'].value;
-    let regionId = target.elements['dictionary_entry[region_id]'].value;
-    if (regionId) {
-      let region = this.waveSurfer.regions.list[regionId];
-      region.update({ data: { transcription: transcription, translation: translation } })
-    }
-    target.reset()
   }
 
   zoom(event) {

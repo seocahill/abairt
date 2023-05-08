@@ -40,50 +40,52 @@
   </div>
   <div class="flex flex-row">
     <%# sidebar %>
-    <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
-      <div class="flex flex-col space-y-4">
-        <%# <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2> %>
-        <%= form_with(model: @new_dictionary_entry, class: "space-y-4") do |form| %>
-          <% if @new_dictionary_entry.errors.any? %>
-            <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-              <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>
-              <ul>
-                <% @new_dictionary_entry.errors.each do |error| %>
-                  <li><%= error.full_message %></li>
-                <% end %>
-              </ul>
+    <% if current_user&.editor? %>
+      <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
+        <div class="flex flex-col space-y-4">
+          <%# <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2> %>
+          <%= form_with(model: @new_dictionary_entry, class: "space-y-4") do |form| %>
+            <% if @new_dictionary_entry.errors.any? %>
+              <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+                <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>
+                <ul>
+                  <% @new_dictionary_entry.errors.each do |error| %>
+                    <li><%= error.full_message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+            <%= form.label :user_ids, "Speaker" %>
+            <div class="mt-1">
+              <%= form.collection_select :speaker_id, @recording.users, :id, :name, {}, {} %>
+            </div>
+            <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
+            <div class="mt-1">
+              <%= form.text_area :word_or_phrase, placeholder: "Gaeilge anseo", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
+            </div>
+            <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
+            <div class="mt-1">
+              <%= form.text_area :translation, placeholder: "Translation", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
+            </div>
+            <div class="hidden" data-rang-target="startRegion">
+              <%= form.hidden_field :region_start %>
+              <input type="hidden" id="region_start" name="region_start">
+            </div>
+            <div class="hidden" data-rang-target="endRegion">
+              <%= form.hidden_field :region_end %>
+            </div>
+            <div class="hidden" data-rang-target="regionId">
+              <%= form.hidden_field :region_id %>
+            </div>
+            <%= form.hidden_field :voice_recording_id, value: @recording.id %>
+            <div id="download-container"></div>
+            <div class="text-right">
+              <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add to transcript</button>
             </div>
           <% end %>
-          <%= form.label :user_ids, "Speaker" %>
-          <div class="mt-1">
-            <%= form.collection_select :speaker_id, @recording.users, :id, :name, {}, {} %>
-          </div>
-          <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
-          <div class="mt-1">
-            <%= form.text_area :word_or_phrase, placeholder: "Gaeilge anseo", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
-          </div>
-          <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
-          <div class="mt-1">
-            <%= form.text_area :translation, placeholder: "Translation", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
-          </div>
-          <div class="hidden" data-rang-target="startRegion">
-            <%= form.hidden_field :region_start %>
-            <input type="hidden" id="region_start" name="region_start">
-          </div>
-          <div class="hidden" data-rang-target="endRegion">
-            <%= form.hidden_field :region_end %>
-          </div>
-          <div class="hidden" data-rang-target="regionId">
-            <%= form.hidden_field :region_id %>
-          </div>
-          <%= form.hidden_field :voice_recording_id, value: @recording.id %>
-          <div id="download-container"></div>
-          <div class="text-right">
-            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add to transcript</button>
-          </div>
-        <% end %>
+        </div>
       </div>
-    </div>
+    <% end %>
     <%# transcript %>
     <div class="flex-grow p-4">
       <div class="flex flex-col space-y-4">

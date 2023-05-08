@@ -20,7 +20,9 @@ class DictionaryEntriesController < ApplicationController
       records = records.has_recording
     end
 
-    @new_dictionary_entry = current_user.dictionary_entries.build
+    if current_user
+      @new_dictionary_entry = current_user.dictionary_entries.build
+    end
 
     @tags = ActsAsTaggableOn::Tag.most_used(15)
 
