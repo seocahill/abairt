@@ -245,5 +245,13 @@ export default class extends Controller {
       parentNode: document.querySelector('#meet')
     };
     this.meeting = new JitsiMeetExternalAPI(domain, options);
+    document.querySelector('#call').classList.add("hidden")
+    document.querySelector('#hang-up').classList.remove("hidden")
+  }
+
+  endMeeting() {
+    this.meeting.dispose();
+    document.querySelector('#call').classList.remove("hidden")
+    document.querySelector('#hang-up').classList.add("hidden")
   }
 }
