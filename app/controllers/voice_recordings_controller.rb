@@ -1,6 +1,6 @@
 class VoiceRecordingsController < ApplicationController
   before_action :set_voice_recording, only: %i[ show edit update destroy ]
-  before_action :authorize, except: %i[index show]
+  before_action :authorize, except: %i[index show preview]
 
   def index
     @new_voice_recording = VoiceRecording.new
