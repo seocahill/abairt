@@ -9,11 +9,20 @@ class RangsController < ApplicationController
   def index
     @contacts = current_user.rangs
     @contact = Rang.find(2)
-    @messages = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
+    @page = params[:page] || 1
+    records = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
+    @pagy, @messages = pagy(records, items: 10, page: params[:page])
+
     if current_user
       @new_dictionary_entry = @contact.dictionary_entries.build(speaker_id: current_user.id)
     end
-    # @pagy, @messages = pagy(records)
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream {
+        render turbo_stream: turbo_stream.append("messages_list", partial: "messages_list", locals: { messages: @messages, current_user: current_user })
+      }
+    end
   end
 
   # GET /rangs/1 or /rangs/1.json
