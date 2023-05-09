@@ -13,6 +13,34 @@ export default class extends Controller {
     })
   }
 
+  connect() {
+    this.intersectionObserver = new IntersectionObserver(
+      this.handleIntersection.bind(this)
+    );
+    this.intersectionObserver.observe(this.listTarget.lastElementChild);
+  }
+
+  disconnect() {
+    this.intersectionObserver.disconnect();
+  }
+
+  handleIntersection(entries) {
+    if (entries[0].isIntersecting) {
+      this.loadMore();
+    }
+  }
+
+  loadMore() {
+    const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
+    const nextPage = parseInt(currentPage) + 1;
+    const url = `/rangs?page=${nextPage}`;
+    Turbo.visit(url, { stream: true });
+  }
+
+  get listTarget() {
+    return this.targets.find("list");
+  }
+
   resetForm(target) {
     try {
       if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
