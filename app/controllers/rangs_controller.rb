@@ -19,9 +19,9 @@ class RangsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.turbo_stream {
+      format.turbo_stream do
         render turbo_stream: turbo_stream.append("messages_list", partial: "messages_list", locals: { messages: @messages, current_user: current_user })
-      }
+      end
     end
   end
 
