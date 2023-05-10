@@ -1,26 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
-import WaveSurfer from "wavesurferjs"
-import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs", "list"]
-  static values = { meetingId: String, media: String, regions: Array }
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "list"]
+  static values = { meetingId: String, media: String }
   scrollDirectionDown = true;
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
       this.resetForm(target)
     })
-  }
-
-  connect() {
-    document.getElementById('bottom').scrollIntoView({ behavior: "smooth" })
-    document.addEventListener('turbo:render', (event) => {
-      if (event.target.contains(newFrame)) {
-        newFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
   }
 
   prevMessages(e) {
@@ -38,97 +27,9 @@ export default class extends Controller {
           }
         })
       }
-      let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
-      let translation = target.elements['dictionary_entry[translation]'].value;
-      let regionId = target.elements['dictionary_entry[region_id]'].value;
-      if (regionId) {
-        let region = this.waveSurfer.regions.list[regionId];
-        region.update({ data: { transcription: transcription, translation: translation } })
-      }
     } finally {
       target.reset()
     }
-  }
-
-  zoom(event) {
-    event.preventDefault()
-    this.waveSurfer.zoom(Number(event.target.value));
-  }
-
-  waveformTargetConnected() {
-    let playButton = this.element.querySelector('#play-pause-button');
-    playButton.innerHTML = "Preparing wave....";
-    let that = this;
-    this.waveSurfer = WaveSurfer.create({
-      backend: 'MediaElement',
-      container: '#waveform',
-      // waveColor: 'violet',
-      // progressColor: 'purple',
-      partialRender: false,
-      pixelRatio: 1,
-      scrollParent: true,
-      // normalize: true,
-      plugins: [
-        RegionsPlugin.create({
-          dragSelection: true,
-        })
-      ]
-    })
-
-    this.waveSurfer.load(this.mediaValue);
-
-    this.waveSurfer.on('loading', function (progress) {
-      if (progress < 99) {
-        playButton.innerHTML = `loading ${progress}%`;
-      } else {
-        playButton.innerHTML = "Play / Pause";
-      }
-    })
-
-    this.waveSurfer.on('ready', function() {
-      playButton.innerHTML = "Play / Pause";
-      that.regionsValue.forEach((region) => {
-        that.waveSurfer.addRegion({
-          id: region.region_id,
-          start: region.region_start,
-          end: region.region_end,
-          data: { transcription: region.word_or_phrase, translation: region.translation }
-        });
-      })
-    })
-
-    this.waveSurfer.on('region-in', (region) => {
-      if (that.gaeSubsTarget.checked) {
-        that.transcriptionTarget.innerText = region.data.transcription
-      }
-      if (that.engSubsTarget.checked) {
-        that.translationTarget.innerText = region.data.translation
-      }
-    });
-
-    this.waveSurfer.on('audioprocess', function () {
-      if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
-        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-      }
-    })
-
-    this.waveSurfer.on('seek', function() {
-      if (that.hasTimeTarget) {
-        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-      }
-    })
-
-    this.waveSurfer.on('region-click', function (region, e) {
-      e.stopPropagation();
-      // // Play on click, loop on shift click
-      e.shiftKey ? region.playLoop() : region.play();
-    })
-
-    this.waveSurfer.on('region-click', function (region) {
-      that.startRegionTarget.children[0].value = Math.round(region.start * 10) / 10
-      that.endRegionTarget.children[0].value = Math.round(region.end * 10) / 10
-      that.regionIdTarget.children[0].value = region.id
-    })
   }
 
   wordSearchTargetConnected() {
@@ -217,8 +118,6 @@ export default class extends Controller {
   }
 
   teardown() {
-    this.waveSurfer.destroy()
-    this.waveSurfer = null;
     this.meeting = null;
   }
 
@@ -230,16 +129,6 @@ export default class extends Controller {
 
   show() {
     this.dropdownTarget.classList.toggle("hidden")
-  }
-
-  slower(event) {
-    event.preventDefault()
-    let currentSpeed = this.waveSurfer.getPlaybackRate()
-    if (currentSpeed <= 0.33) {
-      this.waveSurfer.setPlaybackRate(1)
-    } else {
-      this.waveSurfer.setPlaybackRate((currentSpeed * 0.75))
-    }
   }
 
   play(event) {
