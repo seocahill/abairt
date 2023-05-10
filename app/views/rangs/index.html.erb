@@ -46,8 +46,17 @@
       <section class="flex-1 overflow-y-auto">
         <div class="px-4 py-6 sm:px-6">
           <div class="mt-8">
-            <%= turbo_frame_tag 'messages_list' do %>
-              <%= render partial: "messages_list", locals: { messages: @messages, current_user: current_user } %>
+            <%= turbo_frame_tag "paginate_page_#{@pagy.page}" do %>
+              <% current_day = nil %>
+              <% @messages.each do |message| %>
+                <%= render 'message', message: message, current_user: current_user, current_day: current_day %>
+                <% current_day = message.updated_at.strftime("%d-%m-%y") %>
+              <% end %>
+              <% if @pagy.next %>
+                <%= turbo_frame_tag "paginate_page_#{@pagy.next}", src: rangs_path(page: @pagy.next), loading: 'lazy' do %>
+                  Loading...
+                <% end %>
+              <% end %>
             <% end %>
           </div>
         </div>
