@@ -3,7 +3,7 @@
   <h3 class="text-lg font-medium text-gray-900 m-4"><%= message.updated_at.strftime("%d-%m-%y") %></h3>
   <hr>
 <% end %>
-<div data-controller="message" class="flex <%= current_user.id == message.speaker_id ? 'justify-end' : 'justify-start' %> m-4">
+<div data-controller="message" class="flex <%= current_user&.id == message.speaker_id ? 'justify-end' : 'justify-start' %> m-4">
   <div class="flex">
     <div class="bg-white rounded-lg shadow-md p-6 max-w-sm mx-auto">
       <div class="flex items-center mb-2">
@@ -15,12 +15,12 @@
         </p>
       </div>
       <% if message.word_or_phrase.present? %>
-        <p class="<%= current_user.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+        <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
           <%= message.word_or_phrase%>
         </p>
       <% end %>
       <% if message.translation.present? %>
-        <p class="<%= current_user.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+        <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
           <%= message.translation %>
         </p>
       <% end %>
