@@ -32,7 +32,7 @@ class DictionaryEntriesController < ApplicationController
     end
     @lists += ["Pap", "Seán Kileen", "Darren", "Patchy"]
 
-    @pagy, @dictionary_entries = pagy(records, items: 12)
+    @pagy, @dictionary_entries = pagy(records, items: 20)
 
     respond_to do |format|
       format.html
