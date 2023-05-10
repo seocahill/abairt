@@ -3,7 +3,7 @@ import autoComplete from "autocomplete";
 
 export default class extends Controller {
   static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "list"]
-  static values = { meetingId: String, media: String }
+  static values = { meetingId: String, media: String, currentUserId: String }
   scrollDirectionDown = true;
 
   initialize() {
