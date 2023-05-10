@@ -39,7 +39,7 @@ class UsersController < ApplicationController
   # POST /users or /users.json
   def create
     password = SecureRandom.uuid
-    email = user_params[:name].split.join + "@abairt.com"
+    email = user_params[:email].present? ? user_params[:email] : user_params[:name].split.join + "@abairt.com"
     @user = User.new(user_params.merge(password: password, email: email, role: :speaker))
 
     respond_to do |format|

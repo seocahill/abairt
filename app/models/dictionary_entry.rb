@@ -17,7 +17,7 @@ class DictionaryEntry < ApplicationRecord
 
   before_create :create_audio_snippet, unless: -> { voice_recording_id.nil? }
 
-  after_create_commit { broadcast_prepend_to "dictionary_entries" }
+  after_create_commit { broadcast_append_to "dictionary_entries" }
   after_update_commit { broadcast_replace_later_to "dictionary_entries" }
   after_destroy_commit { broadcast_remove_to "dictionary_entries" }
 
