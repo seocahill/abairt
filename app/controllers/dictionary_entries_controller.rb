@@ -58,11 +58,15 @@ class DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
+        Turbo::StreamsChannel.broadcast_append_to("rangs",
+                                            target: "paginate_page_#{params[:page]}",
+                                            partial: "rangs/message",
+                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y") })
         format.html
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.append(:messages_list, partial: "rangs/message",
-          locals: { message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y")})
-        end
+        # format.turbo_stream do
+        #   render turbo_stream: turbo_stream.append(:messages_list, partial: "rangs/message",
+        #   locals: { message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y")})
+        # end
       else
         format.html { render :new, status: :unprocessable_entity }
       end
