@@ -8,7 +8,9 @@ class RangsController < ApplicationController
   # GET /rangs or /rangs.json
   def index
     @contacts = current_user.lectures + current_user.rangs
-    @contact = Rang.find(2)
+    #FIXME
+    @contact = params[:chat] ? Rang.find(params[:chat]) : @contacts.first
+
 
     records = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
     per_page = 20

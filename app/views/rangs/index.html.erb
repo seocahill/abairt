@@ -12,9 +12,9 @@
       <aside>
         <ul class="divide-y divide-gray-200">
           <% @contacts.each do |contact| %>
-            <li class="flex items-center py-2 px-4 hover:bg-gray-50">
+            <li class="flex items-center py-2 px-4 <%= if @contact.id == contact.id; 'bg-gray-200' else; 'hover:bg-gray-50' end %>">
               <div class="ml-3">
-                <%= link_to contact.name, rang_path(contact), class: "text-base font-medium text-gray-900" %>
+                <%= link_to contact.name, rangs_path(chat: contact.id), class: "text-base font-medium text-gray-900" %>
               </div>
             </li>
           <% end %>
@@ -58,7 +58,7 @@
               <%= turbo_frame_tag "paginate_page_#{@pagy.page}" do %>
                 <% current_day = nil %>
                 <% if @pagy.prev %>
-                  <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev), loading: 'lazy', class: "previous-messages hidden"  do %>
+                  <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev, chat: @contact.id), loading: 'lazy', class: "previous-messages hidden"  do %>
                     Loading...
                   <% end %>
                 <% end %>
