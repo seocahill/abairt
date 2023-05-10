@@ -49,19 +49,20 @@
             <% if @pagy.prev %>
               <a href="#" data-action="click->rang#prevMessages" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-full">Load older messages</a>
             <% end %>
-            <%= turbo_frame_tag "paginate_page_#{@pagy.page}" do %>
-              <% current_day = nil %>
-              <% if @pagy.prev %>
-                <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev), loading: 'lazy', class: "previous-messages hidden", autoscroll: true, data: { "data-autoscroll-block": "end"}  do %>
-                  Loading...
+            <div id="messages_list">
+              <%= turbo_frame_tag "paginate_page_#{@pagy.page}" do %>
+                <% current_day = nil %>
+                <% if @pagy.prev %>
+                  <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev), loading: 'lazy', class: "previous-messages hidden"  do %>
+                    Loading...
+                  <% end %>
+                <% end %>
+                <% @messages.each do |message| %>
+                  <%= render 'message', message: message, current_user: current_user, current_day: current_day %>
+                  <% current_day = message.updated_at.strftime("%d-%m-%y") %>
+                <% end %>
               <% end %>
-              <% end %>
-              <% @messages.each do |message| %>
-                <%= render 'message', message: message, current_user: current_user, current_day: current_day %>
-                <% current_day = message.updated_at.strftime("%d-%m-%y") %>
-              <% end %>
-              <div id="bottom"></div>
-            <% end %>
+            </div>
           </div>
         </div>
       </section>
