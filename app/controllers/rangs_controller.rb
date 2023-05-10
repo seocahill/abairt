@@ -7,6 +7,7 @@ class RangsController < ApplicationController
 
   # GET /rangs or /rangs.json
   def index
+    @current_user = current_user
     @rangs = current_user.lectures + current_user.rangs
     #FIXME
     @rang = params[:chat] ? Rang.find(params[:chat]) : @rangs.first
