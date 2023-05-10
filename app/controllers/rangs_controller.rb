@@ -7,7 +7,7 @@ class RangsController < ApplicationController
 
   # GET /rangs or /rangs.json
   def index
-    @contacts = current_user.rangs
+    @contacts = current_user.lectures + current_user.rangs
     @contact = Rang.find(2)
 
     records = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
@@ -28,13 +28,14 @@ class RangsController < ApplicationController
 
   # GET /rangs/1 or /rangs/1.json
   def show
-    @muinteoir = @rang.grupa.muinteoir
+    @muinteoir = @rang.teacher
     @regions = @rang.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase, :translation)}.to_json
   end
 
   # GET /rangs/new
   def new
     @rang = Rang.new(name: "Cómhrá #{Date.today.to_s(:short)}")
+    @student = @rang.users.build(password: SecureRandom.uuid)
   end
 
   # GET /rangs/1/edit
@@ -43,18 +44,6 @@ class RangsController < ApplicationController
   # POST /rangs or /rangs.json
   def create
     @rang = Rang.new(rang_params.merge(user_id: current_user.id))
-
-    if @rang.name.blank? && @rang.grupa_id.present?
-      @rang.name = [@rang.grupa.ainm, @rang.time.to_s(:short)].join("-")
-    end
-
-    if @rang.start_time.nil?
-      @rang.start_time = @rang.time
-    end
-
-    if @rang.end_time.nil?
-      @rang.end_time = @rang.time + 1.hour
-    end
 
     respond_to do |format|
       if @rang.save
@@ -107,12 +96,12 @@ class RangsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def rang_params
-    params.require(:rang).permit(:name, :user_id, :media, :time, :grupa_id)
+    params.require(:rang).permit(:name, :user_id, users_attributes: [:email, :password])
   end
 
   def authorize
     return if current_user
 
-    redirect_back(fallback_location: root_path, alert: "Tá ort a bheith sínithe isteach!")
+    redirect_back(fallback_location: root_path, alert: "Caithfidh tú a bheith sínithe isteach!")
   end
 end

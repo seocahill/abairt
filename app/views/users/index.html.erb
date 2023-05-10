@@ -39,6 +39,12 @@
               </div>
             </div>
             <div class="mt-1">
+              <label for="name" class="block text-sm font-medium text-gray-700">Email</label>
+              <div class="mt-1">
+                <%= form.email_field :email, class: "w-full", required: false %>
+              </div>
+            </div>
+            <div class="mt-1">
               <label for="search" class="block text-sm font-medium text-gray-700">Voice</label>
               <%= form.select :voice, ["male", "female"], :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
             </div>

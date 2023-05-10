@@ -12,6 +12,8 @@ class Rang < ApplicationRecord
   before_create :generate_meeting_id
   after_commit :send_notification, if: -> { ENV['NOTIFICATIONS_ENABLED'] == "true" }
 
+  accepts_nested_attributes_for :users, reject_if: ->(attributes){ attributes['email'].blank? }, allow_destroy: true
+
   def next_time
     return  "aon am" unless time
     return "críochnaithe" unless time > Time.now

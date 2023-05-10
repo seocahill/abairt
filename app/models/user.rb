@@ -12,6 +12,8 @@ class User < ApplicationRecord
   has_many :seomras
   has_many :rangs, through: :seomras
 
+  has_many :lectures, class_name: "Rang", foreign_key: "user_id"
+
   has_many :conversations
   has_many :voice_recordings, through: :conversations
 

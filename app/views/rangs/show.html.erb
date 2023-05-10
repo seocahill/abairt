@@ -1,99 +1,24 @@
-<%= content_for :page_title do %>
-  "Transcription of Media: <%= truncate(@rang.name, length: 50) %>"
-<% end %>
-<%# player %>
-<div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>">
-  <div class="flex items-center space-x-4 p-4">
-    <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+<%= content_for(:page_title, "Rang: #{truncate(@rang.name, length: 50)}") %>
+<div class="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
+<h2 class="text-xl font-bold mb-2">Class Information</h2>
+<div class="mb-4">
+  <div id="<%= dom_id @rang %>">
+    <p class="my-5">
+      <strong class="block font-medium mb-1">Teacher:</strong>
+      <%= @rang.teacher.name %>
+    </p>
+    <p class="my-5">
+      <strong class="block font-medium mb-1">Students:</strong>
+      <%= @rang.users.pluck(:name).join(', ') %>
+    </p>
+    <p class="my-5">
+      <strong class="block font-medium mb-1">Words and phrases:</strong>
+      <%= @rang.dictionary_entries.size %>
+    </p>
   </div>
-  <div class="flex items-center space-x-4 p-4">
-    <div class="flex flex-col space-y-4">
-      <div class="flex items-center space-x-4">
-        <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
-          Play
-        </button>
-        <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#slower">
-          Slow down
-        </button>
-        <label class="flex items-center space-x-2">
-          <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="rang.engSubs">
-          <span class="ml-2 text-gray-700">English Subtitles</span>
-        </label>
-        <label class="flex items-center space-x-2">
-          <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="rang.gaeSubs">
-          <span class="ml-2 text-gray-700">Irish Subtitles</span>
-        </label>
-        <label class="flex items-center space-x-2">
-          <span class="ml-2 text-gray-700">Zoom:</span>
-          <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0">
-        </label>
-        <label class="flex items-center space-x-2">
-          <span class="ml-2 text-gray-700">Playhead:</span>
-          <p data-target="rang.time">0.0 </p>
-        </label>
-      </div>
-      <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-50">
-        <p class="prose lg:prose-2xl" data-target="rang.transcription">Transcript</p>
-        <i class="prose lg:prose" data-target="rang.translation">Translation</i>
-      </div>
-    </div>
-  </div>
-
-  <div class="flex flex-row">
-    <%# sidebar %>
-    <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
-      <div class="flex flex-col space-y-4">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2>
-        <form class="space-y-4">
-          <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish</label>
-          <div class="mt-1">
-            <textarea id="word_or_phrase" placeholder="Gaeilge anseo" name="word_or_phrase" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
-          </div>
-          <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
-          <div class="mt-1">
-            <textarea id="translation" placeholder="Translation" name="translation" class="py-2 px-3 border border-gray-300 rounded-md w-full"></textarea>
-          </div>
-          <div class="hidden" data-rang-target="startRegion">
-            <input type="number" id="region_start" name="region_start" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-          </div>
-          <div class="hidden" data-rang-target="endRegion">
-            <input type="number" id="region_end" name="region_end" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-          </div>
-          <div class="hidden" data-rang-target="regionId">
-            <input type="text" id="region_id" name="region_id" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-          </div>
-          <div class="text-right">
-            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    <%# transcript %>
-    <div class="flex-grow p-4">
-      <div class="flex flex-col space-y-4">
-        <table class="w-full table-fixed">
-          <thead>
-            <tr class="bg-gray-100 text-left">
-              <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
-              <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
-              <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Start time</th>
-              <th class="w-1/5 py-2 px-4 border-gray-200 text-center">End time</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @rang.dictionary_entries.each do |entry| %>
-              <tr class="bg-white">
-                <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
-                <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
-                <td class="text-center py-2 px-4 border-gray-200"><%= entry.region_start %></td>
-                <td class="text-center"><%= entry.region_end %></td>
-                <td><a href="#">X</a></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  <% if action_name != "show" %>
+    <%= link_to "Show this rang", @rang, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <% end %>
+  <%= link_to 'Edit this rang', edit_rang_path(@rang), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+  <hr class="mt-6">
 </div>
