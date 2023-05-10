@@ -2,7 +2,7 @@
   "Transcription of Media: <%= truncate(@recording.title, length: 50) %>"
 <% end %>
 <%# player %>
-<div data-controller="rang" data-rang-meeting-id-value="abairt-<%= @recording.meeting_id %>" data-rang-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-rang-regions-value="<%= @regions %>">
+<div data-controller="transcription" data-rang-meeting-id-value="abairt-<%= @recording.meeting_id %>" data-rang-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-rang-regions-value="<%= @regions %>">
   <div class="flex items-center space-x-4 p-4">
     <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
   </div>
