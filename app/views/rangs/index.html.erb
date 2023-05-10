@@ -1,4 +1,5 @@
 <%= content_for(:page_title, "Chat history") %>
+<%= turbo_stream_from @rang %>
 <div class="flex flex-row" data-controller="rang" data-rang-meeting-id-value="abairt-1234">
   <div class="flex-shrink-0 w-72 bg-gray-100 p-4">
     <div id="meet" class="mb-2"></div>
@@ -11,8 +12,8 @@
       </div>
       <aside>
         <ul class="divide-y divide-gray-200">
-          <% @contacts.each do |contact| %>
-            <li class="flex items-center py-2 px-4 <%= if @contact.id == contact.id; 'bg-gray-200' else; 'hover:bg-gray-50' end %>">
+          <% @rangs.each do |contact| %>
+            <li class="flex items-center py-2 px-4 <%= if @rang.id == contact.id; 'bg-gray-200' else; 'hover:bg-gray-50' end %>">
               <div class="ml-3">
                 <%= link_to contact.name, rangs_path(chat: contact.id), class: "text-base font-medium text-gray-900" %>
               </div>
@@ -31,7 +32,7 @@
     <header class="flex-shrink-0 bg-white border-b border-gray-200">
       <div class="flex justify-between px-4 py-3 sm:px-6">
         <h2 class="text-lg font-medium leading-6 text-gray-900">
-          <%= @contact.teacher.name %>
+          <%= @rang.teacher.name %>
         </h2>
         <div class="flex items-center">
           <button id="hang-up" class="p-2 bg-red-700 hidden rounded-full" data-action="click->rang#endMeeting">
@@ -58,7 +59,7 @@
               <%= turbo_frame_tag "paginate_page_#{@pagy.page}" do %>
                 <% current_day = nil %>
                 <% if @pagy.prev %>
-                  <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev, chat: @contact.id), loading: 'lazy', class: "previous-messages hidden"  do %>
+                  <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev, chat: @rang.id), loading: 'lazy', class: "previous-messages hidden"  do %>
                     Loading...
                   <% end %>
                 <% end %>
@@ -84,7 +85,7 @@
                               class: 'px-4 py-2 bg-red-200 text-white-700 rounded-lg mr-2',
                               data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
           <% end %>
-          <input type="hidden" id="dictionary_entry_rang_ids" name="dictionary_entry[rang_ids][]" value="<%= @contact.id%>">
+          <input type="hidden" id="dictionary_entry_rang_ids" name="dictionary_entry[rang_ids][]" value="<%= @rang.id%>">
           <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2">Send</button>
         <% end %>
       </div>

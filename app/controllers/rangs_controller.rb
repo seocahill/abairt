@@ -7,12 +7,12 @@ class RangsController < ApplicationController
 
   # GET /rangs or /rangs.json
   def index
-    @contacts = current_user.lectures + current_user.rangs
+    @rangs = current_user.lectures + current_user.rangs
     #FIXME
-    @contact = params[:chat] ? Rang.find(params[:chat]) : @contacts.first
+    @rang = params[:chat] ? Rang.find(params[:chat]) : @rangs.first
 
 
-    records = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
+    records = @rang.dictionary_entries.where.not(id: nil).order(:updated_at)
     per_page = 20
 
     if params[:page].present?
@@ -24,7 +24,7 @@ class RangsController < ApplicationController
     @pagy, @messages = pagy(records, items: per_page, page: current_page_number)
 
     if current_user
-      @new_dictionary_entry = @contact.dictionary_entries.build(speaker_id: current_user.id)
+      @new_dictionary_entry = @rang.dictionary_entries.build(speaker_id: current_user.id)
     end
   end
 
