@@ -4,30 +4,14 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs", "list"]
-  static values = { meetingId: String, media: String, regions: Array }
-  scrollDirectionDown = true;
+  static targets = ["time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs"]
+  static values = { media: String, regions: Array }
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
       this.resetForm(target)
     })
   }
-
-  connect() {
-    document.getElementById('bottom').scrollIntoView({ behavior: "smooth" })
-    document.addEventListener('turbo:render', (event) => {
-      if (event.target.contains(newFrame)) {
-        newFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  }
-
-  prevMessages(e) {
-    e.preventDefault()
-    document.querySelectorAll('.previous-messages').forEach(node => node.classList.remove('hidden'));
-  }
-
 
   resetForm(target) {
     try {
@@ -222,16 +206,6 @@ export default class extends Controller {
     this.meeting = null;
   }
 
-  hide() {
-    this.cellTargets.forEach((cellTarget) => {
-      cellTarget.classList.toggle("hidden")
-    })
-  }
-
-  show() {
-    this.dropdownTarget.classList.toggle("hidden")
-  }
-
   slower(event) {
     event.preventDefault()
     let currentSpeed = this.waveSurfer.getPlaybackRate()
@@ -251,23 +225,5 @@ export default class extends Controller {
     } else {
       this.waveSurfer.playPause()
     }
-  }
-
-  startMeeting() {
-    const domain = 'meet.jit.si';
-    const options = {
-      roomName: this.meetingIdValue,
-      height: 700,
-      parentNode: document.querySelector('#meet')
-    };
-    this.meeting = new JitsiMeetExternalAPI(domain, options);
-    document.querySelector('#call').classList.add("hidden")
-    document.querySelector('#hang-up').classList.remove("hidden")
-  }
-
-  endMeeting() {
-    this.meeting.dispose();
-    document.querySelector('#call').classList.remove("hidden")
-    document.querySelector('#hang-up').classList.add("hidden")
   }
 }
