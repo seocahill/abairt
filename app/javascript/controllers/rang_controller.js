@@ -4,13 +4,23 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs"]
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs", "list"]
   static values = { meetingId: String, media: String, regions: Array }
+  scrollDirectionDown = true;
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
       this.resetForm(target)
     })
+  }
+
+  connect() {
+    document.getElementById('bottom').scrollIntoView({ behavior: "smooth" })
+  }
+
+  prevMessages(e) {
+    e.preventDefault()
+    document.querySelectorAll('.previous-messages').forEach(node => node.classList.remove('hidden'));
   }
 
   resetForm(target) {

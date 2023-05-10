@@ -9,9 +9,17 @@ class RangsController < ApplicationController
   def index
     @contacts = current_user.rangs
     @contact = Rang.find(2)
-    @page = params[:page] || 1
+
     records = @contact.dictionary_entries.where.not(id: nil).order(:updated_at)
-    @pagy, @messages = pagy(records, items: 10, page: params[:page])
+    per_page = 20
+
+    if params[:page].present?
+      current_page_number = params[:page].to_i
+    else
+      current_page_number = Pagy.new(count: records.size, items: per_page).last
+    end
+
+    @pagy, @messages = pagy(records, items: per_page, page: current_page_number)
 
     if current_user
       @new_dictionary_entry = @contact.dictionary_entries.build(speaker_id: current_user.id)
