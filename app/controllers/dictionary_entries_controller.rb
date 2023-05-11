@@ -54,7 +54,8 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    @dictionary_entry = current_user.dictionary_entries.build(dictionary_entry_params)
+    dictionary_entry_params[:speaker_id] ||= current_user.id
+    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params)
 
     respond_to do |format|
       if @dictionary_entry.save
