@@ -58,16 +58,9 @@ class DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
-        Turbo::StreamsChannel.broadcast_append_to("rangs",
-                                            target: "paginate_page_#{params[:page]}",
-                                            partial: "rangs/message",
-                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y") })
+        broadcast_to_rang unless dictionary_entry_params.has_key?("voice_recording_id")
         format.html
         format.turbo_stream
-        # do
-        #   render turbo_stream: turbo_stream.append(:messages_list, partial: "rangs/message",
-        #   locals: { message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y")})
-        # end
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -98,6 +91,13 @@ class DictionaryEntriesController < ApplicationController
   end
 
   private
+
+  def broadcast_to_rang
+    Turbo::StreamsChannel.broadcast_append_to("rangs",
+                                            target: "paginate_page_#{params[:page]}",
+                                            partial: "rangs/message",
+                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y") })
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_dictionary_entry
