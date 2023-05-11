@@ -2,45 +2,45 @@
   "Transcription of Media: <%= truncate(@recording.title, length: 50) %>"
 <% end %>
 <%# player %>
-<div data-controller="transcription" data-rang-meeting-id-value="abairt-<%= @recording.meeting_id %>" data-rang-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-rang-regions-value="<%= @regions %>">
+<div data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-transcription-regions-value="<%= @regions %>">
   <div class="flex items-center space-x-4 p-4">
-    <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+    <div id="waveform" class="flex-grow" data-transcription-target="waveform"></div>
   </div>
   <div class="flex items-center space-x-4 p-4">
     <div class="flex flex-col space-y-4">
       <div class="flex items-center space-x-4">
-        <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
+        <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#play">
           Play
         </button>
-        <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#slower">
+        <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#slower">
           Slow down
         </button>
         <label class="flex items-center space-x-2">
-          <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="rang.engSubs">
+          <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="transcription.engSubs">
           <span class="ml-2 text-gray-700">English Subtitles</span>
         </label>
         <label class="flex items-center space-x-2">
-          <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="rang.gaeSubs">
+          <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="transcription.gaeSubs">
           <span class="ml-2 text-gray-700">Irish Subtitles</span>
         </label>
         <label class="flex items-center space-x-2">
           <span class="ml-2 text-gray-700">Zoom:</span>
-          <input data-action="input->rang#zoom" type="range" min="0" max="100" value="0">
+          <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="0">
         </label>
         <label class="flex items-center space-x-2">
           <span class="ml-2 text-gray-700">Playhead:</span>
-          <p data-target="rang.time">0.0 </p>
+          <p data-target="transcription.time">0.0 </p>
         </label>
       </div>
       <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-50">
-        <p class="prose lg:prose-2xl" data-target="rang.transcription">Transcript</p>
-        <i class="prose lg:prose" data-target="rang.translation">Translation</i>
+        <p class="prose lg:prose-2xl" data-target="transcription.transcription">Transcript</p>
+        <i class="prose lg:prose" data-target="transcription.translation">Translation</i>
       </div>
     </div>
   </div>
   <div class="flex flex-row">
     <%# sidebar %>
-    <% if current_user&.editor? %>
+    <% if current_user&.teacher? || current_user&.admin? %>
       <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
         <div class="flex flex-col space-y-4">
           <%# <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2> %>
@@ -67,14 +67,14 @@
             <div class="mt-1">
               <%= form.text_area :translation, placeholder: "Translation", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
             </div>
-            <div class="hidden" data-rang-target="startRegion">
+            <div class="hidden" data-transcription-target="startRegion">
               <%= form.hidden_field :region_start %>
               <input type="hidden" id="region_start" name="region_start">
             </div>
-            <div class="hidden" data-rang-target="endRegion">
+            <div class="hidden" data-transcription-target="endRegion">
               <%= form.hidden_field :region_end %>
             </div>
-            <div class="hidden" data-rang-target="regionId">
+            <div class="hidden" data-transcription-target="regionId">
               <%= form.hidden_field :region_id %>
             </div>
             <%= form.hidden_field :voice_recording_id, value: @recording.id %>

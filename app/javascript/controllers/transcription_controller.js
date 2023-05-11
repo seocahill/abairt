@@ -14,24 +14,21 @@ export default class extends Controller {
   }
 
   resetForm(target) {
-    try {
-      if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
-        target.elements['dictionary_entry[media]'].forEach((item) => {
-          if (item.type === "hidden") {
-            item.remove()
-          }
-        })
-      }
-      let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
-      let translation = target.elements['dictionary_entry[translation]'].value;
-      let regionId = target.elements['dictionary_entry[region_id]'].value;
-      if (regionId) {
-        let region = this.waveSurfer.regions.list[regionId];
-        region.update({ data: { transcription: transcription, translation: translation } })
-      }
-    } finally {
-      target.reset()
+    if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
+      target.elements['dictionary_entry[media]'].forEach((item) => {
+        if (item.type === "hidden") {
+          item.remove()
+        }
+      })
     }
+    let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
+    let translation = target.elements['dictionary_entry[translation]'].value;
+    let regionId = target.elements['dictionary_entry[region_id]'].value;
+    if (regionId) {
+      let region = this.waveSurfer.regions.list[regionId];
+      region.update({ data: { transcription: transcription, translation: translation } })
+    }
+    target.reset()
   }
 
   zoom(event) {
@@ -105,7 +102,15 @@ export default class extends Controller {
     this.waveSurfer.on('region-click', function (region, e) {
       e.stopPropagation();
       // // Play on click, loop on shift click
-      e.shiftKey ? region.playLoop() : region.play();
+      if (e.altKey) {
+        // alt/option + click logic here (e.g., region.remove())
+        region.remove();
+      } else if (e.shiftKey) {
+        region.playLoop();
+      } else {
+        // Single click logic here (e.g., region.play())
+        region.play();
+      }
     })
 
     this.waveSurfer.on('region-click', function (region) {
