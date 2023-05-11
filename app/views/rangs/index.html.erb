@@ -1,6 +1,7 @@
 <%= content_for(:page_title, "Chat history") %>
 <%= turbo_stream_from "rangs" %>
-<div id="rang" class="flex flex-row" data-controller="rang" data-rang-meeting-id-value="abairt-1234" data-current-user-id="<%= @current_user.id %>">
+<div id="rang" class="flex flex-row" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>"
+ data-current-user-id="<%= @current_user.id %>">
   <div class="flex-shrink-0 w-72 bg-gray-100 p-4">
     <div id="meet" class="mb-2"></div>
     <h2 class="text-lg font-medium text-gray-900 mb-4">Classes</h2>
