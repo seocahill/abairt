@@ -87,6 +87,11 @@ export default class extends Controller {
       }
     });
 
+    this.waveSurfer.on('region-out', (region) => {
+      that.transcriptionTarget.innerText = "~";
+      that.translationTarget.innerText = "~";
+    });
+
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
