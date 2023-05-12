@@ -6,7 +6,7 @@ export default class extends Controller {
 
 
   connect() {
-    this.map = L.map('map').setView([53.9110, -9.4527], 9);
+    this.map = L.map('map', { scrollWheelZoom: false }).setView([53.9110, -9.4527], 9);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
