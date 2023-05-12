@@ -7,6 +7,12 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
 
+  def authorize
+    return if current_user
+
+    redirect_back(fallback_location: root_path, alert: "Caithfidh tú a bheith sínithe isteach!")
+  end
+
   def current_user
     User.find_by(id: session[:user_id], confirmed: true)
   end
