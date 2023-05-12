@@ -2,11 +2,11 @@
 
 class DictionaryEntriesController < ApplicationController
   before_action :set_dictionary_entry, only: %i[show edit update update_all destroy]
-  before_action :set_rang, only: %i[new create]
+  before_action :authorize, only: %i[new create edit destroy]
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
+    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").order(:id, :desc)
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
@@ -54,14 +54,15 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    dictionary_entry_params[:speaker_id] ||= current_user.id
-    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params)
+    @dictionary_entry = current_user.dictionary_entries.build(dictionary_entry_params)
 
     respond_to do |format|
       if @dictionary_entry.save
-        broadcast_to_rang unless dictionary_entry_params.has_key?("voice_recording_id")
         format.html
-        format.turbo_stream
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
+          locals: { entry: @dictionary_entry, current_user: current_user })
+        end
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -76,18 +77,12 @@ class DictionaryEntriesController < ApplicationController
     end
   end
 
-  def update_all
-    @dictionary_entry.update(dictionary_entry_params)
-    respond_to do |format|
-      format.turbo_stream
-    end
-  end
-
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
-    @dictionary_entry.destroy!
+    @dictionary_entry.destroy
     respond_to do |format|
-      format.turbo_stream
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@dictionary_entry) }
+      format.html         { redirect_to dictionary_entries_url }
     end
   end
 
@@ -105,14 +100,8 @@ class DictionaryEntriesController < ApplicationController
     @dictionary_entry = DictionaryEntry.find(params[:id])
   end
 
-  def set_rang
-    return unless params[:rang_id]
-
-    @rang = Rang.find(params[:rang_id])
-  end
-
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, rang_ids: [])
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :tag_list, :speaker_id)
   end
 end
