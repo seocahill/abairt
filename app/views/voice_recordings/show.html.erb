@@ -44,7 +44,7 @@
       <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
         <div class="flex flex-col space-y-4">
           <%# <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2> %>
-          <%= form_with(model: @new_dictionary_entry, url: voice_recordings_dictionary_entries_path, class: "space-y-4") do |form| %>
+          <%= form_with(model: [@recording, @new_dictionary_entry], class: "space-y-4") do |form| %>
             <% if @new_dictionary_entry.errors.any? %>
               <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
                 <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>

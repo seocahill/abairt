@@ -2,7 +2,7 @@
 
 Rails.application.routes.draw do
   resources :voice_recordings do
-    resources :dictionary_entries, only: :create
+    resources :dictionary_entries, only: :create, module: :voice_recordings
     member { get :preview }
   end
 
@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   end
 
   resources :rangs do
-    resources :dictionary_entries, only: :create
+    resources :dictionary_entries, only: :create, module: :rangs
   end
 
   resources :tags
