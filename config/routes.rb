@@ -1,13 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  namespace :voice_recordings do
-    resources :dictionary_entries, only: :create
-  end
   resources :voice_recordings do
-    member do
-      get :preview
-    end
+    resources :dictionary_entries, only: :create
+    member { get :preview }
   end
 
   scope controller: :pages do
@@ -15,7 +11,7 @@ Rails.application.routes.draw do
   end
 
   resources :rangs do
-    resources :dictionary_entries
+    resources :dictionary_entries, only: :create
   end
 
   resources :tags
@@ -28,11 +24,8 @@ Rails.application.routes.draw do
     delete "logout" => :destroy
   end
 
-  resources :dictionary_entries do
-    collection do
-      patch :update_all
-    end
-  end
+  resources :dictionary_entries
+
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   root to: "home#index"
 end
