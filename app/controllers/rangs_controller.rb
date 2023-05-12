@@ -65,11 +65,6 @@ class RangsController < ApplicationController
     respond_to do |format|
       @rang.assign_attributes(rang_params)
 
-      if @rang.time_changed?
-        @rang.start_time = @rang.time
-        @rang.end_time = @rang.time + 1.hour
-      end
-
       if @rang.save
         @rang.send_notification unless @rang.media.audio?
         format.html { redirect_to @rang, notice: 'Rang was successfully updated.' }

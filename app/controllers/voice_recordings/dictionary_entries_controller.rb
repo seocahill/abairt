@@ -1,4 +1,5 @@
 class VoiceRecordings::DictionaryEntriesController < ApplicationController
+  before_action :authorize
   # POST /dictionary_entries or /dictionary_entries.json
   def create
     @dictionary_entry = DictionaryEntry.new(dictionary_entry_params)
