@@ -18,7 +18,7 @@ class User < ApplicationRecord
   has_many :voice_recordings, through: :conversations
 
   # lists
-  has_many :own_lists, lass_name: "WordList", dependent: :destroy
+  has_many :own_lists, class_name: "WordList", dependent: :destroy
   has_many :user_lists, dependent: :destroy
   has_many :followed_lists, class_name: "WordList", through: :user_lists
 
