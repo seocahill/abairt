@@ -79,7 +79,10 @@ class DictionaryEntriesController < ApplicationController
 
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
+    broadcast = @dictionary_entry.rangs.any?
     @dictionary_entry.destroy
+    Turbo::StreamsChannel.broadcast_remove_to("rangs", target: @dictionary_entry) if broadcast
+
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.remove(@dictionary_entry) }
       format.html         { redirect_to dictionary_entries_url }
@@ -87,13 +90,6 @@ class DictionaryEntriesController < ApplicationController
   end
 
   private
-
-  def broadcast_to_rang
-    Turbo::StreamsChannel.broadcast_append_to("rangs",
-                                            target: "paginate_page_#{params[:page]}",
-                                            partial: "rangs/message",
-                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y") })
-  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_dictionary_entry
