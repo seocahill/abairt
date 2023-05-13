@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :lists
   resources :voice_recordings do
     resources :dictionary_entries, only: :create, module: :voice_recordings
     member { get :preview }
