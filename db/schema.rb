@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_07_214107) do
+ActiveRecord::Schema.define(version: 2023_05_13_192136) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -199,6 +199,15 @@ ActiveRecord::Schema.define(version: 2023_05_07_214107) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "user_lists", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "word_list_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_user_lists_on_user_id"
+    t.index ["word_list_id"], name: "index_user_lists_on_word_list_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", limit: 255
     t.string "name", limit: 255
@@ -225,6 +234,25 @@ ActiveRecord::Schema.define(version: 2023_05_07_214107) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "word_list_dictionary_entries", force: :cascade do |t|
+    t.integer "dictionary_entry_id", null: false
+    t.integer "word_list_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["dictionary_entry_id"], name: "index_word_list_dictionary_entries_on_dictionary_entry_id"
+    t.index ["word_list_id"], name: "index_word_list_dictionary_entries_on_word_list_id"
+  end
+
+  create_table "word_lists", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.boolean "starred"
+    t.integer "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_word_lists_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "conversations", "users"
@@ -235,4 +263,9 @@ ActiveRecord::Schema.define(version: 2023_05_07_214107) do
   add_foreign_key "seomras", "rangs"
   add_foreign_key "seomras", "users"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "user_lists", "users"
+  add_foreign_key "user_lists", "word_lists"
+  add_foreign_key "word_list_dictionary_entries", "dictionary_entries"
+  add_foreign_key "word_list_dictionary_entries", "word_lists"
+  add_foreign_key "word_lists", "users"
 end
