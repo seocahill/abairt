@@ -13,18 +13,15 @@ class DictionaryEntry < ApplicationRecord
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
   belongs_to :voice_recording, optional: true
 
+  has_many :word_list_dictionary_entries, dependent: :destroy
+  has_many :word_lists, through: :word_list_dictionary_entries
+
   enum status: [:normal, :ceist, :foghraíocht]
 
   before_create :create_audio_snippet, unless: -> { voice_recording_id.nil? }
 
-  # after_create_commit do
-  #   broadcast_append_to rangs.first, :messages_list, target: "messages_list", partial: "rangs/message",
-  #         locals: { message: self, current_user: nil, current_day: updated_at.strftime("%d-%m-%y")}
-  # end
-  # after_update_commit { broadcast_replace_later_to "dictionary_entries" }
-  # after_destroy_commit { broadcast_remove_to "dictionary_entries" }
-
   acts_as_taggable_on :tags
+
   accepts_nested_attributes_for :rang_entries
 
   scope :has_recording, -> { joins(:media_attachment) }

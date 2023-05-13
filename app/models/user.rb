@@ -17,6 +17,11 @@ class User < ApplicationRecord
   has_many :conversations
   has_many :voice_recordings, through: :conversations
 
+  # lists
+  has_many :own_lists, lass_name: "WordList", dependent: :destroy
+  has_many :user_lists, dependent: :destroy
+  has_many :followed_lists, class_name: "WordList", through: :user_lists
+
   enum role: [:student, :speaker, :teacher, :admin]
   enum voice: [:male, :female]
   enum dialect: [:an_muirthead, :dún_chaocháin, :acaill, :tuar_mhic_éadaigh]
@@ -24,6 +29,10 @@ class User < ApplicationRecord
   class << self
     def with_unanswered_ceisteanna
       joins(daltaí: { rangs: :dictionary_entries }).where.not(dictionary_entries: { status: :normal} ).distinct
+    end
+
+    def starred_list
+      word_lists.where(starred: true).first_or_create
     end
   end
 
