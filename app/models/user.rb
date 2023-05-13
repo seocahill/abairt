@@ -18,7 +18,7 @@ class User < ApplicationRecord
   has_many :voice_recordings, through: :conversations
 
   # lists
-  has_many :own_lists, class_name: "WordList", dependent: :destroy
+  has_many :own_lists, class_name: "WordList", foreign_key: "user_id", dependent: :destroy
   has_many :user_lists, dependent: :destroy
   has_many :followed_lists, class_name: "WordList", through: :user_lists
 
@@ -30,10 +30,6 @@ class User < ApplicationRecord
     def with_unanswered_ceisteanna
       joins(daltaí: { rangs: :dictionary_entries }).where.not(dictionary_entries: { status: :normal} ).distinct
     end
-
-    def starred_list
-      word_lists.where(starred: true).first_or_create
-    end
   end
 
   def address
@@ -41,6 +37,13 @@ class User < ApplicationRecord
 
     results = Geocoder.search(lat_lang.split(','))
     address = results.first.data.dig("address", "city_district")
+  end
+
+  def starred
+    own_lists.where(starred: true).first_or_create! do |list|
+      list.name = "Starred"
+      list.description = "My favourite words and phrases."
+    end
   end
 
   private

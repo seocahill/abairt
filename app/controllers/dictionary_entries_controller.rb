@@ -26,11 +26,10 @@ class DictionaryEntriesController < ApplicationController
 
     @tags = ActsAsTaggableOn::Tag.most_used(15)
 
-    @lists = []
     if current_user
-      @lists += ["Chat history", "Starred"]
+      @starred = current_user.starred
+      @lists = current_user.own_lists.where(starred: false)
     end
-    @lists += ["Pap", "Seán Kileen", "Darren", "Patchy"]
 
     @pagy, @dictionary_entries = pagy(records, items: 20)
 

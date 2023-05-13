@@ -1,5 +1,5 @@
 class WordList < ApplicationRecord
-  belongs_to :owner, class_name: "User"
+  belongs_to :owner, class_name: "User", foreign_key: "user_id"
 
   # entries
   has_many :word_list_dictionary_entries, dependent: :destroy
