@@ -1,11 +1,14 @@
 <%= content_for(:page_title, "Speakers") %>
-<div class="flex flex-row">
+<div class="flex flex-row" data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
   <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
     <div class="mb-4">
       <nav>
         <ul class="flex flex-col py-2" data-sidebar-target="tabs">
           <li>
             <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab1">Search and Filter</a>
+          </li>
+          <li>
+            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="map#showMap">Toggle Mapview</a>
           </li>
           <% if current_user %>
             <li>
@@ -69,7 +72,10 @@
   </div>
   <div class="flex-grow p-4">
     <div class="flex flex-col space-y-4">
-      <table class="min-w-full divide-y divide-gray-200">
+      <div id="map-container" class="hidden">
+        <div id="map" style="height:600px"></div>
+      </div>
+      <table id="users-list" class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
