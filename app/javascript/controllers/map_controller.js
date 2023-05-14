@@ -33,4 +33,10 @@ export default class extends Controller {
     this.marker = L.marker(e.latlng).addTo(this.map);
     document.getElementById("grupa_lat_lang").value = `${e.latlng.lat},${e.latlng.lng}`;
   }
+
+  showMap(e) {
+    e.preventDefault()
+    document.getElementById('users-list').classList.toggle('hidden')
+    document.getElementById('map-container').classList.toggle('hidden')
+  }
 }
