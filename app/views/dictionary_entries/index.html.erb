@@ -120,34 +120,7 @@
         </thead>
         <tbody id="dictionary_entries">
           <% @dictionary_entries.each do |entry| %>
-            <tr class="bg-white" id="<%= dom_id(entry) %>">
-              <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
-              <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
-              <td data-controller="entry" class="text-center py-2 px-4 border-gray-200">
-                <% if entry.media.attached? %>
-                  <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    <audio src="<%= entry.media.url %>"></audio>
-                    play
-                  </a>
-                <% else %>
-                  <span>no media</span>
-                <% end %>
-              </td>
-              <td class="py-2 px-4 text-center border-gray-200">
-                <% if current_user %>
-                  <%= button_to post_path(post), method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, class: "flex items-center" do %>
-                    <% if @starred.dictionary_entries.include? entry %>
-                      <i style="fill:gold;" data-feather="star"></i>
-                    <% else %>
-                      <i data-feather="star"></i>
-                    <% end %>
-                  <% end %>
-                <% end %>
-                <% if current_user && entry.speaker_id == current_user.id %>
-                  <%= link_to 'Delete', dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, confirm: 'Are you sure?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
-                <% end %>
-              </td>
-            </tr>
+            <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, starred: @starred } %>
           <% end %>
         </tbody>
       </table>
