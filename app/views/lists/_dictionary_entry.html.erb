@@ -1,0 +1,19 @@
+<tr class="bg-white" id="<%= dom_id(entry) %>">
+  <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
+  <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
+  <td data-controller="entry" class="text-center py-2 px-4 border-gray-200">
+    <% if entry.media.attached? %>
+      <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        <audio src="<%= entry.media.url %>"></audio>
+        play
+      </a>
+    <% else %>
+      <span>no media</span>
+    <% end %>
+  </td>
+  <td class="py-2 px-4 text-center border-gray-200">
+    <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: @list.id }}, class: "flex items-center" do %>
+      Remove from list
+    <% end %>
+  </td>
+</tr>

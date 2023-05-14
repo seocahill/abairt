@@ -98,9 +98,10 @@
         </form>
         <ul class="divide-y divide-gray-300">
           <% if current_user %>
-            <li class="flex items-center py-4"><%= link_to "Starred", list_path(@starred.id), class: "text-blue-500 hover:text-blue-700" %></li>
             <% @lists.each do |list| %>
-              <li class="flex items-center py-4"><%= link_to list.name, list_path(list), class: "text-blue-500 hover:text-blue-700" %></li>
+              <li class="flex py-4 justify-between">
+                <%= link_to list.name, list_path(list), class: "hover:text-blue-700" %> <%= link_to list_path(id: list.id, format: :csv), class: "bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded" do %><i data-feather="download"></i><% end %>
+              </li>
             <% end %>
           <% end %>
         </ul>
