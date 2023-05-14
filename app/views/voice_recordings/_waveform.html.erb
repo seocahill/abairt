@@ -1,0 +1,40 @@
+
+ <turbo-frame id="wave_display">
+  <div data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-transcription-regions-value="<%= @regions %>">
+    <div class="flex items-center space-x-4 p-4">
+      <div id="waveform" class="flex-grow" data-transcription-target="waveform"></div>
+    </div>
+    <div class="flex items-center space-x-4 p-4">
+      <div class="flex flex-col space-y-4">
+        <div class="flex items-center space-x-4">
+          <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#play">
+            Play
+          </button>
+          <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#slower">
+            Slow down
+          </button>
+          <label class="flex items-center space-x-2">
+            <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="transcription.engSubs">
+            <span class="ml-2 text-gray-700">English Subtitles</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="transcription.gaeSubs">
+            <span class="ml-2 text-gray-700">Irish Subtitles</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <span class="ml-2 text-gray-700">Zoom:</span>
+            <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="0">
+          </label>
+          <label class="flex items-center space-x-2">
+            <span class="ml-2 text-gray-700">Playhead:</span>
+            <p data-target="transcription.time">0.0 </p>
+          </label>
+        </div>
+        <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-900 text-white w-full">
+          <p class="text-white text-2xl" data-target="transcription.transcription">Transcript of <%= @recording.title %></p>
+          <i class="text-white" data-target="transcription.translation">Translation</i>
+        </div>
+      </div>
+    </div>
+  </div>
+</turbo-frame>

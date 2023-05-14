@@ -63,7 +63,7 @@ gem "pagy", "~> 5.2.1"
 
 gem "aws-sdk-s3", "~> 1.88"
 
-gem "tailwindcss-rails", "~> 0.5.1"
+gem "tailwindcss-rails"
 
 gem "sentry-ruby", "~> 4.2"
 
@@ -81,3 +81,7 @@ gem "rufus-scheduler", "~> 3.8"
 
 gem "acts-as-taggable-on", "~> 8.1"
 gem "importmap-rails", "~> 0.8.2"
+
+gem "groupdate", "~> 6.2"
+
+gem "geocoder", "~> 1.8"

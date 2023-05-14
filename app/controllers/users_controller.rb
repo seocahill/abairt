@@ -2,22 +2,39 @@
 
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
-  before_action :authorize, except: %i[new create index]
+  before_action :authorize, except: %i[index show]
 
   # GET /users or /users.json
   def index
-    @users = User.all
+    records = User.where.not(id: nil).teacher
+
+    if params[:search].present?
+      records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
+    end
+
+    @new_speaker = User.new
+
+    @pagy, @users = pagy(records, items: 12)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: records }
+    end
   end
 
   # GET /users/1 or /users/1.json
   def show
-    start_date = params.fetch(:start_date, Date.today).to_date
-    @rangs = Rang.where(start_time: start_date.beginning_of_month.beginning_of_week..start_date.end_of_month.end_of_week)
+    @pagy, @entries = pagy(@user.dictionary_entries, items: 12)
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data @user.entries.to_csv, filename: "dictionary-#{Date.today}.csv" }
+    end
   end
 
   # GET /users/new
   def new
-    @user = User.new
+    @user = User.new(role: :speaker)
   end
 
   # GET /users/1/edit
@@ -25,7 +42,9 @@ class UsersController < ApplicationController
 
   # POST /users or /users.json
   def create
-    @user = User.new(user_params)
+    password = SecureRandom.uuid
+    email = user_params[:email].present? ? user_params[:email] : user_params[:name].split.join + "@abairt.com"
+    @user = User.new(user_params.merge(password: password, email: email, role: :speaker))
 
     respond_to do |format|
       if @user.save
@@ -75,6 +94,6 @@ class UsersController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def user_params
-    params.require(:user).permit(:email, :name, :password)
+    params.require(:user).permit(:email, :name, :password, :dialect, :voice, :lat_lang)
   end
 end

@@ -1,0 +1,32 @@
+<%= content_for(:page_title, "#{current_user.name} #{@list.name} List") %>
+<div class="flex flex-row">
+  <div class="flex-grow p-4">
+    <div class="flex items-center space-x-2 mb-4">
+      <%= link_to list_path(id: @list.id, format: :csv), class: "flex items-center space-x-1" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Click to Download CSV of <%= @list.description %></span>
+      <% end %>
+    </div>
+    <div class="flex flex-col space-y-4">
+      <table class="w-full table-fixed">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Audio</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center"></th>
+          </tr>
+        </thead>
+        <tbody id="dictionary_entries">
+          <% @list.dictionary_entries.each do |entry| %>
+            <%= render partial: "dictionary_entry", locals: { entry: entry } %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

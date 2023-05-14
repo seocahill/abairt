@@ -16,3 +16,6 @@ pin "jitsi" # @2.1.5
 pin "popper", to: "https://cdn.skypack.dev/@popperjs/core"
 pin "autocomplete", to: "https://ga.jspm.io/npm:@tarekraafat/autocomplete.js@10.2.6/dist/autoComplete.js"
 pin "soundtouchjs", to: "https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/soundtouch.js"
+pin "leaflet", to: "https://ga.jspm.io/npm:leaflet@1.8.0/dist/leaflet-src.js"
+pin "lamejs", to: "https://ga.jspm.io/npm:lamejs@1.2.1/src/js/index.js"
+pin "feather-icons", to: "https://ga.jspm.io/npm:feather-icons@4.29.0/dist/feather.js"

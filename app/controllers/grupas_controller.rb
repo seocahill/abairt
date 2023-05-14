@@ -2,13 +2,20 @@ class GrupasController < ApplicationController
   before_action :authorize, except: %i[index show]
 
   def index
-    @grupai = Grupa.all
+    @pagy, @files = pagy(ActiveStorage::Attachment.where(record_type: "Rang"), items: 12)
+    @rang = Rang.with_attached_media.find(56)
+    @regions = @rang.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase)}.to_json
+    @tags = ActsAsTaggableOn::Tag.most_used(15)
   end
 
   def show
     @grupa = Grupa.find(params[:id])
     records = Rang.where(grupa_id: params[:id])
     @pagy, @rangs = pagy(records)
+  end
+
+  def new
+    @grupa = Grupa.new
   end
 
   # GET /Grupas/1/edit
@@ -18,11 +25,11 @@ class GrupasController < ApplicationController
 
   # POST /Grupas or /Grupas.json
   def create
-    @Grupa = Grupa.new(grupa_params)
-
+    @grupa = Grupa.new(grupa_params)
+    @grupa.muinteoir = current_user
     respond_to do |format|
-      if @Grupa.save
-        format.html { redirect_to @grupa, notice: 'Grupa was successfully created.' }
+      if @grupa.save
+        format.html { redirect_to @grupa }
         format.json { render :show, status: :created, location: @grupa }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -65,7 +72,7 @@ class GrupasController < ApplicationController
   end
 
   def grupa_params
-    params.require(:grupa).permit(:ainm)
+    params.require(:grupa).permit(:ainm, :lat_lang)
   end
 
   private

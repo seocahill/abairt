@@ -5,6 +5,7 @@ module SetCurrentRequestDetails
 
   included do
     before_action do
+      Current.user = current_user
       Current.request_id = request.uuid
       Current.user_agent = request.user_agent
       Current.ip_address = request.ip

@@ -1,13 +1,81 @@
-<%= content_for(:page_title, "Úsáideoirí") %>
-<div class="flex flex-col">
-  <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
+<%= content_for(:page_title, "Speakers") %>
+<div class="flex flex-row">
+  <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
+    <div class="mb-4">
+      <nav>
+        <ul class="flex flex-col py-2" data-sidebar-target="tabs">
+          <li>
+            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab1">Search and Filter</a>
+          </li>
+          <% if current_user %>
+            <li>
+              <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab2">Add Speaker</a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+    <div class="tab-content">
+      <div class="tab-pane" id="tab1">
+        <form class="space-y-4" action="/users">
+          <div>
+            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+            <div class="mt-1">
+              <input type="search" id="search" placeholder="Speaker name" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            </div>
+          </div>
+          <div class="text-right">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
+          </div>
+        </form>
+      </div>
+      <% if current_user %>
+        <div class="tab-pane hidden" id="tab2">
+          <%= form_with(model: @new_speaker) do |form| %>
+            <div class="mt-1">
+              <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+              <div class="mt-1">
+                <%= form.text_field :name,  class: "w-full"%>
+              </div>
+            </div>
+            <div class="mt-1">
+              <label for="name" class="block text-sm font-medium text-gray-700">Email</label>
+              <div class="mt-1">
+                <%= form.email_field :email, class: "w-full", required: false %>
+              </div>
+            </div>
+            <div class="mt-1">
+              <label for="search" class="block text-sm font-medium text-gray-700">Voice</label>
+              <%= form.select :voice, ["male", "female"], :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+            </div>
+            <div class="mt-1">
+              <label for="search" class="block text-sm font-medium text-gray-700">Dialect</label>
+              <%= form.select :dialect, User.dialects.keys, :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+            </div>
+            <div class="mt-1" data-controller="location" data-location-target="locationSearch">
+              <label class="block text-sm font-medium text-gray-700">Location</label>
+              <div class="mb-1">
+                <textarea id="autoCompleteLocation" type="search" class="w-full"></textarea>
+                <%= form.hidden_field :lat_lang, id: "user-lat-lang" %>
+              </div>
+            </div>
+            <div class="w-full text-center mx-auto mt-1">
+              <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex-grow p-4">
+    <div class="flex flex-col space-y-4">
+      <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Voice</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dialect</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contributions</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
             </tr>
           </thead>
@@ -15,13 +83,16 @@
             <% @users.each do |user| %>
               <tr>
                 <td class="px-6 py-4 whitespace-nowrap"><%= user.name %></td>
-                <td class="px-6 py-4 whitespace-nowrap"><%= user.daltaí.present? ? "Máistir" : "Dalta" %></td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><%= link_to 'Show', user %></td>
+                <td class="px-6 py-4 whitespace-nowrap"><%= user.voice %></td>
+                <td class="px-6 py-4 whitespace-nowrap"><%= user.dialect.humanize %></td>
+                <td class="px-6 py-4 whitespace-nowrap"><%= user.dictionary_entries.size %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium hover:text-blue-700"><%= link_to 'Show', user %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
-      </div>
+      <%== pagy_nav(@pagy) %>
     </div>
   </div>
 </div>
+

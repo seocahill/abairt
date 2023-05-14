@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "inter-font" %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "tailwind_custom" %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag 'application', media: 'all' %>
-
     <%= yield :head %>
     <%= javascript_importmap_tags %>
   </head>
@@ -16,93 +19,57 @@
     <% if flash.present? %>
       <%= render 'flash' %>
     <% end %>
-    <!-- This example requires Tailwind CSS v2.0+ -->
-    <div>
-      <nav class="bg-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-16">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <%= image_tag "logo.png", class: "h-8 w-8"  %>
+    <div class="min-h-screen flex flex-col">
+    <nav class="bg-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <a href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+                  <path d="M20,10 h36 a10,10 0 0 1 10,10 v24 a10,10 0 0 1 -10,10 h-36 l-10,10 v-44 a10,10 0 0 1 10,-10 z" fill="#FFFFFF" />
+                  <text x="55%" y="50%" fill="#1F2937" font-size="30" font-weight="bold" font-family="Ubuntu, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">A</text>
+                </svg>
+              </a>
+            </div>
+            <div class="hidden md:block">
+              <div class="ml-10 flex items-baseline space-x-4">
+                <%= link_to 'Audio transcriptions', voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                <%= link_to 'Dictionary', dictionary_entries_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                <%= link_to 'Speakers', users_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                <% if current_user.present? %>
+                  <%= link_to "Chat", rangs_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                <% end %>
               </div>
-              <div class="hidden md:block">
-                <div class="ml-10 flex items-baseline space-x-4">
-                  <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                  <a href="/" class="text-gray-300 hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
-                  <a href=<%= grupas_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Grúpaí</a>
-                  <a href=<%= muinteoirs_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Múinteoirí</a>
-                  <%  if current_user  %>
-                    <a href=<%= rangs_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Ranganna</a>
-                    <%= link_to 'Rang nua', new_rang_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                    <%= link_to 'Ceisteanna', ceisteanna_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                    <a href='/ceist'  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Trá na gCeist</a>
-                    <%= link_to 'Mise', user_path(current_user), class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+            </div>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-4 flex items-center md:ml-6">
+              <!-- Profile dropdown -->
+              <div class="ml-3 relative">
+                <div>
+                  <% if current_user.nil? %>
+                    <%= link_to "Login", login_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <% else %>
+                    <%= button_to "Log out", logout_path, method: :delete, class: "text-white px-3 py-2 rounded-md text-sm font-mediums  bg-gray-700" %>
                   <% end %>
                 </div>
               </div>
             </div>
-            <div class="hidden md:block">
-              <div class="ml-4 flex items-center md:ml-6">
-                <!-- Profile dropdown -->
-                <div class="ml-3 relative">
-                  <div>
-                    <% if current_user.nil? %>
-                      <%= link_to "Login", login_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                    <% else %>
-                      <%= button_to "Log out", logout_path, method: :delete, class: "text-white px-3 py-2 rounded-md text-sm font-mediums  bg-gray-700" %>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="-mr-2 flex md:hidden">
-              <!-- Mobile menu button -->
-              <button type="button" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
-                <span class="sr-only">Open main menu</span>
-                <!--
-              Heroicon name: outline/menu
-
-              Menu open: "hidden", Menu closed: "block"
-            -->
-                <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <!--
-              Heroicon name: outline/x
-
-              Menu open: "block", Menu closed: "hidden"
-            -->
-                <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
           </div>
         </div>
-        <!-- Mobile menu, show/hide based on menu state. -->
-        <div class="md:hidden" id="mobile-menu">
-          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Abairt</a>
-            <a href=<%= grupas_path %> class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Grúpaí</a>
-            <a href=<%= muinteoirs_path %>  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Múinteoirí</a>
-          </div>
-        </div>
-      </nav>
-      <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 class="text-3xl font-bold text-gray-900">
-            <%= page_title %>
-          </h1>
-        </div>
-      </header>
-      <main>
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <!-- Replace with your content -->
-          <%= yield %>
-          <!-- /End replace -->
-        </div>
-      </main>
-    </div>
+      </div>
+    </nav>
+    <header class="bg-white shadow">
+      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+          <%= page_title %>
+        </h1>
+      </div>
+    </header>
+    <main class="flex-1">
+      <%= yield %>
+    </main>
+    <%= yield :footer %>
   </body>
 </html>
