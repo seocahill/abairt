@@ -1,8 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
+import feather from "feather-icons"
 
 export default class extends Controller {
   static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media", "status", "word", "template"]
   static values = { url: String, id: Number }
+
+  connect() {
+    feather.replace()
+  }
 
   async deanta(e) {
     e.preventDefault()
@@ -86,7 +91,8 @@ export default class extends Controller {
 
   play(e) {
     e.preventDefault()
-    this.audioTarget.play()
+    this.element.getElementsByTagName("audio")[0].play()
+    // this.audioTarget.play()
   }
 
   show() {

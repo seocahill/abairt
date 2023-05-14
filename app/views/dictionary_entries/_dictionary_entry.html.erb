@@ -1,65 +1,28 @@
-<%= turbo_frame_tag dom_id(dictionary_entry), class: "table-row", data: { controller: "entry", "entry-id-value": dictionary_entry.id, rang_region_value:  dictionary_entry.slice(:id, :region_id, :region_start, :region_end) } do %>
-  <div class="table-cell px-6 py-4" data-controller="word">
-    <% dictionary_entry.word_or_phrase.split.each do |word| %>
-      <span data-controller="word">
-        <span data-action="click->word#focloir" data-word-target="word" class="entry-word"><%= word %></span>
-        <template data-word-target="template">
-          <div id="tooltip" class="teanglann-template">
-            <iframe name="lexclickFrame" style="width: 298px; height: 348px; border: 1px inset #333333;" src="https://www.teanglann.ie/ga/?s=<%= word %>&quickie=true" frameborder="0"></iframe>
-            <button data-action="click->word#dun" class="bg-yellow-500 text-white active:bg-yellow-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Dún</button>
-          </div>
-        </template>
-      </span>
+<tr class="bg-white" id="<%= dom_id(entry) %>" data-controller="entry">
+  <td class="py-2 px-4 border-gray-200"><%= entry.word_or_phrase %></td>
+  <td class="py-2 px-4 border-gray-200"><%= entry.translation %></td>
+  <td data-controller="entry" class="text-center py-2 px-4 border-gray-200">
+    <% if entry.media.attached? %>
+      <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        <audio src="<%= entry.media.url %>"></audio>
+        play
+      </a>
+    <% else %>
+      <span>no media</span>
     <% end %>
-  </div>
-  <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.translation %></div>
-  <div data-target="rang.cell" class="table-cell px-6 py-4"><%= dictionary_entry.notes %></div>
-  <div data-target="rang.cell" class="table-cell px-6 py-4">
-    <% dictionary_entry.tag_list.each do |tag| %>
-      <%= link_to tag, dictionary_entries_path(tag: tag), target: "_top" %>
+  </td>
+  <td class="py-2 px-4 text-center border-gray-200">
+    <% if current_user %>
+      <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: starred.id }}, class: "flex items-center" do %>
+        <% if starred.dictionary_entries.include? entry %>
+          <i style="fill:gold;" data-feather="star"></i>
+        <% else %>
+          <i data-feather="star"></i>
+        <% end %>
+      <% end %>
     <% end %>
-  </div>
-  <div data-target="rang.cell" class="table-cell px-6 py-4">
-    <% if dictionary_entry.media.attached? && (dictionary_entry.media.audio? ||  dictionary_entry.media.video?) %>
-      <audio src="<%= url_for(dictionary_entry.media) %>" preload=true data-target="entry.audio"></audio>
-      <button data-action="click->entry#play" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow inline-flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-      </button>
+    <% if current_user && entry.speaker_id == current_user.id %>
+      <%= link_to 'Delete', dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, confirm: 'Are you sure?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
     <% end %>
-  </div>
-  <% if current_user %>
-    <div data-target="rang.cell" class="table-cell px-6 py-4">
-      <div class="relative inline-block text-left">
-        <div>
-          <button type="button" data-action="click->entry#show" class="inline-flex px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500" id="options-menu" aria-expanded="true" aria-haspopup="true">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
-          </button>
-        </div>
-        <div data-action="click->entry#show mouseleave->entry#hide" data-target="entry.dropdown" class="hidden origin-top-right absolute right-20 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-          <div class="py-1" role="none">
-            <%= link_to "Edit", edit_dictionary_entry_path(dictionary_entry), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" %>
-            <button data-action="click->entry#ceist" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-              Ceist
-            </button>
-            <button data-action="click->entry#foghraíocht" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-              Foghraíocht
-            </button>
-            <button data-action="click->entry#scrios" class="block bg-white background-transparent px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-              Scrios
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="table-cell px-6 py-4 whitespace-nowrap <%= "invisible" if dictionary_entry.normal? %>">
-      <span data-target="entry.status" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-gray-600">
-        <%= dictionary_entry.status %>
-      </span>
-    </div>
-  <% end %>
-<% end %>
+  </td>
+</tr>

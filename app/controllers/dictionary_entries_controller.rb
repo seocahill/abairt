@@ -2,11 +2,11 @@
 
 class DictionaryEntriesController < ApplicationController
   before_action :set_dictionary_entry, only: %i[show edit update update_all destroy]
-  before_action :set_rang, only: %i[new create]
+  before_action :authorize, only: %i[new create edit destroy]
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.joins(:rangs).where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").where("rangs.url is null")
+    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").order(:id, :desc)
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
@@ -20,11 +20,18 @@ class DictionaryEntriesController < ApplicationController
       records = records.has_recording
     end
 
+    if current_user
+      @new_dictionary_entry = current_user.dictionary_entries.build
+    end
+
     @tags = ActsAsTaggableOn::Tag.most_used(15)
 
-    records
+    if current_user
+      @starred = current_user.starred
+      @lists = current_user.own_lists #.where(starred: false)
+    end
 
-    @pagy, @dictionary_entries = pagy(records)
+    @pagy, @dictionary_entries = pagy(records, items: 20)
 
     respond_to do |format|
       format.html
@@ -46,17 +53,15 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    if params[:dictionary_entry][:dictionary_entry_id].present?
-       @dictionary_entry = DictionaryEntry.find(params[:dictionary_entry][:dictionary_entry_id])
-       @dictionary_entry.assign_attributes(dictionary_entry_params)
-    else
-      @dictionary_entry = @rang.dictionary_entries.new(dictionary_entry_params)
-    end
+    @dictionary_entry = current_user.dictionary_entries.build(dictionary_entry_params)
 
     respond_to do |format|
       if @dictionary_entry.save
-        @rang.dictionary_entries << @dictionary_entry
-        format.turbo_stream
+        format.html
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
+          locals: { entry: @dictionary_entry, current_user: current_user })
+        end
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -71,19 +76,15 @@ class DictionaryEntriesController < ApplicationController
     end
   end
 
-  def update_all
-    @dictionary_entry.update(dictionary_entry_params)
-    respond_to do |format|
-      format.turbo_stream
-    end
-  end
-
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
-    @entry = RangEntry.find_by(rang_id: params[:rang_id], dictionary_entry_id: params[:id])
-    @entry.destroy!
+    broadcast = @dictionary_entry.rangs.any?
+    @dictionary_entry.destroy
+    Turbo::StreamsChannel.broadcast_remove_to("rangs", target: @dictionary_entry) if broadcast
+
     respond_to do |format|
-      format.turbo_stream
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@dictionary_entry) }
+      format.html         { redirect_to dictionary_entries_url }
     end
   end
 
@@ -94,12 +95,8 @@ class DictionaryEntriesController < ApplicationController
     @dictionary_entry = DictionaryEntry.find(params[:id])
   end
 
-  def set_rang
-    @rang = Rang.find(params[:rang_id])
-  end
-
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :rang_id, :status, :tag_list, :region_start, :region_end, :region_id)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :tag_list, :speaker_id)
   end
 end

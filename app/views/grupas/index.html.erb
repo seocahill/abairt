@@ -1,56 +1,174 @@
-<%= content_for(:page_title, "Grúpaí") %>
-<div class="flex flex-col">
-  <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-      <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ainm
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Múinteoir
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Líon na Daltaí
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              </th>
-               <% if current_user %>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                </th>
-              <% end %>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <% @grupai.each do |grupa| %>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= truncate(grupa.ainm, length: 50) %></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= grupa.muinteoir.name %></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900"><%= grupa.users.size %></div>
-                </td>
-                <td class="px-6 whitespace-nowrap text-right text-sm font-medium">
-                  <%= link_to 'An Chead Rang eile', rang_path(grupa.rangs.last.id), class: "text-indigo-600 hover:text-indigo-900" %>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <%= link_to 'Uile Ranganna', grupa, class: "text-indigo-600 hover:text-indigo-900" %>
-                </td>
-                <% if current_user %>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"> <%= link_to "Edit", edit_grupa_path(grupa) %></td>
-              <% end %>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+<%= content_for :page_title do %>
+  Native Speakers recorded and transcribed
+<% end %>
+<div class="flex flex-row">
+  <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
+    <div class="mb-4">
+      <nav>
+        <ul class="flex flex-col py-2" data-sidebar-target="tabs">
+          <li>
+            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab1">Search and Filter</a>
+          </li>
+          <li>
+            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab3">Tags</a>
+          </li>
+          <% if current_user %>
+            <li>
+              <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab2">Upload Audio or Video</a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+    <div class="tab-content">
+      <div class="tab-pane" id="tab1">
+        <form class="space-y-4">
+          <div>
+            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+            <div class="mt-1">
+              <input type="text" id="search" placeholder="Name or Place" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            </div>
+          </div>
+          <div>
+            <label for="voice" class="block text-sm font-medium text-gray-700">Voice</label>
+            <div class="mt-1">
+              <select id="voice" name="voice" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+                <option value="">All</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="voice" class="block text-sm font-medium text-gray-700">Dialect</label>
+            <div class="mt-1">
+              <select id="voice" name="voice" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+                <option value="">All</option>
+                <option value="">Acaill</option>
+                <option value="male">Du Chaocháin</option>
+                <option value="female">Túar Mhic Éadaigh</option>
+                <option value="female">An Fód Dubh</option>
+              </select>
+            </div>
+          </div>
+          <div class="text-right">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
+          </div>
+        </form>
       </div>
+      <% if current_user %>
+        <div class="tab-pane hidden" id="tab2">
+          <form>
+            <div class="mt-1">
+              <label for="search" class="block text-sm font-medium text-gray-700">Speaker</label>
+              <div class="mt-1">
+                <input type="search" class="w-full" placeholder="Search for Speakers"/>
+              </div>
+            </div>
+            <div class="mt-1">
+              <label for="voice" class="block text-sm font-medium text-gray-700">Dialect</label>
+              <div class="mt-1">
+                <select id="voice" name="voice" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+                  <option value="">All</option>
+                  <option value="">Acaill</option>
+                  <option value="male">Du Chaocháin</option>
+                  <option value="female">Túar Mhic Éadaigh</option>
+                  <option value="female">An Fód Dubh</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
+              <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
+              <div class="mt-1">
+                <textarea class="w-full" id= "autoCompleteTags"></textarea>
+              </div>
+            </div>
+            <div class="mt-1">
+              <%= render "media_upload" %>
+            </div>
+            <div class="mt-1 w-full text-center mx-auto">
+              <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
+            </div>
+          </form>
+        </div>
+      <% end %>
+      <div class="tab-pane hidden" id="tab3">
+        <aside>
+          <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
+          <ul class="flex flex-wrap -mx-1">
+            <% @tags.each do |tag| %>
+              <li class="my-1 mx-1"><%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "nline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300" %></li>
+            <% end %>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </div>
+  <div class="flex-grow p-4">
+    <%# begin wave display %>
+    <div class="flex flex-col space-y-4">
+      <div class="flex items-center space-x-4" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-rang-media-value="<%= @rang.media.url if @rang.media.attached? %>" data-rang-regions-value="<%= @regions %>">
+        <div id="waveform" class="flex-grow" data-rang-target="waveform"></div>
+        <div class="flex flex-col space-y-4">
+          <div class="flex items-center space-x-4">
+            <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->rang#play">
+              Play
+            </button>
+            <label class="flex items-center space-x-2">
+              <input id="toggle-english" type="checkbox" class="form-checkbox" checked>
+              <span class="ml-2 text-gray-700">English Subtitles</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input id="toggle-irish" type="checkbox" class="form-checkbox" checked>
+              <span class="ml-2 text-gray-700">Irish Subtitles</span>
+            </label>
+            <div class="relative">
+              <select id="playback-speed" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                <option value="1">1x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="1.75">1.75x</option>
+                <option value="2">2x</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h7l4 4V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div id="subtitles" class="flex items-center space-x-4">
+            <p data-target="rang.time"></p>
+            <p class="prose lg:prose-2xl" data-target="rang.transcription"></p>
+          </div>
+        </div>
+      </div>
+      <%# begin table %>
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Voice recordings</h2>
+      <table class="w-full table-fixed">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="w-1/5 py-2 px-4 border-gray-200">Title</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200">Speakers</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200">Dialects</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Transcribed</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @files.each do |file| %>
+            <tr class="bg-white">
+              <td class="py-2 px-4 border-gray-200"><%= file.filename %></td>
+              <td class="py-2 px-4 border-gray-200"><%= %w[Muchchu Maoilruaidh Gallochobair].sample(2).join(', ') %></td>
+              <td class="py-2 px-4 border-gray-200"><%= %w[DuChoicain FodhDubh TuarMhicEadaigh Acaill].sample %></td>
+              <td class="text-center py-2 px-4 border-gray-200"><%= rand(99).to_s + "%" %></td>
+              <td class="text-center"><%= link_to "view", rang_path(file.record_id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%== pagy_nav(@pagy) %>
     </div>
   </div>
 </div>

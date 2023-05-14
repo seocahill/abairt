@@ -22,5 +22,8 @@ module Abairt
 
     # override migrations path
     config.paths['db/migrate'] = ['migrations']
+
+    # assets
+    config.assets.paths << Rails.root.join("app", "assets", "fonts")
   end
 end

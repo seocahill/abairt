@@ -1,43 +1,34 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :lists
+  resources :voice_recordings do
+    resources :dictionary_entries, only: :create, module: :voice_recordings
+    member { get :preview }
+  end
 
+  scope controller: :pages do
+    get :faq
+  end
 
   resources :rangs do
-    resources :dictionary_entries
+    resources :dictionary_entries, only: :create, module: :rangs
   end
 
   resources :tags
 
   resources :users
 
-  resources :muinteoirs, only: %i[index show]
-
-  resources :grupas do
-    get "scrios_dalta", to: "grupas#scrios_dalta"
-    post "dalta_nua", to: "grupas#dalta_nua"
+  scope controller: :sessions do
+    get "login" => :new
+    post "login" => :create
+    delete "logout" => :destroy
   end
 
-  get "login", to: "sessions#new"
-  post "login", to: "sessions#create"
-  delete "logout", to: "sessions#destroy"
+  resources :dictionary_entries
 
-  resources :dictionary_entries do
-    collection do
-      patch :update_all
-    end
-  end
+  resources :word_list_dictionary_entries, only: [:create, :destroy]
 
-  get "ceist", to: "ceist#new"
-  post "ceist", to: "ceist#create"
-  patch "/ceisteanna/:id", to: "ceist#update", as: "patch_ceisteanna"
-  get "ceisteanna", to: "ceist#index"
-
-  namespace :api do
-    namespace :v1 do
-      resources :dictionary_entries, only: :create
-    end
-  end
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  root to: "dictionary_entries#index"
+  root to: "home#index"
 end

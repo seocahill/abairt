@@ -9,11 +9,11 @@
       <div class="max-w-md mx-auto">
         <div class="flex items-center space-x-5">
           <div class="block pl-2 font-semibold text-xl self-start">
-            <h2 class="leading-relaxed">Rang Nua</h2>
+            <h2 class="leading-relaxed">Rang Úr</h2>
           </div>
         </div>
         <div class="divide-y">
-          <%= form_with(model: rang, data: { controller: "direct-upload"}) do |form| %>
+          <%= form_with(model: rang) do |form| %>
             <% if rang.errors.any? %>
               <div id="error_explanation">
                 <h2><%= pluralize(rang.errors.count, "error") %> prohibited this rang from being saved:</h2>
@@ -26,19 +26,26 @@
             <% end %>
             <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
               <div class="flex flex-col">
-                <label class="leading-loose">Grúpa</label>
-                <%= form.select :grupa_id, Grupa.all.pluck(:ainm, :id), :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
-              </div>
-              <div class="flex flex-col">
-                <label class="leading-loose">Ainm</label>
-                <%= form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Group-Date-Time by default" %>
-              </div>
-              <div class="flex flex-col">
-                <label class="leading-loose">Dáta agus Am</label>
-                <%= form.datetime_select :time, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+                <label class="leading-loose">Classname</label>
+                <%= form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Classname" %>
               </div>
             </div>
-            <%= render "media_upload", form: form %>
+            <%= form.fields_for :users do |user_form| %>
+              <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+                <div class="flex flex-col">
+                  <label class="leading-loose">Student Name</label>
+                  <%= user_form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Jams O'Donnell" %>
+                </div>
+                <div class="flex flex-col">
+                  <label class="leading-loose">Student Email</label>
+                  <%= user_form.email_field :email, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "student@email.com" %>
+                </div>
+                <div class="flex flex-col">
+                  <label class="leading-loose">Student Password</label>
+                  <%= user_form.text_field :password, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", value: SecureRandom.alphanumeric %>
+                </div>
+              </div>
+            <% end %>
             <div class="pt-4 flex items-center space-x-4">
               <button class="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none">Save</button>
             </div>

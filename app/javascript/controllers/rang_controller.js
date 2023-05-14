@@ -1,12 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
-import  WaveSurfer from "wavesurferjs"
-import RegionsPlugin from 'wavesurferregionsjs';
 import autoComplete from "autocomplete";
-// import { SoundTouch } from "soundtouchjs";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription"]
-  static values = { meetingId: String, media: String, regions: Array }
+  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "list"]
+  static values = { meetingId: String, media: String, currentUserId: String }
+  scrollDirectionDown = true;
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
@@ -14,91 +12,24 @@ export default class extends Controller {
     })
   }
 
+  prevMessages(e) {
+    e.preventDefault()
+    document.querySelectorAll('.previous-messages').forEach(node => node.classList.remove('hidden'));
+  }
+
+
   resetForm(target) {
-    if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
-      target.elements['dictionary_entry[media]'].forEach((item) => {
-        if (item.type === "hidden") {
-          item.remove()
-        }
-      })
-    }
-    let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
-    let regionId = target.elements["regionId"].value;
-    if (regionId) {
-      let region = this.waveSurfer.regions.list[regionId];
-      region.update({ data: { transcription: transcription } })
-    }
-    target.reset()
-  }
-
-  zoom(event) {
-    event.preventDefault()
-    this.waveSurfer.zoom(Number(event.target.value));
-  }
-
-  waveformTargetConnected() {
-    let playButton = this.element.querySelector('#play-pause-button');
-    playButton.innerHTML = "Preparing wave....";
-    let that = this;
-    this.waveSurfer = WaveSurfer.create({
-      backend: 'MediaElement',
-      container: '#waveform',
-      // waveColor: 'violet',
-      // progressColor: 'purple',
-      partialRender: false,
-      pixelRatio: 1,
-      scrollParent: true,
-      // normalize: true,
-      plugins: [
-        RegionsPlugin.create({
-          dragSelection: true,
+    try {
+      if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
+        target.elements['dictionary_entry[media]'].forEach((item) => {
+          if (item.type === "hidden") {
+            item.remove()
+          }
         })
-      ]
-    })
-
-    this.waveSurfer.load(this.mediaValue);
-
-    this.waveSurfer.on('loading', function (progress) {
-      playButton.innerHTML = `loading ${progress}%`;
-    })
-
-    this.waveSurfer.on('ready', function() {
-      playButton.innerHTML = "Play / Pause";
-      that.regionsValue.forEach((region) => {
-        that.waveSurfer.addRegion({
-          id: region.region_id,
-          start: region.region_start,
-          end: region.region_end,
-          data: { transcription: region.word_or_phrase }
-        });
-      })
-    })
-
-    this.waveSurfer.on('region-in', (region) => {
-      that.transcriptionTarget.innerText= region.data.transcription
-    });
-
-    this.waveSurfer.on('audioprocess', function () {
-      if (that.waveSurfer.isPlaying()) {
-        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
       }
-    })
-
-    this.waveSurfer.on('seek', function() {
-      that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-    })
-
-    this.waveSurfer.on('region-click', function (region, e) {
-      e.stopPropagation();
-      // // Play on click, loop on shift click
-      e.shiftKey ? region.playLoop() : region.play();
-    })
-
-    this.waveSurfer.on('region-click', function (region) {
-      that.startRegionTarget.children[1].value = Math.round(region.start * 10) / 10
-      that.endRegionTarget.children[1].value = Math.round(region.end * 10) / 10
-      that.regionIdTarget.children[1].value = region.id
-    })
+    } finally {
+      target.reset()
+    }
   }
 
   wordSearchTargetConnected() {
@@ -187,8 +118,6 @@ export default class extends Controller {
   }
 
   teardown() {
-    this.waveSurfer.destroy()
-    this.waveSurfer = null;
     this.meeting = null;
   }
 
@@ -202,19 +131,15 @@ export default class extends Controller {
     this.dropdownTarget.classList.toggle("hidden")
   }
 
-  slower(event) {
-    event.preventDefault()
-    let currentSpeed = this.waveSurfer.getPlaybackRate()
-    if (currentSpeed <= 0.33) {
-      this.waveSurfer.setPlaybackRate(1)
-    } else {
-      this.waveSurfer.setPlaybackRate((currentSpeed * 0.75))
-    }
-  }
-
   play(event) {
     event.preventDefault()
-    this.waveSurfer.playPause()
+    const regionId = event.currentTarget.dataset.regionId;
+    const region = this.waveSurfer.regions.list[regionId]
+    if (region) {
+      region.play()
+    } else {
+      this.waveSurfer.playPause()
+    }
   }
 
   startMeeting() {
@@ -225,5 +150,13 @@ export default class extends Controller {
       parentNode: document.querySelector('#meet')
     };
     this.meeting = new JitsiMeetExternalAPI(domain, options);
+    document.querySelector('#call').classList.add("hidden")
+    document.querySelector('#hang-up').classList.remove("hidden")
+  }
+
+  endMeeting() {
+    this.meeting.dispose();
+    document.querySelector('#call').classList.remove("hidden")
+    document.querySelector('#hang-up').classList.add("hidden")
   }
 }

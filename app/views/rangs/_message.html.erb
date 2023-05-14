@@ -1,0 +1,43 @@
+<%= turbo_frame_tag dom_id(message) do %>
+  <% if current_day != message.updated_at.strftime("%d-%m-%y") %>
+    <hr>
+    <h3 class="text-lg font-medium text-gray-900 m-4"><%= message.updated_at.strftime("%d-%m-%y") %></h3>
+    <hr>
+  <% end %>
+  <div data-controller="message" data-message-user-id-value="<%= message.speaker_id %>" class="flex m-4" data-action="mouseenter->message#showDeleteButton mouseleave->message#hideDeleteButton">
+    <div class="flex">
+      <div class="bg-white rounded-lg shadow-md p-6 max-w-sm mx-auto">
+        <div class="flex items-center mb-2">
+          <h4 class="text-sm font-medium">
+            <span><%= message.speaker.name  %></span>
+          </h4>
+          <p class="text-sm text-gray-500 ml-2">
+            <%= message.created_at.strftime("%l:%M %p") %>
+          </p>
+        </div>
+        <% if message.word_or_phrase.present? %>
+          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+            <%= message.word_or_phrase%>
+          </p>
+        <% end %>
+        <% if message.translation.present? %>
+          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+            <%= message.translation %>
+          </p>
+        <% end %>
+        <% if message.media.present? %>
+          <audio controls class="my-2">
+            <source src="<%= message.media.url %>" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        <% end %>
+        <% if current_user&.id == message.speaker_id %>
+          <div class="mt-1">
+            <%= link_to 'delete', dictionary_entry_path(message), method: :delete, data: { "turbo-method": :delete, "message-target": "deleteButton" }, class: "bg-red-400 text-white px-2 py-1 opacity-0 transition-opacity duration-200 hover:opacity-100 focus:outline-none" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+

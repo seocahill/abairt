@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_06_112054) do
+ActiveRecord::Schema.define(version: 2023_05_13_192136) do
 
   create_table "_litestream_lock", id: false, force: :cascade do |t|
     t.integer "id"
@@ -48,6 +48,15 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "voice_recording_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_conversations_on_user_id"
+    t.index ["voice_recording_id"], name: "index_conversations_on_voice_recording_id"
+  end
+
   create_table "dictionary_entries", force: :cascade do |t|
     t.string "word_or_phrase", limit: 255
     t.string "translation", limit: 255
@@ -62,6 +71,10 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.decimal "region_start"
     t.decimal "region_end"
     t.string "region_id"
+    t.integer "voice_recording_id"
+    t.integer "speaker_id"
+    t.index ["speaker_id"], name: "index_dictionary_entries_on_speaker_id"
+    t.index ["voice_recording_id"], name: "index_dictionary_entries_on_voice_recording_id"
   end
 
 # Could not dump table "fts_dictionary_entries" because of following StandardError
@@ -98,11 +111,29 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
 # Could not dump table "fts_tags_idx" because of following StandardError
 #   Unknown type '' for column 'segid'
 
+# Could not dump table "fts_users" because of following StandardError
+#   Unknown type '' for column 'name'
+
+# Could not dump table "fts_users_config" because of following StandardError
+#   Unknown type '' for column 'k'
+
+  create_table "fts_users_data", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "fts_users_docsize", force: :cascade do |t|
+    t.binary "sz"
+  end
+
+# Could not dump table "fts_users_idx" because of following StandardError
+#   Unknown type '' for column 'segid'
+
   create_table "grupas", force: :cascade do |t|
     t.string "ainm"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "muinteoir_id"
+    t.string "lat_lang"
     t.index ["muinteoir_id"], name: "index_grupas_on_muinteoir_id"
   end
 
@@ -128,6 +159,15 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.datetime "end_time"
     t.index ["grupa_id"], name: "index_rangs_on_grupa_id"
     t.index ["user_id"], name: "index_rangs_on_user_id"
+  end
+
+  create_table "seomras", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "rang_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["rang_id"], name: "index_seomras_on_rang_id"
+    t.index ["user_id"], name: "index_seomras_on_user_id"
   end
 
   create_table "taggings", force: :cascade do |t|
@@ -159,6 +199,15 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "user_lists", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "word_list_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_user_lists_on_user_id"
+    t.index ["word_list_id"], name: "index_user_lists_on_word_list_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", limit: 255
     t.string "name", limit: 255
@@ -167,17 +216,56 @@ ActiveRecord::Schema.define(version: 2022_08_06_112054) do
     t.datetime "updated_at", null: false
     t.boolean "confirmed", default: false, null: false
     t.string "token", limit: 255
-    t.bigint "master_id"
-    t.bigint "grupa_id"
+    t.integer "master_id"
+    t.integer "grupa_id"
+    t.string "lat_lang"
+    t.integer "role", default: 0, null: false
+    t.integer "voice", default: 0, null: false
+    t.integer "dialect", default: 0, null: false
     t.index ["grupa_id"], name: "index_users_on_grupa_id"
     t.index ["master_id"], name: "index_users_on_master_id"
     t.index ["token"], name: "index_users_on_token"
   end
 
+  create_table "voice_recordings", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "word_list_dictionary_entries", force: :cascade do |t|
+    t.integer "dictionary_entry_id", null: false
+    t.integer "word_list_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["dictionary_entry_id"], name: "index_word_list_dictionary_entries_on_dictionary_entry_id"
+    t.index ["word_list_id"], name: "index_word_list_dictionary_entries_on_word_list_id"
+  end
+
+  create_table "word_lists", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.boolean "starred"
+    t.integer "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_word_lists_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "conversations", "users"
+  add_foreign_key "conversations", "voice_recordings"
   add_foreign_key "rang_entries", "dictionary_entries"
   add_foreign_key "rang_entries", "rangs"
   add_foreign_key "rangs", "users"
+  add_foreign_key "seomras", "rangs"
+  add_foreign_key "seomras", "users"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "user_lists", "users"
+  add_foreign_key "user_lists", "word_lists"
+  add_foreign_key "word_list_dictionary_entries", "dictionary_entries"
+  add_foreign_key "word_list_dictionary_entries", "word_lists"
+  add_foreign_key "word_lists", "users"
 end
