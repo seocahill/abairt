@@ -1,8 +1,13 @@
 // app/javascript/controllers/tabbed_sidebar_controller.js
 import { Controller } from "@hotwired/stimulus"
+import feather from "feather-icons"
 
 export default class extends Controller {
   static targets = ["content"]
+
+  connect() {
+    feather.replace()
+  }
 
   showTab(event) {
     event.preventDefault()
