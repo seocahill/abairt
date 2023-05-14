@@ -8,6 +8,10 @@ class ListsController < ApplicationController
 
   # GET /lists/1 or /lists/1.json
   def show
+    respond_to do |format|
+      format.html
+      format.csv { send_data @list.dictionary_entries.to_csv, filename: "abairt-wordlist-#{Date.today}.csv" }
+    end
   end
 
   # GET /lists/new

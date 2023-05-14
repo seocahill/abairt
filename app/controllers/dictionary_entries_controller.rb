@@ -28,7 +28,7 @@ class DictionaryEntriesController < ApplicationController
 
     if current_user
       @starred = current_user.starred
-      @lists = current_user.own_lists.where(starred: false)
+      @lists = current_user.own_lists #.where(starred: false)
     end
 
     @pagy, @dictionary_entries = pagy(records, items: 20)
