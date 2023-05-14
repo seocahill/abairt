@@ -126,7 +126,7 @@
           <% @recordings.each do |recording| %>
             <tr class="bg-white">
               <td class="py-2 px-4 border-gray-200"><%= recording.title %></td>
-              <td class="py-2 px-4 border-gray-200"><%= recording.users.pluck(:name).join(', ') %></td>
+              <td class="py-2 px-4 border-gray-200"><% recording.users.map do |user| %><%= link_to user.name, user_path(user), class: "hover:text-blue-700 hover:underline " %>, <% end %></td>
               <td class="py-2 px-4 border-gray-200"><%= recording.users.pluck(:dialect).uniq.map(&:humanize).join(', ') %></td>
               <td class="text-center py-2 px-4 border-gray-200"><%= recording.percentage_complete %></td>
               <td class="text-center">

@@ -2,7 +2,7 @@
 
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
-  before_action :authorize, except: %i[new create index]
+  before_action :authorize, except: %i[index show]
 
   # GET /users or /users.json
   def index
@@ -24,8 +24,12 @@ class UsersController < ApplicationController
 
   # GET /users/1 or /users/1.json
   def show
-    start_date = params.fetch(:start_date, Date.today).to_date
-    @rangs = Rang.where(start_time: start_date.beginning_of_month.beginning_of_week..start_date.end_of_month.end_of_week)
+    @pagy, @entries = pagy(@user.dictionary_entries, items: 12)
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data @user.entries.to_csv, filename: "dictionary-#{Date.today}.csv" }
+    end
   end
 
   # GET /users/new
