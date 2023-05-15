@@ -24,6 +24,6 @@ module ApplicationHelper
   end
 
   def page_title
-    content_for(:page_title) || controller.controller_name.humanize.capitalize
+    content_for(:page_title)
   end
 end
