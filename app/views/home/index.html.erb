@@ -3,8 +3,8 @@
   <div class="grid max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 lg:pt-28">
     <div class="mr-auto place-self-center lg:col-span-7">
       <h1 class="max-w-2xl mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl dark:text-white">Learn Mayo Irish<br>
-        from Native Speakers.</h1>
-      <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">"Abairt" means phrase in Irish and you will find many abairtí on this site, orated by speakers of the Mayo dialects, searchable in English or Irish and with downloadable datasets.</p>
+        through native speech.</h1>
+      <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">To learn Mayo Irish you have to memorise words and phrases (abairtí), hear them spoken properly in the natural flow of conversation and practice speaking yourself with a native interlocuter. This website will help you do all three.</p>
       <div class="space-y-4 sm:flex sm:space-y-0 sm:space-x-4">
         <a href="https://github.com/themesberg/landwind" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
           Learner FAQ
@@ -38,10 +38,10 @@
       </a>
       <a href="https://linktr.ee/gaeilgemhaigheo" class="flex items-center lg:justify-center">
         <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('tree.png') %>">
-        Podcasts
+        Media
       </a>
       <a href="//github.com/seocahill/abairt" class="flex items-center lg:justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Github
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>Github
       </a>
     </div>
   </div>
@@ -51,35 +51,35 @@
 <section class="bg-gray-50 dark:bg-gray-800">
   <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
     <!-- Row -->
-    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16"  data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
       <div class="text-gray-500 sm:text-lg dark:text-gray-400">
-        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Work with tools you already use</h2>
-        <p class="mb-8 font-light lg:text-xl">Deliver great service experiences fast - without the complexity of traditional ITSM solutions. Accelerate critical development work, eliminate toil, and deploy changes with ease.</p>
+        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Find Speakers</h2>
+        <p class="mb-8 font-light lg:text-xl">Click on the map to listen to recordings of native speakers from all over Mayo. Follow the links to view transcriptions, words and phrases for each speaker.</p>
         <!-- List -->
         <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
           <li class="flex space-x-3">
             <!-- Icon -->
             <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Continuous integration and deployment</span>
+            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Longform transcriptions of recordings of native speakers</span>
           </li>
           <li class="flex space-x-3">
             <!-- Icon -->
             <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Development workflow</span>
+            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Full text search in Irish and English</span>
           </li>
           <li class="flex space-x-3">
             <!-- Icon -->
             <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Knowledge management</span>
+            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Filter by voice, dialect, tag.</span>
           </li>
         </ul>
-        <p class="mb-8 font-light lg:text-xl">Deliver great service experiences fast - without the complexity of traditional ITSM solutions.</p>
+        <p class="mb-8 font-light lg:text-xl">Every speaker has their own page with all of their contributions listed. Speakers can create wordlists that learners can follow and download for use in learning apps like <a class="hover:text-purple-700 hover:underline" href="https://apps.ankiweb.net/">Anki</a> for example.</p>
       </div>
-      <img class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex" src="<%= image_path('voice-screen.png') %>" alt="dashboard feature image">
+      <div id="map" style="height:450px" class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex"></div>
     </div>
     <!-- Row -->
-    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16"  data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
-      <div id="map" style="height:600px" class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex"></div>
+    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+      <img class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex" src="<%= image_path('voice-screen.png') %>" alt="dashboard feature image">
       <div class="text-gray-500 sm:text-lg dark:text-gray-400">
         <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">We invest in the world’s potential</h2>
         <p class="mb-8 font-light lg:text-xl">Deliver great service experiences fast - without the complexity of traditional ITSM solutions. Accelerate critical development work, eliminate toil, and deploy changes with ease.</p>
@@ -113,6 +113,33 @@
         </ul>
         <p class="font-light lg:text-xl">Deliver great service experiences fast - without the complexity of traditional ITSM solutions.</p>
       </div>
+    </div>
+    <!-- Row -->
+    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+      <div class="text-gray-500 sm:text-lg dark:text-gray-400">
+        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Transcriptions</h2>
+        <p class="mb-8 font-light lg:text-xl">Native speakers can transcribe recordings with ease by uploading audio and slicing tracks into regions which can then be annotated. Each transcibed region is in turn added to the master word list and the speaker's personal word list and is fully searcable and downloadable.</p>
+        <!-- List -->
+        <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
+          <li class="flex space-x-3">
+            <!-- Icon -->
+            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Upload and transcribe audio using simple interface.</span>
+          </li>
+          <li class="flex space-x-3">
+            <!-- Icon -->
+            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Individual transcriptions of words and phrases become searcable, listable, taggable and downloadable.</span>
+          </li>
+          <li class="flex space-x-3">
+            <!-- Icon -->
+            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Export subtitles in English or Irish. </span>
+          </li>
+        </ul>
+        <p class="mb-8 font-light lg:text-xl">Deliver great service experiences fast - without the complexity of traditional ITSM solutions.</p>
+      </div>
+      <img class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex" src="<%= image_path('chat.png') %>" alt="dashboard feature image">
     </div>
   </div>
 </section>
