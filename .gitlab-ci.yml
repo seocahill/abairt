@@ -11,6 +11,7 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   CI_DEPLOY_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+  DOCKER_BUILDKIT: 1
 
 build deploy image:
   stage: build
