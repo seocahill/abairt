@@ -35,6 +35,7 @@ deploy:
     - chmod 700 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - unset DOCKER_HOST
   script:
     - docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
     - docker context use abairt
