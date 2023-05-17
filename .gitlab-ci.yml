@@ -53,6 +53,12 @@ deploy:
     ##
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    ##
+    ## Assuming you created the SSH_KNOWN_HOSTS file type CI/CD variable, uncomment the
+    ## following two lines.
+    ##
+    - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
     - unset DOCKER_HOST
   script:
     - ssh -q -o BatchMode=yes root@abairt.com "echo 'SSH connection successful'"
