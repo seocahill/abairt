@@ -61,7 +61,7 @@ deploy:
     - chmod 644 ~/.ssh/known_hosts
     - unset DOCKER_HOST
   script:
-    - ssh -q -o BatchMode=yes root@abairt.com "echo 'SSH connection successful'"
+    - ssh root@abairt.com
     - docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
     - docker context use abairt
     - docker system prune -f
