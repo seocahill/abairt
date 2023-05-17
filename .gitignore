@@ -41,6 +41,6 @@ litestream.yml
 vendor/javascript/annotation.example.js
 search.example.html
 
-/app/assets/builds/*
-!/app/assets/builds/.keep
+# /app/assets/builds/*
+# !/app/assets/builds/.keep
 .tmp
