@@ -46,3 +46,4 @@ search.example.html
 .tmp
 /app/assets/builds/*
 !/app/assets/builds/.keep
+.ssh
