@@ -5,6 +5,7 @@ services:
 
 stages:
   - build
+  - deploy
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -21,3 +22,23 @@ build deploy image:
       --tag $CI_DEPLOY_IMAGE
       --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
     - docker push ${CI_REGISTRY_IMAGE}
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
+    - docker context use abairt
+    - docker system prune -f
+    - docker service ls
+    - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+    - docker service update abairt_app --image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
