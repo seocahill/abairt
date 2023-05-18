@@ -22,10 +22,5 @@ module Abairt
 
     # override migrations path
     config.paths['db/migrate'] = ['migrations']
-
-    # assets
-    config.assets.paths << Rails.root.join("app", "assets", "fonts")
-      config.assets.css_compressor = :csso
-
   end
 end

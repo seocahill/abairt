@@ -4,46 +4,27 @@
 # or operating system, you probably want to add a global ignore instead:
 #   git config --global core.excludesfile '~/.gitignore_global'
 
-# Ignore bundler config.
-/.bundle
-
-# Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
+!/app/assets/builds/.keep
 !/log/.keep
+!/storage/.keep
 !/tmp/.keep
-app/assets/builds
-
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
 !/tmp/pids/
 !/tmp/pids/.keep
-
-# Ignore uploaded files in development.
-/storage/*
-!/storage/.keep
-
-/public/assets
 .byebug_history
-
-# Ignore master key for decrypting credentials and more.
-/config/master.key
-
-secrets
-
-node_modules
-
 .env
-
-*.sqlite3*
-
-litestream.yml
-vendor/javascript/annotation.example.js
-search.example.html
-
-# /app/assets/builds/*
-# !/app/assets/builds/.keep
-.tmp
-/app/assets/builds/*
-!/app/assets/builds/.keep
 .ssh
+.tmp
+*.sqlite3*
+/.bundle
+/config/master.key
+/log/*
+/public/assets
+/storage/*
+/tmp/*
+/tmp/pids/*
+app/assets/builds
+litestream.yml
+node_modules
+search.example.html
+secrets
+vendor/javascript/annotation.example.js
