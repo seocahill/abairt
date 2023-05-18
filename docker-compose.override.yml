@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  rails:
+    image: registry.gitlab.com/abairt/web-application:master
+    build: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      RAILS_MASTER_KEY: 7513760470ad7c65a83527b21e8978b0
+      RAILS_LOG_TO_STDOUT: true
+      RAILS_SERVE_STATIC_FILES: true
+    # volumes:
+    # - ./config/environments:/app/config/environments
+    ports:
+      - 3000:3000
+    working_dir: /app
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        # tail -f
+        bin/rails db:create db:migrate
+        # bundle check || bundle install # uncomment to use bunder cache
+        # rm -f tmp/pids/server.pid
+        bin/rails s -b 0.0.0.0
+        # rdebug-ide --host 0.0.0.0 --port 1234 --dispatcher-port 26162 -- bin/rails s -b 0.0.0.0
+
+
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+# volumes:
+#   db:

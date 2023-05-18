@@ -12,7 +12,6 @@ RUN \
   bundle config set without 'development test'
 RUN \
   bundle install && \
-  SECRET_KEY_BASE=1 bin/rails tailwindcss:build && \
   SECRET_KEY_BASE=1 bin/rails assets:precompile
 
 # second stage
