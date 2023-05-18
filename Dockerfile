@@ -13,6 +13,7 @@ RUN \
 RUN \
   bundle install && \
   npm install && \
+  SECRET_KEY_BASE=1 bin/rails tailwindcss:build && \
   SECRET_KEY_BASE=1 bin/rails assets:precompile
 
 # second stage
