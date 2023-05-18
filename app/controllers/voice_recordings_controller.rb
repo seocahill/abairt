@@ -5,9 +5,12 @@ class VoiceRecordingsController < ApplicationController
   def index
     @new_voice_recording = VoiceRecording.new
     @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
-    if @recording = VoiceRecording.find(params[:preview] ||= VoiceRecording.last&.id)
-      @regions = set_regions
+    if params[:preview].present?
+      @recording = VoiceRecording.find(params[:preview])
+    else
+      @recording = VoiceRecording.last
     end
+    @regions = set_regions if @voice_recording
     @tags = ActsAsTaggableOn::Tag.most_used(15)
   end
 
