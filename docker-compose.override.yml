@@ -8,7 +8,6 @@ services:
       REDIS_URL: redis://redis:6379
       RAILS_MASTER_KEY: 7513760470ad7c65a83527b21e8978b0
       RAILS_LOG_TO_STDOUT: true
-      RAILS_SERVE_STATIC_FILES: true
     # volumes:
     # - ./config/environments:/app/config/environments
     ports:
