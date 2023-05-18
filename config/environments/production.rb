@@ -29,10 +29,7 @@ Rails.application.configure do
   config.public_file_server.enabled = true
 
   # Compress CSS using a preprocessor.
-  config.assets.css_compressor = :csso
-  config.assets.configure do |env|
-    env.cache = ActiveSupport::Cache.lookup_store(:null_store)
-  end
+  config.assets.css_compressor = :yui
 
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
