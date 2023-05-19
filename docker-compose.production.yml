@@ -15,11 +15,13 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:503f5820db0eff5d2789cfe36c8c1baa4c5dcda9
+    image: registry.gitlab.com/abairt/web-application:f1954aaba2a94ce458a7e2625ea1081add3bec60
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
       RAILS_LOG_TO_STDOUT: "true"
+      BUNDLE_PATH: "vendor/bundle"
+      BUNDLE_WITHOUT: "development:test"
     secrets:
       - source: master_key
         target: /app/config/master.key
