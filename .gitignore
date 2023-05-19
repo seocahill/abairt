@@ -28,3 +28,6 @@ node_modules
 search.example.html
 secrets
 vendor/javascript/annotation.example.js
+/app/assets/builds/*
+!/app/assets/builds/.keep
+docker-compose.override.yml
