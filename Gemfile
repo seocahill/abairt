@@ -70,7 +70,7 @@ gem "sentry-rails", "~> 4.2"
 
 gem "rack-cors", "~> 1.1"
 
-gem "sqlite3", "~> 1.4"
+gem "sqlite3", "~> 1.6"
 
 gem "simple_calendar", "~> 2.4"
 

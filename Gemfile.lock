@@ -334,7 +334,7 @@ DEPENDENCIES
   sentry-ruby (~> 4.2)
   simple_calendar (~> 2.4)
   spring
-  sqlite3 (~> 1.4)
+  sqlite3 (~> 1.6)
   tailwindcss-rails
   tzinfo-data
   web-console (>= 4.1.0)
