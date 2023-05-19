@@ -7,14 +7,15 @@ services:
       - "80:80"
       - "443:443"
     configs:
-      - source: caddyfile_v3
+      - source: caddyfile_v5
         target: /etc/caddy/Caddyfile
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:f129222841e0457f6a8dcbcf628ff9a15cf8531e
+    image: registry.gitlab.com/abairt/web-application:503f5820db0eff5d2789cfe36c8c1baa4c5dcda9
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
@@ -23,6 +24,7 @@ services:
         target: /app/config/master.key
     volumes:
       - db:/app/db
+      # - assets:/app/public
     command:
       - /bin/bash
       - -c
@@ -48,16 +50,15 @@ services:
 
   redis:
     image: redis:alpine
-    # ports:
-    #   - 6379:6379
 
 volumes:
   db:
   caddy_data:
   caddy_config:
+  # assets:
 
 configs:
-  caddyfile_v3:
+  caddyfile_v5:
     file: ./Caddyfile
 
 secrets:
