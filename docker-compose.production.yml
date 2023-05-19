@@ -7,7 +7,7 @@ services:
       - "80:80"
       - "443:443"
     configs:
-      - source: caddyfile_v5
+      - source: caddyfile_v6
         target: /etc/caddy/Caddyfile
     volumes:
       - caddy_data:/data
@@ -19,6 +19,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
+      RAILS_LOG_TO_STDOUT: "true"
     secrets:
       - source: master_key
         target: /app/config/master.key
@@ -58,7 +59,7 @@ volumes:
   # assets:
 
 configs:
-  caddyfile_v5:
+  caddyfile_v6:
     file: ./Caddyfile
 
 secrets:

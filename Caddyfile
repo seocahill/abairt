@@ -13,6 +13,7 @@ abairt.com {
 
     @notStatic {
         not file
+        not path /public/*
     }
 
     reverse_proxy @notStatic rails:3000
