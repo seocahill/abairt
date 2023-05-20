@@ -5,6 +5,7 @@ services:
 
 stages:
   - build
+  - test
   - deploy
 
 variables:
@@ -23,6 +24,14 @@ build deploy image:
       --tag $CI_DEPLOY_IMAGE
       --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
     - docker push ${CI_REGISTRY_IMAGE}
+  only:
+    - master
+
+run tests:
+  stage: test
+  script:
+  - bin/rails db:drop db:create db:migrate
+  - bin/rails test
 
 deploy:
   stage: deploy
