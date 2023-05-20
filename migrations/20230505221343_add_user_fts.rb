@@ -2,8 +2,7 @@ class AddUserFts < ActiveRecord::Migration[6.1]
   def up
     execute <<-SQL
       -- Create an external content fts5 table to index it. c/f https://sqlite.org/fts5.html#external_content_tables
-      CREATE VIRTUAL TABLE tri USING fts5(a, tokenize="trigram");
-      CREATE VIRTUAL TABLE fts_users USING fts5(name, content='users', content_rowid='id', tokenize='trigram');
+      CREATE VIRTUAL TABLE fts_users USING fts5(name, content='users', content_rowid='id', tokenize='porter unicode61');
 
       -- Triggers to keep the FTS index up to date.
       CREATE TRIGGER insert_users_search AFTER INSERT ON users BEGIN
