@@ -22,5 +22,8 @@ module Abairt
 
     # override migrations path
     config.paths['db/migrate'] = ['migrations']
+
+    # support fts
+    config.active_record.schema_format = :sql
   end
 end
