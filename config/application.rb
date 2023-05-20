@@ -25,5 +25,8 @@ module Abairt
 
     # support fts
     config.active_record.schema_format = :sql
+
+    # assets issue
+    config.assets.css_compressor = :yui
   end
 end

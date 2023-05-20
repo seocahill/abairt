@@ -4,10 +4,10 @@ one:
   name: MyString
   description: MyString
   starred: false
-  user: one
+  owner: one
 
 two:
   name: MyString
   description: MyString
   starred: false
-  user: two
+  owner: two
