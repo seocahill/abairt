@@ -3,6 +3,7 @@ require "test_helper"
 class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @dictionary_entry = dictionary_entries(:one)
+    ApplicationController.any_instance.stubs(:current_user).returns(users(:one))
   end
 
   test "should get index" do
@@ -17,7 +18,7 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create dictionary_entry" do
     assert_difference('DictionaryEntry.count') do
-      post dictionary_entries_url, params: { dictionary_entry: { notes: @dictionary_entry.notes, translation: @dictionary_entry.translation, word_or_phrase: @dictionary_entry.word_or_phrase } }
+      post dictionary_entries_url, params: { dictionary_entry: { notes: "notes", translation: "something", word_or_phrase: "rud éicint" } }
     end
 
     assert_redirected_to dictionary_entry_url(DictionaryEntry.last)

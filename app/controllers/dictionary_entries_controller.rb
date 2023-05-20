@@ -41,7 +41,12 @@ class DictionaryEntriesController < ApplicationController
   end
 
   # GET /dictionary_entries/1 or /dictionary_entries/1.json
-  def show; end
+  def show
+    if current_user
+      @starred = current_user.starred
+      @lists = current_user.own_lists #.where(starred: false)
+    end
+  end
 
   # GET /dictionary_entries/new
   def new
@@ -57,7 +62,7 @@ class DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
-        format.html
+        format.html { redirect_to @dictionary_entry }
         format.turbo_stream do
           render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
           locals: { entry: @dictionary_entry, current_user: current_user })
