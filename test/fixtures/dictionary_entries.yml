@@ -1,11 +1,26 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  word_or_phrase: MyString
-  translation: MyString
-  notes: MyString
+  word_or_phrase: "Marbhfháisc ort"
+  translation: "The death cowl on you"
+  speaker: one
 
 two:
-  word_or_phrase: MyString
-  translation: MyString
-  notes: MyString
+  word_or_phrase: "Cén chaoi gur éirigh leat"
+  translation: "How did you get on"
+  speaker: one
+
+three:
+  word_or_phrase: "Ní thig leis an ngobadán dhá thráigh a fhreastal"
+  translation: "you can't do two things at once"
+  speaker: one
+
+four:
+  word_or_phrase: "Airím uaim thú"
+  translation: "i miss you"
+  speaker: one
+
+five:
+  word_or_phrase: "A chladhaire"
+  translation: "You divil!"
+  speaker: one

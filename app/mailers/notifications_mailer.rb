@@ -6,10 +6,6 @@ class NotificationsMailer < ApplicationMailer
   #
   #   en.notifications_mailer.ceisteanna.subject
   #
-  def ceisteanna
-    @user = params[:user]
-    mail(to: @user.email, subject: 'Tá ceisteanna ag fanacht duit')
-  end
 
   # Subject can be set in your I18n file at config/locales/en.yml
   # with the following lookup:
