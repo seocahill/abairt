@@ -6,13 +6,13 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
-        format.html
+        format.html { redirect_to @dictionary_entry.voice_recording }
         format.turbo_stream do
           render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",
           locals: { entry: @dictionary_entry })
         end
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { redirect_back fallback_location: root_path, status: :unprocessable_entity }
       end
     end
   end

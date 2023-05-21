@@ -62,41 +62,6 @@ export default class extends Controller {
     })
   }
 
-  tagSearchTargetConnected() {
-    const tagsSearch = new autoComplete({
-      selector: "#autoCompleteTags",
-      placeHolder: "Déan cuardach ar clib...",
-      debounce: 300,
-      data: {
-        src: async (query) => {
-          try {
-            // Fetch Data from external Source
-            const source = await fetch(`/tags?search=${query.replace(/\W/g, '')}`, { headers: { accept: "application/json" } });
-            // Data is array of `Objects` | `Strings`
-            const data = await source.json();
-
-            return data;
-          } catch (error) {
-            return error;
-          }
-        },
-        keys: ['name']
-      },
-      resultItem: {
-        highlight: {
-          render: true
-        }
-      },
-      events: {
-        input: {
-          selection: (event) => {
-            const selection = event.detail.selection.value['name'];
-            tagsSearch.input.value = selection;
-          }
-        }
-      }
-    })
-  }
 
   format(n) {
     let mil_s = String(n % 1000).padStart(3, '0');

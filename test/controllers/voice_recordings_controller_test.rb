@@ -3,6 +3,7 @@ require "test_helper"
 class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @voice_recording = voice_recordings(:one)
+    ApplicationController.any_instance.stubs(:current_user).returns(users(:one))
   end
 
   test "should get index" do

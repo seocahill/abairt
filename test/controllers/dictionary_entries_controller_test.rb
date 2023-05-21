@@ -11,6 +11,17 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should search index" do
+    setup_search
+    get dictionary_entries_url, params: { search: "chaoí" }, as: :json
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert_equal 1, json_response.length
+    assert_equal "Cén chaoi gur éirigh leat", json_response[0]['word_or_phrase']
+    # Add more assertions as needed
+  end
+
   test "should get new" do
     get new_dictionary_entry_url
     assert_response :success
@@ -45,5 +56,14 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to dictionary_entries_url
+  end
+
+  def setup_search
+    ActiveRecord::Base.connection.execute <<-SQL
+       -- Bulk insert existing data
+      INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase)
+      SELECT id, translation, word_or_phrase
+      FROM dictionary_entries;
+    SQL
   end
 end
