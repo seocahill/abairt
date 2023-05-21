@@ -1,11 +1,26 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  email: MyString
-  name: MyString
+  email: seosamh@seocahill.com
+  name: Seosamh Ó Cathail
   password_digest: MyString
 
 two:
-  email: MyString
-  name: MyString
+  email: dazpatreg@yahoo.ie
+  name: Darren Ó Riagáin
+  password_digest: MyString
+
+three:
+  email: seanoraghaille@abairt.com
+  name: Seán Ó Raghallaigh
+  password_digest: MyString
+
+four:
+  email: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair@abairt.com
+  name: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair
+  password_digest: MyString
+
+five:
+  email: Padraic Ó Murachú@abairt.com
+  name: Padraic Ó Murachú
   password_digest: MyString

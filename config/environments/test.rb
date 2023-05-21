@@ -10,6 +10,7 @@ Rails.application.configure do
 
   config.cache_classes = false
   config.action_view.cache_template_loading = true
+  config.logger = ActiveSupport::Logger.new(config.paths["log"].first, 1, 5 * 1024 * 1024)  # Adjust the size as needed (50 MB in this example)
 
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that

@@ -1,5 +1,7 @@
 # first stage
-FROM registry.gitlab.com/abairt/web-application:master as gem-cache
+ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
+
+FROM ${GEM_IMAGE} as gem-cache
 FROM ruby:3.0-slim as builder
 USER root
 ENV RAILS_ENV="production"

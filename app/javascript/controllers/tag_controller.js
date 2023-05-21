@@ -8,52 +8,14 @@ export default class extends Controller {
     console.log("connect to tags");
   }
 
-  wordSearchTargetConnected() {
-    const abairtSearch = new autoComplete({
-      selector: "#autoComplete",
-      placeHolder: "Déan cuardach ar focal...",
-      debounce: 300,
-      threshold: 2,
-      data: {
-        src: async (query) => {
-          try {
-            // Fetch Data from external Source
-            const source = await fetch(`/dictionary_entries?search=${query.replace(/\W/g, '')}`, { headers: { accept: "application/json" } });
-            // Data is array of `Objects` | `Strings`
-            const data = await source.json();
-
-            return data;
-          } catch (error) {
-            return error;
-          }
-        },
-        keys: ['word_or_phrase']
-      },
-      resultItem: {
-        highlight: {
-          render: true
-        }
-      },
-      events: {
-        input: {
-          selection: (event) => {
-            console.log
-            document.getElementById("dictionary_entry_id").value = event.detail.selection.value["id"]
-            abairtSearch.input.value = event.detail.selection.value["word_or_phrase"]
-            document.getElementById("translation").value = event.detail.selection.value["translation"]
-            document.getElementById("notes").value = event.detail.selection.value["notes"]
-            document.getElementById("autoCompleteTags").value = event.detail.selection.value["tag_list"]
-          }
-        }
-      }
-    })
-  }
-
   tagSearchTargetConnected() {
     const tagsSearch = new autoComplete({
       selector: "#autoCompleteTags",
       placeHolder: "Déan cuardach ar clib...",
       debounce: 300,
+      searchEngine: function (query, record) {
+        return record
+      },
       data: {
         src: async (query) => {
           try {

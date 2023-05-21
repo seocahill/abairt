@@ -3,6 +3,7 @@ require "test_helper"
 class RangsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @rang = rangs(:one)
+    ApplicationController.any_instance.stubs(:current_user).returns(users(:one))
   end
 
   test "should get index" do
