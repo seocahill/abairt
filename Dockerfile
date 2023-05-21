@@ -22,7 +22,7 @@ RUN \
 # second stage
 FROM ruby:3.0-slim as prod
 COPY --from=builder /app/ /app/
-RUN apt update && apt install -y sqlite3
+RUN apt update && apt install -y sqlite3 ffmpeg
 RUN useradd -r -u 1001 -g root nonroot
 RUN chown -R nonroot /app
 USER nonroot
