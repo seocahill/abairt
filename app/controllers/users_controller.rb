@@ -33,6 +33,7 @@ class UsersController < ApplicationController
   # GET /users/1 or /users/1.json
   def show
     @pagy, @entries = pagy(@user.dictionary_entries, items: 12)
+    @starred = current_user.starred
 
     respond_to do |format|
       format.html
@@ -80,7 +81,9 @@ class UsersController < ApplicationController
 
   # DELETE /users/1 or /users/1.json
   def destroy
-    @user.destroy
+    # FIXME implement soft delete
+    # render head :ok
+    # @user.destroy
     respond_to do |format|
       format.html { redirect_to users_url, notice: 'User was successfully destroyed.' }
       format.json { head :no_content }

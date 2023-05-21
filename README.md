@@ -79,3 +79,7 @@ Downloadable lists include:
 
 Lists are private by default but can be made public, dictionary_entries are always public and included in the codex
 Lists can be downloaded as csvs for use in spaced repition apps like anki.
+
+## Notes on Libs
+- Rufus for wrapping cron
+- yui-compressor to get around sassc tailwind incompatibility

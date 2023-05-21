@@ -1,20 +1,10 @@
 require "test_helper"
 
 class NotificationsMailerTest < ActionMailer::TestCase
-  test "ceisteanna" do
-    mail = NotificationsMailer.ceisteanna
-    assert_equal "Ceisteanna", mail.subject
-    assert_equal ["to@example.org"], mail.to
-    assert_equal ["from@example.com"], mail.from
-    assert_match "Hi", mail.body.encoded
-  end
-
   test "ceád_rang_eile" do
-    mail = NotificationsMailer.ceád_rang_eile
-    assert_equal "Ceád rang eile", mail.subject
-    assert_equal ["to@example.org"], mail.to
-    assert_equal ["from@example.com"], mail.from
-    assert_match "Hi", mail.body.encoded
+    mail = NotificationsMailer.with(rang: rangs(:one)).ceád_rang_eile
+    assert_equal "An chéad rang eile", mail.subject
+    assert_equal rangs(:one).users.pluck(:email), mail.to
+    assert_equal ['abairt@abairt.com'], mail.from
   end
-
 end

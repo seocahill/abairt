@@ -114,6 +114,36 @@ FOREIGN KEY ("word_list_id")
 );
 CREATE INDEX "index_user_lists_on_user_id" ON "user_lists" ("user_id");
 CREATE INDEX "index_user_lists_on_word_list_id" ON "user_lists" ("word_list_id");
+CREATE TRIGGER insert_search AFTER INSERT ON dictionary_entries BEGIN
+        INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase) VALUES (new.id, new.translation, new.word_or_phrase);
+      END;
+CREATE TRIGGER delete_search AFTER DELETE ON dictionary_entries BEGIN
+        INSERT INTO fts_dictionary_entries(fts_dictionary_entries, rowid, translation, word_or_phrase) VALUES('delete', old.id, old.translation, old.word_or_phrase);
+      END;
+CREATE TRIGGER update_search AFTER UPDATE ON dictionary_entries BEGIN
+        INSERT INTO fts_dictionary_entries(fts_dictionary_entries, rowid, translation, word_or_phrase) VALUES('delete', old.id, old.translation, old.word_or_phrase);
+        INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase) VALUES (new.id, new.translation, new.word_or_phrase);
+      END;
+CREATE TRIGGER insert_tags_search AFTER INSERT ON tags BEGIN
+        INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
+      END;
+CREATE TRIGGER delete_tags_search AFTER DELETE ON tags BEGIN
+        INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
+      END;
+CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
+        INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
+        INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
+      END;
+CREATE TRIGGER insert_users_search AFTER INSERT ON users BEGIN
+        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
+      END;
+CREATE TRIGGER delete_users_search AFTER DELETE ON users BEGIN
+        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
+      END;
+CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
+        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
+        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
+      END;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210210153031'),
 ('20210210175509'),
@@ -159,6 +189,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230507214107'),
 ('20230513191222'),
 ('20230513191223'),
-('20230513192136');
+('20230513192136'),
+('20230520225514'),
+('20230520225609'),
+('20230520230902'),
+('20230521083532');
 
 

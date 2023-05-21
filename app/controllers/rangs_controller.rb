@@ -66,7 +66,7 @@ class RangsController < ApplicationController
       @rang.assign_attributes(rang_params)
 
       if @rang.save
-        @rang.send_notification unless @rang.media.audio?
+        @rang.send_notification
         format.html { redirect_to @rang, notice: 'Rang was successfully updated.' }
         format.json { render :show, status: :ok, location: @rang }
       else

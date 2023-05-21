@@ -1,10 +1,10 @@
-<%= form_with(model: list, class: "contents") do |form| %>
-  <% if list.errors.any? %>
+<%= form_with(model: word_list, class: "contents") do |form| %>
+  <% if word_list.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(list.errors.count, "error") %> prohibited this list from being saved:</h2>
+      <h2><%= pluralize(word_list.errors.count, "error") %> prohibited this word_list from being saved:</h2>
 
       <ul>
-        <% list.errors.each do |error| %>
+        <% word_list.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
