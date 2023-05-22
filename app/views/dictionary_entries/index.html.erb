@@ -125,7 +125,9 @@
           <% end %>
         </tbody>
       </table>
-      <%== pagy_nav(@pagy) %>
     </div>
   </div>
 </div>
+<%= content_for :footer do %>
+  <%== pagy_nav(@pagy) %>
+<% end %>

@@ -31,7 +31,7 @@ class DictionaryEntriesController < ApplicationController
       @lists = current_user.own_lists #.where(starred: false)
     end
 
-    @pagy, @dictionary_entries = pagy(records, items: 20)
+    @pagy, @dictionary_entries = pagy(records, items: PAGE_SIZE)
 
     respond_to do |format|
       format.html
