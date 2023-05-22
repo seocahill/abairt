@@ -7,8 +7,6 @@ class VoiceRecordingsController < ApplicationController
     @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
     if params[:preview].present?
       @recording = VoiceRecording.find(params[:preview])
-    else
-      @recording = VoiceRecording.last
     end
     @regions = set_regions if @voice_recording
     @tags = ActsAsTaggableOn::Tag.most_used(15)
@@ -18,6 +16,7 @@ class VoiceRecordingsController < ApplicationController
     @recording = VoiceRecording.find(params[:id])
     @regions = set_regions
     @new_dictionary_entry = @recording.dictionary_entries.build
+    @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil), items: 12)
   end
 
   def preview

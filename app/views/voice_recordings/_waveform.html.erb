@@ -1,8 +1,12 @@
 
  <turbo-frame id="wave_display">
-  <div data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording.media.attached? %>" data-transcription-regions-value="<%= @regions %>">
+  <div data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording&.media&.attached? %>" data-transcription-regions-value="<%= @regions %>">
     <div class="flex items-center space-x-4 p-4">
+    <% if @recording %>
       <div id="waveform" class="flex-grow" data-transcription-target="waveform"></div>
+    <% else %>
+      <p>Click on "preview" to load a recording.</p>
+    <% end %>
     </div>
     <div class="flex items-center space-x-4 p-4">
       <div class="flex flex-col space-y-4">
@@ -31,7 +35,7 @@
           </label>
         </div>
         <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-900 text-white w-full">
-          <p class="text-white text-2xl" data-target="transcription.transcription">Transcript of <%= @recording.title %></p>
+          <p class="text-white text-2xl" data-target="transcription.transcription">Transcript of <%= @recording&.title %></p>
           <i class="text-white" data-target="transcription.translation">Translation</i>
         </div>
       </div>
