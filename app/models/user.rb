@@ -30,6 +30,19 @@ class User < ApplicationRecord
     def with_unanswered_ceisteanna
       joins(daltaí: { rangs: :dictionary_entries }).where.not(dictionary_entries: { status: :normal} ).distinct
     end
+
+    def pins
+      all.map do |user|
+        next unless user.lat_lang.present?
+
+        user.slice(:id, :name, :lat_lang).tap do |c|
+          if user.voice_recordings.any?
+            sample = user.voice_recordings.with_attached_media.order("RANDOM()").limit(1).first
+            c[:media_url] = sample.media.url
+          end
+        end
+      end.compact
+    end
   end
 
   def address
