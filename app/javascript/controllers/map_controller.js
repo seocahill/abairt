@@ -14,9 +14,14 @@ export default class extends Controller {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    this.pinsValue.forEach((rang) => {
-      let marker = L.marker(rang.lat_lang.split(','))
-      let content = `<a href="/grupas/${rang.id}">${rang.ainm}</a><audio controls src="${rang.media_url}"></audio>`;
+    this.pinsValue.forEach((user) => {
+      let marker = L.marker(user.lat_lang.split(','))
+      let content
+      if (user.media_url) {
+        content = `<a href="/users/${user.id}">${user.name}</a><audio controls src="${user.media_url}"></audio>`;
+      } else {
+        content = `<a href="/users/${user.id}">${user.name}</a>`;
+      }
       marker.bindPopup(content).openPopup();
       marker.addTo(this.map);
     });

@@ -33,7 +33,7 @@ class UsersController < ApplicationController
   # GET /users/1 or /users/1.json
   def show
     @pagy, @entries = pagy(@user.dictionary_entries, items: 12)
-    @starred = current_user.starred
+    @starred = current_user&.starred
 
     respond_to do |format|
       format.html
