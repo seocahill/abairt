@@ -4,7 +4,7 @@ class VoiceRecordingsController < ApplicationController
 
   def index
     @new_voice_recording = VoiceRecording.new
-    @pagy, @recordings = pagy(VoiceRecording.all, items: 12)
+    @pagy, @recordings = pagy(VoiceRecording.all, items: PAGE_SIZE)
     if params[:preview].present?
       @recording = VoiceRecording.find(params[:preview])
     end
@@ -16,7 +16,7 @@ class VoiceRecordingsController < ApplicationController
     @recording = VoiceRecording.find(params[:id])
     @regions = set_regions
     @new_dictionary_entry = @recording.dictionary_entries.build
-    @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil), items: 12)
+    @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil), items: PAGE_SIZE)
   end
 
   def preview

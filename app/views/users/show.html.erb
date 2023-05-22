@@ -1,8 +1,8 @@
 <%= content_for(:page_title, @user.name) %>
 <div class="flex flex-row">
   <div class="flex-grow p-4">
-    <div class="flex items-center mb-4">
-      <%= link_to word_list_path(id: @user.id, format: :csv), class: "flex items-center space-x-1" do %>
+    <div class="flex items-center mb-4 p-4">
+      <%= link_to word_list_path(id: @user.id, format: :csv), class: "flex items-center space-x-1 hover:text-blue hover:underline" do %>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
           <polyline points="7 10 12 15 17 10"></polyline>
@@ -12,13 +12,13 @@
       <% end %>
     </div>
     <div class="flex flex-col space-y-4">
-      <table class="w-full table-fixed">
+      <table class="table-fixed w-full">
         <thead>
           <tr class="bg-gray-100 text-left">
-            <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Audio</th>
-            <th></th>
+            <th class="w-1/4 py-2 px-4 border-gray-200">Irish</th>
+            <th class="w-1/4 py-2 px-4 border-gray-200">English</th>
+            <th class="w-1/4 py-2 px-4 border-gray-200 text-center">Audio</th>
+            <th class="w-1/4"></th>
           </tr>
         </thead>
         <tbody id="dictionary_entries">
@@ -27,7 +27,9 @@
           <% end %>
         </tbody>
       </table>
-      <%== pagy_nav(@pagy) %>
     </div>
   </div>
 </div>
+<%= content_for :footer do %>
+ <%== pagy_nav(@pagy) %>
+<% end %>

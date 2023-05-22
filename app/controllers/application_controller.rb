@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   include Pagy::Backend
   include Authentication
   include SetCurrentRequestDetails
+  PAGE_SIZE = 15
 
   helper_method :current_user
 

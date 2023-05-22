@@ -22,7 +22,7 @@ class UsersController < ApplicationController
 
     @new_speaker = User.new
 
-    @pagy, @users = pagy(records, items: 12)
+    @pagy, @users = pagy(records, items: PAGE_SIZE)
 
     respond_to do |format|
       format.html
@@ -32,7 +32,7 @@ class UsersController < ApplicationController
 
   # GET /users/1 or /users/1.json
   def show
-    @pagy, @entries = pagy(@user.dictionary_entries, items: 12)
+    @pagy, @entries = pagy(@user.dictionary_entries, items: PAGE_SIZE)
     @starred = current_user&.starred
 
     respond_to do |format|
