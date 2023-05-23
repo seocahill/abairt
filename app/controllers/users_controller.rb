@@ -12,6 +12,8 @@ class UsersController < ApplicationController
       records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
     end
 
+    @showmap = params[:map]
+
     @pins = User.where.not(lat_lang: nil).map do |g|
       g.slice(:id, :name, :lat_lang).tap do |c|
         if (sample = g.rangs.detect { |r| r.media.audio? }&.media)
