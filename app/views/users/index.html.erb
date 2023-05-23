@@ -1,5 +1,5 @@
 <%= content_for(:page_title, "Speakers") %>
-<div class="flex flex-row" data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
+<div class="flex flex-row">
   <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
     <div class="mb-4">
       <nav>
@@ -10,6 +10,14 @@
           <li>
             <% if @showmap %>
                 <a href="/users" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Close Mapview</a>
+                <div class="flex items-center">
+                  <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" class="p-4">
+                  <label for="image" class="text-lg">Pubs</label>
+                </div>
+                <div class="flex items-center">
+                  <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" class="p-4">
+                  <label for="image" class="text-lg">Speakers</label>
+                </div>
             <% else %>
               <a href="/users?map=true" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Toggle Mapview</a>
             <% end %>
@@ -77,7 +85,7 @@
   <div class="flex-grow p-4">
     <div class="flex flex-col space-y-4">
       <% if @showmap %>
-        <div id="map-container">
+        <div id="map-container" data-controller="map" data-map-pins-value="<%= @pins.to_json %>" data-map-pubs-value="<%= @pubs.to_json %>">
           <div id="map" style="height:600px"></div>
         </div>
       <% else %>

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+Pub = Struct.new(:name, :lat_lang, :url)
+
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
   before_action :authorize, except: %i[index show]
@@ -21,6 +23,8 @@ class UsersController < ApplicationController
         end
       end
     end
+
+    @pubs = pub_list
 
     @new_speaker = User.new
 
@@ -93,6 +97,15 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def pub_list
+    [
+      Pub.new("Teach Chonghóile", "54.313123,-9.8230029", "https://goo.gl/maps/cGVh3FmjhVvCyLQt6"),
+      Pub.new("Máire Lukes", "53.6128147,-9.4194681", "https://goo.gl/maps/e5FvZnm8RnkJGyDi8"),
+      Pub.new("The Compass", "53.8767457,-9.9279619", "https://goo.gl/maps/Q9BS13btgPt7j8b79")
+    ]
+
+  end
 
   def authorize
     return if current_user
