@@ -102,7 +102,8 @@ class UsersController < ApplicationController
     [
       Pub.new("Teach Chonghóile", "54.313123,-9.8230029", "https://goo.gl/maps/cGVh3FmjhVvCyLQt6"),
       Pub.new("Máire Lukes", "53.6128147,-9.4194681", "https://goo.gl/maps/e5FvZnm8RnkJGyDi8"),
-      Pub.new("The Compass", "53.8767457,-9.9279619", "https://goo.gl/maps/Q9BS13btgPt7j8b79")
+      Pub.new("The Compass", "53.8767457,-9.9279619", "https://goo.gl/maps/Q9BS13btgPt7j8b79"),
+      Pub.new("Turas Siar", "54.1274471,-10.0904116", "https://goo.gl/maps/ojSnzBFiyL3rGcqy9")
     ]
 
   end
