@@ -8,7 +8,14 @@
         play
       </a>
     <% else %>
-      <span>no media</span>
+      <% if current_user %>
+        <%= form_with(model: entry) do |form| %>
+          <%= render 'recorder', form: form %>
+        <% end %>
+      <% else %>
+        <a href="#" disabled class='bg-grey-500 hover:bg-grey-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer'>No media</a>
+
+      <% end %>
     <% end %>
   </td>
   <td class="py-2 px-4 text-center border-gray-200 w-1/4">

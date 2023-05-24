@@ -1,12 +1,5 @@
 <%= content_tag :div, data: { controller: 'recorder' } do %>
-  <%= form.label :record_media %>
   <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-  <p>
-    <%= content_tag :div, 'RECORD',
-                      class: 'btn btn-primary',
-                      data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
-    <%= content_tag :div, 'STOP',
-                      class: 'btn btn-primary',
-                      data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
-  </p>
+    <a href="#" class='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer' data-target= 'recorder.recordButton' data-action='click->recorder#record'>Rec</a>
+    <a href="#" class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer' data-target= 'recorder.stopButton' data-action='click->recorder#stop'>Stop</a>
 <% end %>
