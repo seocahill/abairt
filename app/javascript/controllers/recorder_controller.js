@@ -3,6 +3,7 @@ import { DirectUpload } from "@rails/activestorage";
 
 export default class extends Controller {
   static targets = ["input", "recordButton", "stopButton"]
+  static values = { autosave: Boolean }
 
   connect() {
     this.stopButtonTarget.classList.toggle('hidden')
@@ -48,8 +49,14 @@ export default class extends Controller {
           that.hiddenInput.value = blob.signed_id
           that.hiddenInput.setAttribute("data-target", "entry.media");
           that.inputTarget.parentNode.insertBefore(that.hiddenInput, that.inputTarget.nextSibling)
+          console.log(that.autosaveValue)
           if (that.element.parentNode.querySelector('audio')) {
             that.element.parentNode.querySelector('audio').setAttribute('src', `/rails/active_storage/blobs/redirect/${blob.signed_id}/audio.ogg`)
+          } else if (that.autosaveValue) {
+            console.log("submitting", that.hiddenInput)
+            setTimeout(() => {
+              Turbo.navigator.submitForm(that.element.parentNode)
+            }, 500); // Adjust the delay as needed
           }
         })
         that._stream = null;
