@@ -1,9 +1,9 @@
 <%= form_with model: @dictionary_entry, class: "" do |form| %>
   <%= render "dictionary_entries/inline_fields", form: form, method: :word_or_phrase do %>
-    <%= form.text_field :word_or_phrase %>
+    <%= form.text_area :word_or_phrase %>
   <% end %>
   <%= render "dictionary_entries/inline_fields", form: form, method: :translation do %>
-    <%= form.text_field :translation %>
+    <%= form.text_area :translation %>
   <% end %>
   <%= form.button %>
 <% end %>
