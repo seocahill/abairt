@@ -107,12 +107,12 @@
                 <td class="py-2 px-4 border-gray-200"><%= entry.region_start %>:<%= entry.region_end %></td>
                 <td class="py-2 px-4 border-gray-200">
                   <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
-                    <%= entry.word_or_phrase %>
+                    <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase" %>
                   <% end %>
                 </td>
                 <td class="py-2 px-4 border-gray-200">
                   <%= render "dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
-                    <%= entry.translation %>
+                    <%= entry.translation.present? ? entry.translation : "Add translation" %>
                   <% end %>
                 </td>
                 <td data-controller="entry" class="py-2 px-4 border-gray-200">
