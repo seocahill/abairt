@@ -1,0 +1,8 @@
+<% frame_id = dom_id(model, "#{method}_turbo_frame") %>
+<%= form_with model: model, class: "contents", data: { turbo_frame: frame_id } do %>
+  <turbo-frame id="<%= frame_id %>" class="contents group inline-edit">
+    <%= link_to edit_dictionary_entry_path(model), class: "hover:underline hover:text-blue-700" do %>
+      <%= yield %>
+    <% end %>
+  </turbo-frame>
+<% end %>

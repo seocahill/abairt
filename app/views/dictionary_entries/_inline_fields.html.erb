@@ -1,0 +1,8 @@
+<% frame_id = dom_id(form.object, "#{method}_turbo_frame") %>
+<turbo-frame id="<%= frame_id %>" class="contents">
+  <%= yield %>
+  <%= form.button class: "" do %>
+    Save
+  <% end %>
+  <%= link_to "Cancel", dictionary_entry_path(form.object), class: "" %>
+</turbo-frame>
