@@ -76,21 +76,19 @@ class DictionaryEntriesController < ApplicationController
   # PATCH/PUT /dictionary_entries/1 or /dictionary_entries/1.json
   def update
     if @dictionary_entry.update dictionary_entry_params
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(:dictionary_entries, partial: "dictionary_entry",
-        locals: { entry: @dictionary_entry, current_user: current_user })
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            @dictionary_entry,
+            partial: "dictionary_entry",
+            locals: { entry: @dictionary_entry, current_user: current_user, starred: current_user.starred }
+          )
+        end
+        format.html { redirect_to @dictionary_entry, notice: 'entry was successfully updated.' }
       end
-      format.html { redirect_to @dictionary_entry, notice: 'entry was successfully updated.' }
     else
       render :edit, status: :unprocessable_entity
     end
-    # respond_to do |format|
-    #   format.turbo_stream do
-    #     render turbo_stream: turbo_stream.replace(:dictionary_entries, partial: "dictionary_entry",
-    #     locals: { entry: @dictionary_entry, current_user: current_user })
-    #   end
-    #   format.html { redirect_to @dictionary_entry, notice: 'entry was successfully updated.' }
-    # end
   end
 
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
