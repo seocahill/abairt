@@ -8,6 +8,7 @@ class WordListsController < ApplicationController
 
   # GET /word_lists/1
   def show
+    @pagy, @entries = pagy(@word_list.dictionary_entries, items: PAGE_SIZE)
   end
 
   # GET /word_lists/new

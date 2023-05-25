@@ -1,15 +1,58 @@
-<div class="mx-auto md:w-2/3 w-full flex">
-  <div class="mx-auto">
-    <% if notice.present? %>
-      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
-    <% end %>
-
-    <%= render @word_list %>
-
-    <%= link_to 'Edit this word_list', edit_word_list_path(@word_list), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-    <div class="inline-block ml-2">
-      <%= button_to 'Destroy this word_list', word_list_path(@word_list), method: :delete, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 font-medium" %>
+<%= content_for(:page_title, @word_list.name) %>
+<div class="flex flex-row">
+  <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
+    <div class="mb-4">
+      <nav>
+        <ul class="flex flex-col py-2" data-sidebar-target="tabs">
+          <li>
+            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab1">Search and Filter</a>
+          </li>
+        </ul>
+      </nav>
     </div>
-    <%= link_to 'Back to word_lists', word_lists_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <div class="tab-content">
+      <div class="tab-pane" id="tab1">
+        <form class="space-y-4" action="/dictionary_entries">
+          <div>
+            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+            <div class="mt-1">
+              <input type="search" id="search" placeholder="Irish or English words" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+            </div>
+          </div>
+          <div class="flex items-center">
+            <input id="checkbox" type="checkbox" name="media" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
+            <label for="checkbox" class="ml-2 block text-sm leading-5 text-gray-900">
+              Only results with audio
+            </label>
+          </div>
+          <div class="text-right">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="flex-grow p-4">
+    <div class="flex flex-col space-y-4">
+    <h2><%= @word_list.description %></h2>
+      <table class="w-full table-fixed">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Audio</th>
+            <th class="w-1/5 py-2 px-4 border-gray-200 text-center"></th>
+          </tr>
+        </thead>
+        <tbody id="dictionary_entries">
+          <% @entries.each do |entry| %>
+            <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, list: @word_list } %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+<%= content_for :footer do %>
+  <%== pagy_nav(@pagy) %>
+<% end %>
