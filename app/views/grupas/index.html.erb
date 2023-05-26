@@ -97,7 +97,7 @@
           <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
           <ul class="flex flex-wrap -mx-1">
             <% @tags.each do |tag| %>
-              <li class="my-1 mx-1"><%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "nline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300" %></li>
+              <li class="my-1 mx-1"><%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "iwnline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300" %></li>
             <% end %>
           </ul>
         </aside>

@@ -4,12 +4,36 @@ class VoiceRecordingsController < ApplicationController
 
   def index
     @new_voice_recording = VoiceRecording.new
-    @pagy, @recordings = pagy(VoiceRecording.all, items: PAGE_SIZE)
+    records = VoiceRecording.order(:id, :desc)
+
     if params[:preview].present?
       @recording = VoiceRecording.find(params[:preview])
     end
+
+    if params[:search].present?
+      records = VoiceRecording
+        .joins(:users)
+        .where("title LIKE ?", "%#{params[:search]}%")
+        .or(VoiceRecording.joins(:users).where("users.name LIKE ?", "%#{params[:search]}%"))
+    end
+
+    if params[:tag].present?
+      records = records.tagged_with(params[:tag])
+    end
+
+    if params[:voice].present?
+      value =  User.voices[params[:voice]]
+      records = records.joins(:users).where("users.voice = ?", value)
+    end
+
+    if params[:dialect].present?
+      value =  User.dialects[params[:dialect]]
+      records = records.joins(:users).where("users.dialect = ?", value)
+    end
+
+    @pagy, @recordings = pagy(records.distinct, items: PAGE_SIZE)
     @regions = set_regions if @voice_recording
-    @tags = ActsAsTaggableOn::Tag.most_used(15)
+    @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
   end
 
   def show
