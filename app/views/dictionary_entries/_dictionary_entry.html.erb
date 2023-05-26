@@ -9,7 +9,12 @@
       <%= entry.translation.present? ? entry.translation : "Add translation" %>
     <% end %>
   </td>
-  <td data-controller="entry" class="text-center py-2 px-4 border-gray-200 w-1/4">
+  <td class="py-2 px-4 text-center border-gray-200 w-1/4">
+    <% entry.tag_list.each do |tag| %>
+      <%= link_to tag, dictionary_entries_path(tag: tag), class: "hover:text-blue hover:underline rounded-full px-2 py-1 bg-gray-200 hover:bg-gray-300" %>
+    <% end %>
+  </td>
+  <td data-controller="entry" class="text-center py-2 px-4 border-gray-200 w-1/12">
     <% if entry.media.attached? %>
       <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
         <audio src="<%= entry.media.url %>"></audio>
@@ -26,18 +31,22 @@
       <% end %>
     <% end %>
   </td>
-  <td class="py-2 px-4 text-center border-gray-200 w-1/4">
+  <td class="py-2 px-4 text-center border-gray-200 w-1/12">
     <% if current_user %>
       <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: starred.id }}, class: "flex items-center" do %>
-        <% if starred.dictionary_entries.include? entry %>
+        <% if starred && starred.dictionary_entries.include?(entry) %>
           <i style="fill:gold;" data-feather="star"></i>
         <% else %>
           <i data-feather="star"></i>
         <% end %>
       <% end %>
     <% end %>
+  </td>
+  <td class="py-2 px-4 text-center border-gray-200 w-1/12">
     <% if current_user && entry.speaker_id == current_user.id %>
-      <%= link_to 'Delete', dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, confirm: 'Are you sure?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, confirm: 'Are you sure?' }, class: "" do %>
+        <i data-feather="trash"></i>
+      <% end %>
     <% end %>
   </td>
 </tr>

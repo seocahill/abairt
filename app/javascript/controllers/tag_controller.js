@@ -2,16 +2,17 @@ import { Controller } from "@hotwired/stimulus"
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch"]
+  static targets = ["cell", "dropdown", "time", "tagSearch"]
 
   initialize() {
     console.log("connect to tags");
   }
 
   tagSearchTargetConnected() {
+    const selectedTags = [];
     const tagsSearch = new autoComplete({
       selector: "#autoCompleteTags",
-      placeHolder: "Déan cuardach ar clib...",
+      placeHolder: "Separate each tag with a comma",
       debounce: 300,
       searchEngine: function (query, record) {
         return record
@@ -20,7 +21,14 @@ export default class extends Controller {
         src: async (query) => {
           try {
             // Fetch Data from external Source
-            const source = await fetch(`/tags?search=${query.replace(/\W/g, '')}`, { headers: { accept: "application/json" } });
+            const sanitizedQuery = query
+              .split(',')
+              .map(tag => tag.trim())
+              .at(-1)
+              .normalize('NFD') // Convert accented characters to their base form
+              .replace(/[\u0300-\u036f]/g, '') // Remove combining diacritical marks
+              .replace(/[^a-zA-Z0-9]/g, ''); // Remove non-alphanumeric characters
+            const source = await fetch(`/tags?search=${sanitizedQuery}`, { headers: { accept: "application/json" } });
             // Data is array of `Objects` | `Strings`
             const data = await source.json();
 
@@ -40,20 +48,13 @@ export default class extends Controller {
       events: {
         input: {
           selection: (event) => {
-            const selection = event.detail.selection.value['name'];
-            tagsSearch.input.value = selection;
+            const selection = event.detail.selection.value.name;
+            selectedTags.push(selection);
+            usersSearch.input.value = selectedTags;
           }
-        }
+        },
       }
-    })
-  }
-
-  format(n) {
-    let mil_s = String(n % 1000).padStart(3, '0');
-    n = Math.trunc(n / 1000);
-    let sec_s = String(n % 60).padStart(2, '0');
-    n = Math.trunc(n / 60);
-    return String(n) + ' m ' + sec_s + ' s ' + mil_s + ' ms';
+    });
   }
 
   teardown() {

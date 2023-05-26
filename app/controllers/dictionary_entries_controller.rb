@@ -24,7 +24,7 @@ class DictionaryEntriesController < ApplicationController
       @new_dictionary_entry = current_user.dictionary_entries.build
     end
 
-    @tags = ActsAsTaggableOn::Tag.most_used(15)
+    @tags = DictionaryEntry.tag_counts_on(:tags).most_used(15)
 
     if current_user
       @starred = current_user.starred
@@ -65,7 +65,7 @@ class DictionaryEntriesController < ApplicationController
         format.html { redirect_to @dictionary_entry }
         format.turbo_stream do
           render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
-          locals: { entry: @dictionary_entry, current_user: current_user })
+          locals: { entry: @dictionary_entry, current_user: current_user, starred: current_user.starred })
         end
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -112,6 +112,6 @@ class DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :tag_list, :speaker_id)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :speaker_id, :tag_list)
   end
 end
