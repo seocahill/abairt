@@ -76,15 +76,15 @@
       </section>
       <div class="fixed bottom-0 bg-white w-full">
         <%= form_with(model: [@rang, @new_dictionary_entry], class: "flex flex-row px-3 py-2 bg-white border-t border-gray-200", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
-          <%= form.text_field :word_or_phrase, class: "w-1/3 py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "Irish message" %>
-          <%= form.text_field :translation, class: "w-1/3 py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "English message" %>
-          <%= content_tag :div, data: { controller: 'recorder' }, class: "" do %>
+          <%= form.text_area :word_or_phrase, class: "w-1/3 py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "Irish message" %>
+          <%= form.text_area :translation, class: "w-1/3 py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "English message" %>
+          <%= content_tag :div, data: { controller: 'recorder' }, class: "flex cursor-pointer" do %>
             <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
             <%= content_tag :div, "Record voice",
-                              class: 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg mr-2',
+                              class: 'flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-lg mr-2',
                               data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
             <%= content_tag :div, "Stop",
-                              class: 'px-4 py-2 bg-red-200 text-white-700 rounded-lg mr-2',
+                              class: 'flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg mr-2',
                               data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
           <% end %>
           <input type="hidden" id="dictionary_entry_rang_ids" name="dictionary_entry[rang_ids][]" value="<%= @rang.id%>">
