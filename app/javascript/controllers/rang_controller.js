@@ -66,7 +66,9 @@ export default class extends Controller {
       events: {
         input: {
           selection: (event) => {
-            abairtSearch.input.value = event.detail.selection.value["word_or_phrase"]
+            // FIXME: add to converstation list e.g POST /rang_entries [rang_id, entry_id]
+            // Tidy up styling needs to go above
+            // abairtSearch.input.value = event.detail.selection.value["word_or_phrase"]
           }
         }
       }
