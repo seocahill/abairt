@@ -39,6 +39,7 @@ export default class extends Controller {
       placeHolder: "Irish: duplicates will be shown if exists...",
       debounce: 300,
       threshold: 2,
+      wrapper: false,
       data: {
         src: async (query) => {
           try {

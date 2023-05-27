@@ -76,7 +76,7 @@
       </section>
       <div class="fixed bottom-0 bg-white w-full">
         <%= form_with(model: [@rang, @new_dictionary_entry], class: "flex flex-row px-3 py-2 bg-white border-t border-gray-200", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset", "rang-target": "wordSearch"}) do |form| %>
-          <%= form.text_area :word_or_phrase, class: "py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "Irish message", id: "autoCompleteWord" %>
+          <%= form.text_area :word_or_phrase, class: "w-1/3 py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "Irish message", id: "autoCompleteWord" %>
           <%= form.text_area :translation, class: "w-1/3 py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "English message" %>
           <%= content_tag :div, data: { controller: 'recorder' }, class: "flex cursor-pointer" do %>
             <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
