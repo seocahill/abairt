@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch", "list"]
+  static targets = ["cell", "dropdown", "time", "wordSearch", "list"]
   static values = { meetingId: String, media: String, currentUserId: String }
   scrollDirectionDown = true;
 
@@ -33,12 +33,43 @@ export default class extends Controller {
   }
 
 
-  format(n) {
-    let mil_s = String(n % 1000).padStart(3, '0');
-    n = Math.trunc(n / 1000);
-    let sec_s = String(n % 60).padStart(2, '0');
-    n = Math.trunc(n / 60);
-    return String(n) + ' m ' + sec_s + ' s ' + mil_s + ' ms';
+  wordSearchTargetConnected() {
+    const abairtSearch = new autoComplete({
+      selector: "#autoCompleteWord",
+      placeHolder: "Irish: duplicates will be shown if exists...",
+      debounce: 300,
+      threshold: 2,
+      data: {
+        src: async (query) => {
+          try {
+            const sanitizedQuery = query.normalize('NFD') // Convert accented characters to their base form
+              .replace(/[\u0300-\u036f]/g, '') // Remove combining diacritical marks
+              .replace(/[^a-zA-Z0-9]/g, ''); // Remove non-alphanumeric characters
+            // Fetch Data from external Source
+            const source = await fetch(`/dictionary_entries?search=${sanitizedQuery}`, { headers: { accept: "application/json" } });
+            // Data is array of `Objects` | `Strings`
+            const data = await source.json();
+
+            return data;
+          } catch (error) {
+            return error;
+          }
+        },
+        keys: ['word_or_phrase']
+      },
+      resultItem: {
+        highlight: {
+          render: true
+        }
+      },
+      events: {
+        input: {
+          selection: (event) => {
+            abairtSearch.input.value = event.detail.selection.value["word_or_phrase"]
+          }
+        }
+      }
+    })
   }
 
   teardown() {
