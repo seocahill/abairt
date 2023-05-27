@@ -42,12 +42,12 @@
         </form>
       </div>
       <% if current_user %>
-        <div class="tab-pane hidden" id="tab2" data-controller="dictionary-entry">
+        <div class="tab-pane hidden" id="tab2">
           <%= form_with(model: @new_dictionary_entry, class: "", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
-            <div class="mt-1">
+            <div class="mt-1" data-controller="dictionary-entry" data-dictionary-entry-target="wordSearch">
               <label for="search" class="block text-sm font-medium text-gray-700">Irish</label>
               <div class="mt-1">
-                <%= form.text_area :word_or_phrase, class: "w-full" %>
+                <%= form.text_area :word_or_phrase, class: "w-full", id: "autoCompleteEntry" %>
               </div>
             </div>
             <div class="mt-1">
@@ -63,8 +63,8 @@
               </div>
             </div>
             <div class="mt-1">
-                <ul class="rounded p-2 max-w-md" id="selectedTags"></ul>
-              </div>
+              <ul class="rounded p-2 max-w-md" id="selectedTags"></ul>
+            </div>
             <%= content_tag :div, data: { controller: 'recorder' }, class: "mt-1 w-full text-center mx-auto" do %>
               <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
               <%= content_tag :div, "Record voice",

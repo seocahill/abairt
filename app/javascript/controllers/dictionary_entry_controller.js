@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import autoComplete from "autocomplete";
 
 export default class extends Controller {
-  static targets = ["cell", "dropdown", "time", "wordSearch", "tagSearch"]
+  static targets = ["wordSearch"]
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
@@ -23,15 +23,18 @@ export default class extends Controller {
 
   wordSearchTargetConnected() {
     const abairtSearch = new autoComplete({
-      selector: "#autoComplete",
-      placeHolder: "Déan cuardach ar focal...",
+      selector: "#autoCompleteEntry",
+      placeHolder: "Duplicates will be shown if exists...",
       debounce: 300,
       threshold: 2,
       data: {
         src: async (query) => {
           try {
+            const sanitizedQuery = query.normalize('NFD') // Convert accented characters to their base form
+              .replace(/[\u0300-\u036f]/g, '') // Remove combining diacritical marks
+              .replace(/[^a-zA-Z0-9]/g, ''); // Remove non-alphanumeric characters
             // Fetch Data from external Source
-            const source = await fetch(`/dictionary_entries?search=${query.replace(/\W/g, '')}`, { headers: { accept: "application/json" } });
+            const source = await fetch(`/dictionary_entries?search=${sanitizedQuery}`, { headers: { accept: "application/json" } });
             // Data is array of `Objects` | `Strings`
             const data = await source.json();
 
@@ -50,25 +53,11 @@ export default class extends Controller {
       events: {
         input: {
           selection: (event) => {
-            console.log
-            document.getElementById("dictionary_entry_id").value = event.detail.selection.value["id"]
             abairtSearch.input.value = event.detail.selection.value["word_or_phrase"]
-            document.getElementById("translation").value = event.detail.selection.value["translation"]
-            document.getElementById("notes").value = event.detail.selection.value["notes"]
-            document.getElementById("autoCompleteTags").value = event.detail.selection.value["tag_list"]
           }
         }
       }
     })
-  }
-
-
-  format(n) {
-    let mil_s = String(n % 1000).padStart(3, '0');
-    n = Math.trunc(n / 1000);
-    let sec_s = String(n % 60).padStart(2, '0');
-    n = Math.trunc(n / 60);
-    return String(n) + ' m ' + sec_s + ' s ' + mil_s + ' ms';
   }
 
   teardown() {
