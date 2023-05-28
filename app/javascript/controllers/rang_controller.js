@@ -34,6 +34,7 @@ export default class extends Controller {
 
 
   wordSearchTargetConnected() {
+    const that = this;
     const abairtSearch = new autoComplete({
       selector: "#autoCompleteWord",
       placeHolder: "Irish: duplicates will be shown if exists...",
@@ -66,13 +67,26 @@ export default class extends Controller {
       events: {
         input: {
           selection: (event) => {
-            // FIXME: add to converstation list e.g POST /rang_entries [rang_id, entry_id]
-            // Tidy up styling needs to go above
-            // abairtSearch.input.value = event.detail.selection.value["word_or_phrase"]
+            let entryId = event.detail.selection.value["id"]
+            that.addRangEntry(entryId)
           }
         }
       }
     })
+  }
+
+  addRangEntry(entryId) {
+    let formData = new FormData()
+    formData.append("rang[dicionary_entry_ids][]", entryId)
+    fetch(`/rangs/${this.idValue}`, {
+      body: formData,
+      method: 'PATCH',
+      credentials: "include",
+      dataType: "script",
+      headers: {
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+      },
+    });
   }
 
   teardown() {
