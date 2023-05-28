@@ -11,6 +11,7 @@ class User < ApplicationRecord
 
   has_many :seomras
   has_many :rangs, through: :seomras
+  has_many :chats, through: :rangs, source: "dictionary_entries"
 
   has_many :lectures, class_name: "Rang", foreign_key: "user_id"
 
@@ -27,7 +28,6 @@ class User < ApplicationRecord
   enum dialect: [:an_muirthead, :dún_chaocháin, :acaill, :tuar_mhic_éadaigh]
 
   validates :email, presence: true, uniqueness: { case_sensitive: false }, length: {maximum: 50}
-
 
 
   class << self
@@ -61,6 +61,11 @@ class User < ApplicationRecord
       list.name = "Starred"
       list.description = "My favourite words and phrases."
     end
+  end
+
+  def recent_messages
+    last_24_hours = Time.now.utc - 24.hours
+    chats.where("dictionary_entries.created_at >= ?", last_24_hours.to_s)
   end
 
   private

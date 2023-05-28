@@ -1,0 +1,9 @@
+<h1>New Messages in Abairt!</h1>
+<hr>
+<ul>
+  <% @messages.each do |message| %>
+    <% next unless message.speaker %>
+
+    <li>From <%= message.speaker.name %> <%= link_to "read", rang_url(message.rangs.last) %></li>
+  <% end %>
+</ul>

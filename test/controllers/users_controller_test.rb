@@ -17,8 +17,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create user" do
+    random_str = SecureRandom.alphanumeric
+
     assert_difference('User.count') do
-      post users_url, params: { user: { email: @user.email, name: @user.name, password_digest: @user.password_digest } }
+      post users_url, params: { user: { email: "#{random_str}@abairt.com", name: random_str, password_digest: random_str } }
     end
 
     assert_redirected_to user_url(User.last)

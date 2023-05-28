@@ -3,6 +3,8 @@ require "test_helper"
 class WordListsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @word_list = word_lists(:one)
+    @user = users(:one)
+    ApplicationController.any_instance.stubs(:current_user).returns(users(:one))
   end
 
   test "should get index" do

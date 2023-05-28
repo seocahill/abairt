@@ -15,7 +15,9 @@ return if defined?(Rails::Console) || Rails.env.test? || File.split($PROGRAM_NAM
 s = Rufus::Scheduler.singleton
 # scheduler.cron '00 09 * * *'  9am
 s.cron '00 09 * * *' do
-  Rang.where("strftime('%m-%d-%Y', rangs.time) = strftime('%m-%d-%Y', 'now')").each do |rang|
-    NotificationsMailer.with(rang: rang).ceád_rang_eile.deliver
+  User.each do |user|
+    next unless user.recent_messages.any?
+
+    NotificationsMailer.with(user: user).recent_messages.deliver
   end
 end
