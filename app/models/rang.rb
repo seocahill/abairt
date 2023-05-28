@@ -3,6 +3,7 @@
 class Rang < ApplicationRecord
   has_many :rang_entries, dependent: :destroy
   has_many :dictionary_entries, through: :rang_entries
+  accepts_nested_attributes_for :rang_entries
 
   has_many :seomras, dependent: :destroy
   has_many :users, through: :seomras
