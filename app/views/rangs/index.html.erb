@@ -33,7 +33,11 @@
     <header class="flex-shrink-0 bg-white border-b border-gray-200">
       <div class="flex justify-between px-4 py-3 sm:px-6">
         <h2 class="text-lg font-medium leading-6 text-gray-900">
-          <%= @rang.teacher.name %>
+          <% if other_participents.present? %>
+            With <%= other_participents.join(', ') %> | <%= link_to "add or remove students", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
+          <% else %>
+            No one to chat with! Add students <%= link_to "here", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
+          <% end %>
         </h2>
         <div class="flex items-center">
           <button id="hang-up" class="p-2 bg-red-700 hidden rounded-full" data-action="click->rang#endMeeting">
@@ -66,6 +70,7 @@
 
                 <% end %>
                 <% @messages.each do |message| %>
+                  <%= next unless message.speaker %>
                   <%= render 'message', message: message, current_user: current_user, current_day: current_day %>
                   <% current_day = message.updated_at.strftime("%d-%m-%y") %>
                 <% end %>
