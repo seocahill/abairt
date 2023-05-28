@@ -16,7 +16,7 @@
           </p>
         </div>
         <% if message.word_or_phrase.present? %>
-          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm mb-2">
             <%= message.word_or_phrase%>
           </p>
         <% end %>
