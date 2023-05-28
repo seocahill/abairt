@@ -3,8 +3,10 @@ class WordListsController < ApplicationController
 
   # GET /word_lists
   def index
-    @new_word_list = WordList.new(starred: false)
     records = WordList.where("id is not null AND starred is not true")
+    if params[:search].present?
+      records = WordList.where(starred: nil).where("name LIKE ? OR description LIKE ?", "%#{params[:search]}%", "%#{params[:search]}%")
+    end
     @pagy, @word_lists = pagy(records, items: PAGE_SIZE)
   end
 
