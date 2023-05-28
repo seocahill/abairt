@@ -42,6 +42,16 @@
       <% end %>
     <% end %>
   </td>
+  <td>
+    <% if current_user %>
+      <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-controller="list">
+        <% current_user.own_lists.where(starred: nil).each do |list| %>
+          <option value="default" selected="selected">Add to list</option>
+          <option value="<%= list.id %>"><%= list.name %></option>
+        <% end %>
+        </select>
+    <% end %>
+  </td>
   <td class="py-2 px-4 text-center border-gray-200 w-1/12">
     <% if current_user && entry.speaker_id == current_user.id %>
       <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' }, class: "" do %>
