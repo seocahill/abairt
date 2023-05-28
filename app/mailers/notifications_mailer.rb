@@ -12,8 +12,9 @@ class NotificationsMailer < ApplicationMailer
   #
   #   en.notifications_mailer.ceád_rang_eile.subject
   #
-  def ceád_rang_eile
-    @rang = params[:rang]
-    mail(to: @rang.participants, subject: 'An chéad rang eile')
+  def recent_messages
+    @user = params[:user]
+    @messages = @user.recent_messages
+    mail(to: @user.email, subject: "You have received #{@messages.size} messages since yesterday")
   end
 end

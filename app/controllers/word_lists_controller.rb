@@ -1,5 +1,6 @@
 class WordListsController < ApplicationController
   before_action :set_word_list, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate, except: [:show, :index]
 
   # GET /word_lists
   def index

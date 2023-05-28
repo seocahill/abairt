@@ -1,10 +1,10 @@
 require "test_helper"
 
 class NotificationsMailerTest < ActionMailer::TestCase
-  test "ceád_rang_eile" do
-    mail = NotificationsMailer.with(rang: rangs(:one)).ceád_rang_eile
-    assert_equal "An chéad rang eile", mail.subject
-    assert_equal rangs(:one).users.pluck(:email), mail.to
+  test "recent messages" do
+    mail = NotificationsMailer.with(user: users(:one)).recent_messages
+    assert_equal "You have received 1 messages since yesterday", mail.subject
+    assert_equal [users(:one).email], mail.to
     assert_equal ['abairt@abairt.com'], mail.from
   end
 end

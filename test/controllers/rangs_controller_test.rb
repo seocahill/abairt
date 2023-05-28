@@ -21,7 +21,7 @@ class RangsControllerTest < ActionDispatch::IntegrationTest
       post rangs_url, params: { rang: { name: @rang.name } }
     end
 
-    assert_redirected_to rang_url(Rang.last)
+    assert_redirected_to rangs_url(chat: Rang.last.id)
   end
 
   test "should show rang" do
@@ -36,7 +36,7 @@ class RangsControllerTest < ActionDispatch::IntegrationTest
 
   test "should update rang" do
     patch rang_url(@rang), params: { rang: { name: @rang.name } }
-    assert_redirected_to rang_url(@rang)
+    assert_redirected_to rangs_url(chat: @rang.id)
   end
 
   test "should destroy rang" do
