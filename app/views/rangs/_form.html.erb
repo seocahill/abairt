@@ -7,11 +7,6 @@
   <div class="relative py-3 sm:max-w-xl sm:mx-auto">
     <div class="relative px-4 py-10 bg-gray-50 mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
       <div class="max-w-md mx-auto">
-        <div class="flex items-center space-x-5">
-          <div class="block pl-2 font-semibold text-xl self-start">
-            <h2 class="leading-relaxed">Rang Úr</h2>
-          </div>
-        </div>
         <div class="divide-y">
           <%= form_with(model: rang) do |form| %>
             <% if rang.errors.any? %>
@@ -30,6 +25,7 @@
                 <%= form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Classname" %>
               </div>
             </div>
+            <hr>
             <%= form.fields_for :users do |user_form| %>
               <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
                 <div class="flex flex-col">
@@ -42,14 +38,20 @@
                 </div>
                 <div class="flex flex-col">
                   <label class="leading-loose">Student Password</label>
-                  <%= user_form.text_field :password, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", value: SecureRandom.alphanumeric %>
+                  <%= user_form.text_field :password, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "new password if required" %>
+                </div>
+                <div class="flex flex-col">
+                  <button disabled=true class="bg-red-500 flex justify-center items-center w-full text-white px-1 py-1 rounded-md focus:outline-none">Remove</button>
                 </div>
               </div>
             <% end %>
+            <hr>
             <div class="pt-4 flex items-center space-x-4">
               <button class="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none">Save</button>
             </div>
-            <%= link_to 'Back', rangs_path %>
+            <div class="pt-4 flex items-center space-x-4">
+              <%= link_to 'Cancel', rangs_path, class: "bg-gray-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none" %>
+            </div>
           <% end %>
         </div>
       </div>

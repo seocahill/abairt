@@ -26,6 +26,10 @@ class User < ApplicationRecord
   enum voice: [:male, :female]
   enum dialect: [:an_muirthead, :dún_chaocháin, :acaill, :tuar_mhic_éadaigh]
 
+  validates :email, presence: true, uniqueness: { case_sensitive: false }, length: {maximum: 50}
+
+
+
   class << self
     def with_unanswered_ceisteanna
       joins(daltaí: { rangs: :dictionary_entries }).where.not(dictionary_entries: { status: :normal} ).distinct
