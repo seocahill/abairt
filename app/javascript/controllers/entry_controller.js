@@ -33,62 +33,6 @@ export default class extends Controller {
     }
   }
 
-  async ceist(e) {
-    let status = "ceist";
-    e.preventDefault()
-    let formData = new FormData()
-    formData.append("dictionary_entry[status]", status)
-    let response = await fetch(`/dictionary_entries/${this.idValue}`, {
-      body: formData,
-      method: 'PATCH',
-      credentials: "include",
-      dataType: "script",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-      },
-    })
-    if (response.ok) {
-      this.statusTarget.innerText = status;
-      this.statusTarget.parentNode.classList.remove('invisible');
-    }
-  }
-
-  async foghraíocht(e) {
-    e.preventDefault()
-    let status = "foghraíocht";
-    let formData = new FormData()
-    formData.append("dictionary_entry[status]", status)
-    let response = await fetch(`/dictionary_entries/${this.idValue}`, {
-      body: formData,
-      method: 'PATCH',
-      credentials: "include",
-      dataType: "script",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-      },
-    })
-    if (response.ok) {
-      this.statusTarget.innerText = status;
-      this.statusTarget.parentNode.classList.remove('invisible');
-    }
-  }
-
-  async scrios(e) {
-    e.preventDefault()
-    const rangId = location.pathname.split('/')[2];
-    let response = await fetch(`/rangs/${rangId}/dictionary_entries/${this.idValue}`, {
-      method: 'DELETE',
-      credentials: "include",
-      dataType: "script",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-      },
-    })
-    if (response.ok) {
-      this.element.parentNode.removeChild(this.element);
-    }
-  }
-
   play(e) {
     e.preventDefault()
     this.element.getElementsByTagName("audio")[0].play()
