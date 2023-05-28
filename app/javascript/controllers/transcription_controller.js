@@ -155,6 +155,8 @@ export default class extends Controller {
     const region = this.waveSurfer.regions.list[regionId]
     if (region) {
       region.play()
+    } else if (this.waveSurfer.getPlaybackRate() < 1) {
+      this.waveSurfer.setPlaybackRate(1)
     } else {
       this.waveSurfer.playPause()
     }
