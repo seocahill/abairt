@@ -3,7 +3,9 @@ class WordListsController < ApplicationController
 
   # GET /word_lists
   def index
-    @word_lists = WordList.all
+    @new_word_list = WordList.new(starred: false)
+    records = WordList.where("id is not null AND starred is not true")
+    @pagy, @word_lists = pagy(records, items: PAGE_SIZE)
   end
 
   # GET /word_lists/1
@@ -22,7 +24,7 @@ class WordListsController < ApplicationController
 
   # POST /word_lists
   def create
-    @word_list = WordList.new(word_list_params)
+    @word_list = current_user.own_lists.build(word_list_params)
 
     if @word_list.save
       redirect_to @word_list, notice: 'Word list was successfully created.'
@@ -54,6 +56,6 @@ class WordListsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def word_list_params
-      params.require(:word_list).permit(:name, :user_id, :description)
+      params.permit(:name, :description)
     end
 end
