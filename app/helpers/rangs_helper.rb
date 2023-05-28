@@ -5,6 +5,11 @@ module RangsHelper
     current_user&.rangs&.include?(@rang)
   end
 
+  def other_participents
+    users = @rang.users.where.not(id: nil) + [@rang.teacher] - [current_user]
+    users.pluck(:name)
+  end
+
   def type(rang)
     if rang.url
       ["Alt", "green"]

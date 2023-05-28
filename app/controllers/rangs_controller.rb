@@ -38,11 +38,13 @@ class RangsController < ApplicationController
   # GET /rangs/new
   def new
     @rang = Rang.new(name: "Cómhrá #{Date.today.to_s(:short)}")
-    @student = @rang.users.build(password: SecureRandom.uuid)
+    @student = @rang.users.build(password: SecureRandom.alphanumeric)
   end
 
   # GET /rangs/1/edit
-  def edit; end
+  def edit
+    @rang.users.build(password: SecureRandom.alphanumeric)
+  end
 
   # POST /rangs or /rangs.json
   def create
@@ -51,7 +53,7 @@ class RangsController < ApplicationController
     respond_to do |format|
       if @rang.save
         @rang.send_notification
-        format.html { redirect_to @rang, notice: 'Rang was successfully created.' }
+        format.html { redirect_to rangs_path(chat: @rang.id), notice: 'Rang was successfully created.' }
         format.json { render :show, status: :created, location: @rang }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -67,7 +69,7 @@ class RangsController < ApplicationController
 
       if @rang.save
         @rang.send_notification
-        format.html { redirect_to @rang, notice: 'Rang was successfully updated.' }
+        format.html { redirect_to rangs_path(chat: @rang.id), notice: 'Rang was successfully updated.' }
         format.json { render :show, status: :ok, location: @rang }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -94,7 +96,7 @@ class RangsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def rang_params
-    params.require(:rang).permit(:name, :user_id, users_attributes: [:email, :password])
+    params.require(:rang).permit(:name, :user_id, users_attributes: [:email, :password, :name])
   end
 
   def authorize
