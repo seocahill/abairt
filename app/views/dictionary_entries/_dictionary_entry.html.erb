@@ -7,11 +7,10 @@
     <% else %>
       <% entry.word_or_phrase.split.each do |word| %>
         <span data-controller="word">
-          <span data-action="click->word#focloir" data-word-target="word" class="entry-word"><%= word %></span>
+          <span data-action="click->word#focloir touchstart->word#focloir touchend->word#dun" data-word-target="word" class="entry-word"><%= word %></span>
           <template data-word-target="template">
             <div id="tooltip" class="teanglann-template">
-              <iframe name="lexclickFrame" style="width: 298px; height: 348px; border: 1px inset #333333;" src="https://www.teanglann.ie/ga/?s=<%= word %>&quickie=true" frameborder="0"></iframe>
-              <button data-action="click->word#dun" class="bg-yellow-500 text-white active:bg-yellow-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">Dún</button>
+              <iframe data-action="mouseleave->word#dun" name="lexclickFrame" style="width: 298px; height: 348px; border: 1px inset #333333;" src="https://www.teanglann.ie/ga/?s=<%= word %>&quickie=true" frameborder="0"></iframe>
             </div>
           </template>
         </span>
