@@ -8,9 +8,9 @@
       <p>Click on "preview" to load a recording.</p>
     <% end %>
     </div>
-    <div class="flex items-center space-x-4 p-4">
-      <div class="flex flex-col space-y-4">
-        <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-4 p-4 w-full">
+      <div class="flex flex-col space-y-4 w-full">
+        <div class="flex items-center space-x-4 w-full">
           <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#play">
             Play
           </button>
@@ -26,8 +26,8 @@
             <span class="ml-2 text-gray-700">Irish Subtitles</span>
           </label>
           <label class="flex items-center space-x-2">
-            <span class="ml-2 text-gray-700">Zoom:</span>
-            <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="0">
+            <span class="ml-2 text-gray-700">Zoom 0%</span>
+            <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="50"> 100%
           </label>
           <label class="flex items-center space-x-2">
             <span class="ml-2 text-gray-700">Playhead:</span>
@@ -35,8 +35,8 @@
           </label>
         </div>
         <div id="subtitles" class="flex items-center space-x-4 p-6 bg-gray-900 text-white w-full">
-          <p class="text-white text-2xl" data-target="transcription.transcription">Transcript of <%= @recording&.title %></p>
-          <i class="text-white" data-target="transcription.translation">Translation</i>
+          <p class="text-white text-4xl" data-target="transcription.transcription">Transcript of <%= @recording&.title %></p>
+          <i class="text-white text-xl" data-target="transcription.translation">Translation</i>
         </div>
       </div>
     </div>
