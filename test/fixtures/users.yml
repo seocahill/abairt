@@ -4,6 +4,7 @@ one:
   email: seosamh@seocahill.com
   name: Seosamh Ó Cathail
   password_digest: MyString
+  role: :teacher
 
 two:
   email: dazpatreg@yahoo.ie
