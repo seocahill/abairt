@@ -6,7 +6,12 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.where.not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE").order(:id, :desc)
+    records = DictionaryEntry
+      .joins(:speaker)
+      .where("users.role != ?", 0)
+      .where
+      .not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
+      .order(:id, :desc)
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
