@@ -59,8 +59,10 @@
     <% if current_user %>
       <% if current_user.own_lists.where(starred: nil).any? %>
         <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-action="change->entry#addToList">
-          <option value="default" selected="selected">Add to list</option>
+          <option value="default" selected="selected">On <%= entry.word_lists.size %> lists</option>
           <% current_user.own_lists.where(starred: nil).each do |list| %>
+            <% next if list.dictionary_entries.include? entry %>
+
             <option value="<%= list.id %>"><%= list.name %></option>
           <% end %>
         </select>
