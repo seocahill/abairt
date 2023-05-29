@@ -1,0 +1,96 @@
+name: Main
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # container:
+    #   image: registry.gitlab.com/accounto/nodes/documents-api/test/dev:latest
+    #   credentials:
+    #     username: gh-actions
+    #     password: glpat-f5b8pxQ6D3Vq9gR-Jcw1
+    #   volumes:
+    #     - ${{ github.workspace }}:/app
+
+
+    # If you need DB like PostgreSQL, Redis then define service below.
+    # https://github.com/actions/example-services/tree/master/.github/workflows
+    services:
+      # postgres:
+      #   image: postgres:12
+      #   env:
+      #     POSTGRES_USER: postgres
+      #     POSTGRES_PASSWORD: ""
+      #     POSTGRES_DB: postgres
+      #     POSTGRES_HOST_AUTH_METHOD: trust
+      #   ports:
+      #     - 5432:5432
+      #   # needed because the postgres container does not provide a healthcheck
+      #   # tmpfs makes DB faster by using RAM
+      #   options: >-
+      #     --mount type=tmpfs,destination=/var/lib/postgresql/data
+      #     --health-cmd pg_isready
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    # https://help.github.com/en/articles/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
+    # strategy:
+    #   fail-fast: true
+      # matrix:
+      #   # [n] - where the n is a number of parallel jobs you want to run your tests on.
+      #   # Use a higher number if you have slow tests to split them between more parallel jobs.
+      #   # Remember to update the value of the `ci_node_index` below to (0..n-1).
+      #   ci_node_total: [20]
+      #   # Indexes for parallel jobs (starting from zero).
+      #   # E.g. use [0, 1] for 2 parallel jobs, [0, 1, 2] for 3 parallel jobs, etc.
+      #   ci_node_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+
+    env:
+      RAILS_ENV: test
+      # PGUSER: postgres
+      # PGHOST: localhost
+      GEMFILE_RUBY_VERSION: 3.0.0
+      # DATABASE_HOST: postgres
+      # DATABASE_USER: postgres
+      # RAILS_MASTER_KEY: 42fdb2be835bdae2376117ef2e4e3293
+      # PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+      GROVER_NO_SANDBOX: true
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+      # Rails verifies the time zone in DB is the same as the time zone of the Rails app
+      # TZ: "Europe/Berlin"
+
+    steps:
+      - uses: actions/checkout@v2
+      # - uses: awalsh128/cache-apt-pkgs-action@latest
+      #   with:
+      #     packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef
+      # - name: Set up Ruby
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     # Not needed with a .ruby-version file
+      #     ruby-version: 3.0.6
+      #     # runs 'bundle install' and caches installed gems automatically
+      #     bundler-cache: true
+      - name: Update Dependencies
+        run: |
+          bundle check || bundle install
+          yarn install --immutable --immutable-cache --check-cache
+      - name: Create DB
+        run: |
+          bin/rails db:prepare
+      - name: Run tests
+        # env:
+          # DATABASE_HOST: postgres
+          # CI_NODE_TOTAL: 20
+          # CI_NODE_INDEX: ${{ matrix.ci_node_index }}
+          # RAILS_MASTER_KEY: 42fdb2be835bdae2376117ef2e4e3293
+          # PUPPETEER_TMP_DIR: ${{ runner.temp }}
+        run: |
+          bin/rails test
