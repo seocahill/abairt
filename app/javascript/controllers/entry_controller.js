@@ -9,34 +9,26 @@ export default class extends Controller {
     feather.replace()
   }
 
-  async deanta(e) {
+  play(e) {
     e.preventDefault()
+    this.element.getElementsByTagName("audio")[0].play()
+    // this.audioTarget.play()
+  }
+
+  addToList(e) {
+    const wordListId = e.target.value
     let formData = new FormData()
-    formData.append("dictionary_entry[word_or_phrase]", this.abairtTarget.innerText)
-    formData.append("dictionary_entry[translation]", this.translationTarget.innerText)
-    formData.append("dictionary_entry[notes]", this.notesTarget.innerText)
-    if (this.hasMediaTarget) {
-      formData.append("dictionary_entry[media]", this.mediaTarget.value)
-    }
-    formData.append("dictionary_entry[status]", "normal")
-    let response = await fetch(this.urlValue, {
+    formData.append("word_list_dictionary_entry[dictionary_entry_id]", this.idValue)
+    formData.append("word_list_dictionary_entry[word_list_id]", wordListId)
+    fetch("/word_list_dictionary_entries", {
       body: formData,
-      method: 'PATCH',
+      method: 'POST',
       credentials: "include",
       dataType: "script",
       headers: {
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
     })
-    if (response.ok) {
-      this.element.parentNode.removeChild(this.element);
-    }
-  }
-
-  play(e) {
-    e.preventDefault()
-    this.element.getElementsByTagName("audio")[0].play()
-    // this.audioTarget.play()
   }
 
   show() {
