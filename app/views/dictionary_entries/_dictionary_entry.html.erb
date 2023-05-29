@@ -1,4 +1,4 @@
-<tr class="bg-white" id="<%= dom_id(entry) %>" data-controller="entry">
+<tr class="bg-white" id="<%= dom_id(entry) %>" data-controller="entry" data-entry-id-value="<%= entry.id %>">
   <td class="py-2 px-4 border-gray-200 w-1/4">
     <% if current_user %>
       <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
@@ -58,9 +58,9 @@
   <td>
     <% if current_user %>
       <% if current_user.own_lists.where(starred: nil).any? %>
-        <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-controller="list">
+        <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-action="change->entry#addToList">
+          <option value="default" selected="selected">Add to list</option>
           <% current_user.own_lists.where(starred: nil).each do |list| %>
-            <option value="default" selected="selected">Add to list</option>
             <option value="<%= list.id %>"><%= list.name %></option>
           <% end %>
         </select>
