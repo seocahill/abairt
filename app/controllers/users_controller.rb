@@ -14,6 +14,11 @@ class UsersController < ApplicationController
       records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
     end
 
+    if params[:dialect].present?
+      value =  User.dialects[params[:dialect]]
+      records = User.where("users.dialect = ?", value)
+    end
+
     @showmap = params[:map]
 
     @pins = User.where.not(lat_lang: nil).map do |g|
