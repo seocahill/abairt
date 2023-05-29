@@ -57,12 +57,16 @@
   </td>
   <td>
     <% if current_user %>
-      <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-controller="list">
-        <% current_user.own_lists.where(starred: nil).each do |list| %>
-          <option value="default" selected="selected">Add to list</option>
-          <option value="<%= list.id %>"><%= list.name %></option>
-        <% end %>
+      <% if current_user.own_lists.where(starred: nil).any? %>
+        <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-controller="list">
+          <% current_user.own_lists.where(starred: nil).each do |list| %>
+            <option value="default" selected="selected">Add to list</option>
+            <option value="<%= list.id %>"><%= list.name %></option>
+          <% end %>
         </select>
+      <% elsif current_user %>
+        <%= link_to "Create your first list", word_lists_path, class: "cursor-pointer, hover:text-blue-700 hover:underline" %>
+      <% end %>
     <% end %>
   </td>
   <td class="py-2 px-4 text-center border-gray-200 w-1/12">
