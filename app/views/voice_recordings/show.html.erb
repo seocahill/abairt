@@ -93,7 +93,7 @@
           <thead>
             <tr class="bg-gray-100 text-left">
               <th class="w-1/6 py-2 px-4 border-gray-200">Speaker</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200">Position</th>
+              <th class="w-1/6 py-2 px-4 border-gray-200">Range</th>
               <th class="w-1/6 py-2 px-4 border-gray-200">Irish</th>
               <th class="w-1/6 py-2 px-4 border-gray-200">English</th>
               <th class="w-1/6 py-2 px-4 border-gray-200">Audio</th>
@@ -103,8 +103,8 @@
           <tbody id="transcriptions">
             <% @entries.each do |entry| %>
               <tr class="bg-white" id="<%= dom_id(entry) %>">
-                <td class="py-2 px-4 border-gray-200"><%= entry.speaker.name %></td>
-                <td class="py-2 px-4 border-gray-200"><%= entry.region_start %>:<%= entry.region_end %></td>
+                <td class="py-2 px-4 border-gray-200"><%= link_to entry.speaker.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %></td>
+                <td class="py-2 px-4 border-gray-200"><%= entry.region_start.round(1) %>-<%= entry.region_end.round(1) %></td>
                 <td class="py-2 px-4 border-gray-200">
                   <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
                     <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase" %>
@@ -116,13 +116,15 @@
                   <% end %>
                 </td>
                 <td data-controller="entry" class="py-2 px-4 border-gray-200">
-                  <a href="#" data-action="entry#play" class="text-blue">
+                  <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 mt-2 text-white font-bold py-2 px-4 rounded">
                     <audio src="<%= entry.media.url %>"></audio>
                     play
                   </a>
                 </td>
                 <td class="py-2 px-4 border-gray-200">
-                  <%= link_to 'Delete', dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' } %>
+                  <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' } do %>
+                    <i data-feather="trash"></i>
+                  <% end %>
                 </td>
               </tr>
             <% end %>
