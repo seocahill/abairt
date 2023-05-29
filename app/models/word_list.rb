@@ -8,4 +8,14 @@ class WordList < ApplicationRecord
 
   has_many :user_lists, dependent: :destroy
   has_many :users, through: :user_lists
+
+  def to_csv
+    CSV.generate(headers: true) do |csv|
+      csv << %w[front back audio]
+
+      dictionary_entries.find_each do |entry|
+        csv << [entry.word_or_phrase, entry.translation, entry.media.url]
+      end
+    end
+  end
 end

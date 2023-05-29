@@ -5,15 +5,22 @@ class WordListsController < ApplicationController
   # GET /word_lists
   def index
     records = WordList.where("id is not null AND starred is not true")
+
     if params[:search].present?
       records = WordList.where(starred: nil).where("name LIKE ? OR description LIKE ?", "%#{params[:search]}%", "%#{params[:search]}%")
     end
+
     @pagy, @word_lists = pagy(records, items: PAGE_SIZE)
   end
 
   # GET /word_lists/1
   def show
     @pagy, @entries = pagy(@word_list.dictionary_entries, items: PAGE_SIZE)
+    respond_to do |format|
+      format.html
+      format.csv { send_data @word_list.to_csv, filename: "#{@word_list.name}.csv" }
+      format.json { render json: records }
+    end
   end
 
   # GET /word_lists/new
