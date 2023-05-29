@@ -37,6 +37,7 @@ jobs:
         run: |
           bundle check || bundle install
           yarn install --immutable --immutable-cache --check-cache
+          bin/rails assets:precompile
       - name: Create DB
         run: |
           bin/rails db:prepare
