@@ -59,11 +59,11 @@ jobs:
         uses: tanmancan/action-setup-ssh-agent-key@1.0.0
         with:
           ssh-private-key: ${{ secrets.ABAIRT_PRIVATE_KEY }}
-        run: ssh -T root@abairt.com "echo 'hello from abairt'"
 
-      # - name: Deploy to docker remote host
-      #   run: |
-      #     eval $(ssh-agent -s)
+      - name: Deploy to docker remote host
+        run: |
+          ssh -T root@abairt.com "echo 'hello from abairt'"
+
       #     chmod 400 "$SSH_PRIVATE_KEY"
       #     ssh-add "$SSH_PRIVATE_KEY"
       #     docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
