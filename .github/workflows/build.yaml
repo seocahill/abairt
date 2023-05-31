@@ -10,11 +10,6 @@
 name: Create and publish a Docker image
 
 on:
-  workflow_run:
-    workflows:
-      - Test
-    types:
-      - completed
   push:
     branches:
       - master
@@ -62,11 +57,11 @@ jobs:
 
       - name: Deploy to docker remote host
         run: |
-          chmod 400 "${{ secrets.ABAIRT_PRIVATE_KEY }}"
-          ssh-add "${{ secrets.ABAIRT_PRIVATE_KEY }}"
+          chmod 400 ${{ secrets.ABAIRT_PRIVATE_KEY }}
+          ssh-add ${{ secrets.ABAIRT_PRIVATE_KEY }}
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          cp "${{ secrets.SSH_KNOWN_HOSTS }}" ~/.ssh/known_hosts
+          cp ${{ secrets.SSH_KNOWN_HOSTS }} ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
           unset DOCKER_HOST
           docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
