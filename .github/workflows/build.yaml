@@ -55,22 +55,25 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Setup SSH Agent and Key
-        uses: tanmancan/action-setup-ssh-agent-key@1.0.0
-        with:
-          ssh-private-key: ${{ secrets.ABAIRT_PRIVATE_KEY }}
+      # - name: Setup SSH Agent and Key
+      #   uses: tanmancan/action-setup-ssh-agent-key@1.0.0
+      #   with:
+      #     ssh-private-key: ${{ secrets.ABAIRT_PRIVATE_KEY }}
 
       - name: Deploy to docker remote host
         run: |
-          ssh -T root@abairt.com "echo 'hello from abairt'"
-
-      #     chmod 400 "$SSH_PRIVATE_KEY"
-      #     ssh-add "$SSH_PRIVATE_KEY"
-      #     docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-      #     docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
-      #     docker context use abairt
-      #     docker system prune -f
-      #     docker service ls
-      #     docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
-      #     docker service update abairt_rails --image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
-      #     docker service inspect abairt_rails
+          chmod 400 "${{ secrets.ABAIRT_PRIVATE_KEY }}"
+          ssh-add "${{ secrets.ABAIRT_PRIVATE_KEY }}"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          cp "${{ secrets.SSH_KNOWN_HOSTS }}" ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          unset DOCKER_HOST
+          docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
+          docker context use abairt
+          docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          docker system prune -f
+          docker service ls
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          docker service update abairt_rails --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          docker service inspect abairt_rails
