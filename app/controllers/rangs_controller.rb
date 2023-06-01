@@ -52,7 +52,6 @@ class RangsController < ApplicationController
 
     respond_to do |format|
       if @rang.save
-        @rang.send_notification
         format.html { redirect_to rangs_path(chat: @rang.id), notice: 'Rang was successfully created.' }
         format.json { render :show, status: :created, location: @rang }
       else
@@ -68,7 +67,6 @@ class RangsController < ApplicationController
       @rang.assign_attributes(rang_params)
 
       if @rang.save
-        @rang.send_notification
         format.html { redirect_to rangs_path(chat: @rang.id), notice: 'Rang was successfully updated.' }
         format.json { render :show, status: :ok, location: @rang }
       else
