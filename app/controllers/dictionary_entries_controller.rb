@@ -85,7 +85,7 @@ class DictionaryEntriesController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             @dictionary_entry,
-            partial: "dictionary_entry",
+            partial: partial,
             locals: { entry: @dictionary_entry, current_user: current_user, starred: current_user.starred }
           )
         end
@@ -109,6 +109,11 @@ class DictionaryEntriesController < ApplicationController
   end
 
   private
+
+  def partial
+    # hack but it'll do for now
+    @dictionary_entry.voice_recording_id ? "voice_recordings/dictionary_entries/dictionary_entry" : "dictionary_entry"
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_dictionary_entry
