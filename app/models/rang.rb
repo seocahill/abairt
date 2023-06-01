@@ -11,7 +11,6 @@ class Rang < ApplicationRecord
   belongs_to :teacher, class_name: "User", foreign_key: "user_id"
 
   before_create :generate_meeting_id
-  # after_commit :send_notification, if: -> { ENV['NOTIFICATIONS_ENABLED'] == "true" }
 
   accepts_nested_attributes_for :users, reject_if: ->(attributes){ attributes['email'].blank? }, allow_destroy: true
 
@@ -21,16 +20,6 @@ class Rang < ApplicationRecord
 
     time.strftime("%b %e, %l:%M %p %Z")
   end
-
-  # def participants
-  #   users.pluck(:email)
-  # end
-
-  # def send_notification
-  #   return unless time
-
-  #   NotificationsMailer.with(rang: self).ceád_rang_eile.deliver
-  # end
 
   private
 
