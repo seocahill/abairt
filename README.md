@@ -83,3 +83,11 @@ Lists can be downloaded as csvs for use in spaced repition apps like anki.
 ## Notes on Libs
 - Rufus for wrapping cron
 - yui-compressor to get around sassc tailwind incompatibility
+
+## Splitting big file
+
+Caching might help but generally avoid longer than 10 minutes. Maybe set upload limit.
+
+```
+ffmpeg -i ~/Desktop/turas-siar-59.mp3 -ss 00:00:00 -t 00:10:00 -acodec copy ~/Desktop/turas-siar-59-a.mp3
+```
