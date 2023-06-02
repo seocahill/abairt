@@ -29,6 +29,11 @@ Rails.application.routes.draw do
 
   resources :word_list_dictionary_entries, only: [:create, :destroy]
 
+  get 'password_resets/new'
+  post 'password_resets', to: 'password_resets#create'
+  get 'password_resets/:token/edit', to: 'password_resets#edit', as: 'password_reset'
+  patch 'password_resets/:token', to: 'password_resets#update'
+
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   root to: "home#index"
 end

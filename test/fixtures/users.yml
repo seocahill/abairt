@@ -25,3 +25,8 @@ five:
   email: Padraic Ó Murachú@abairt.com
   name: Padraic Ó Murachú
   password_digest: MyString
+
+john:
+  email: john@abairt.com
+  name: John McShean
+  password_digest: jonnypass

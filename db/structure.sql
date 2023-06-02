@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_data'(id INTEGER PRIMARY KEY,
 CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
 CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS "users" ("id" integer NOT NULL PRIMARY KEY, "email" varchar(255) DEFAULT NULL, "name" varchar(255) DEFAULT NULL, "password_digest" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT 0 NOT NULL, "token" varchar(255) DEFAULT NULL, "master_id" integer DEFAULT NULL, "grupa_id" integer DEFAULT NULL, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL);
+CREATE TABLE IF NOT EXISTS "users" ("id" integer NOT NULL PRIMARY KEY, "email" varchar(255) DEFAULT NULL, "name" varchar(255) DEFAULT NULL, "password_digest" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT 0 NOT NULL, "token" varchar(255) DEFAULT NULL, "master_id" integer DEFAULT NULL, "grupa_id" integer DEFAULT NULL, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "password_reset_token" varchar, "password_reset_sent_at" datetime);
 CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
 CREATE INDEX "index_users_on_token" ON "users" ("token");
 CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
@@ -181,6 +181,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230520225514'),
 ('20230520225609'),
 ('20230520230902'),
-('20230521083532');
+('20230521083532'),
+('20230602173347');
 
 
