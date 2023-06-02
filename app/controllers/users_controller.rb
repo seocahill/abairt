@@ -114,7 +114,10 @@ class UsersController < ApplicationController
   end
 
   def authorize
-    return if current_user
+    # when params present have to be logged into own account to edit/destroy/update
+    return if current_user && (current_user&.id == params[:id])
+    # for new and create a teacher or admin can access
+    return if current_user.teacher? || current_user.admin?
 
     redirect_to root_path
   end
