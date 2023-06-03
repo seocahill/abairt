@@ -123,10 +123,10 @@ Rails.application.configure do
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
   config.action_mailer.smtp_settings = {
-    :user_name      => 'apikey',
-    :password       => Rails.application.credentials.dig(:sendgrid, :password),
+    :user_name      => 'ses-abairt-mail',
+    :password       => Rails.application.credentials.dig(:ses, :password),
     :domain         => 'abairt.com',
-    :address        => 'smtp.sendgrid.net',
+    :address        => 'email-smtp.eu-central-1.amazonaws.com',
     :port           => 587,
     :authentication => :plain,
     :enable_starttls_auto => true
