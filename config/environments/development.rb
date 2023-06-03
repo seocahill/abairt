@@ -77,15 +77,15 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
-  config.action_mailer.smtp_settings = {
-    :user_name      => 'apikey',
-    :password       => ENV['SENDGRID_PASSWORD'],
-    :domain         => 'abairt.com',
-    :address        => 'smtp.sendgrid.net',
-    :port           => 587,
-    :authentication => :plain,
-    :enable_starttls_auto => true
-  }
+  # config.action_mailer.smtp_settings = {
+  #   :user_name      => 'apikey',
+  #   :password       => ENV['SENDGRID_PASSWORD'],
+  #   :domain         => 'abairt.com',
+  #   :address        => 'smtp.sendgrid.net',
+  #   :port           => 587,
+  #   :authentication => :plain,
+  #   :enable_starttls_auto => true
+  # }
   config.action_mailer.perform_deliveries = false
   config.delivery_method = :test
   config.action_mailer.default_url_options = { host: "abairt.com" }
