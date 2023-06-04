@@ -88,5 +88,5 @@ Rails.application.configure do
   # }
   config.action_mailer.perform_deliveries = false
   config.delivery_method = :test
-  config.action_mailer.default_url_options = { host: "abairt.com" }
+  config.action_mailer.default_url_options = { host: "localhost", port: "3000" }
 end
