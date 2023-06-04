@@ -5,6 +5,6 @@ class NotificationsMailerTest < ActionMailer::TestCase
     mail = NotificationsMailer.with(user: users(:one)).recent_messages
     assert_equal "You have received 1 messages since yesterday", mail.subject
     assert_equal [users(:one).email], mail.to
-    assert_equal ['abairt@abairt.com'], mail.from
+    assert_equal ['info@abairt.com'], mail.from
   end
 end
