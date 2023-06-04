@@ -122,15 +122,13 @@ Rails.application.configure do
   # config.active_record.database_selector = { delay: 2.seconds }
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+  config.x.mail_from = %(Abairt <info@abairt.com>)
   config.action_mailer.smtp_settings = {
-    :user_name      => 'ses-abairt-mail',
-    :password       => Rails.application.credentials.dig(:ses, :password),
-    :domain         => 'abairt.com',
-    :address        => 'email-smtp.eu-central-1.amazonaws.com',
-    :port           => 587,
-    :authentication => :plain,
-    :enable_starttls_auto => true
+    user_name:       Rails.application.credentials.dig(:mailjet, :username),
+    password:        Rails.application.credentials.dig(:mailjet, :password),
+    address:         'in-v3.mailjet.com',
+    port:            587,
   }
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { host: "abairt.com" }
+  config.delivery_method = :smtp
+  config.action_mailer.default_url_options = { host: "abairt.com", protocol: 'https' }
 end
