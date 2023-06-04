@@ -86,7 +86,7 @@ deploy:
     - unset DOCKER_HOST
   script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker context create abairt --description "Abairt" --docker "host=ssh://root@abairt.com"
+    - docker context create abairt --description "Abairt" --docker "host=ssh://root@139.59.188.211"
     - docker context use abairt
     - docker system prune -f
     - docker service ls
