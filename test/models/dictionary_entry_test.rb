@@ -1,7 +1,8 @@
 require "test_helper"
 
 class DictionaryEntryTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test "uniqueness" do
+    refute DictionaryEntry.new(word_or_phrase: dictionary_entries(:one).word_or_phrase).valid?
+    assert DictionaryEntry.new(word_or_phrase: dictionary_entries(:one).word_or_phrase, voice_recording_id: 1).valid?
+  end
 end
