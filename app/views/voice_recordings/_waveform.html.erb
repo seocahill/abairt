@@ -1,7 +1,10 @@
 
- <turbo-frame id="wave_display">
+ <turbo-frame id="wave_display" class="w-full">
   <div data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording&.media&.attached? %>" data-transcription-regions-value="<%= @regions %>">
     <div class="flex items-center space-x-4 p-4">
+    <% if @recording&.media&.video? %>
+      <%= video_tag(@recording.media.url, size: "200", data: { "transcription-target": "video" }) %>
+    <% end %>
     <% if @recording %>
       <div id="waveform" class="flex-grow" data-transcription-target="waveform"></div>
     <% else %>
