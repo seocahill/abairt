@@ -88,7 +88,7 @@ deploy:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - docker context create abairt --description "Abairt" --docker "host=ssh://root@139.59.188.211"
     - docker context use abairt
-    - docker system prune -f
+    - docker system prune -af
     - docker service ls
     - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
     - docker service update abairt_rails --image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
