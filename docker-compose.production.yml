@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:f1954aaba2a94ce458a7e2625ea1081add3bec60
+    image: registry.gitlab.com/abairt/web-application:96e27d8dc855177a3afecc259c34e6be7537e9bb
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
@@ -40,7 +40,7 @@ services:
     deploy:
       replicas: 1
     secrets:
-      - source: litestream_v4
+      - source: litestream_v5
         target: /etc/litestream.yml
     volumes:
       - db:/data
@@ -65,7 +65,7 @@ configs:
     file: ./Caddyfile
 
 secrets:
-  litestream_v4:
+  litestream_v5:
     file: ./litestream.yml
   master_key:
     file: ./config/master.key
