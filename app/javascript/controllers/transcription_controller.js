@@ -3,7 +3,7 @@ import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
-  static targets = ["time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs"]
+  static targets = ["time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs", "video"]
   static values = { media: String, regions: Array }
 
   initialize() {
@@ -54,8 +54,8 @@ export default class extends Controller {
         })
       ]
     })
-
-    this.waveSurfer.load(this.mediaValue);
+    const mediaFile = (this.hasVideoTarget ? this.videoTarget : this.mediaValue);
+    this.waveSurfer.load(mediaFile);
 
     this.waveSurfer.on('loading', function (progress) {
       if (progress < 99) {
