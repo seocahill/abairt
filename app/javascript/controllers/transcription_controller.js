@@ -3,7 +3,7 @@ import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
-  static targets = ["time", "wordSearch", "tagSearch", "waveform", "startRegion", "endRegion", "regionId", "transcription", "translation", "engSubs", "gaeSubs", "video"]
+  static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video"]
   static values = { media: String, regions: Array }
 
   initialize() {
@@ -118,9 +118,9 @@ export default class extends Controller {
     })
 
     this.waveSurfer.on('region-click', function (region) {
-      that.startRegionTarget.children[0].value = Math.round(region.start * 10) / 10
-      that.endRegionTarget.children[0].value = Math.round(region.end * 10) / 10
-      that.regionIdTarget.children[0].value = region.id
+      document.getElementById('dictionary_entry_region_start').value = Math.round(region.start * 10) / 10
+      document.getElementById('dictionary_entry_region_end').value = Math.round(region.end * 10) / 10
+      document.getElementById('dictionary_entry_region_id').value = region.id
     })
   }
 

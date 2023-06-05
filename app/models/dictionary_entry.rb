@@ -64,10 +64,12 @@ class DictionaryEntry < ApplicationRecord
     output_path = "/tmp/#{region_id}.mp3"
     File.delete output_path rescue nil
     voice_recording.media.open do |file|
-
-      # Extract the selected region and save it as a new MP3 file using ffmpeg
-      stdout, stderr, status = Open3.capture3("ffmpeg -ss #{region_start} -i #{file.path} -t #{duration} -c:a copy #{output_path}")
-
+      if voice_recording.media.audio?
+        # Extract the selected region and save it as a new MP3 file using ffmpeg
+        stdout, stderr, status = Open3.capture3("ffmpeg -ss #{region_start} -i #{file.path} -t #{duration} -c:a copy #{output_path}")
+      else
+        stdout, stderr, status = Open3.capture3("ffmpeg -ss #{region_start} -i #{file.path} -t #{duration} -vn #{output_path}")
+      end
       # Attach the new file to a Recording model using Active Storage
       self.media.attach(io: File.open(output_path), filename: "#{region_id}.mp3")
     end
