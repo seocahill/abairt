@@ -11,8 +11,4 @@ class VoiceRecording < ApplicationRecord
   def meeting_id
     SecureRandom.uuid
   end
-
-  def percentage_complete
-    rand(99).to_s + "%"
-  end
 end
