@@ -13,16 +13,16 @@ export default class extends Controller {
   }
 
   resetForm(target) {
-    if (target.elements['dictionary_entry[media]'] instanceof RadioNodeList) {
-      target.elements['dictionary_entry[media]'].forEach((item) => {
+    if (document.getElementById('dictionary_entry_media') instanceof RadioNodeList) {
+      document.getElementById('dictionary_entry_media').forEach((item) => {
         if (item.type === "hidden") {
           item.remove()
         }
       })
     }
-    let transcription = target.elements['dictionary_entry[word_or_phrase]'].value;
-    let translation = target.elements['dictionary_entry[translation]'].value;
-    let regionId = target.elements['dictionary_entry[region_id]'].value;
+    let transcription = document.getElementById('dictionary_entry_word_or_phrase').value;
+    let translation = document.getElementById('dictionary_entry_translation').value;
+    let regionId = document.getElementById('dictionary_entry_region_id').value;
     if (regionId) {
       let region = this.waveSurfer.regions.list[regionId];
       region.update({ data: { transcription: transcription, translation: translation } })
