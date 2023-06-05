@@ -13,12 +13,15 @@ export default class extends Controller {
       selector: "#autoCompleteLocation",
       placeHolder: "Déan cuardach ar áit...",
       debounce: 300,
-      threshold: 2,
+      threshold: 3,
+      searchEngine: function (query, record) {
+        return record
+      },
       data: {
         src: async (query) => {
           try {
             // Fetch Data from external Source
-            var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=10';
+            var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=20';
             const source = await fetch(url, { headers: { accept: "application/json" } });
             // Data is array of `Objects` | `Strings`
             const data = await source.json();
