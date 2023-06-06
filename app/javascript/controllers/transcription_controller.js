@@ -41,11 +41,9 @@ export default class extends Controller {
     let that = this;
     const mediaFile = this.mediaValue
     // Fetch the audio file separately with custom headers
-    fetch(mediaFile, {
-        headers: {
-          cache: 'force-cache'
-        },
-      })
+    fetch(mediaFile, { cache: 'force-cache', headers: {
+      "Cache-Control": "force-cache"
+    }})
       .then(response => response.arrayBuffer())
       .then(audioData => {
         let mediaElement;
@@ -61,6 +59,7 @@ export default class extends Controller {
         this.waveSurfer = WaveSurfer.create({
           backend: 'MediaElement',
           container: '#waveform',
+          audioContext: mediaElement,
           // audioContext: audio,
           partialRender: false,
           pixelRatio: 1,
