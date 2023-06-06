@@ -39,89 +39,111 @@ export default class extends Controller {
     let playButton = this.element.querySelector('#play-pause-button');
     playButton.innerHTML = "Preparing wave....";
     let that = this;
-    this.waveSurfer = WaveSurfer.create({
-      backend: 'MediaElement',
-      container: '#waveform',
-      // waveColor: 'violet',
-      // progressColor: 'purple',
-      partialRender: false,
-      pixelRatio: 1,
-      scrollParent: true,
-      // normalize: true,
-      plugins: [
-        RegionsPlugin.create({
-          dragSelection: true,
-        })
-      ]
-    })
-    const mediaFile = (this.hasVideoTarget ? this.videoTarget : this.mediaValue);
-    this.waveSurfer.load(mediaFile);
-
-    this.waveSurfer.on('loading', function (progress) {
-      if (progress < 99) {
-        playButton.innerHTML = `loading ${progress}%`;
-      } else {
-        playButton.innerHTML = "Play / Pause";
-      }
-    })
-
-    this.waveSurfer.on('ready', function() {
-      playButton.innerHTML = "Play / Pause";
-      that.regionsValue.forEach((region) => {
-        that.waveSurfer.addRegion({
-          id: region.region_id,
-          start: region.region_start,
-          end: region.region_end,
-          data: { transcription: region.word_or_phrase, translation: region.translation }
-        });
+    const mediaFile = this.mediaValue
+    // Fetch the audio file separately with custom headers
+    fetch(mediaFile, {
+        headers: {
+          cache: 'force-cache'
+        },
       })
-    })
+      .then(response => response.arrayBuffer())
+      .then(audioData => {
+        let mediaElement;
+        if (this.hasVideoTarget) {
+          mediaElement = this.videoTarget;
+        } else {
+          mediaElement = new Audio()
+        }
 
-    this.waveSurfer.on('region-in', (region) => {
-      if (that.gaeSubsTarget.checked) {
-        that.transcriptionTarget.innerText = region.data.transcription
-      }
-      if (that.engSubsTarget.checked) {
-        that.translationTarget.innerText = region.data.translation
-      }
-    });
+        mediaElement.src = URL.createObjectURL(new Blob([audioData]));
 
-    this.waveSurfer.on('region-out', (region) => {
-      that.transcriptionTarget.innerText = "~";
-      that.translationTarget.innerText = "~";
-    });
+        // Initialize WaveSurfer with the preloaded audio element
+        this.waveSurfer = WaveSurfer.create({
+          backend: 'MediaElement',
+          container: '#waveform',
+          // audioContext: audio,
+          partialRender: false,
+          pixelRatio: 1,
+          scrollParent: true,
+          // normalize: true,
+          plugins: [
+            RegionsPlugin.create({
+              dragSelection: true,
+            })
+          ]
+        });
 
-    this.waveSurfer.on('audioprocess', function () {
-      if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
-        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-      }
-    })
+        this.waveSurfer.on('ready', function () {
+          playButton.innerHTML = "Play / Pause";
+          that.regionsValue.forEach((region) => {
+            that.waveSurfer.addRegion({
+              id: region.region_id,
+              start: region.region_start,
+              end: region.region_end,
+              data: { transcription: region.word_or_phrase, translation: region.translation }
+            });
+          })
+        })
 
-    this.waveSurfer.on('seek', function() {
-      if (that.hasTimeTarget) {
-        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-      }
-    })
+        this.waveSurfer.on('region-in', (region) => {
+          if (that.gaeSubsTarget.checked) {
+            that.transcriptionTarget.innerText = region.data.transcription
+          }
+          if (that.engSubsTarget.checked) {
+            that.translationTarget.innerText = region.data.translation
+          }
+        });
 
-    this.waveSurfer.on('region-click', function (region, e) {
-      e.stopPropagation();
-      // // Play on click, loop on shift click
-      if (e.altKey) {
-        // alt/option + click logic here (e.g., region.remove())
-        region.remove();
-      } else if (e.shiftKey) {
-        region.playLoop();
-      } else {
-        // Single click logic here (e.g., region.play())
-        region.play();
-      }
-    })
+        this.waveSurfer.on('region-out', (region) => {
+          that.transcriptionTarget.innerText = "~";
+          that.translationTarget.innerText = "~";
+        });
 
-    this.waveSurfer.on('region-click', function (region) {
-      document.getElementById('dictionary_entry_region_start').value = Math.round(region.start * 10) / 10
-      document.getElementById('dictionary_entry_region_end').value = Math.round(region.end * 10) / 10
-      document.getElementById('dictionary_entry_region_id').value = region.id
-    })
+        this.waveSurfer.on('audioprocess', function () {
+          if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
+            that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+          }
+        })
+
+        this.waveSurfer.on('seek', function () {
+          if (that.hasTimeTarget) {
+            that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+          }
+        })
+
+        this.waveSurfer.on('region-click', function (region, e) {
+          e.stopPropagation();
+          // // Play on click, loop on shift click
+          if (e.altKey) {
+            // alt/option + click logic here (e.g., region.remove())
+            region.remove();
+          } else if (e.shiftKey) {
+            region.playLoop();
+          } else {
+            // Single click logic here (e.g., region.play())
+            region.play();
+          }
+        })
+
+        this.waveSurfer.load(mediaElement);
+
+        this.waveSurfer.on('loading', function (progress) {
+          if (progress < 99) {
+            playButton.innerHTML = `loading ${progress}%`;
+          } else {
+            playButton.innerHTML = "Play / Pause";
+          }
+        })
+
+        this.waveSurfer.on('region-click', function (region) {
+          document.getElementById('dictionary_entry_region_start').value = Math.round(region.start * 10) / 10
+          document.getElementById('dictionary_entry_region_end').value = Math.round(region.end * 10) / 10
+          document.getElementById('dictionary_entry_region_id').value = region.id
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      });
   }
 
 
