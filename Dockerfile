@@ -114,7 +114,7 @@ RUN \
 # second stage
 FROM ruby:3.0-slim as prod
 COPY --from=builder /app/ /app/
-COPY --from=builder --chmod=755 /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
+COPY --from=builder --chmod=777 /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
 RUN apt update && apt install -y \
   ffmpeg \
   libboost-filesystem-dev \
@@ -125,10 +125,10 @@ RUN apt update && apt install -y \
   libmad0 \
   libsndfile1 \
   sqlite3
-# RUN useradd -r -u 1001 -g root nonroot
-# RUN chown -R nonroot /app
-# USER nonroot
-# WORKDIR /app
-# EXPOSE 3000
-# ENV RAILS_ENV="production"
-# CMD ["bin/rails", "server"]
+RUN useradd -r -u 1001 -g root nonroot
+RUN chown -R nonroot /app
+USER nonroot
+WORKDIR /app
+EXPOSE 3000
+ENV RAILS_ENV="production"
+CMD ["bin/rails", "server"]
