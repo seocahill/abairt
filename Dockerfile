@@ -1,7 +1,7 @@
 # first stage
-# ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
+ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
 
-# FROM ${GEM_IMAGE} as gem-cache
+FROM ${GEM_IMAGE} as gem-cache
 FROM ruby:3.0-slim as builder
 USER root
 ENV RAILS_ENV="production"
@@ -100,7 +100,7 @@ RUN \
   make package
 
 COPY . /app
-# COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
+COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
 WORKDIR /app
 RUN \
   bundle config set deployment 'true' && \
