@@ -9,9 +9,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   before_action do
-    if Rails.env.production?
-      ActiveStorage::Current.host = "https://assets.abairt.com"
-    else
+    if Rails.env.development?
       ActiveStorage::Current.host = request.url
     end
   end
