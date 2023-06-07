@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
   static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video"]
-  static values = { media: String, regions: Array }
+  static values = { media: String, regions: Array, peaks: Array }
 
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
@@ -55,6 +55,8 @@ export default class extends Controller {
 
         mediaElement.src = URL.createObjectURL(new Blob([audioData]));
 
+        console.log(that.peaksValue)
+
         // Initialize WaveSurfer with the preloaded audio element
         this.waveSurfer = WaveSurfer.create({
           backend: 'MediaElement',
@@ -65,6 +67,7 @@ export default class extends Controller {
           pixelRatio: 1,
           scrollParent: true,
           // normalize: true,
+          peaks: that.peaksValue,
           plugins: [
             RegionsPlugin.create({
               dragSelection: true,
