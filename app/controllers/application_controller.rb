@@ -9,8 +9,11 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   before_action do
-    asset_url = ENV.fetch("ASSET_HOST", request.url)
-    ActiveStorage::Current.host = asset_url
+    if Rails.env.production?
+      ActiveStorage::Current.host = "https://assets.abairt.com"
+    else
+      ActiveStorage::Current.host = request.url
+    end
   end
 
   def authorize
