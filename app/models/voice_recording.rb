@@ -16,7 +16,7 @@ class VoiceRecording < ApplicationRecord
   def generate_peaks
     require 'open3'
 
-    return unless media.changed? || peaks.empty?
+    return unless media.changed? || peaks.blank?
     # Set the output file path and delete cache
     output_path = "/tmp/#{media.key}.json"
     File.delete output_path rescue nil
