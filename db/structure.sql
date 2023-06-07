@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS "users" ("id" integer NOT NULL PRIMARY KEY, "email" v
 CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
 CREATE INDEX "index_users_on_token" ON "users" ("token");
 CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar, "description" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar, "description" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json);
 CREATE TABLE IF NOT EXISTS "conversations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "voice_recording_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_7c15d62a0a"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -182,6 +182,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230520225609'),
 ('20230520230902'),
 ('20230521083532'),
-('20230602173347');
+('20230602173347'),
+('20230607103341');
 
 

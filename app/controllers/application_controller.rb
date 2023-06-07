@@ -8,6 +8,11 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
 
+  before_action do
+    asset_url = ENV.fetch("ASSET_HOST", request.url)
+    ActiveStorage::Current.host = asset_url
+  end
+
   def authorize
     return if current_user
 
@@ -16,11 +21,5 @@ class ApplicationController < ActionController::Base
 
   def current_user
     User.find_by(id: session[:user_id])
-  end
-
-  before_action do
-    if Rails.env.development?
-      ActiveStorage::Current.host = (request.url || "http://localhost:3000")
-    end
   end
 end
