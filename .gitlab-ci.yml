@@ -23,7 +23,7 @@ build deploy image:
       --cache-from $CI_DEPLOY_IMAGE
       --tag $CI_DEPLOY_IMAGE
       --tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
-    - docker push ${CI_REGISTRY_IMAGE}
+    - docker push -a ${CI_REGISTRY_IMAGE}
   only:
     - master
 
