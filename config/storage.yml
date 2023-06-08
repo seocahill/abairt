@@ -17,8 +17,9 @@ amazon:
     cache_control: 'private, max-age=31536000'
 
 cloudflare:
-  service: S3
+  service: Cloudflare
   endpoint: https://<%= Rails.application.credentials.dig(:cloudflare, :account_id) %>.r2.cloudflarestorage.com
+  public: true
   access_key_id: <%= Rails.application.credentials.dig(:cloudflare, :access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
   region: auto
