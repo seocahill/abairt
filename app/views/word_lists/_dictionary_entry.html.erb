@@ -12,8 +12,10 @@
     <% end %>
   </td>
   <td class="py-2 px-4 text-center border-gray-200">
-    <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: list.id }}, class: "flex items-center" do %>
-      Remove from list
+    <% if current_user && list.owner == current_user %>
+      <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: list.id }}, class: "flex items-center" do %>
+        Remove from list
+      <% end %>
     <% end %>
   </td>
 </tr>
