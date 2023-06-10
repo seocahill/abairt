@@ -4,15 +4,13 @@ class ApplicationController < ActionController::Base
   include Pagy::Backend
   include Authentication
   include SetCurrentRequestDetails
+  unless Rails.env.production?
+    include ActiveStorage::SetCurrent
+  end
+
   PAGE_SIZE = 15
 
   helper_method :current_user
-
-  before_action do
-    if Rails.env.development?
-      ActiveStorage::Current.host = request.url
-    end
-  end
 
   def authorize
     return if current_user
