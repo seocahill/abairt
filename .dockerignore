@@ -29,3 +29,7 @@ litestream.yml
 **/test
 **/secrets
 **/.ssh
+queue.db
+queue.db-shm
+queue.db-wal
+*queue*

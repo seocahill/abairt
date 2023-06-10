@@ -3,7 +3,7 @@ class VoiceRecording < ApplicationRecord
   has_many :conversations, dependent: :destroy
   has_many :users, through: :conversations
   has_many :dictionary_entries
-  before_save :generate_peaks
+  after_commit :enqueue_generate_peaks_job
 
   accepts_nested_attributes_for :conversations
 
@@ -13,10 +13,14 @@ class VoiceRecording < ApplicationRecord
     SecureRandom.uuid
   end
 
+  def enqueue_generate_peaks_job
+    return unless media.changed? || peaks.blank?
+
+    GeneratePeaksJob.perform_later(id)
+  end
+
   def generate_peaks
     require 'open3'
-
-    return unless media.changed? || peaks.blank?
     # Set the output file path and delete cache
     output_path = "/tmp/#{media.key}.json"
     File.delete output_path rescue nil
@@ -32,6 +36,7 @@ class VoiceRecording < ApplicationRecord
     json_data = File.read(output_path)
     peak_data = JSON.parse(json_data)
     self.peaks = peak_data['data']
+    save
   rescue => e
     Rails.logger.warn(["Peak generation failed", e])
   end

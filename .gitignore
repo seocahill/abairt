@@ -32,3 +32,7 @@ vendor/javascript/annotation.example.js
 !/app/assets/builds/.keep
 docker-compose.override.yml
 scripts
+queue.db
+queue.db-shm
+queue.db-wal
+*queue*

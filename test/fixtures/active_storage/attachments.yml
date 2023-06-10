@@ -1,0 +1,5 @@
+# test/fixtures/active_storage/attachments.yml
+first_media_attachment:
+  name: media
+  record: one (VoiceRecording)
+  blob: first_media_blob
