@@ -31,3 +31,4 @@ vendor/javascript/annotation.example.js
 /app/assets/builds/*
 !/app/assets/builds/.keep
 docker-compose.override.yml
+scripts
