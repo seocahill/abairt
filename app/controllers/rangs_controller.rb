@@ -37,7 +37,7 @@ class RangsController < ApplicationController
 
   # GET /rangs/new
   def new
-    @rang = Rang.new(name: "Cómhrá #{Date.today.to_s(:short)}")
+    @rang = Rang.new(name: "Cómhrá #{Date.today.to_fs(:short)}")
     @student = @rang.users.build(password: SecureRandom.alphanumeric)
   end
 
