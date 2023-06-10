@@ -1,8 +1,6 @@
 CREATE TABLE sqlite_sequence(name,seq);
-CREATE TABLE `active_storage_blobs` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `key` varchar(255) NOT NULL, `filename` varchar(255) NOT NULL, `content_type` varchar(255), `metadata` text, `service_name` varchar(255) NOT NULL, `byte_size` bigint NOT NULL, `checksum` varchar(255) NOT NULL, `created_at` timestamp NOT NULL);
 CREATE TABLE `ar_internal_metadata` (`key` varchar(255) NOT NULL, `value` varchar(255), `created_at` timestamp NOT NULL, `updated_at` timestamp NOT NULL, PRIMARY KEY (`key`));
 CREATE TABLE `schema_migrations` (`version` varchar(255) NOT NULL, PRIMARY KEY (`version`));
-CREATE UNIQUE INDEX `index_active_storage_blobs_on_key` ON `active_storage_blobs` (`key`);
 CREATE TABLE `active_storage_attachments`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `name` varchar(255) DEFAULT (NULL) NOT NULL, `record_type` varchar(255) DEFAULT (NULL) NOT NULL, `record_id` bigint DEFAULT (NULL) NOT NULL, `blob_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_c3b3935057` FOREIGN KEY (`blob_id`) REFERENCES `active_storage_blobs`(`id`));
 CREATE UNIQUE INDEX `index_active_storage_attachments_uniqueness` ON `active_storage_attachments` (`record_type`, `record_id`, `name`, `blob_id`);
 CREATE INDEX `index_active_storage_attachments_on_blob_id` ON `active_storage_attachments` (`blob_id`);
@@ -131,6 +129,8 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
         INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
         INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
       END;
+CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
+CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210210153031'),
 ('20210210175509'),
@@ -183,6 +183,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230520230902'),
 ('20230521083532'),
 ('20230602173347'),
-('20230607103341');
+('20230607103341'),
+('20230610165705'),
+('20230610165706'),
+('20230610165707');
 
 

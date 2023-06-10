@@ -46,7 +46,7 @@
   </td>
   <td class="py-2 px-4 text-center border-gray-200 w-1/12">
     <% if current_user %>
-      <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: starred.id }}, class: "flex items-center" do %>
+      <%= button_to word_list_dictionary_entries_path, method: :post, form: {}, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: starred.id }}, class: "flex items-center" do %>
         <% if starred && starred.dictionary_entries.include?(entry) %>
           <i style="fill:gold;" data-feather="star"></i>
         <% else %>

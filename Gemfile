@@ -2,7 +2,7 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "~> 3.0.0"
-gem "rails", "~> 6.1.2"
+gem "rails", "~> 7.0.0"
 gem "puma", "~> 6.0"
 gem 'sassc-rails'
 gem "redis", "~> 4.0"
@@ -20,9 +20,7 @@ end
 group :development do
   gem "web-console", ">= 4.1.0"
   gem "listen", "~> 3.3"
-  gem "spring"
   gem "dotenv-rails", "~> 2.7"
-
 end
 
 group :test do
@@ -44,8 +42,10 @@ gem "sentry-rails", "~> 4.2"
 gem "rack-cors", "~> 1.1"
 gem "sqlite3", "~> 1.6"
 gem "rufus-scheduler", "~> 3.8"
-gem "acts-as-taggable-on", "~> 8.1"
+gem "acts-as-taggable-on"
 gem "importmap-rails", "~> 0.8.2"
 gem "groupdate", "~> 6.2"
 gem "geocoder", "~> 1.8"
 gem "yui-compressor", "~> 0.12.0"
+gem "sprockets-rails"
+
