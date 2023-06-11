@@ -6,27 +6,23 @@ export default class extends Controller {
   static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video"]
   static values = { media: String, regions: Array, peaks: Array }
 
+  connect() {
+    this.element[this.identifier] = this
+  }
+
   initialize() {
     addEventListener("turbo:submit-end", ({ target }) => {
+      console.log("RESET!")
       this.resetForm(target)
     })
   }
 
   resetForm(target) {
-    if (document.getElementById('dictionary_entry_media') instanceof RadioNodeList) {
-      document.getElementById('dictionary_entry_media').forEach((item) => {
-        if (item.type === "hidden") {
-          item.remove()
-        }
-      })
-    }
     let transcription = document.getElementById('dictionary_entry_word_or_phrase').value;
     let translation = document.getElementById('dictionary_entry_translation').value;
     let regionId = document.getElementById('dictionary_entry_region_id').value;
-    if (regionId) {
-      let region = this.waveSurfer.regions.list[regionId];
-      region.update({ data: { transcription: transcription, translation: translation } })
-    }
+    let region = this.waveSurfer.regions.list[regionId];
+    region.update({ data: { transcription: transcription, translation: translation } })
     target.reset()
   }
 
@@ -160,5 +156,10 @@ export default class extends Controller {
     } else {
       this.waveSurfer.playPause()
     }
+  }
+
+  seek(seekPosition) {
+    const value = seekPosition / this.waveSurfer.getDuration();
+    this.waveSurfer.seekTo(value);
   }
 }

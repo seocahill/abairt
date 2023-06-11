@@ -3,7 +3,7 @@
 
 require 'rufus-scheduler'
 
-return if defined?(Rails::Console) || Rails.env.test? || File.split($PROGRAM_NAME).last == 'rake'
+return if defined?(Rails::Console) || Rails.env.test? || Rails.env.development? || File.split($PROGRAM_NAME).last == 'rake'
   #
   # do not schedule when Rails is run from its console, for a test/spec, or
   # from a Rake task

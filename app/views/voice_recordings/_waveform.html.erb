@@ -1,6 +1,6 @@
 
  <turbo-frame id="wave_display" class="w-full">
-  <div data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording&.media&.attached? %>" data-transcription-regions-value="<%= @regions %>" data-transcription-peaks-value="<%= @recording&.peaks || [] %>">
+  <div id="wave-controller" data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording&.media&.attached? %>" data-transcription-regions-value="<%= @regions %>" data-transcription-peaks-value="<%= @recording&.peaks || [] %>">
     <div class="flex items-center space-x-4 p-4">
     <% if @recording&.media&.video? %>
       <%= video_tag(@recording.media.url, size: "200", data: { "transcription-target": "video" }) %>

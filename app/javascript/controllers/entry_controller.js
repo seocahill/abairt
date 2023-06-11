@@ -3,7 +3,7 @@ import feather from "feather-icons"
 
 export default class extends Controller {
   static targets = ["dropdown", "audio", "translation", "abairt", "notes", "media", "status", "word", "template"]
-  static values = { url: String, id: Number }
+  static values = { url: String, id: Number, seek: Number }
 
   connect() {
     feather.replace()
@@ -29,6 +29,12 @@ export default class extends Controller {
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
     })
+  }
+
+  seek(event) {
+    event.preventDefault()
+    const seekPosition = this.seekValue;
+    document.getElementById("wave-controller").transcription.seek(seekPosition)
   }
 
   show() {
