@@ -5,5 +5,10 @@
   <%= render "dictionary_entries/inline_fields", form: form, method: :translation do %>
     <%= form.text_area :translation %>
   <% end %>
+  <%= render "dictionary_entries/inline_fields", form: form, method: :tag_list do %>
+    <div data-controller="tag" data-tag-target="tagSearch">
+      <%= form.text_area :tag_list, class: "w-full", id: "autoCompleteTags" %>
+    </div>
+  <% end %>
   <%= form.button %>
 <% end %>
