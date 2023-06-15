@@ -25,7 +25,7 @@ class User < ApplicationRecord
 
   enum role: [:student, :speaker, :teacher, :admin]
   enum voice: [:male, :female]
-  enum dialect: [:an_muirthead, :dún_chaocháin, :acaill, :tuar_mhic_éadaigh]
+  enum dialect: [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
 
   validates :email, presence: true, uniqueness: { case_sensitive: false }, length: {maximum: 50}
 
