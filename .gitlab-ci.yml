@@ -27,27 +27,31 @@ build deploy image:
   only:
     - master
 
-# build test image:
-#   stage: build
-#   script:
-#     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-#     - docker pull ${CI_REGISTRY_IMAGE} || true
-#     - docker build
-#       --cache-from ${CI_REGISTRY_IMAGE}
-#       --tag ${CI_REGISTRY_IMAGE} .
-#       --build-arg GEM_IMAGE=registry.gitlab.com/abairt/web-application:latest
-#     - docker push ${CI_REGISTRY_IMAGE}
-#   only:
-#     - master
+build test image:
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker pull ${CI_REGISTRY_IMAGE} || true
+    - docker build
+      --cache-from ${CI_REGISTRY_IMAGE}
+      --tag ${CI_REGISTRY_IMAGE} .
+      --build-arg GEM_IMAGE=registry.gitlab.com/abairt/web-application:latest
+    - docker push ${CI_REGISTRY_IMAGE}
+  only:
+    - branches
+  except:
+    - master
 
-# run tests:
-#   image: ${CI_REGISTRY_IMAGE}
-#   stage: test
-#   script:
-#   - bin/rails db:test:prepare
-#   - bin/rails test
-#   except:
-#   - master
+run tests:
+  image: ${CI_REGISTRY_IMAGE}
+  stage: test
+  script:
+  - bin/rails db:test:prepare
+  - bin/rails test
+  only:
+    - branches
+  except:
+    - master
 
 deploy:
   stage: deploy

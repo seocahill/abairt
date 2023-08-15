@@ -83,3 +83,13 @@ Lists can be downloaded as csvs for use in spaced repition apps like anki.
 ## Notes on Libs
 - Rufus for wrapping cron
 - yui-compressor to get around sassc tailwind incompatibility
+
+
+## Restoring
+
+First do lightsream (restore only)
+Then change permissions `chown nonroot:root db` `chmod 755 db`
+Then add Rails
+Finally when other server is retired add back replication
+
+## SSH on server
