@@ -44,4 +44,52 @@ export default class extends Controller {
   hide() {
     this.dropdownTarget.classList.add("hidden")
   }
+
+  async synth(event) {
+    const text = event.currentTarget.dataset.audioText;
+    const response = await this.synthesizeSpeech(text);
+    const synthesizedAudioBase64 = response.audioContent;
+    this.playSynthesizedAudio(synthesizedAudioBase64);
+  }
+
+  async synthesizeSpeech(text) {
+    const uri = 'https://abair.ie/api2/synthesise';
+    const requestBody = {
+      synthinput: { text: text, ssml: 'string' },
+      voiceparams: { languageCode: 'ga-IE', name: "ga_UL_anb_nemo", ssmlGender: 'UNSPECIFIED' },
+      audioconfig: { audioEncoding: 'LINEAR16', speakingRate: 1, pitch: 1, volumeGainDb: 1 },
+      outputType: 'JSON'
+    };
+
+    const response = await fetch(uri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    return await response.json();  // assuming the response is directly the base64 string of the audio.
+  }
+
+  playSynthesizedAudio(base64AudioData) {
+    const audioContext = new AudioContext();
+    const audioBuffer = this.base64ToArrayBuffer(base64AudioData);
+
+    audioContext.decodeAudioData(audioBuffer, (buffer) => {
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start(0);
+    });
+  }
+
+  base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
 }
