@@ -28,6 +28,7 @@
         <% entry.tag_list.each do |tag| %>
           <%= content_tag :span, tag, class: "rounded-full px-2 py-1 bg-gray-200" %>
         <% end %>
+        <%= content_tag :span, "add", class: "rounded-full px-2 py-1 bg-yellow-200" if entry.tag_list.empty? %>
       <% end %>
     <% else %>
       <% entry.tag_list.each do |tag| %>
@@ -47,7 +48,8 @@
           <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
         <% end %>
       <% else %>
-        <a href="#" disabled class='bg-grey-500 hover:bg-grey-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer'>No media</a>
+        <%# <a href="#" disabled class='bg-grey-500 hover:bg-grey-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer'>No media</a> %>
+        <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
       <% end %>
     <% end %>
   </td>
