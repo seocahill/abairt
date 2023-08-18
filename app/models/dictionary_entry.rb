@@ -73,5 +73,34 @@ class DictionaryEntry < ApplicationRecord
       # Attach the new file to a Recording model using Active Storage
       self.media.attach(io: File.open(output_path), filename: "#{region_id}.mp3")
     end
+
+    # Auto transcribe if no values
+    return if word_or_phrase.present?
+
+    self.word_or_phrase = transcribe_audio(output_path)
+  end
+
+  private
+
+  def transcribe_audio(output_path)
+    audio_blob = `ffmpeg -i "#{output_path}" -f mp3 -c:a copy - | base64`
+    uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(uri.path)
+
+    payload = {
+      recogniseBlob: audio_blob,
+      developer: true,
+      method: 'online2bin'
+    }
+
+    request.body = payload.to_json
+    request['Content-Type'] = 'application/json'
+
+    response = http.request(request)
+    JSON.parse(response.body).dig("transcriptions", 0, "utterance")
+  rescue => e
+    "trasscríobh ar bith"
   end
 end
