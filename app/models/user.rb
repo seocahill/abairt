@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_secure_password
 
   before_create :generate_token
+  after_create :add_default_rang
 
   has_many :dictionary_entries, foreign_key: :speaker_id
 
@@ -23,12 +24,11 @@ class User < ApplicationRecord
   has_many :user_lists, dependent: :destroy
   has_many :followed_lists, class_name: "WordList", through: :user_lists
 
-  enum role: [:student, :speaker, :teacher, :admin]
+  enum role: [:student, :speaker, :teacher, :admin, :ai]
   enum voice: [:male, :female]
   enum dialect: [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
 
   validates :email, presence: true, uniqueness: { case_sensitive: false }, length: {maximum: 50}
-
 
   class << self
     def with_unanswered_ceisteanna
@@ -82,7 +82,15 @@ class User < ApplicationRecord
     password_reset_sent_at < 2.hours.ago
   end
 
-  private
+  # private
+
+  def add_default_rang
+    caotharnach = User.where(name: "An Caotharnach", role: "ai", email: "ai@abairt.com").first_or_create! do | u|
+      u.password = SecureRandom.uuid
+    end
+    rang = caotharnach.lectures.create(name: "Rang leis an Caotharnach")
+    self.rangs << rang
+  end
 
   def generate_token
     begin
