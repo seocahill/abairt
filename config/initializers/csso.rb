@@ -2,7 +2,7 @@ require "open3"
 
 class CssoCompressor
   def self.call(input)
-    puts "[CssoCompressor] Compressing…"
+    Rails.logger.debug "[CssoCompressor] Compressing…"
 
     # Copy the contents of the CSS file to a temp file
     temp_file = Tempfile.new([input[:name], ".css"])

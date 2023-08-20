@@ -27,11 +27,11 @@ class VoiceRecording < ApplicationRecord
     media.open do |file|
       # Extract the selected region and save it as a new MP3 file using ffmpeg
       # audiowaveform -i input.mp3 -o output.json
-      puts file.path
+      Rails.logger.debug file.path
       # ffmpeg -i test.mp4 -f wav - | audiowaveform --input-format wav --output-format dat -b 8 > test.dat
       stdout, stderr, status = Open3.capture3("ffmpeg -i #{file.path} -f mp3 -  | audiowaveform --input-format mp3 -o #{output_path}")
       # Attach the new file to a Recording model using Active Storage
-      puts [stdout, stderr, status]
+      Rails.logger.debug [stdout, stderr, status]
     end
     json_data = File.read(output_path)
     peak_data = JSON.parse(json_data)

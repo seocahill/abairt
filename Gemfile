@@ -49,3 +49,5 @@ gem "geocoder", "~> 1.8"
 gem "yui-compressor", "~> 0.12.0"
 gem "sprockets-rails"
 gem "litestack", "~> 0.2.3"
+gem "ruby-openai", "~> 4.2"
+
