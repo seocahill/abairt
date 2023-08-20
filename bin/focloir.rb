@@ -11,4 +11,4 @@ res = doc.css("span.sense").map do |node|
   }
 end.to_json
 
-puts res
+Rails.logger.debug res

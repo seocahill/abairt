@@ -49,7 +49,7 @@
                   <% if current_user.nil? %>
                     <%= link_to "Login", login_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
                   <% else %>
-                    <%= button_to "Log out", logout_path, method: :delete, class: "text-white px-3 py-2 rounded-md text-sm font-mediums  bg-gray-700" %>
+                    <%= button_to "Log out of #{current_user.name}", logout_path, method: :delete, class: "text-white px-3 py-2 rounded-md text-sm font-mediums  bg-gray-700" %>
                   <% end %>
                 </div>
               </div>

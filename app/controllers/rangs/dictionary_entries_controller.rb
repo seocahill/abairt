@@ -7,9 +7,11 @@ class Rangs::DictionaryEntriesController < ApplicationController
 
     respond_to do |format|
       if @dictionary_entry.save
+        if rang = Rang.where(id: params["dictionary_entry"]["rang_ids"]).first
+          @dictionary_entry.create_ai_response(rang) if rang.teacher.ai?
+        end
         broadcast_to_rang
         format.html
-        # format.turbo_stream
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -22,7 +24,7 @@ class Rangs::DictionaryEntriesController < ApplicationController
     Turbo::StreamsChannel.broadcast_append_to("rangs",
                                             target: "paginate_page_#{params[:page]}",
                                             partial: "rangs/message",
-                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y") })
+                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y"), autoplay: false })
   end
 
   def set_rang

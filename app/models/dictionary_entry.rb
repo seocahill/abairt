@@ -18,15 +18,13 @@ class DictionaryEntry < ApplicationRecord
 
   enum status: [:normal, :ceist, :foghraíocht]
 
-  before_create :create_audio_snippet, unless: -> { voice_recording_id.nil? }
-
   acts_as_taggable_on :tags
 
   accepts_nested_attributes_for :rang_entries
 
   scope :has_recording, -> { joins(:media_attachment) }
 
-  validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id }
+  validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker.ai? }
 
   class << self
     def to_csv
@@ -80,10 +78,42 @@ class DictionaryEntry < ApplicationRecord
     self.word_or_phrase = transcribe_audio(output_path)
   end
 
-  private
+  def chat_with_gpt(rang)
+    # set default context
+    context =  { role: 'system', content: "You are an Irish speaker called 'An Chaothernach'. You are chatting with another Irish speaker about everyday things, e.g. your job, your family, holidays, the news, the weather, hobbies, etc. Try not to give long answers. If you don't understand, say it." }
 
-  def transcribe_audio(output_path)
-    audio_blob = `ffmpeg -i "#{output_path}" -f mp3 -c:a copy - | base64`
+    # send recent conversation with
+    messages = rang.dictionary_entries.last(10).map do |message|
+      if message.speaker.ai?
+        { role: "assistant", content: message.word_or_phrase }
+      else
+        { role: "user", content: message.word_or_phrase }
+      end
+    end
+    # context first and last
+    messages.unshift(context)
+    Rails.logger.debug(messages)
+    # generate chat
+    response = OpenAI::Client.new(
+      access_token: Rails.application.credentials.dig(:openai, :openai_key),
+      organization_id: Rails.application.credentials.dig(:openai, :openai_org)).chat(parameters: {
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+        temperature: 0.5
+      })
+    Rails.logger.debug response
+    response.dig('choices', 0, 'message', 'content')
+  rescue => e
+    Rails.logger.debug(e)
+    "Tá aiféala orm ach tá ganntanas airgid ag cur isteach orm. Tá mo OpenAI cúntas folamh, is dóigh liom."
+  end
+
+  def create_ai_response(rang)
+    ChatBotJob.perform_later(self, rang)
+  end
+
+  def transcribe_audio(file_path, content_type = 'mp3')
+    audio_blob = `ffmpeg -i "#{file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
     uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -99,8 +129,35 @@ class DictionaryEntry < ApplicationRecord
     request['Content-Type'] = 'application/json'
 
     response = http.request(request)
+    Rails.logger.debug(response)
     JSON.parse(response.body).dig("transcriptions", 0, "utterance")
   rescue => e
     "trasscríobh ar bith"
+  end
+
+
+  def synthesize_text_to_speech_and_store
+    uri = URI.parse('https://abair.ie/api2/synthesise')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(uri.path)
+    request.body = {
+      synthinput: { text: word_or_phrase, ssml: 'string' },
+      voiceparams: { languageCode: 'ga-IE', name: 'ga_UL_anb_nemo', ssmlGender: 'UNSPECIFIED' },
+      audioconfig: { audioEncoding: 'LINEAR16', speakingRate: 1, pitch: 1, volumeGainDb: 1 },
+      outputType: 'JSON'
+    }.to_json
+    request['Content-Type'] = 'application/json'
+    response = http.request(request)
+    api_response = JSON.parse(response.body)
+    decoded_data = Base64.decode64(api_response['audioContent'])
+
+    # Create a temporary file and attach to ActiveStorage within its block
+    Tempfile.create(['temp_audio', '.wav']) do |temp_file|
+      temp_file.binmode
+      temp_file.write(decoded_data)
+      temp_file.rewind
+      self.media.attach(io: temp_file, filename: 'chat.wav', content_type: 'audio/wav')
+    end
   end
 end

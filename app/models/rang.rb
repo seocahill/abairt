@@ -12,6 +12,11 @@ class Rang < ApplicationRecord
 
   before_create :generate_meeting_id
 
+  enum context: %i[
+    hello weather family job holidays movies books actor football politics news
+    home travel
+  ]
+
   accepts_nested_attributes_for :users, reject_if: ->(attributes){ attributes['email'].blank? }, allow_destroy: true
 
   def next_time
