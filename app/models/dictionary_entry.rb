@@ -24,7 +24,7 @@ class DictionaryEntry < ApplicationRecord
 
   scope :has_recording, -> { joins(:media_attachment) }
 
-  validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker.ai? }
+  validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? }
 
   class << self
     def to_csv

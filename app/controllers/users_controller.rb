@@ -65,7 +65,6 @@ class UsersController < ApplicationController
     password = SecureRandom.uuid
     email = user_params[:email].present? ? user_params[:email] : user_params[:name].split.join + "@abairt.com"
     @user = User.new(user_params.merge(password: password, email: email, role: :speaker))
-
     respond_to do |format|
       if @user.save
         format.html { redirect_to @user, notice: 'User was successfully created.' }

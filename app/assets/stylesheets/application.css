@@ -15,3 +15,44 @@
  */
 
 
+/* Webkit browsers */
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #E5E7EB;
+  /* bg-gray-200 in Tailwind */
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  background: #3B82F6;
+  /* bg-blue-500 in Tailwind */
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -6px;
+  /* To center align the thumb with the track */
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-track {
+  background: #E5E7EB;
+  /* bg-gray-200 in Tailwind */
+  height: 4px;
+}
+
+input[type="range"]::-moz-range-progress {
+  background: #3B82F6;
+  /* bg-blue-500 in Tailwind */
+  height: 4px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  background: #3B82F6;
+  /* bg-blue-500 in Tailwind */
+  border-radius: 50%;
+  cursor: pointer;
+}

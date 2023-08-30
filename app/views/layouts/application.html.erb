@@ -13,63 +13,68 @@
     <%= javascript_importmap_tags %>
   </head>
   <body>
-    <% if flash.present? %>
-      <%= render 'flash' %>
-    <% end %>
-    <div class="min-h-screen flex flex-col">
-    <nav class="bg-gray-800">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <a href="/">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-                  <path d="M20,10 h36 a10,10 0 0 1 10,10 v24 a10,10 0 0 1 -10,10 h-36 l-10,10 v-44 a10,10 0 0 1 10,-10 z" fill="#FFFFFF" />
-                  <text x="55%" y="50%" fill="#1F2937" font-size="30" font-weight="bold" font-family="Ubuntu, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">A</text>
-                </svg>
-              </a>
-            </div>
-            <div class="hidden md:block">
-              <div class="ml-10 flex items-baseline space-x-4">
-                <%= link_to 'Audio transcriptions', voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                <%= link_to 'Dictionary', dictionary_entries_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                <%= link_to 'Speakers', users_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                <%= link_to 'Lists', word_lists_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                <% if current_user.present? %>
-                  <%= link_to "Chat", rangs_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                <% end %>
+    <div class="mx-auto">
+      <!-- Navbar -->
+      <nav class="p-4 bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <a href="/">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+                    <path d="M20,10 h36 a10,10 0 0 1 10,10 v24 a10,10 0 0 1 -10,10 h-36 l-10,10 v-44 a10,10 0 0 1 10,-10 z" fill="#FFFFFF" />
+                    <text x="55%" y="50%" fill="#1F2937" font-size="30" font-weight="bold" font-family="Ubuntu, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">A</text>
+                  </svg>
+                </a>
+              </div>
+              <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                  <%= link_to 'Transcriptions', voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to 'Dictionary', dictionary_entries_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to 'Speakers', users_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to 'Lists', word_lists_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <% if current_user.present? %>
+                    <%= link_to "Chat", rangs_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <% end %>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="hidden md:block">
-            <div class="ml-4 flex items-center md:ml-6">
-              <!-- Profile dropdown -->
-              <div class="ml-3 relative">
-                <div>
-                  <% if current_user.nil? %>
-                    <%= link_to "Login", login_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                  <% else %>
-                    <%= button_to "Log out of #{current_user.name}", logout_path, method: :delete, class: "text-white px-3 py-2 rounded-md text-sm font-mediums  bg-gray-700" %>
-                  <% end %>
+            <div class="hidden md:block">
+              <div class="ml-4 flex items-center md:ml-6">
+                <!-- Profile dropdown -->
+                <div class="ml-3 relative">
+                  <div>
+                    <% if current_user.nil? %>
+                      <%= link_to "Login", login_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                    <% else %>
+                      <%= button_to "Log out of #{current_user.name}", logout_path, method: :delete, class: "text-white px-3 py-2 rounded-md text-sm font-mediums  bg-gray-700" %>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </nav>
-    <% if page_title %>
-      <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 class="text-3xl font-bold text-gray-900">
-            <%= page_title %>
-          </h1>
+      </nav>
+
+      <!-- Flash Messages -->
+      <% flash.each do |message_type, message| %>
+        <div class="fixed top-0 left-0 z-50 flex justify-between w-full p-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+          <div class="flex items-center mx-auto">
+            <p class="flex items-center text-sm font-normal text-gray-500 dark:text-gray-400">
+              <%= message %>
+            </p>
+          </div>
         </div>
-      </header>
-    <% end %>
-    <main class="flex-1">
-      <%= yield %>
-    </main>
-    <%= yield :footer %>
+      <% end %>
+
+      <!-- Main Content Area -->
+      <main class="flex flex-wrap md:flex-nowrap space-x-0 md:space-x-4 mt-4 container mx-auto">
+        <%= yield %>
+      </main>
+
+       <!-- Optional Footer -->
+      <%= yield :footer %>
+    </div>
   </body>
 </html>

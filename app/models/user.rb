@@ -7,6 +7,7 @@ class User < ApplicationRecord
   after_create :add_default_rang
 
   has_many :dictionary_entries, foreign_key: :speaker_id
+  has_many :voice_recordings, through: :dictionary_entries
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
@@ -16,8 +17,6 @@ class User < ApplicationRecord
 
   has_many :lectures, class_name: "Rang", foreign_key: "user_id"
 
-  has_many :conversations
-  has_many :voice_recordings, through: :conversations
 
   # lists
   has_many :own_lists, class_name: "WordList", foreign_key: "user_id", dependent: :destroy

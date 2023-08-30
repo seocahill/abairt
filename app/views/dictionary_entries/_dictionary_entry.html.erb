@@ -1,5 +1,5 @@
-<tr class="bg-white" id="<%= dom_id(entry) %>" data-controller="entry" data-entry-id-value="<%= entry.id %>">
-  <td class="py-2 px-4 border-gray-200 w-1/4">
+<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-controller="entry" data-entry-id-value="<%= entry.id %>">
+  <td class="px-6 py-4">
     <% if current_user %>
       <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
         <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase"  %>
@@ -17,12 +17,12 @@
       <% end %>
     <% end %>
   </td>
-  <td class="py-2 px-4 border-gray-200 w-1/4">
+  <td class="px-6 py-4">
     <%= render "dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
       <%= entry.translation.present? ? entry.translation : "Add translation" %>
     <% end %>
   </td>
-  <td class="py-2 px-4 text-center border-gray-200 w-1/4">
+  <td class="px-6 py-4">
     <% if current_user %>
       <%= render "dictionary_entries/inline_edit", model: entry, method: :tag_list, current_user: current_user do %>
         <% entry.tag_list.each do |tag| %>
@@ -36,36 +36,24 @@
       <% end %>
     <% end %>
   </td>
-  <td data-controller="entry" class="text-center py-2 px-4 border-gray-200 w-1/12">
+  <td data-controller="entry" class="px-6 py-4">
     <% if entry.media.attached? %>
-      <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+      <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
         <audio src="<%= entry.media.url %>"></audio>
         play
-      </a>
+      </button>
     <% else %>
       <% if current_user %>
         <%= form_with(model: entry) do |form| %>
           <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
         <% end %>
       <% else %>
-        <%# <a href="#" disabled class='bg-grey-500 hover:bg-grey-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer'>No media</a> %>
         <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
       <% end %>
     <% end %>
   </td>
-  <td class="py-2 px-4 text-center border-gray-200 w-1/12">
-    <% if current_user %>
-      <%= button_to word_list_dictionary_entries_path, method: :post, form: {}, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: starred.id }}, class: "flex items-center" do %>
-        <% if starred && starred.dictionary_entries.include?(entry) %>
-          <i style="fill:gold;" data-feather="star"></i>
-        <% else %>
-          <i data-feather="star"></i>
-        <% end %>
-      <% end %>
-    <% end %>
-  </td>
-  <td>
-    <% if current_user %>
+  <% if current_user %>
+    <td class="px-6 py-4">
       <% if current_user.own_lists.where(starred: nil).any? %>
         <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-action="change->entry#addToList">
           <option value="default" selected="selected">On <%= entry.word_lists.size %> lists</option>
@@ -78,13 +66,13 @@
       <% elsif current_user %>
         <%= link_to "Create your first list", word_lists_path, class: "cursor-pointer, hover:text-blue-700 hover:underline" %>
       <% end %>
-    <% end %>
-  </td>
-  <td class="py-2 px-4 text-center border-gray-200 w-1/12">
-    <% if current_user && entry.speaker_id == current_user.id %>
+    </td>
+  <% end %>
+  <% if current_user && entry.speaker_id == current_user.id %>
+    <td class="px-6 py-4">
       <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' }, class: "" do %>
         <i data-feather="trash"></i>
       <% end %>
-    <% end %>
-  </td>
+    </td>
+  <% end %>
 </tr>
