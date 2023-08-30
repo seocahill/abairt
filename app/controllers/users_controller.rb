@@ -23,7 +23,7 @@ class UsersController < ApplicationController
 
     @pins = User.where(role: [:speaker, :teacher]).where.not(lat_lang: nil).map do |g|
       g.slice(:id, :name, :lat_lang).tap do |c|
-        if (sample = g.rangs.detect { |r| r.media.audio? }&.media)
+        if (sample = g.dictionary_entries.detect { |d| d.media&.audio? }&.media)
           c[:media_url] = Rails.application.routes.url_helpers.rails_blob_url(sample)
         end
       end
