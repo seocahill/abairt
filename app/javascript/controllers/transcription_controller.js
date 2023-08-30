@@ -68,6 +68,7 @@ export default class extends Controller {
           id: region.region_id,
           start: region.region_start,
           end: region.region_end,
+          drag: false,
           data: { transcription: region.word_or_phrase, translation: region.translation }
         });
       })

@@ -1,8 +1,7 @@
-<%= content_for :page_title do %>
-  Native Speakers recorded and transcribed
-<% end %>
-<div class="flex flex-row">
-  <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
+<!-- Sidebar for CRUD -->
+<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
+
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <div class="mb-4">
       <nav>
         <ul class="flex flex-col py-2" data-sidebar-target="tabs">
@@ -59,15 +58,6 @@
       <% if current_user %>
         <div class="tab-pane hidden" id="tab2">
           <%= form_with(model: @new_voice_recording) do |form| %>
-            <div class="mt-1" data-controller="user" data-user-target="userSearch">
-              <label for="search" class="block text-sm font-medium text-gray-700">Add a Speaker</label>
-              <div class="mt-1">
-                <input id="autoCompleteUsers" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="2048"  class="w-full"/>
-              </div>
-              <div class="mt-1">
-                <ul class="rounded p-2 max-w-md" id="selectedUsers"></ul>
-              </div>
-            </div>
             <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
               <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
               <div class="mt-1">
@@ -103,45 +93,58 @@
       </div>
     </div>
   </div>
-  <div class="flex-grow p-4">
-    <div class="flex flex-col space-y-4">
+</div>
+
+<!-- Primary Content Area: Two Rectangles -->
+<div class="w-full md:w-3/4 p-4">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <!-- Top Interactive Rectangle -->
+      <div class="w-full bg-white rounded-md p-4 mb-4">
         <%= turbo_frame_tag "wave_display" do %>
           <%= render partial: 'waveform', locals: { recording:  @recording, regions: @regions } %>
         <% end %>
-      <%# begin table %>
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Voice recordings</h2>
-      <table class="w-full table-fixed">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="w-1/5 py-2 px-4 border-gray-200">Title</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200">Speakers</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200">Dialects</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Transcriptions</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @recordings.each do |recording| %>
-            <tr class="bg-white">
-              <td class="py-2 px-4 border-gray-200"><%= recording.title %></td>
-              <td class="py-2 px-4 border-gray-200"><% recording.users.map do |user| %><%= link_to user.name, user_path(user), class: "hover:text-blue-700 hover:underline " %>, <% end %></td>
-              <td class="py-2 px-4 border-gray-200">
-                <% recording.users.pluck(:dialect).uniq.map do |dialect| %>
-                  <%= link_to dialect.humanize, users_path(dialect: dialect), class: "hover:text-blue-700 hover:underline" %>
-                <% end %>
-              </td>
-              <td class="text-center py-2 px-4 border-gray-200"><%= recording.dictionary_entries.size %></td>
-              <td class="text-center">
-                <%= link_to "preview", preview_voice_recording_path(recording.id), data: { turbo_frame: 'wave_display' }, class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %>
-                <%= link_to "full transcript", voice_recording_path(recording.id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      </div>
+      <!-- Bottom Table Rectangle -->
+      <div class="w-full bg-white rounded-md p-4">
+        <div class="relative overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="px-6 py-3" >Title</th>
+                <th scope="col" class="px-6 py-3" >Speakers</th>
+                <th scope="col" class="px-6 py-3" >Dialects</th>
+                <th scope="col" class="px-6 py-3" >Transcriptions</th>
+                <th scope="col" class="px-6 py-3" ></th>
+                <th scope="col" class="px-6 py-3" ></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @recordings.each do |recording| %>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                  <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><%= recording.title %></th>
+                  <td class="px-6 py-4"><% recording.users.map do |user| %><%= link_to user.name, user_path(user), class: "hover:text-blue-700 hover:underline " %>, <% end %></td>
+                  <td class="px-6 py-4">
+                    <% recording.users.pluck(:dialect).uniq.map do |dialect| %>
+                      <%= link_to dialect.humanize, users_path(dialect: dialect), class: "hover:text-blue-700 hover:underline" %>
+                    <% end %>
+                  </td>
+                  <td  class="px-6 py-4"><%= recording.dictionary_entries.size %></td>
+                  <td  class="px-6 py-4">
+                    <%= link_to "load", preview_voice_recording_path(recording.id), data: { turbo_frame: 'wave_display' }, class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %>
+                  </td>
+                  <td  class="px-6 py-4">
+                    <%= link_to "details", voice_recording_path(recording.id), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <%# footer %>
+      <div class="w-full bg-white rounded-md p-4">
+        <%== pagy_nav(@pagy) %>
+      </div>
     </div>
   </div>
 </div>
-<%= content_for :footer do %>
-  <%== pagy_nav(@pagy) %>
-<% end %>
