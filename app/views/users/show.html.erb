@@ -1,6 +1,6 @@
-<%= content_for(:page_title, @user.name) %>
-<div class="flex flex-row">
-  <div class="flex-grow p-4">
+<!-- Sidebar for CRUD -->
+<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <div class="flex items-center mb-4 p-4">
       <%= link_to word_list_path(id: @user.id, format: :csv), class: "flex items-center space-x-1 hover:text-blue hover:underline" do %>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download">
@@ -8,32 +8,44 @@
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        <span>Click to Download CSV of <%= @user.name %>'s contributions</span>
+        Download user's contributions as CSV file
       <% end %>
-    </div>
-    <div class="flex flex-col space-y-4">
-      <table class="table-fixed w-full">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="w-1/6 py-2 px-4 border-gray-200">Irish</th>
-            <th class="w-1/6 py-2 px-4 border-gray-200">English</th>
-            <th class="w-1/6 py-2 px-4 border-gray-200 text-center">Tags</th>
-            <th class="w-1/6 py-2 px-4 border-gray-200 text-center">Audio</th>
-            <% if current_user %>
-              <th class="w-1/6 py-2 px-4 border-gray-200">Favourites</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200">Add to List</th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody id="dictionary_entries">
-          <% @entries.each do |entry| %>
-            <%= render partial: "dictionary_entries/dictionary_entry", locals: { entry: entry, starred: @starred, current_user: current_user } %>
-          <% end %>
-        </tbody>
-      </table>
     </div>
   </div>
 </div>
-<%= content_for :footer do %>
- <%== pagy_nav(@pagy) %>
-<% end %>
+<!-- Primary Content Area: Two Rectangles -->
+<div class="w-full md:w-3/4 p-4">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+    <div class="flex-grow p-4">
+      <div class="relative overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+              <%= @user.name %>
+              <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400"> <%= @user.address %>, <%= @user.voice %>, <%= @user.dialect.humanize %>.</p>
+          </caption>
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" class="px-6 py-3" >Irish</th>
+              <th scope="col" class="px-6 py-3" >English</th>
+              <th scope="col" class="px-6 py-3" >Tags</th>
+              <th scope="col" class="px-6 py-3" >Audio</th>
+              <% if current_user %>
+                <th scope="col" class="px-6 py-3" >Favourites</th>
+                <th scope="col" class="px-6 py-3" >Add to List</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody id="dictionary_entries">
+            <% @entries.each do |entry| %>
+              <%= render partial: "dictionary_entries/dictionary_entry", locals: { entry: entry, starred: @starred, current_user: current_user } %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="w-full bg-white rounded-md p-4">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+</div>

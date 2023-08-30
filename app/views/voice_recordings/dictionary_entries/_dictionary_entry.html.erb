@@ -1,27 +1,27 @@
-<tr data-controller="entry" class="bg-white" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>">
-  <td class="py-2 px-4 border-gray-200"><%= link_to entry.speaker.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %></td>
-  <td class="py-2 px-4 border-gray-200">
+<tr data-controller="entry" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>">
+  <td class="px-6 py-4"><%= link_to entry.speaker.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %></td>
+  <td class="px-6 py-4">
     <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
       <%= entry.region_start.round(1) %>-<%= entry.region_end.round(1) %>
     </a>
   </td>
-  <td class="py-2 px-4 border-gray-200">
+  <td class="px-6 py-4">
     <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
       <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase" %>
     <% end %>
   </td>
-  <td class="py-2 px-4 border-gray-200">
+  <td class="px-6 py-4">
     <%= render "dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
       <%= entry.translation.present? ? entry.translation : "Add translation" %>
     <% end %>
   </td>
-  <td class="py-2 px-4 border-gray-200">
+  <td class="px-6 py-4">
     <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 mt-2 text-white font-bold py-2 px-4 rounded">
       <audio src="<%= entry.media.url %>"></audio>
       play
     </a>
   </td>
-  <td class="py-2 px-4 border-gray-200">
+  <td class="px-6 py-4">
     <% if current_user %>
       <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' } do %>
         <i data-feather="trash"></i>

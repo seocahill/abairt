@@ -3,6 +3,14 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
   # POST /dictionary_entries or /dictionary_entries.json
   def create
     @dictionary_entry = DictionaryEntry.new(dictionary_entry_params)
+    # datalist sends name over the wire, need id. Also might not exist yet.
+    speaker = User.where(name: dictionary_entry_params[:speaker_id]).first_or_create do |user|
+      user.email = "#{dictionary_entry_params[:speaker_id]}@abairt.com"
+      user.role = :speaker
+      user.password = SecureRandom.alphanumeric
+    end
+
+    @dictionary_entry.speaker = speaker
 
     respond_to do |format|
       if @dictionary_entry.save

@@ -27,6 +27,7 @@ class DictionaryEntriesController < ApplicationController
 
     if current_user
       @new_dictionary_entry = current_user.dictionary_entries.build
+      @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
 
     @tags = DictionaryEntry.tag_counts_on(:tags).most_used(15)

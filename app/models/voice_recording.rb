@@ -1,11 +1,8 @@
 class VoiceRecording < ApplicationRecord
   has_one_attached :media
-  has_many :conversations, dependent: :destroy
-  has_many :users, through: :conversations
   has_many :dictionary_entries
+  has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: 'User'
   after_commit :enqueue_generate_peaks_job
-
-  accepts_nested_attributes_for :conversations
 
   acts_as_taggable_on :tags
 
