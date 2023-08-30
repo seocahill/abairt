@@ -1,63 +1,45 @@
-<%= content_for(:page_title, @word_list.name) %>
-<div class="flex flex-row">
-  <div class="flex-shrink-0 w-64 bg-gray-100 p-4"  data-controller="sidebar">
-    <div class="mb-4">
-      <nav>
-        <ul class="flex flex-col py-2" data-sidebar-target="tabs">
-          <li>
-            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab1">Search and Filter</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-    <div class="tab-content">
-      <div class="tab-pane" id="tab1">
-        <form class="space-y-4" action="/dictionary_entries">
-          <div>
-            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
-            <div class="mt-1">
-              <input type="search" id="search" placeholder="Irish or English words" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-            </div>
-          </div>
-          <div class="flex items-center">
-            <input id="checkbox" type="checkbox" name="media" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
-            <label for="checkbox" class="ml-2 block text-sm leading-5 text-gray-900">
-              Only results with audio
-            </label>
-          </div>
-          <div class="text-right">
-            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
-          </div>
-        </form>
+<!-- Sidebar for CRUD -->
+<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <%= link_to word_list_path(@word_list, format: :csv), class: "flex items-center space-x-1 hover:text-blue-700 hover:underline" do %>
+      <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path clip-rule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm4.75 6.75a.75.75 0 011.5 0v2.546l.943-1.048a.75.75 0 011.114 1.004l-2.25 2.5a.75.75 0 01-1.114 0l-2.25-2.5a.75.75 0 111.114-1.004l.943 1.048V8.75z" fill-rule="evenodd"></path>
+      </svg>
+      Download list as CSV file
+    <% end %>
+  </div>
+</div>
+<!-- Primary Content Area: Two Rectangles -->
+<div class="w-full md:w-3/4 p-4">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex-grow p-4">
+      <div class="flex flex-col space-y-4">
+        <table class="w-full table-fixed">
+          <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+              <%= @word_list.name %>
+              <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400"> <%= @word_list.description %></p>
+          </caption>
+          <thead>
+            <tr class="bg-gray-100 text-left">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Irish</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">English</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Audio</th>
+              <% if current_user %>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody id="dictionary_entries">
+            <% @entries.each do |entry| %>
+              <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, list: @word_list } %>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
-  <div class="flex-grow p-4">
-    <div class="flex flex-col space-y-4">
-      <h2><%= link_to word_list_path(@word_list, format: :csv), class: "flex items-center space-x-1 hover:text-blue-700 hover:underline" do %>
-          <%= @word_list.description %> <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path clip-rule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm4.75 6.75a.75.75 0 011.5 0v2.546l.943-1.048a.75.75 0 011.114 1.004l-2.25 2.5a.75.75 0 01-1.114 0l-2.25-2.5a.75.75 0 111.114-1.004l.943 1.048V8.75z" fill-rule="evenodd"></path>
-          </svg>
-        <% end %>
-      </h2>
-      <table class="w-full table-fixed">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="w-1/5 py-2 px-4 border-gray-200">Irish</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200">English</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200 text-center">Audio</th>
-            <th class="w-1/5 py-2 px-4 border-gray-200 text-center"></th>
-          </tr>
-        </thead>
-        <tbody id="dictionary_entries">
-          <% @entries.each do |entry| %>
-            <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, list: @word_list } %>
-          <% end %>
-        </tbody>
-      </table>
+    <%# footer %>
+    <div class="w-full bg-white rounded-md p-4">
+      <%== pagy_nav(@pagy) %>
     </div>
   </div>
 </div>
-<%= content_for :footer do %>
-  <%== pagy_nav(@pagy) %>
-<% end %>

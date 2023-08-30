@@ -1,87 +1,80 @@
-<%= content_for :page_title do %>
-  "Transcription of Media: <%= truncate(@recording.title, length: 50) %>" <% if current_user %><%= link_to edit_voice_recording_path(@recording), class: "cursor-pointer hover:text-blue-700 hover:underline text-small" do %>
-    <svg class="w-6 h-6 inline" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" stroke-linecap="round" stroke-linejoin="round"></path>
-    </svg>
-  <% end %><% end %>
-<% end %>
-<%# player %>
-<div>
+<div class="w-full p-4">
+  <%# player %>
   <div class="flex items-center space-x-4 p-4">
     <%= render partial: 'waveform', locals: { recording:  @recording, regions: @regions } %>
   </div>
+  <%# form %>
   <div class="flex flex-row">
-    <%# sidebar %>
     <% if current_user&.teacher? || current_user&.admin? %>
-      <div class="flex-shrink-0 w-100 bg-gray-100 p-4 mt-4"  data-controller="sidebar">
-        <div class="flex flex-col space-y-4">
-          <%# <h2 class="text-lg font-medium text-gray-900 mb-4">New transcription</h2> %>
-          <%= form_with(model: [@recording, @new_dictionary_entry], class: "space-y-4") do |form| %>
-            <% if @new_dictionary_entry.errors.any? %>
-              <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-                <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>
-                <ul>
-                  <% @new_dictionary_entry.errors.each do |error| %>
-                    <li><%= error.full_message %></li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-            <%= form.label :user_ids, "Speaker" %>
-            <div class="mt-1">
-              <%= form.collection_select :speaker_id, @recording.users, :id, :name, {}, {} %>
-            </div>
-            <label for="word_or_phrase" class="block text-sm font-medium text-gray-700">Irish (leave blank for auto-transcription)</label>
-            <div class="mt-1">
-              <%= form.text_area :word_or_phrase, placeholder: "Gaeilge anseo", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
-            </div>
-            <label for="translation" class="block text-sm font-medium text-gray-700">English</label>
-            <div class="mt-1">
-              <%= form.text_area :translation, placeholder: "Translation", class: "py-2 px-3 border border-gray-300 rounded-md w-full" %>
-            </div>
-            <div class="hidden" data-transcription-target="startRegion">
-              <%= form.hidden_field :region_start %>
-              <input type="hidden" id="region_start" name="region_start">
-            </div>
-            <div class="hidden" data-transcription-target="endRegion">
-              <%= form.hidden_field :region_end %>
-            </div>
-            <div class="hidden" data-transcription-target="regionId">
-              <%= form.hidden_field :region_id %>
-            </div>
-            <%= form.hidden_field :voice_recording_id, value: @recording.id %>
-            <div id="download-container"></div>
-            <div class="text-right">
-              <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full">Add to transcript</button>
+      <div class="w-full p-4 mt-4 bg-gray-100" data-controller="sidebar">
+        <%= form_with(model: [@recording, @new_dictionary_entry], class: "space-y-4") do |form| %>
+          <% if @new_dictionary_entry.errors.any? %>
+            <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+              <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>
+              <ul>
+                <% @new_dictionary_entry.errors.each do |error| %>
+                  <li><%= error.full_message %></li>
+                <% end %>
+              </ul>
             </div>
           <% end %>
-        </div>
+          <div class="flex space-x-4">
+            <div class="flex-2 space-y-4 flex-grow">
+              <label for="speaker_id" class="sr-only">Speaker</label>
+              <%= form.text_field :speaker_id, list: "speaker-list", class:  "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", placeholder: "Search for or create new speaker" %>
+              <datalist id="speaker-list">
+                <% @speaker_names.each do |name| %>
+                  <option value="<%= name %>">
+                <% end %>
+              </datalist>
+            </div>
+            <div class="flex-2 space-y-4 flex-grow">
+              <label for="word_or_phrase" class="sr-only">Irish (leave blank for auto-transcription)</label>
+              <%= form.text_area :word_or_phrase, placeholder: "Gaeilge anseo", class: "h-10 py-2 px-3 border border-gray-300 rounded-md w-full" %>
+            </div>
+            <div class="flex-2 space-y-4 flex-grow">
+              <label for="translation" class="sr-only">English</label>
+              <%= form.text_area :translation, placeholder: "Translation", class: "h-10 py-2 px-3 border border-gray-300 rounded-md w-full" %>
+            </div>
+            <div class="flex-1 flex items-end space-y-4">
+              <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Add to transcript</button>
+            </div>
+          </div>
+          <!-- Hidden Fields -->
+          <div class="hidden">
+            <%= form.hidden_field :region_start %>
+            <%= form.hidden_field :region_end %>
+            <%= form.hidden_field :region_id %>
+            <%= form.hidden_field :voice_recording_id, value: @recording.id %>
+          </div>
+          <div id="download-container"></div>
+        <% end %>
       </div>
     <% end %>
-    <%# transcript %>
-    <div class="flex-grow p-4">
-      <div class="flex flex-col space-y-4">
-        <table class="w-full table-fixed">
-          <thead>
-            <tr class="bg-gray-100 text-left">
-              <th class="w-1/6 py-2 px-4 border-gray-200">Speaker</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200">Range</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200">Irish</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200">English</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200">Audio</th>
-              <th class="w-1/6 py-2 px-4 border-gray-200"></th>
-            </tr>
-          </thead>
-          <tbody id="transcriptions">
-            <% @entries.each do |entry| %>
-              <%= render partial: "voice_recordings/dictionary_entries/dictionary_entry", locals: { entry: entry, current_user: current_user, starred: @starred } %>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+  </div>
+  <%# transcript %>
+  <div class="flex-grow p-4">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3" >Speaker</th>
+            <th scope="col" class="px-6 py-3" >Range</th>
+            <th scope="col" class="px-6 py-3" >Irish</th>
+            <th scope="col" class="px-6 py-3" >English</th>
+            <th scope="col" class="px-6 py-3" >Audio</th>
+            <th scope="col" class="px-6 py-3" ></th>
+          </tr>
+        </thead>
+        <tbody id="transcriptions">
+          <% @entries.each do |entry| %>
+            <%= render partial: "voice_recordings/dictionary_entries/dictionary_entry", locals: { entry: entry, current_user: current_user, starred: @starred } %>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   </div>
+  <div class="w-full bg-white rounded-md p-4">
+    <%== pagy_nav(@pagy) %>
+  </div>
 </div>
-<%= content_for :footer do %>
-  <%== pagy_nav(@pagy) %>
-<% end %>
