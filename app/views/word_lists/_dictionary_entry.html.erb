@@ -14,7 +14,7 @@
   <% if current_user && list.owner == current_user %>
     <td class="px-6 py-4">
       <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: list.id }}, class: "flex items-center" do %>
-        Remove from list
+        <i data-feather="trash"></i>
       <% end %>
     </td>
   <% end %>
