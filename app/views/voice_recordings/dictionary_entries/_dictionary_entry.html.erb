@@ -16,10 +16,10 @@
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 mt-2 text-white font-bold py-2 px-4 rounded">
+    <button data-action="entry#play" class="bg-green-500 hover:bg-green-700 mt-2 text-white font-bold py-2 px-4 rounded">
       <audio src="<%= entry.media.url %>"></audio>
       play
-    </a>
+    </button>
   </td>
   <td class="px-6 py-4">
     <% if current_user %>
