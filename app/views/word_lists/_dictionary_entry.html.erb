@@ -3,12 +3,18 @@
   <td class="px-6 py-4"><%= entry.translation %></td>
   <td data-controller="entry" class="px-6 py-4">
     <% if entry.media.attached? %>
-      <a href="#" data-action="entry#play" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+      <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
         <audio src="<%= entry.media.url %>"></audio>
         play
-      </a>
+      </button>
     <% else %>
-      <span>no media</span>
+      <% if current_user %>
+        <%= form_with(model: entry) do |form| %>
+          <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
+        <% end %>
+      <% else %>
+        <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
+      <% end %>
     <% end %>
   </td>
   <% if current_user && list.owner == current_user %>
