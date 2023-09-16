@@ -8,7 +8,7 @@ class DictionaryEntriesController < ApplicationController
   def index
     records = DictionaryEntry
       .joins(:speaker)
-      .where("users.role != ?", 0)
+      .where("users.role IN (?)", [1,2])
       .where
       .not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
       .order(:id, :desc)
