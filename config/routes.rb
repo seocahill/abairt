@@ -27,7 +27,7 @@ Rails.application.routes.draw do
 
   resources :dictionary_entries
 
-  resources :word_list_dictionary_entries, only: [:create, :destroy]
+  resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
 
   get 'password_resets/new'
   post 'password_resets', to: 'password_resets#create'

@@ -1,5 +1,5 @@
 <%= content_tag :div, data: { controller: 'recorder', "recorder-autosave-value": true } do %>
   <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-    <a href="#" class='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer' data-target= 'recorder.recordButton' data-action='click->recorder#record'>Rec</a>
-    <a href="#" class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer' data-target= 'recorder.stopButton' data-action='click->recorder#stop'>Stop</a>
+    <button class='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer' data-target= 'recorder.recordButton' data-action='click->recorder#record'>Rec</button>
+    <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer' data-target= 'recorder.stopButton' data-action='click->recorder#stop'>Stop</button>
 <% end %>

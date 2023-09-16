@@ -37,6 +37,24 @@ class WordListDictionaryEntriesController < ApplicationController
   #   end
   # end
 
+  def update
+    if @word_list_dictionary_entry.update word_list_dictionary_entry_params
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            @word_list_dictionary_entry.dictionary_entry,
+            partial: "word_lists/dictionary_entry",
+            locals: { entry: @word_list_dictionary_entry.dictionary_entry, list:  @word_list_dictionary_entry.word_list, current_user: current_user, starred: current_user.starred }
+          )
+        end
+        format.html { redirect_to @word_list_dictionary_entry.word_list, notice: 'entry was successfully updated.' }
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+
   # DELETE /list_entries/1 or /list_entries/1.json
   def destroy
     @word_list_dictionary_entry.destroy
@@ -55,6 +73,6 @@ class WordListDictionaryEntriesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def word_list_dictionary_entry_params
-      params.require(:word_list_dictionary_entry).permit(:dictionary_entry_id, :word_list_id)
+      params.require(:word_list_dictionary_entry).permit(:dictionary_entry_id, :word_list_id, :media)
     end
 end
