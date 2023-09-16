@@ -18,6 +18,20 @@
     <% end %>
   </td>
   <% if current_user && list.owner == current_user %>
+    <% list_entry = WordListDictionaryEntry.find_by(dictionary_entry_id: entry.id, word_list_id: list.id) %>
+    <td data-controller="entry" class="px-6 py-4">
+      <div class="flex">
+        <% if entry.media.attached? %>
+          <button class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
+            <audio src="<%= list_entry.media.url %>"></audio>
+            play
+          </button>
+        <% end %>
+        <%= form_with(model: list_entry) do |form| %>
+          <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
+        <% end %>
+      </div>
+    </td>
     <td class="px-6 py-4">
       <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: list.id }}, class: "flex items-center" do %>
         <i data-feather="trash"></i>
