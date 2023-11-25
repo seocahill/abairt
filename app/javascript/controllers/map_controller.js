@@ -26,15 +26,17 @@ export default class extends Controller {
     });
 
     this.pinsValue.forEach((user) => {
-      let marker = L.marker(user.lat_lang.split(','))
-      let content
-      if (user.media_url) {
-        content = `<a href="/users/${user.id}">${user.name}</a><audio controls src="${user.media_url}"></audio>`;
-      } else {
-        content = `<a href="/users/${user.id}">${user.name}</a>`;
+      if (user.lat_lang && user.lat_lang.trim() !== '') {
+        let marker = L.marker(user.lat_lang.split(','))
+        let content
+        if (user.media_url) {
+          content = `<a href="/users/${user.id}">${user.name}</a><audio controls src="${user.media_url}"></audio>`;
+        } else {
+          content = `<a href="/users/${user.id}">${user.name}</a>`;
+        }
+        marker.bindPopup(content).openPopup();
+        marker.addTo(this.map);
       }
-      marker.bindPopup(content).openPopup();
-      marker.addTo(this.map);
     });
 
     if (this.hasPubsValue) {

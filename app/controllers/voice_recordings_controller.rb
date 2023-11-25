@@ -1,6 +1,5 @@
 class VoiceRecordingsController < ApplicationController
   before_action :set_voice_recording, only: %i[ show edit update destroy ]
-  before_action :authorize, except: %i[index show preview]
 
   def index
     @new_voice_recording = VoiceRecording.new
@@ -43,27 +42,31 @@ class VoiceRecordingsController < ApplicationController
       @new_dictionary_entry = @recording.dictionary_entries.build
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
-    @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil), items: PAGE_SIZE)
+    @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil).reorder(:region_start), items: PAGE_SIZE)
   end
 
   def preview
     @recording = VoiceRecording.find(params[:id])
+    authorize @recording
     @regions = set_regions
     render partial: 'waveform', locals: { recording:  @recording, regions: @regions }
   end
 
   # GET /voice_recordings/new
   def new
-    @voice_recording = VoiceRecording.new
+    @voice_recording = VoiceRecording.new(owner: current_user)
+    authorize @voice_recording
   end
 
   # GET /voice_recordings/1/edit
   def edit
+    authorize @voice_recording
   end
 
   # POST /voice_recordings or /voice_recordings.json
   def create
-    @voice_recording = VoiceRecording.new(voice_recording_params)
+    @voice_recording = VoiceRecording.new(voice_recording_params.merge(user_id: current_user.id))
+    authorize @voice_recording
 
     respond_to do |format|
       if @voice_recording.save
@@ -78,6 +81,7 @@ class VoiceRecordingsController < ApplicationController
 
   # PATCH/PUT /voice_recordings/1 or /voice_recordings/1.json
   def update
+    authorize @voice_recording
     respond_to do |format|
       if @voice_recording.update(voice_recording_params)
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully updated." }
@@ -91,6 +95,7 @@ class VoiceRecordingsController < ApplicationController
 
   # DELETE /voice_recordings/1 or /voice_recordings/1.json
   def destroy
+    authorize @voice_recording
     @voice_recording.destroy
 
     respond_to do |format|
@@ -114,9 +119,4 @@ class VoiceRecordingsController < ApplicationController
       params.require(:voice_recording).permit(:title, :description, :media, :tag_list, user_ids: [])
     end
 
-    def authorize
-      return if current_user
-
-      redirect_back(fallback_location: root_path, alert: "Caithfidh tú a bheith sínithe isteach!")
-    end
 end

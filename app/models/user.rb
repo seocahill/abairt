@@ -6,7 +6,7 @@ class User < ApplicationRecord
   before_create :generate_token
   after_create :add_default_rang
 
-  has_many :dictionary_entries, foreign_key: :speaker_id
+  has_many :dictionary_entries #, foreign_key: :speaker_id
   has_many :voice_recordings, through: :dictionary_entries
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
@@ -23,11 +23,31 @@ class User < ApplicationRecord
   has_many :user_lists, dependent: :destroy
   has_many :followed_lists, class_name: "WordList", through: :user_lists
 
-  enum role: [:student, :speaker, :teacher, :admin, :ai]
+  enum role: [
+    :student,
+    :speaker,
+    :teacher,
+    :admin,
+    :ai,
+    :place
+  ]
   enum voice: [:male, :female]
   enum dialect: [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
+  # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
+  enum ability: %i[
+    A1
+    A2
+    B1
+    B2
+    C1
+    C2
+    native
+  ]
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false }, length: {maximum: 50}
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  validates :name, presence: true
+  validates :role, exclusion: { in: %w(teacher admin) }, if: -> { role_changed? && Current.user&.admin? == false }
+
 
   class << self
     def with_unanswered_ceisteanna
@@ -38,7 +58,7 @@ class User < ApplicationRecord
       all.map do |user|
         next unless user.lat_lang.present?
 
-        user.slice(:id, :name, :lat_lang).tap do |c|
+        user.slice(:id, :name, :lat_lang, :role).tap do |c|
           if user.voice_recordings.any?
             sample = user.voice_recordings.with_attached_media.order("RANDOM()").limit(1).first
             c[:media_url] = sample.media.url
@@ -48,11 +68,23 @@ class User < ApplicationRecord
     end
   end
 
-  def address
-    return "no address provided" if lat_lang.nil?
-
-    results = Geocoder.search(lat_lang.split(','))
-    address = results.first.data.dig("address", "city_district")
+  def quality
+    case ability
+    when "A1"
+      "low"
+    when "A2"
+      "low"
+    when "B1"
+      "low"
+    when "B2"
+      "fair"
+    when "C1"
+      "good"
+    when "C2"
+      "good"
+    when "native"
+      "excellent"
+     end
   end
 
   def starred
@@ -75,10 +107,15 @@ class User < ApplicationRecord
   def clear_password_reset_token
     self.password_reset_token = nil
     self.password_reset_sent_at = nil
+    save
   end
 
   def password_reset_token_expired?
-    password_reset_sent_at < 2.hours.ago
+    password_reset_sent_at < 5.minutes.ago
+  end
+
+  def edit?
+    !student? && confirmed
   end
 
   # private

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  </head>
+  <body>
+    <h1>New signup</h1>
+    <p><%= @user.name %>.humanize with an email of <%= @user.email %> signed up <%= time_ago_in_words(@user.created_at) %> ago.</p>
+    <p>Please review their details and confirm them <a href="<%= madmin_user_url(@user) %>">here</a>.</p>
+    <p>Thank you!</p>
+  </body>
+</html>

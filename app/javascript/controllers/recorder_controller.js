@@ -6,7 +6,7 @@ export default class extends Controller {
   static values = { autosave: Boolean }
 
   connect() {
-    this.stopButtonTarget.classList.toggle('hidden')
+    this.stopButtonTarget.classList.add('hidden')
   }
 
   record(event) {
@@ -17,12 +17,16 @@ export default class extends Controller {
       this.flipButtons()
       this.recorder().start(1000)
     })
+    this.element.classList.remove('bg-blue-500')
+    this.element.classList.add('bg-red-500')
   }
 
   stop(event) {
     event.preventDefault()
     this.flipButtons()
     this.recorder().stop()
+    this.element.classList.add('bg-blue-500')
+    this.element.classList.remove('bg-red-500')
   }
 
   stream() {

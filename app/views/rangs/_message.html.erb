@@ -1,8 +1,6 @@
 <%= turbo_frame_tag dom_id(message) do %>
-  <% if current_day != message.updated_at.strftime("%d-%m-%y") %>
-    <hr>
-    <h3 class="text-lg font-medium text-gray-900 m-4"><%= message.updated_at.strftime("%d-%m-%y") %></h3>
-    <hr>
+  <% if current_day != message.updated_at.strftime("%a, %b %d, %Y") %>
+    <h3 class="text-lg font-medium text-gray-900 m-4"><%= message.updated_at.strftime("%a, %b %d, %Y") %></h3>
   <% end %>
   <div data-controller="message" data-message-user-id-value="<%= message.speaker_id %>" class="flex m-4" data-action="mouseenter->message#showDeleteButton mouseleave->message#hideDeleteButton">
     <div class="flex">
@@ -16,12 +14,12 @@
           </p>
         </div>
         <% if message.word_or_phrase.present? %>
-          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm mb-2">
+          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm mb-2 font-bold">
             <%= message.word_or_phrase%>
           </p>
         <% end %>
         <% if message.translation.present? %>
-          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm">
+          <p class="<%= current_user&.id == message.speaker_id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> rounded-xl p-3 text-sm italic">
             <%= message.translation %>
           </p>
         <% end %>

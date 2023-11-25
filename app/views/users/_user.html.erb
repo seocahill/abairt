@@ -1,0 +1,28 @@
+<tr id="<%= dom_id(user) %>" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+  <td class="px-6 py-4">
+    <%= render "users/inline_edit", model: user, method: :name, current_user: current_user do %>
+      <%= user.name.present? ? user.name : "Add name" %>
+    <% end %>
+  </td>
+  <td class="px-6 py-4">
+    <%= render "users/inline_edit", model: user, method: :voice, current_user: current_user do %>
+      <%= user.voice %>
+    <% end %>
+  </td>
+  <td class="px-6 py-4">
+    <%= render "users/inline_edit", model: user, method: :dialect, current_user: current_user do %>
+      <%= user.dialect.humanize %>
+    <% end %>
+  </td>
+  <td class="px-6 py-4 w-1/2">
+    <%= render "users/inline_edit", model: user, method: :address, current_user: current_user do %>
+      <%= user.address.present? ? user.address : "Add address" %>
+    <% end %>
+  </td>
+  <td class="px-6 py-4"><%= user.dictionary_entries&.size %></td>
+  <td class="px-6 py-4">
+    <%= link_to user do %>
+      <i data-feather="eye"></i>
+    <% end %>
+  </td>
+</tr>

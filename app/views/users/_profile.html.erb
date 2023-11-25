@@ -1,0 +1,61 @@
+<div id="<%= dom_id(@user) %>" class="m-10">
+  <div class="px-4 sm:px-0">
+    <h3 class="text-base font-semibold leading-7 text-gray-900">
+      <%= @user.name %>
+      <span class="bg-green-200 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-700 dark:text-green-300"><%= @user.role.humanize %></span>
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">User profile</p>
+  </div>
+  <div class="mt-6 border-t border-gray-100">
+    <dl class="divide-y divide-gray-100">
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Full name</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <%= render "users/inline_edit", model: @user, method: :name, current_user: current_user do %>
+            <%= @user.name  %>
+          <% end %>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Email address</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <%= render "users/inline_edit", model: @user, method: :email, current_user: current_user do %>
+            <%= @user.email  %>
+          <% end %>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">About</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <%= render "users/inline_edit", model: @user, method: :about, current_user: current_user do %>
+            <%= @user.about || "Add information" %>
+          <% end %>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Voice</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <%= render "users/inline_edit", model: @user, method: :voice, current_user: current_user do %>
+            <%= @user.voice  %>
+          <% end %>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Location</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <%= render "users/inline_edit", model: @user, method: :address, current_user: current_user do %>
+            <%= @user.address || "Add your address"  %>
+          <% end %>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Language ability</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <%= render "users/inline_edit", model: @user, method: :ability, current_user: current_user do %>
+            <%= @user.ability&.humanize || "Add your ability"  %>
+          <% end %>
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<% frame_id = dom_id(form.object, "#{method}_turbo_frame") %>
+<turbo-frame id="<%= frame_id %>" class="contents">
+  <%= yield %>
+  <div class="flex items-center justify-center mt-2">
+    <%= form.button class: "py-1 px-2 text-sm bg-green-500 text-white rounded" do %> Save<% end %>
+    <%= link_to "Cancel", :back, class: "py-1 px-2 text-sm text-gray-500 rounded hover:bg-gray-500 hover:text-black" %>
+  </div>
+  <% if form.object.errors.any? %>
+    <div id="error_explanation" class="mt-3 text-sm text-red-500">
+      <ul class="list-disc list-inside">
+        <% form.object.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</turbo-frame>

@@ -1,83 +1,6 @@
 <!-- Sidebar for CRUD -->
 <div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div class="mb-4">
-      <nav>
-        <ul class="flex flex-col py-2" data-sidebar-target="tabs">
-          <li>
-            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab3">Tags</a>
-          </li>
-          <% if current_user %>
-            <li>
-              <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab2">Add to Dictionary</a>
-            </li>
-          <% end %>
-        </ul>
-      </nav>
-    </div>
-    <div class="tab-content">
-      <% if current_user %>
-        <div class="tab-pane hidden" id="tab2">
-          <%= form_with(model: @new_dictionary_entry, class: "", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
-            <div class="mt-1">
-              <label for="speaker_id" class="block text-sm font-medium text-gray-700">Speaker</label>
-              <div class="mt-1">
-                <%= form.text_field :speaker_id, list: "speaker-list", class:  "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", placeholder: "Search for or create new speaker", value: @new_dictionary_entry.speaker.name %>
-                <datalist id="speaker-list">
-                  <% @speaker_names.each do |name| %>
-                    <option value="<%= name %>">
-                  <% end %>
-                </datalist>
-              </div>
-            </div>
-            <div class="mt-1" data-controller="dictionary-entry" data-dictionary-entry-target="wordSearch">
-              <label for="search" class="block text-sm font-medium text-gray-700">Irish</label>
-              <div class="mt-1">
-                <%= form.text_area :word_or_phrase,  class: "h-15 py-2 px-3 border border-gray-300 rounded-md w-full", id: "autoCompleteEntry" %>
-              </div>
-            </div>
-            <div class="mt-1">
-              <label for="search" class="block text-sm font-medium text-gray-700">English</label>
-              <div class="mt-1">
-                <%= form.text_area :translation,  class: "h-15 py-2 px-3 border border-gray-300 rounded-md w-full" %>
-              </div>
-            </div>
-            <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
-              <label for="tag_list" class="block text-sm font-medium text-gray-700">Tags</label>
-              <div class="mt-1">
-                  <%= form.text_area :tag_list,  class: "h-15 py-2 px-3 border border-gray-300 rounded-md w-full", id: "autoCompleteTags" %>
-              </div>
-            </div>
-            <div class="mt-1">
-              <ul class="rounded p-2 max-w-md" id="selectedTags"></ul>
-            </div>
-            <%= content_tag :div, data: { controller: 'recorder' }, class: "mt-1 w-full text-center mx-auto" do %>
-              <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-              <%= content_tag :div, "Record voice",
-                                class: 'bg-green-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
-                                data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
-              <%= content_tag :div, "Stop",
-                                class: 'bg-red-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
-                                data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
-            <% end %>
-            <div class="w-full text-center mx-auto mt-1">
-              <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-      <div class="tab-pane hidden" id="tab3">
-        <aside>
-            <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
-            <ul class="flex flex-wrap -mx-1">
-              <% @tags.each do |tag| %>
-                <li class="my-1 mx-1"><%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "inline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300" %></li>
-              <% end %>
-            </ul>
-          </aside>
-      </div>
-    </div>
-  </div>
+  <%= render "sidebar" %>
 </div>
 
 <!-- Primary Content Area: Two Rectangles -->
@@ -107,6 +30,10 @@
               <th scope="col" class="px-6 py-3">Audio</th>
               <% if current_user %>
                 <th scope="col" class="px-6 py-3">Add to List</th>
+              <% end %>
+              <% if current_user&.edit?  %>
+                <th scope="col" class="px-6 py-3"></th>
+                <th scope="col" class="px-6 py-3"></th>
                 <th scope="col" class="px-6 py-3"></th>
               <% end %>
             </tr>

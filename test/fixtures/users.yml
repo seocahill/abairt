@@ -4,7 +4,7 @@ one:
   email: seosamh@seocahill.com
   name: Seosamh Ó Cathail
   password_digest: MyString
-  role: :teacher
+  confirmed: true
 
 two:
   email: dazpatreg@yahoo.ie
@@ -20,6 +20,7 @@ four:
   email: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair@abairt.com
   name: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair
   password_digest: MyString
+  role: speaker
 
 five:
   email: Padraic Ó Murachú@abairt.com
@@ -30,3 +31,8 @@ john:
   email: john@abairt.com
   name: John McShean
   password_digest: jonnypass
+
+caotharnach:
+  name: "An Caotharnach"
+  role: "ai"
+  email: "ai@abairt.com"

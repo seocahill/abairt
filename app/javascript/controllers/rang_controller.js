@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import autoComplete from "autocomplete";
+import feather from "feather-icons"
 
 export default class extends Controller {
   static targets = ["cell", "dropdown", "time", "wordSearch", "list"]
@@ -12,11 +13,14 @@ export default class extends Controller {
     })
   }
 
+  connect() {
+    feather.replace()
+  }
+
   prevMessages(e) {
     e.preventDefault()
     document.querySelectorAll('.previous-messages').forEach(node => node.classList.remove('hidden'));
   }
-
 
   resetForm(target) {
     try {

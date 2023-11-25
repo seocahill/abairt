@@ -3,20 +3,22 @@
 require "csv"
 
 class DictionaryEntry < ApplicationRecord
+  # only save new version if different user
+  has_paper_trail only: [:word_or_phrase, :translation], if: Proc.new { |entry| Current.user&.id&.to_s != entry.versions.last&.whodunnit }, limit: 5, on: %i[update destroy]
+
   has_one_attached :media
 
   has_many :rang_entries, dependent: :destroy
   has_many :rangs, through: :rang_entries
 
   belongs_to :speaker, class_name: "User", foreign_key: "speaker_id", optional: true
+  belongs_to :owner, class_name: "User", foreign_key: "user_id"
 
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
   belongs_to :voice_recording, optional: true
 
   has_many :word_list_dictionary_entries, dependent: :destroy
   has_many :word_lists, through: :word_list_dictionary_entries
-
-  enum status: [:normal, :ceist, :foghraíocht]
 
   acts_as_taggable_on :tags
 
@@ -25,7 +27,13 @@ class DictionaryEntry < ApplicationRecord
   scope :has_recording, -> { joins(:media_attachment) }
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? }
-
+  # Based on CEFR scale i.e. low: < B2, fair: B2, good: C, excellent: native
+  enum quality: %i[
+    low
+    fair
+    good
+    excellent
+  ]
   class << self
     def to_csv
       attributes = %w[word_or_phrase translation media_url]
@@ -110,6 +118,22 @@ class DictionaryEntry < ApplicationRecord
 
   def create_ai_response(rang)
     ChatBotJob.perform_later(self, rang)
+  end
+
+  def auto_tag
+    client = OpenAI::Client.new(access_token: Rails.application.credentials.dig(:openai, :openai_key),
+      organization_id: Rails.application.credentials.dig(:openai, :openai_org))
+
+    prompt = "Please analyze the following phrase and generate tags with a focus on grammatical features, broader semantic categories relevant to language learners and also a mood. Keep the selected categories general and not too granular. Return up to two category tags, a single grammatical feature tag and a single mood or voice tag, the most relevant of each in your opinion. The results you return should be a single array of the tags you have chose, nothing else. Phrase: #{translation}"
+
+    response = client.chat(parameters: {
+      model: "gpt-4-1106-preview",  # or use the appropriate model you have access to
+      messages: [
+        { "role": "user", "content": prompt }
+      ]
+    })
+    self.tag_list = JSON.parse(response.dig('choices', 0, 'message', 'content'))
+    save
   end
 
   def transcribe_audio(file_path, content_type = 'mp3')

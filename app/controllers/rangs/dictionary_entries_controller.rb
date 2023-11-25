@@ -1,9 +1,9 @@
 class Rangs::DictionaryEntriesController < ApplicationController
   # POST /dictionary_entries or /dictionary_entries.json
-  before_action :authorize
 
   def create
-    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(speaker_id: current_user.id))
+    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(speaker_id: current_user.id, user_id: current_user.id, quality: current_user.quality))
+    authorize @dictionary_entry
 
     respond_to do |format|
       if @dictionary_entry.save
@@ -35,6 +35,6 @@ class Rangs::DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :tag_list, :speaker_id, rang_ids: [])
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :tag_list, :speaker_id, :quality, rang_ids: [])
   end
 end

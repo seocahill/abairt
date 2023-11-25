@@ -5,7 +5,7 @@
   </div>
   <%# form %>
   <div class="flex flex-row">
-    <% if current_user&.teacher? || current_user&.admin? %>
+    <% if current_user&.edit? %>
       <div class="w-full p-4 mt-4 bg-gray-100" data-controller="sidebar">
         <%= form_with(model: [@recording, @new_dictionary_entry], class: "space-y-4") do |form| %>
           <% if @new_dictionary_entry.errors.any? %>
@@ -63,7 +63,11 @@
             <th scope="col" class="px-6 py-3" >Irish</th>
             <th scope="col" class="px-6 py-3" >English</th>
             <th scope="col" class="px-6 py-3" >Audio</th>
-            <th scope="col" class="px-6 py-3" ></th>
+            <th scope="col" class="px-6 py-3" title="Based on translator's language ability" >Quality</th>
+            <% if current_user && @entries.any? { |e| current_user.id == e.user_id } %>
+              <th scope="col" class="px-6 py-3" ></th>
+              <th scope="col" class="px-6 py-3" ></th>
+            <% end %>
           </tr>
         </thead>
         <tbody id="transcriptions">

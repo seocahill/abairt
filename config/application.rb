@@ -19,7 +19,7 @@ module Abairt
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-    config.action_mailer.default_url_options = { host: "abairt.herokuapp.com" }
+    config.action_mailer.default_url_options = { host: "localhost:3000" }
 
     # override migrations path
     config.paths['db/migrate'] = ['migrations']

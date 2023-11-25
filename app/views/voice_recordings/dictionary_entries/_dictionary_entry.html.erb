@@ -1,5 +1,9 @@
 <tr data-controller="entry" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>">
-  <td class="px-6 py-4"><%= link_to entry.speaker.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %></td>
+  <td class="px-6 py-4">
+     <%= render "dictionary_entries/inline_edit", model: entry, method: :speaker_id, current_user: current_user do %>
+        <%= link_to_unless policy(entry).edit?, entry.speaker.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
+    <% end %>
+  </td>
   <td class="px-6 py-4">
     <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
       <%= entry.region_start.round(1) %>-<%= entry.region_end.round(1) %>
@@ -22,10 +26,18 @@
     </button>
   </td>
   <td class="px-6 py-4">
-    <% if current_user %>
+    <span class="<%= pill_color(entry) %>"><%= entry.quality %></span>
+  </td>
+  <% if current_user && entry.user_id == current_user.id %>
+    <td class="px-6 py-4">
+      <%= link_to dictionary_entry_path(entry) do %>
+        <i data-feather="eye"></i>
+      <% end %>
+    </td>
+    <td class="px-6 py-4">
       <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' } do %>
         <i data-feather="trash"></i>
       <% end %>
-    <% end %>
-  </td>
+    </td>
+  <% end %>
 </tr>

@@ -4,23 +4,34 @@ one:
   word_or_phrase: "Marbhfháisc ort"
   translation: "The death cowl on you"
   speaker: one
+  owner: one
+  quality: good
 
 two:
   word_or_phrase: "Cén chaoi gur éirigh leat"
   translation: "How did you get on"
   speaker: one
+  owner: one
+  quality: good
+
 
 three:
   word_or_phrase: "Ní thig leis an ngobadán dhá thráigh a fhreastal"
   translation: "you can't do two things at once"
   speaker: one
+  owner: one
+  quality: excellent
 
 four:
   word_or_phrase: "Airím uaim thú"
   translation: "i miss you"
   speaker: one
+  owner: one
+  quality: good
+
 
 five:
   word_or_phrase: "A chladhaire"
   translation: "You divil!"
   speaker: one
+  owner: one

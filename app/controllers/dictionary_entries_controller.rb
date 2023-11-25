@@ -2,15 +2,11 @@
 
 class DictionaryEntriesController < ApplicationController
   before_action :set_dictionary_entry, only: %i[show edit update update_all destroy]
-  before_action :authorize, only: %i[new create edit destroy]
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
     records = DictionaryEntry
-      .joins(:speaker)
-      .where("users.role IN (?)", [1,2])
-      .where
-      .not("(dictionary_entries.word_or_phrase <> '') IS NOT TRUE")
+      .not_low
       .order(:id, :desc)
 
     if params[:search].present?
@@ -26,7 +22,7 @@ class DictionaryEntriesController < ApplicationController
     end
 
     if current_user
-      @new_dictionary_entry = current_user.dictionary_entries.build
+      @new_dictionary_entry = current_user.dictionary_entries.build(speaker: current_user)
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
 
@@ -56,19 +52,26 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries/new
   def new
-    @dictionary_entry = DictionaryEntry.new
+    @dictionary_entry = DictionaryEntry.new(owner: current_user, speaker: current_user)
+    authorize @dictionary_entry
   end
 
   # GET /dictionary_entries/1/edit
-  def edit; end
+  def edit
+    authorize @dictionary_entry
+  end
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
     speaker = dictionary_entry_params["speaker_id"] ? User.find(dictionary_entry_params["speaker_id"]) : current_user
-    @dictionary_entry = speaker.dictionary_entries.build(dictionary_entry_params)
+    @dictionary_entry = speaker.dictionary_entries.build(dictionary_entry_params.merge(user_id: current_user.id, quality: current_user.quality))
+    authorize @dictionary_entry
 
     respond_to do |format|
       if @dictionary_entry.save
+        # auto_tag
+        AutoTagEntryJob.perform_later(@dictionary_entry)
+
         format.html { redirect_to @dictionary_entry }
         format.turbo_stream do
           render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
@@ -82,6 +85,20 @@ class DictionaryEntriesController < ApplicationController
 
   # PATCH/PUT /dictionary_entries/1 or /dictionary_entries/1.json
   def update
+    authorize @dictionary_entry
+
+    # purge media
+    if params.dig(:dictionary_entry, :purge)
+      @dictionary_entry.media.purge
+    end
+
+    # datalist sends name over the wire, need id. Also might not exist yet.
+    speaker = User.where(name: dictionary_entry_params[:speaker_id]).first_or_create do |user|
+      user.email = "#{SecureRandom.alphanumeric}@abairt.com"
+      user.role = :speaker
+      user.password = SecureRandom.alphanumeric
+    end
+
     if @dictionary_entry.update dictionary_entry_params
       respond_to do |format|
         format.turbo_stream do
@@ -100,6 +117,7 @@ class DictionaryEntriesController < ApplicationController
 
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
+    authorize @dictionary_entry
     broadcast = @dictionary_entry.rangs.any?
     @dictionary_entry.destroy
     Turbo::StreamsChannel.broadcast_remove_to("rangs", target: @dictionary_entry) if broadcast
@@ -124,6 +142,6 @@ class DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :speaker_id, :tag_list)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :speaker_id, :tag_list, :quality)
   end
 end

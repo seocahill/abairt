@@ -16,7 +16,7 @@ export default class extends Controller {
   }
 
   addToList(e) {
-    const wordListId = e.target.value
+    const wordListId = e.target.dataset.listId
     let formData = new FormData()
     formData.append("word_list_dictionary_entry[dictionary_entry_id]", this.idValue)
     formData.append("word_list_dictionary_entry[word_list_id]", wordListId)

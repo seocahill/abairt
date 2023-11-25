@@ -1,0 +1,20 @@
+<button id="dropdownUsersButton" data-dropdown-toggle="dropdown<%= entry.id %>" data-dropdown-placement="bottom" class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800" type="button">Lists <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+  </svg>
+</button>
+<!-- Dropdown menu -->
+<div id="dropdown<%= entry.id %>" class="z-10 hidden bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+  <ul class="h-32 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
+    <% current_user.own_lists.where(starred: nil).each do |list| %>
+      <li>
+        <a href="#" data-action="click->entry#addToList" data-list-id="<%= list.id %>" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+          <%= list.name %> <% if list.dictionary_entries.include?(entry) %> <i data-feather="check"></i><% end %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+  <%= link_to word_lists_path, class: "flex items-center p-3 text-sm font-medium text-gray-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-500 hover:underline" do %>
+    <i data-feather="plus"></i>
+    Add new list
+  <% end %>
+</div>

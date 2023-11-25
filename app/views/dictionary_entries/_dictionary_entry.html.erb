@@ -54,21 +54,20 @@
   </td>
   <% if current_user %>
     <td class="px-6 py-4">
-      <% if current_user.own_lists.where(starred: nil).any? %>
-        <select class="block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2" data-action="change->entry#addToList">
-          <option value="default" selected="selected">On <%= entry.word_lists.size %> lists</option>
-          <% current_user.own_lists.where(starred: nil).each do |list| %>
-            <% next if list.dictionary_entries.include? entry %>
-
-            <option value="<%= list.id %>"><%= list.name %></option>
-          <% end %>
-        </select>
-      <% elsif current_user %>
-        <%= link_to "Create your first list", word_lists_path, class: "cursor-pointer, hover:text-blue-700 hover:underline" %>
-      <% end %>
+      <%= render "dictionary_entries/list", entry: entry, rand: rand(1000) %>
     </td>
   <% end %>
-  <% if current_user && entry.speaker_id == current_user.id %>
+  <% if current_user&.admin? || (current_user && entry.speaker_id == current_user.id) %>
+    <td class="px-6 py-4">
+      <%= link_to dictionary_entry_path(entry) do %>
+        <i data-feather="eye"></i>
+      <% end %>
+    </td>
+    <td class="px-6 py-4">
+      <%= button_to dictionary_entry_path(entry), title: "Delete recording", method: :patch, form: { data: { turbo_confirm: 'Delete recording?' } }, params: { dictionary_entry: { purge: true } }, class: "flex items-center" do %>
+        <i data-feather="delete"></i>
+      <% end %>
+    </td>
     <td class="px-6 py-4">
       <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' }, class: "" do %>
         <i data-feather="trash"></i>

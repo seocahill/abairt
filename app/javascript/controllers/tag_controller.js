@@ -10,8 +10,9 @@ export default class extends Controller {
 
   tagSearchTargetConnected() {
     const selectedTags = [];
+    const id = `#${this.element.getElementsByTagName("textarea")[0].id}`
     const tagsSearch = new autoComplete({
-      selector: "#autoCompleteTags",
+      selector: id,
       placeHolder: "Separate each tag with a comma",
       debounce: 300,
       searchEngine: function (query, record) {

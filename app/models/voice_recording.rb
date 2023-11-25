@@ -4,6 +4,8 @@ class VoiceRecording < ApplicationRecord
   has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: 'User'
   after_commit :enqueue_generate_peaks_job
 
+  belongs_to :owner, class_name: "User", foreign_key: "user_id"
+
   acts_as_taggable_on :tags
 
   def meeting_id
