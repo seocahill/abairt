@@ -105,7 +105,7 @@ class DictionaryEntry < ApplicationRecord
     response = OpenAI::Client.new(
       access_token: Rails.application.credentials.dig(:openai, :openai_key),
       organization_id: Rails.application.credentials.dig(:openai, :openai_org)).chat(parameters: {
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4-1106-preview',
         messages: messages,
         temperature: 0.5
       })

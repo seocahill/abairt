@@ -9,7 +9,7 @@ class RangsController < ApplicationController
     authorize(Rang)
 
     @current_user = current_user
-    @rangs = current_user.lectures + current_user.rangs
+    @rangs = (current_user.lectures + current_user.rangs).uniq
     @students = User.student
   end
 

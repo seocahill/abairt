@@ -32,7 +32,7 @@ class ChatBotJob < ApplicationJob
 
     # generate a text response
     irish = question.chat_with_gpt(rang)
-    new_entry = DictionaryEntry.create(speaker: rang.teacher, word_or_phrase: irish, translation: nil)
+    new_entry = DictionaryEntry.create(speaker: rang.teacher, word_or_phrase: irish, translation: nil, owner: rang.teacher)
 
     # synth into gaelic
     new_entry.synthesize_text_to_speech_and_store if question.media.attached?

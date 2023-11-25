@@ -6,7 +6,7 @@ class Rang < ApplicationRecord
   accepts_nested_attributes_for :rang_entries
 
   has_many :seomras, dependent: :destroy
-  has_many :users, through: :seomras
+  has_many :users, -> { distinct },through: :seomras
   accepts_nested_attributes_for :seomras
 
   belongs_to :teacher, class_name: "User", foreign_key: "user_id"

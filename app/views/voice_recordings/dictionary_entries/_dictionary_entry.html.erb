@@ -26,7 +26,7 @@
     </button>
   </td>
   <td class="px-6 py-4">
-    <span class="<%= pill_color(entry) %>"><%= entry.quality %></span>
+    <span title="Translated by <%= entry.owner.name %>" class="<%= pill_color(entry) %>"><%= link_to entry.quality, user_path(entry.owner) %></span>
   </td>
   <% if current_user && entry.user_id == current_user.id %>
     <td class="px-6 py-4">
