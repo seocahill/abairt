@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Sentry.init do |config|
+  config.dsn = Rails.application.credentials.dig(:sentry_dsn)
   config.breadcrumbs_logger = [:active_support_logger]
 
   # To activate performance monitoring, set one of these options.

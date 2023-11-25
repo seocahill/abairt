@@ -57,3 +57,5 @@ gem "pundit", "~> 2.3"
 gem "paper_trail", "~> 15.0"
 
 gem "madmin", "~> 1.2"
+
+gem "mailjet", "~> 1.7"
