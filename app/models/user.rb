@@ -100,7 +100,7 @@ class User < ApplicationRecord
   end
 
   def generate_password_reset_token
-    self.password_reset_token = SecureRandom.urlsafe_base64
+    self.password_reset_token = SecureRandom.urlsafe_base64(32)
     self.password_reset_sent_at = Time.current
   end
 
