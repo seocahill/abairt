@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   # GET /users or /users.json
   def index
     @template = "user"
-    records = User.where.where(ability: %i[C1 C2 native]).where.not(id: nil)
+    records = User.where(ability: %i[C1 C2 native]).where.not(id: nil)
 
     if params[:search].present?
       # records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
