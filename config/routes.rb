@@ -20,6 +20,7 @@ Rails.application.routes.draw do
 
   scope controller: :sessions do
     get "login" => :new
+    get 'login_with_token/:token' => :login_with_token, as: :login_with_token
     post "login" => :create
     delete "logout" => :destroy
   end

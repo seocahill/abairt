@@ -24,6 +24,15 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Login successful.', flash[:notice]
   end
 
+  test "should set session and redirect to user path on successful login with token" do
+    get login_with_token_url(@user.password_reset_token)
+
+    assert_nil @user.reload.password_reset_token
+    assert_equal @user.id, session[:user_id]
+    assert_redirected_to user_path(@user)
+    assert_equal 'Login successful.', flash[:notice]
+  end
+
   test "should show alert and redirect to login path if user is nil or password reset token is expired on create" do
     post login_path, params: { token: "invalid_token" }
 
