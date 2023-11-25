@@ -1,0 +1,82 @@
+<div id="accordion-collapse" data-accordion="collapse" data-controller="sidebar">
+  <h2 id="accordion-collapse-heading-1">
+    <button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3" data-accordion-target="#accordion-collapse-body-1" aria-expanded="true" aria-controls="accordion-collapse-body-1">
+      <span>Search and Filter</span>
+      <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+      </svg>
+    </button>
+  </h2>
+  <div id="accordion-collapse-body-1" class="hidden" aria-labelledby="accordion-collapse-heading-1">
+    <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+      <form class="space-y-4" action="/users">
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+          <div class="mt-1">
+            <input type="search" id="search" placeholder="Speaker name" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
+          </div>
+        </div>
+        <div class="text-right">
+          <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <h2>
+    <a href="<%= @showmap ? '/users' : '/users?map=true' %>" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 <% if current_user&.edit? %>border-b-0<% end %>">
+      <span>Toggle Mapview</span>
+      <i class="w-3 h-3 rotate-180 shrink-0" data-feather="map"></i>
+    </a>
+  </h2>
+  <% if current_user&.edit? %>
+    <h2 id="accordion-collapse-heading-3">
+      <button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3" data-accordion-target="#accordion-collapse-body-3" aria-expanded="false" aria-controls="accordion-collapse-body-3">
+        <span>Cainteoir nó Áit Úr</span>
+        <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+        </svg>
+      </button>
+    </h2>
+    <div id="accordion-collapse-body-3" class="hidden" aria-labelledby="accordion-collapse-heading-3">
+      <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+        <%= form_with(model: @new_speaker) do |form| %>
+          <div class="mt-1">
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <div class="mt-1">
+              <%= form.text_field :name,  class: "w-full", required: true %>
+            </div>
+          </div>
+          <%= form.hidden_field :email, class: "w-full", value: SecureRandom.hex(15) %>
+          <div class="mt-1">
+            <label for="search" class="block text-sm font-medium text-gray-700">Type</label>
+            <%= form.select :role, ["speaker", "place"], :default => 'speaker', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+          </div>
+          <div class="mt-1">
+            <label for="search" class="block text-sm font-medium text-gray-700">Voice</label>
+            <%= form.select :voice, ["male", "female"], :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+          </div>
+          <div class="mt-1">
+            <label for="search" class="block text-sm font-medium text-gray-700">Dialect</label>
+            <%= form.select :dialect, User.dialects.keys, :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
+          </div>
+          <div class="mt-1" data-controller="location" data-location-target="locationSearch">
+            <label class="block text-sm font-medium text-gray-700">Location</label>
+            <div class="mb-1">
+              <%= form.text_area :address, id: "autoCompleteLocation", type: "search", class: "w-full"  %>
+              <%= form.hidden_field :lat_lang, id: "user-lat-lang" %>
+            </div>
+          </div>
+          <div class="mt-1">
+            <label class="block text-sm font-medium text-gray-700">About</label>
+            <div class="mb-1">
+              <%= form.text_area :about, class: "w-full"  %>
+            </div>
+          </div>
+          <div class="w-full text-center mx-auto mt-1">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

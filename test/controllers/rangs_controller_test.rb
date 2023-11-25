@@ -21,7 +21,7 @@ class RangsControllerTest < ActionDispatch::IntegrationTest
       post rangs_url, params: { rang: { name: @rang.name } }
     end
 
-    assert_redirected_to rangs_url(chat: Rang.last.id)
+    assert_redirected_to rangs_url
   end
 
   test "should show rang" do

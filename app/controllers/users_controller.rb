@@ -4,14 +4,15 @@ Pub = Struct.new(:name, :lat_lang, :url)
 
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
-  before_action :authorize, except: %i[index show]
 
   # GET /users or /users.json
   def index
-    records = User.where(role: [:speaker, :teacher]).where.not(id: nil)
+    @template = "user"
+    records = User.where.not(role: :student).where.not(id: nil)
 
     if params[:search].present?
-      records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
+      # records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
+      records = User.where("name LIKE ?", "%#{params[:search]}%")
     end
 
     if params[:dialect].present?
@@ -21,7 +22,7 @@ class UsersController < ApplicationController
 
     @showmap = params[:map]
 
-    @pins = User.where(role: [:speaker, :teacher]).where.not(lat_lang: nil).map do |g|
+    @pins = User.where(ability: %i[C1 C2 native]).where.not(lat_lang: nil).map do |g|
       g.slice(:id, :name, :lat_lang).tap do |c|
         if (sample = g.dictionary_entries.detect { |d| d.media&.audio? }&.media)
           c[:media_url] = Rails.application.routes.url_helpers.rails_blob_url(sample)
@@ -29,9 +30,15 @@ class UsersController < ApplicationController
       end
     end
 
-    @pubs = pub_list
+    @pubs = User.place.where.not(lat_lang: nil).map do |g|
+      g.slice(:id, :name, :lat_lang).tap do |c|
+        c[:url] = g.about
+      end
+    end
 
-    @new_speaker = User.new
+    if current_user&.edit?
+      @new_speaker = User.new(role: :speaker)
+    end
 
     @pagy, @users = pagy(records, items: PAGE_SIZE)
 
@@ -45,6 +52,8 @@ class UsersController < ApplicationController
   def show
     @pagy, @entries = pagy(@user.dictionary_entries, items: PAGE_SIZE)
     @starred = current_user&.starred
+    @new_speaker = User.new
+    @template = "profile"
 
     respond_to do |format|
       format.html
@@ -54,19 +63,22 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    @user = User.new(role: :speaker)
+    authorize(current_user)
+    @user = User.new
   end
 
   # GET /users/1/edit
-  def edit; end
+  def edit
+    authorize current_user
+  end
 
   # POST /users or /users.json
   def create
-    password = SecureRandom.uuid
-    email = user_params[:email].present? ? user_params[:email] : user_params[:name].split.join + "@abairt.com"
-    @user = User.new(user_params.merge(password: password, email: email, role: :speaker))
+    authorize current_user
+    @user = User.new(user_params.merge(password: SecureRandom.uuid))
+
     respond_to do |format|
-      if @user.save
+      if @user.save!
         format.html { redirect_to @user, notice: 'User was successfully created.' }
         format.json { render :show, status: :created, location: @user }
       else
@@ -78,8 +90,17 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1 or /users/1.json
   def update
+    authorize current_user
+
     respond_to do |format|
       if @user.update(user_params)
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            @user,
+            partial: params["partial"],
+            locals: { user: @user, current_user: current_user }
+          )
+        end
         format.html { redirect_to @user, notice: 'User was successfully updated.' }
         format.json { render :show, status: :ok, location: @user }
       else
@@ -91,6 +112,7 @@ class UsersController < ApplicationController
 
   # DELETE /users/1 or /users/1.json
   def destroy
+    authorize current_user
     # FIXME implement soft delete
     # render head :ok
     # @user.destroy
@@ -112,22 +134,12 @@ class UsersController < ApplicationController
 
   end
 
-  def authorize
-    # when params present have to be logged into own account to edit/destroy/update
-    return if current_user && (current_user&.id == params[:id])
-    # for new and create a teacher or admin can access
-    return if current_user.teacher? || current_user.admin?
-
-    redirect_to root_path
-  end
-
   # Use callbacks to share common setup or constraints between actions.
   def set_user
     @user = User.find(params[:id])
   end
 
-  # Only allow a list of trusted parameters through.
   def user_params
-    params.require(:user).permit(:email, :name, :password, :dialect, :voice, :lat_lang)
+    params.require(:user).permit(:email, :name, :password, :dialect, :voice, :lat_lang, :role, :address, :about, :ability)
   end
 end

@@ -1,6 +1,5 @@
 class WordListsController < ApplicationController
   before_action :set_word_list, only: [:show, :edit, :update, :destroy]
-  before_action :authenticate, except: [:show, :index]
 
   # GET /word_lists
   def index
@@ -26,15 +25,18 @@ class WordListsController < ApplicationController
   # GET /word_lists/new
   def new
     @word_list = WordList.new
+    authorize @word_list
   end
 
   # GET /word_lists/1/edit
   def edit
+    authorize @word_list
   end
 
   # POST /word_lists
   def create
     @word_list = current_user.own_lists.build(word_list_params)
+    authorize @word_list
 
     if @word_list.save
       redirect_to @word_list, notice: 'Word list was successfully created.'
@@ -45,6 +47,8 @@ class WordListsController < ApplicationController
 
   # PATCH/PUT /word_lists/1
   def update
+    authorize @word_list
+
     if @word_list.update(word_list_params)
       redirect_to @word_list, notice: 'Word list was successfully updated.'
     else
@@ -54,6 +58,7 @@ class WordListsController < ApplicationController
 
   # DELETE /word_lists/1
   def destroy
+    authorize @word_list
     @word_list.destroy
     redirect_to word_lists_url, notice: 'Word list was successfully destroyed.'
   end

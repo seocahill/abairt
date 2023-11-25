@@ -3,119 +3,14 @@
 
 <!-- Sidebar for CRUD -->
 <div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div id="meet" class="mb-2"></div>
-    <h2 class="text-lg font-medium text-gray-900 mb-4">Classes</h2>
-    <form class="space-y-4" action="/rangs">
-      <div>
-        <div class="mt-1">
-          <input type="search" id="search" placeholder="Search rangs" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-        </div>
-      </div>
-      <aside>
-        <ul class="divide-y divide-gray-200">
-          <% @rangs.each do |contact| %>
-            <li class="flex items-center py-2 px-4 <%= if @rang.id == contact.id; 'bg-gray-200' else; 'hover:bg-gray-50' end %>">
-              <div class="ml-3">
-                <%= link_to contact.name, rangs_path(chat: contact.id), class: "text-base font-medium text-gray-900" %>
-              </div>
-            </li>
-          <% end %>
-        </ul>
-      </aside>
-    </form>
-    <div class="mt-4">
-      <% if current_user.teacher? || current_user.admin? %>
-        <%= link_to "Add new Class", new_rang_path, class: "bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600" %>
-      <% end %>
-    </div>
-  </div>
+  <%= render "sidebar" %>
 </div>
 <!-- Primary Content Area: Two Rectangles -->
-<div id="rang" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-current-user-id="<%= @current_user.id %>" class="w-full md:w-3/4 p-4">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div class="flex-1 flex flex-col bg-gray-50">
-      <header class="flex-shrink-0 bg-white border-b border-gray-200">
-        <div class="flex justify-between px-4 py-3 sm:px-6">
-          <h2 class="text-lg font-medium leading-6 text-gray-900">
-            <% if other_participents.present? %>
-              With <%= other_participents.join(', ') %> | <%= link_to "chat settings and participants", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
-            <% elsif current_user.teacher? %>
-              No one to chat with! Add students <%= link_to "here", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
-            <% end %>
-          </h2>
-          <% unless @rang.teacher.email == "ai@abairt.com" %>
-            <div class="flex items-center">
-              <button id="hang-up" class="p-2 bg-red-700 hidden rounded-full" data-action="click->rang#endMeeting">
-                <svg class="h-6 w-6 text-white" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path clip-rule="evenodd" d="M3.5 2A1.5 1.5 0 002 3.5V5c0 1.149.15 2.263.43 3.326a13.022 13.022 0 009.244 9.244c1.063.28 2.177.43 3.326.43h1.5a1.5 1.5 0 001.5-1.5v-1.148a1.5 1.5 0 00-1.175-1.465l-3.223-.716a1.5 1.5 0 00-1.767 1.052l-.267.933c-.117.41-.555.643-.95.48a11.542 11.542 0 01-6.254-6.254c-.163-.395.07-.833.48-.95l.933-.267a1.5 1.5 0 001.052-1.767l-.716-3.223A1.5 1.5 0 004.648 2H3.5zm9.78.22a.75.75 0 10-1.06 1.06L13.94 5l-1.72 1.72a.75.75 0 001.06 1.06L15 6.06l1.72 1.72a.75.75 0 101.06-1.06L16.06 5l1.72-1.72a.75.75 0 00-1.06-1.06L15 3.94l-1.72-1.72z" fill-rule="evenodd"></path>
-                </svg>
-              </button>
-              <button id="call" class="p-2 bg-green-500 rounded-full" data-action="click->rang#startMeeting">
-                <svg class="h-6 w-6 text-white" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path clip-rule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 012.43 8.326 13.019 13.019 0 012 5V3.5z" fill-rule="evenodd"></path>
-                </svg>
-              </button>
-            </div>
-          <% end %>
-        </div>
-      </header>
-      <div class="h-screen flex flex-col">
-        <section class="flex-1 overflow-y-auto" data-rang-target="list" id="messages-list-container">
-          <div class="px-4 py-6 sm:px-6">
-            <div class="mt-8">
-              <% if @pagy.prev %>
-                <a href="#" data-action="click->rang#prevMessages" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-full">Load older messages</a>
-              <% end %>
-              <div id="messages_list">
-                <%= turbo_frame_tag "paginate_page_#{@pagy.page}" do %>
-                  <% current_day = nil %>
-                  <% if @pagy.prev %>
-                    <%= turbo_frame_tag "paginate_page_#{@pagy.prev}", src: rangs_path(page: @pagy.prev, chat: @rang.id), loading: 'lazy', class: "previous-messages hidden"  do %>
-                    Loading...
-                  <% end %>
-
-                  <% end %>
-                  <% @messages.each do |message| %>
-                    <%= next unless message.speaker %>
-                    <%= render 'message', message: message, current_user: current_user, current_day: current_day, autoplay: false %>
-                    <% current_day = message.updated_at.strftime("%d-%m-%y") %>
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  </div>
-  <div class="sticky bottom-0 w-full p-6 mt-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <%= form_with(model: [@rang, @new_dictionary_entry], class: "flex space-x-4", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset", "rang-target": "FixmeWordSearch"}) do |form| %>
-      <div class="flex-2 space-y-4 flex-grow">
-        <%= form.text_area :word_or_phrase, class: "w-full py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "Irish message", id: "autoCompleteWord" %>
-      </div>
-      <% if current_user.teacher? %>
-        <div class="flex-2 space-y-4 flex-grow">
-          <%= form.text_area :translation, class: "w-full py-2 mr-2 border border-gray-300 rounded-lg", placeholder: "English message" %>
-        </div>
-      <% end %>
-      <%= content_tag :div, data: { controller: 'recorder' }, class: "flex-1 space-y-4 flex-grow" do %>
-        <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
-        <%= content_tag :button, "Record",
-                                  class: 'w-full h-full bg-red-500 text-white rounded-lg',
-                                  data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
-        <%= content_tag :button, "Stop",
-                                  class: 'w-full h-full bg-blue-500 text-white rounded-lg',
-                                  data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
-      <% end %>
-      <div class="flex-1 space-y-4 flex-grow">
-        <button type="submit" class="w-full h-full px-4 py-2 bg-blue-500 text-white rounded-lg mr-2">Send</button>
-      </div>
-      <input type="hidden" id="dictionary_entry_rang_ids" name="dictionary_entry[rang_ids][]" value="<%= @rang.id%>">
-      <input type="hidden" name="page" value="<%= @pagy.page %>">
-    <% end %>
-  </div>
+<div class="w-full md:w-3/4 p-4">
+  <!-- Turbo Frame for Current Chat -->
+  <turbo-frame id="current_rang" data-turbo-action="advance">
+    <p>Select a chat to view messages.</p>
+  </turbo-frame>
 </div>
 
 

@@ -22,8 +22,10 @@ export default class extends Controller {
     let translation = document.getElementById('dictionary_entry_translation').value;
     let regionId = document.getElementById('dictionary_entry_region_id').value;
     let region = this.waveSurfer.regions.list[regionId];
-    region.update({ data: { transcription: transcription, translation: translation } })
-    target.reset()
+    if (region) {
+      region.update({ data: { transcription: transcription, translation: translation } })
+      target.reset()
+    }
   }
 
   zoom(event) {

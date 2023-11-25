@@ -15,6 +15,8 @@ class WordListDictionaryEntriesController < ApplicationController
       WordListDictionaryEntry.create(word_list_dictionary_entry_params)
     end
 
+    authorize list
+
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("dictionary_entry_#{entry.id}", partial: "dictionary_entries/dictionary_entry",
@@ -24,20 +26,8 @@ class WordListDictionaryEntriesController < ApplicationController
     end
   end
 
-  # # PATCH/PUT /list_entries/1 or /list_entries/1.json
-  # def update
-  #   respond_to do |format|
-  #     if @word_list_dictionary_entry.update(word_list_dictionary_entry_params)
-  #       format.html { redirect_to word_list_dictionary_entry_url(@word_list_dictionary_entry), notice: "List entry was successfully updated." }
-  #       format.json { render :show, status: :ok, location: @word_list_dictionary_entry }
-  #     else
-  #       format.html { render :edit, status: :unprocessable_entity }
-  #       format.json { render json: @word_list_dictionary_entry.errors, status: :unprocessable_entity }
-  #     end
-  #   end
-  # end
-
   def update
+    authorize @word_list_dictionary_entry.word_list
     if @word_list_dictionary_entry.update word_list_dictionary_entry_params
       respond_to do |format|
         format.turbo_stream do
@@ -57,6 +47,7 @@ class WordListDictionaryEntriesController < ApplicationController
 
   # DELETE /list_entries/1 or /list_entries/1.json
   def destroy
+    authorize @word_list_dictionary_entry
     @word_list_dictionary_entry.destroy
 
     respond_to do |format|

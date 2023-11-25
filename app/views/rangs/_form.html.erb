@@ -1,70 +1,61 @@
-<!-- component -->
-<!--
-  UI Design Prototype
-  Link : https://dribbble.com/shots/10452538-React-UI-Components
--->
-<div class="min-h-screen py-6 flex flex-col justify-center sm:py-12">
-  <div class="relative py-3 sm:max-w-xl sm:mx-auto">
-    <div class="relative px-4 py-10 bg-gray-50 mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
-      <div class="max-w-md mx-auto">
-        <div class="divide-y">
-          <%= form_with(model: rang) do |form| %>
-            <% if rang.errors.any? %>
-              <div id="error_explanation">
-                <h2><%= pluralize(rang.errors.count, "error") %> prohibited this rang from being saved:</h2>
-                <ul>
-                  <% rang.errors.each do |error| %>
-                    <li><%= error.full_message %></li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-            <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-              <div class="flex flex-col">
-                <label class="leading-loose">Classname</label>
-                <%= form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Classname" %>
-              </div>
-            </div>
-            <hr>
-            <% if @rang.teacher&.ai? %>
-              <div class="flex flex-col">
-                <label class="leading-loose">Converstation Context</label>
-                <%= form.select :scenario, Rang.contexts.keys, :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
-              </div>
-            <% else %>
-              <%= form.fields_for :users do |user_form| %>
-                <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                  <div class="flex flex-col">
-                    <label class="leading-loose">Student Name</label>
-                    <%= user_form.text_field :name, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "Jams O'Donnell" %>
-                  </div>
-                  <div class="flex flex-col">
-                    <label class="leading-loose">Student Email</label>
-                    <%= user_form.email_field :email, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "student@email.com" %>
-                  </div>
-                  <div class="flex flex-col">
-                    <label class="leading-loose">Student Password</label>
-                    <%= user_form.text_field :password, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "new password if required" %>
-                    <% if user_form.object.new_record?  %>
-                      <div class=" text-gray-500 text-sm">Hint: Make a note of this password, it will not be shown again!</div>
-                    <% end %>
-                  </div>
-                  <div class="flex flex-col">
-                    <button disabled=true class="bg-red-500 flex justify-center items-center w-full text-white px-1 py-1 rounded-md focus:outline-none">Remove</button>
-                  </div>
-                </div>
-              <% end %>
-            <% end %>
-            <hr>
-            <div class="pt-4 flex items-center space-x-4">
-              <button class="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none">Save</button>
-            </div>
-            <div class="pt-4 flex items-center space-x-4">
-              <%= link_to 'Cancel', rangs_path, class: "bg-gray-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none" %>
-            </div>
-          <% end %>
-        </div>
+<div data-controller="rang" data-rang-id-value="<%= @rang.id %>" id="<%= dom_id(@rang) %>">
+  <div class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 gap-3">
+    <h1 class="mb-2 text-gray-900 dark:text-white">Rang name: <%= @rang.name %></h1>
+    <%= button_to "Delete Rang", @rang, method: :delete, data: { turbo: false }, class: "text-white px-3 py-2 bg-red-700"  %>
+  </div>
+  <div class="p-5 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+    <%= form_with(model: @rang, class: "w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400") do |form| %>
+      <label for="email-address-icon" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Add Student to Rang</label>
+      <div data-controller="user" data-user-target="userSearch">
+        <input name="userSearch" id="autoCompleteUsers" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md">
       </div>
-    </div>
+    <% end %>
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+          Current Students
+          <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400"></p>
+      </caption>
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" class="px-6 py-3">
+            Name
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Email
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Status
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Action
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @students.each do |student| %>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+          <td scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+            <%= student.name %>
+          </td>
+          <td class="px-6 py-4">
+            <%= student.email %>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center" >
+              <div class="h-2.5 w-2.5 rounded-full bg-<%= student.confirmed ? 'green' : 'gray' %>-500 me-2"></div>
+              <%= student.confirmed ? "Active" : "Unconfirmed" %>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <%= button_to @rang, method: :patch, form: { data: { turbo_confirm: 'Are you sure?' } }, class: "flex items-center" do %>
+              <%= hidden_field_tag "rang[user_ids][]", @students.ids - [student.id] %>
+              <%= hidden_field_tag "delete", true %>
+              <i data-feather="trash"></i>
+            <% end %>
+          </td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
 </div>

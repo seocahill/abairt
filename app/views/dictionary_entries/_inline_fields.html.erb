@@ -3,6 +3,6 @@
   <%= yield %>
   <div class="flex items-center justify-center mt-2">
     <%= form.button class: "py-1 px-2 text-sm bg-green-500 text-white rounded" do %> Save<% end %>
-    <%= link_to "Cancel", dictionary_entry_path(form.object), class: "py-1 px-2 text-sm text-gray-500 rounded hover:bg-gray-500 hover:text-black" %>
+    <%= link_to "Cancel", :back, class: "py-1 px-2 text-sm text-gray-500 rounded hover:bg-gray-500 hover:text-black" %>
   </div>
 </turbo-frame>

@@ -5,6 +5,12 @@
   <%= render "dictionary_entries/inline_fields", form: form, method: :translation do %>
     <%= form.text_area :translation %>
   <% end %>
+  <%= render "dictionary_entries/inline_fields", form: form, method: :speaker_id do %>
+    <div data-controller="user" data-user-target="userSearch" data-user-field-name-value="dictionary_entry[speaker_id]">
+        <input name="userSearch" id="autoCompleteUsers" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm resize border border-gray-300 rounded-md">
+      </div>
+  <% end %>
+
   <%= render "dictionary_entries/inline_fields", form: form, method: :tag_list do %>
     <div data-controller="tag" data-tag-target="tagSearch">
       <%= form.text_area :tag_list, class: "w-full", id: "autoCompleteTags" %>

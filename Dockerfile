@@ -4,7 +4,8 @@ ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
 FROM ${GEM_IMAGE} as gem-cache
 FROM ruby:3.0-slim as builder
 USER root
-ENV RAILS_ENV="production"
+ARG RAILS_ENV=production
+ENV RAILS_ENV=${RAILS_ENV}
 RUN \
   apt update && apt install -y \
     acl \
@@ -13,6 +14,7 @@ RUN \
     cmake \
     curl \
     default-libmysqlclient-dev \
+    ffmpeg \
     g++ \
     gcc \
     ghostscript \
@@ -37,6 +39,7 @@ RUN \
     libgnutls30 \
     libgpg-error0 \
     libgssapi-krb5-2 \
+    libid3tag0 \
     libid3tag0-dev \
     libidn2-0 \
     libjemalloc2 \
@@ -46,6 +49,7 @@ RUN \
     libkrb5support0 \
     libldap-2.4-2 \
     liblzma5 \
+    libmad0 \
     libmad0-dev \
     libmariadb3 \
     libncurses6 \
@@ -58,6 +62,7 @@ RUN \
     libreadline-dev \
     librtmp1 \
     libsasl2-2 \
+    libsndfile1 \
     libsndfile1-dev \
     libsqlite3-0 \
     libsqlite3-dev \
@@ -79,6 +84,7 @@ RUN \
     pkg-config \
     procps \
     sqlite3 \
+    sqlite3 \
     sudo \
     tar \
     unzip \
@@ -97,14 +103,21 @@ RUN \
   mkdir build && \
   cd build && \
   cmake .. && \
-  make package
+  make package && \
+  ln -s /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
 
 COPY . /app
 COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
 WORKDIR /app
+
+# Run bundle commands conditionally based on RAILS_ENV
 RUN \
-  bundle config set deployment 'true' && \
-  bundle config set without 'development test'
+  if [ "$RAILS_ENV" = "production" ]; then \
+    echo "Deploy build setup!" \
+    bundle config set deployment 'true' && \
+    bundle config set without 'development test'; \
+  fi
+
 RUN \
   bundle install && \
   npm install && \

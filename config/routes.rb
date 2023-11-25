@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  draw :madmin
   resources :word_lists
+  resources :seomras, only: :destroy
+  resources :registrations, only: [:new, :create]
   resources :voice_recordings do
     resources :dictionary_entries, only: :create, module: :voice_recordings
     member { get :preview }
-  end
-
-  scope controller: :pages do
-    get :faq
   end
 
   resources :rangs do
@@ -25,15 +24,17 @@ Rails.application.routes.draw do
     delete "logout" => :destroy
   end
 
+  resource :reify, only: :create
+
   resources :dictionary_entries
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
 
   get 'password_resets/new'
   post 'password_resets', to: 'password_resets#create'
-  get 'password_resets/:token/edit', to: 'password_resets#edit', as: 'password_reset'
-  patch 'password_resets/:token', to: 'password_resets#update', as: 'password_update'
+
+  get 'home', to: 'home#index'
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  root to: "home#index"
+  root to: 'application#root_redirect'
 end

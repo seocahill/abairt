@@ -1,13 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  description: MyString
+  name: Verbs
+  description: Irregular Verbs
   starred: false
   owner: one
 
 two:
-  name: MyString
-  description: MyString
+  name: Nouns
+  description: Nouns of animals
   starred: false
   owner: two

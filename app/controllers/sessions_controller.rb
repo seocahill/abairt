@@ -1,15 +1,24 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  def new; end
+  skip_after_action :verify_authorized
+  skip_before_action :verify_authenticity_token, only: :create
+  layout 'centered_layout'
+
+  def new
+    redirect_to root_path if current_user
+  end
 
   def create
-    user = User.find_by(email: params[:email])
-    if user&.authenticate(params[:password])
-      session[:user_id] = user.id
-      redirect_to root_path
+    @user = User.find_by(password_reset_token: params[:token])
+    if @user.nil? || @user.password_reset_token_expired?
+      flash[:alert] = 'Invalid password reset link.'
+      redirect_to login_path
     else
-      render :new
+      @user.clear_password_reset_token
+      session[:user_id] = @user.id
+      flash[:notice] = 'Login successful.'
+      redirect_to user_path(@user)
     end
   end
 

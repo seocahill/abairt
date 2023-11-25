@@ -1,4 +1,4 @@
-CREATE TABLE sqlite_sequence(name,seq);
+-- CREATE TABLE sqlite_sequence(name,seq);
 CREATE TABLE `ar_internal_metadata` (`key` varchar(255) NOT NULL, `value` varchar(255), `created_at` timestamp NOT NULL, `updated_at` timestamp NOT NULL, PRIMARY KEY (`key`));
 CREATE TABLE `schema_migrations` (`version` varchar(255) NOT NULL, PRIMARY KEY (`version`));
 CREATE TABLE `active_storage_attachments`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `name` varchar(255) DEFAULT (NULL) NOT NULL, `record_type` varchar(255) DEFAULT (NULL) NOT NULL, `record_id` bigint DEFAULT (NULL) NOT NULL, `blob_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_c3b3935057` FOREIGN KEY (`blob_id`) REFERENCES `active_storage_blobs`(`id`));
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_data'(id INTEGER PRIMARY KEY,
 CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
 CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS "users" ("id" integer NOT NULL PRIMARY KEY, "email" varchar(255) DEFAULT NULL, "name" varchar(255) DEFAULT NULL, "password_digest" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT 0 NOT NULL, "token" varchar(255) DEFAULT NULL, "master_id" integer DEFAULT NULL, "grupa_id" integer DEFAULT NULL, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "password_reset_token" varchar, "password_reset_sent_at" datetime);
+CREATE TABLE IF NOT EXISTS "users" ("id" integer NOT NULL PRIMARY KEY, "email" varchar(255) DEFAULT NULL, "name" varchar(255) DEFAULT NULL, "password_digest" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT 0 NOT NULL, "token" varchar(255) DEFAULT NULL, "master_id" integer DEFAULT NULL, "grupa_id" integer DEFAULT NULL, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "password_reset_token" varchar, "password_reset_sent_at" datetime, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL);
 CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
 CREATE INDEX "index_users_on_token" ON "users" ("token");
 CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
@@ -72,9 +72,6 @@ CREATE TABLE IF NOT EXISTS 'fts_users_data'(id INTEGER PRIMARY KEY, block BLOB);
 CREATE TABLE IF NOT EXISTS 'fts_users_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS 'fts_users_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
 CREATE TABLE IF NOT EXISTS 'fts_users_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "notes" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "recall_date" datetime DEFAULT NULL, "previous_inteval" integer DEFAULT 0 NOT NULL, "previous_easiness_factor" decimal DEFAULT 2.5 NOT NULL, "committed_to_memory" boolean DEFAULT 0 NOT NULL, "status" integer DEFAULT 0 NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL);
-CREATE INDEX "index_dictionary_entries_on_voice_recording_id" ON "dictionary_entries" ("voice_recording_id");
-CREATE INDEX "index_dictionary_entries_on_speaker_id" ON "dictionary_entries" ("speaker_id");
 CREATE TABLE IF NOT EXISTS "word_lists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "description" varchar, "starred" boolean, "user_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_4aed2b283b"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -98,16 +95,6 @@ FOREIGN KEY ("word_list_id")
 );
 CREATE INDEX "index_user_lists_on_user_id" ON "user_lists" ("user_id");
 CREATE INDEX "index_user_lists_on_word_list_id" ON "user_lists" ("word_list_id");
-CREATE TRIGGER insert_search AFTER INSERT ON dictionary_entries BEGIN
-        INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase) VALUES (new.id, new.translation, new.word_or_phrase);
-      END;
-CREATE TRIGGER delete_search AFTER DELETE ON dictionary_entries BEGIN
-        INSERT INTO fts_dictionary_entries(fts_dictionary_entries, rowid, translation, word_or_phrase) VALUES('delete', old.id, old.translation, old.word_or_phrase);
-      END;
-CREATE TRIGGER update_search AFTER UPDATE ON dictionary_entries BEGIN
-        INSERT INTO fts_dictionary_entries(fts_dictionary_entries, rowid, translation, word_or_phrase) VALUES('delete', old.id, old.translation, old.word_or_phrase);
-        INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase) VALUES (new.id, new.translation, new.word_or_phrase);
-      END;
 CREATE TRIGGER insert_tags_search AFTER INSERT ON tags BEGIN
         INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
       END;
@@ -130,7 +117,20 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
       END;
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL);
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, CONSTRAINT "fk_rails_91ca04707d"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id");
+CREATE TABLE IF NOT EXISTS "versions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "item_type" varchar NOT NULL, "item_id" bigint NOT NULL, "event" varchar NOT NULL, "whodunnit" varchar, "object" json, "created_at" datetime(6));
+CREATE INDEX "index_versions_on_item_type_and_item_id" ON "versions" ("item_type", "item_id");
+CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, CONSTRAINT "fk_rails_43cc55d212"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_dictionary_entries_on_voice_recording_id" ON "dictionary_entries" ("voice_recording_id");
+CREATE INDEX "index_dictionary_entries_on_speaker_id" ON "dictionary_entries" ("speaker_id");
+CREATE INDEX "index_dictionary_entries_on_user_id" ON "dictionary_entries" ("user_id");
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210210153031'),
 ('20210210175509'),
@@ -187,6 +187,18 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230610165705'),
 ('20230610165706'),
 ('20230610165707'),
-('20230819224320');
+('20230819224320'),
+('20231018093109'),
+('20231018094006'),
+('20231018094753'),
+('20231018101303'),
+('20231018101326'),
+('20231018101336'),
+('20231019184955'),
+('20231019201218'),
+('20231117183654'),
+('20231120132429'),
+('20231124072402'),
+('20231124073827');
 
 

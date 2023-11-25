@@ -9,8 +9,9 @@ export default class extends Controller {
   }
 
   locationSearchTargetConnected() {
+    const id = `#${this.element.getElementsByTagName("textarea")[0].id}`
     const locSearch = new autoComplete({
-      selector: "#autoCompleteLocation",
+      selector: id,
       placeHolder: "Déan cuardach ar áit...",
       debounce: 300,
       threshold: 3,
@@ -21,7 +22,7 @@ export default class extends Controller {
         src: async (query) => {
           try {
             // Fetch Data from external Source
-            var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=20';
+            var url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=20&countrycodes=ie';
             const source = await fetch(url, { headers: { accept: "application/json" } });
             // Data is array of `Objects` | `Strings`
             const data = await source.json();

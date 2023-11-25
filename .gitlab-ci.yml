@@ -31,22 +31,32 @@ build test image:
   stage: build
   script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker pull ${CI_REGISTRY_IMAGE} || true
-    - docker build
-      --cache-from ${CI_REGISTRY_IMAGE}
-      --tag ${CI_REGISTRY_IMAGE} .
+    - docker pull ${CI_REGISTRY_IMAGE}:test || true
+    - docker build --target builder
+      --cache-from ${CI_REGISTRY_IMAGE}:test
+      --tag ${CI_REGISTRY_IMAGE}:test .
       --build-arg GEM_IMAGE=registry.gitlab.com/abairt/web-application:latest
-    - docker push ${CI_REGISTRY_IMAGE}
+      --build-arg RAILS_ENV=test
+    - docker push ${CI_REGISTRY_IMAGE}:test
   only:
-    - branches
+    refs:
+      - branches
+    changes:
+      - Dockerfile
+      - Gemfile.lock
   except:
-    - master
+    refs:
+      - master
 
 run tests:
-  image: ${CI_REGISTRY_IMAGE}
+  image: ${CI_REGISTRY_IMAGE}:test
   stage: test
+  variables:
+    RAILS_ENV: test
   script:
-  - bin/rails db:test:prepare
+  - npm ci
+  - SECRET_KEY_BASE=1 bin/rails tailwindcss:build
+  - bin/rails db:test:prepare assets:precompile
   - bin/rails test
   only:
     - branches

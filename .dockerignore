@@ -23,10 +23,8 @@
 README.md
 litestream.yml
 # Exclude public/assets folder
-**/public/assets
 **/log
 **/tmp
-**/test
 **/secrets
 **/.ssh
 queue.db

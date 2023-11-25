@@ -1,1 +1,33 @@
-<%= render partial: "dictionary_entry", locals: { entry: @dictionary_entry, current_user: current_user, starred: @starred } %>
+<div class="w-full p-4">
+  <div class="relativemoverflow-x-auto">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+        Dictionary Entry Versions
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col" class="px-6 py-3">Version</th>
+          <th scope="col" class="px-6 py-3">Date</th>
+          <th scope="col" class="px-6 py-3">Author</th>
+          <th scope="col" class="px-6 py-3">Abairt</th>
+          <th scope="col" class="px-6 py-3">Translation</th>
+          <th scope="col" class="px-6 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dictionary_entry.versions.each do |version| %>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <td class="px-6 py-4"><%= version.index %></td>
+            <td class="px-6 py-4"><%= time_ago_in_words version.created_at %> ago</td>
+            <td class="px-6 py-4"><%= User.find(version.whodunnit).email %></td>
+            <td class="px-6 py-4"><%= version.object.dig("word_or_phrase") %></td>
+            <td class="px-6 py-4"><%= version.object.dig("translation") %></td>
+            <td class="px-6 py-4">
+              <%= button_to "Reify", reify_path(version_id: version.id), method: :post, class: "bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

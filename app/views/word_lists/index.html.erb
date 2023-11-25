@@ -1,57 +1,6 @@
 <!-- Sidebar for CRUD -->
 <div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div class="mb-4">
-      <nav>
-        <ul class="flex flex-col py-2" data-sidebar-target="tabs">
-          <li>
-            <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab1">Search and Filter</a>
-          </li>
-          <% if current_user %>
-            <li>
-              <a href="#" class="tab-button mb-2 block py-2 px-4 rounded-md text-sm font-medium text-gray-900 bg-white hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  data-action="sidebar#showTab" data-sidebar-tab-param="tab2">Add List</a>
-            </li>
-          <% end %>
-        </ul>
-      </nav>
-    </div>
-    <div class="tab-content">
-      <div class="tab-pane" id="tab1">
-        <form class="space-y-4" action="/word_lists">
-          <div>
-            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
-            <div class="mt-1">
-              <input type="search" id="search" placeholder="List name or description" name="search" class="py-2 px-3 border border-gray-300 rounded-md w-full">
-            </div>
-          </div>
-          <div class="text-right">
-            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Search</button>
-          </div>
-        </form>
-      </div>
-      <% if current_user %>
-        <div class="tab-pane hidden" id="tab2">
-          <%= form_with(model: @new_list) do |form| %>
-            <div class="mt-1">
-              <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
-              <div class="mt-1">
-                <%= form.text_field :name,  class: "w-full"%>
-              </div>
-            </div>
-            <div class="mt-1">
-              <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
-              <div class="mt-1">
-                <%= form.text_area :description, class: "w-full", required: false %>
-              </div>
-            </div>
-            <div class="w-full text-center mx-auto mt-1">
-              <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-  </div>
+  <%= render "sidebar" %>
 </div>
 <!-- Primary Content Area: Two Rectangles -->
 <div class="w-full md:w-3/4 p-4">
@@ -64,6 +13,7 @@
             <th scope="col" class="px-6 py-3">Description</th>
             <th scope="col" class="px-6 py-3">Words</th>
             <th scope="col" class="px-6 py-3">User</th>
+            <th scope="col" class="px-6 py-3">CSV</th>
             <th scope="col" class="px-6 py-3"></th>
           </tr>
         </thead>
@@ -74,7 +24,8 @@
               <td class="px-6 py-4"><%= list.description %></td>
               <td class="px-6 py-4"><%= list.dictionary_entries.size %></td>
               <td class="px-6 py-4"><%= list.owner.name %></td>
-              <td class="px-6 py-4"><%= link_to 'Show', list %></td>
+              <td class="px-6 py-4"><%= link_to word_list_path(list, format: :csv) do %><i data-feather="download"></i><% end %></td>
+              <td class="px-6 py-4"><%= link_to list do %><i data-feather="eye"></i><% end %></td>
             </tr>
           <% end %>
         </tbody>

@@ -1,0 +1,80 @@
+<div id="accordion-collapse" data-accordion="collapse">
+  <h2 id="accordion-collapse-heading-2">
+    <button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 <% if current_user&.edit? %>border-b-0<% end %>" data-accordion-target="#accordion-collapse-body-2" aria-expanded="false" aria-controls="accordion-collapse-body-2">
+      <span>Tags</span>
+      <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+      </svg>
+    </button>
+  </h2>
+  <div id="accordion-collapse-body-2" class="hidden" aria-labelledby="accordion-collapse-heading-2">
+    <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+      <h2 class="text-lg font-medium mb-2">Tag Cloud</h2>
+      <ul class="flex flex-wrap -mx-1">
+        <% @tags.each do |tag| %>
+          <li class="my-1 mx-1"><%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "inline-block rounded-full text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300" %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+  <% if current_user&.edit? %>
+    <h2 id="accordion-collapse-heading-3">
+      <button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3" data-accordion-target="#accordion-collapse-body-3" aria-expanded="false" aria-controls="accordion-collapse-body-3">
+        <span>Abairt Úr</span>
+        <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+        </svg>
+      </button>
+    </h2>
+    <div id="accordion-collapse-body-3" class="hidden" aria-labelledby="accordion-collapse-heading-3">
+      <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+        <%= form_with(model: @new_dictionary_entry, class: "", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset" }) do |form| %>
+          <div class="mt-1">
+            <label for="speaker_id" class="block text-sm font-medium text-gray-700">Cainteoir</label>
+            <div class="mt-1">
+              <%= form.text_field :speaker_id, list: "speaker-list", class:  "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", placeholder: "Search for or create new speaker", value: @new_dictionary_entry.speaker.name %>
+              <datalist id="speaker-list">
+                <% @speaker_names.each do |name| %>
+                  <option value="<%= name %>">
+                <% end %>
+              </datalist>
+            </div>
+          </div>
+          <div class="mt-1" data-controller="dictionary-entry" data-dictionary-entry-target="wordSearch">
+            <label for="search" class="block text-sm font-medium text-gray-700">Gaeilge</label>
+            <div class="mt-1">
+              <%= form.text_area :word_or_phrase,  class: "h-15 py-2 px-3 border border-gray-300 rounded-md w-full", id: "autoCompleteEntry" %>
+            </div>
+          </div>
+          <div class="mt-1">
+            <label for="search" class="block text-sm font-medium text-gray-700">Béarla</label>
+            <div class="mt-1">
+              <%= form.text_area :translation,  class: "h-15 py-2 px-3 border border-gray-300 rounded-md w-full" %>
+            </div>
+          </div>
+          <div class="mt-1" data-controller="tag" data-tag-target="tagSearch">
+            <label for="tag_list" class="block text-sm font-medium text-gray-700">Clibeanna</label>
+            <div class="mt-1">
+                <%= form.text_area :tag_list,  class: "h-15 py-2 px-3 border border-gray-300 rounded-md w-full", id: "autoCompleteTagsNew" %>
+            </div>
+          </div>
+          <div class="mt-1">
+            <ul class="rounded p-2 max-w-md" id="selectedTags"></ul>
+          </div>
+          <%= content_tag :div, data: { controller: 'recorder' }, class: "mt-1 w-full text-center mx-auto" do %>
+            <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
+            <%= content_tag :div, "Déan Taifead",
+                              class: 'bg-green-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                              data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
+            <%= content_tag :div, "Stop",
+                              class: 'bg-red-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                              data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
+          <% end %>
+          <div class="w-full text-center mx-auto mt-1">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Sábháil</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
