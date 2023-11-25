@@ -113,7 +113,6 @@ WORKDIR /app
 # Run bundle commands conditionally based on RAILS_ENV
 RUN \
   if [ "$RAILS_ENV" = "production" ]; then \
-    echo "Deploy build setup!" \
     bundle config set deployment 'true' && \
     bundle config set without 'development test'; \
   fi
