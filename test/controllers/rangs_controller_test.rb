@@ -12,11 +12,13 @@ class RangsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get new" do
+    users(:one).update_columns(role: User.roles[:teacher])
     get new_rang_url
     assert_response :success
   end
 
   test "should create rang" do
+    users(:one).update_columns(role: User.roles[:teacher])
     assert_difference('Rang.count') do
       post rangs_url, params: { rang: { name: @rang.name } }
     end
@@ -35,6 +37,7 @@ class RangsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update rang" do
+    assert_equal @rang.teacher, users(:one)
     patch rang_url(@rang), params: { rang: { name: @rang.name } }
     assert_redirected_to rangs_url(chat: @rang.id)
   end

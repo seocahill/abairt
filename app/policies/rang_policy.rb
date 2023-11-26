@@ -4,18 +4,18 @@ class RangPolicy < ApplicationPolicy
   end
 
   def create?
-    true if user.teacher? || user.admin?
+    true if user&.teacher? || user&.admin?
   end
 
-  def edit?
-    true if record.teacher == user
+  def update?
+    true if record&.teacher == user
   end
 
   def destroy?
-    true if record.teacher == user
+    true if record&.teacher == user
   end
 
   def show?
-    true if user
+    true if user && (user == record.teacher || record.users.include?(user))
   end
 end

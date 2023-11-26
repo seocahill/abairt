@@ -6,7 +6,7 @@ class RangPolicyTest < ActiveSupport::TestCase
   end
 
   def test_show
-    policy = RangPolicy.new(nil, @rang)
+    policy = RangPolicy.new(users(:two), @rang)
     refute policy.show?
   end
 
@@ -16,17 +16,17 @@ class RangPolicyTest < ActiveSupport::TestCase
   end
 
   def test_create
-    policy = RangPolicy.new(nil, nil)
+    policy = RangPolicy.new(users(:two), nil)
     refute policy.create?
   end
 
   def test_update
-    policy = RangPolicy.new(nil, nil)
+    policy = RangPolicy.new(users(:two), @rang)
     refute policy.update?
   end
 
   def test_destroy
-    policy = RangPolicy.new(nil, nil)
+    policy = RangPolicy.new(users(:two), @rang)
     refute policy.destroy?
   end
 end
