@@ -8,7 +8,7 @@
         play
       </button>
     <% else %>
-      <% if current_user %>
+      <% if current_user == entry.owner %>
         <%= form_with(model: entry) do |form| %>
           <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
         <% end %>

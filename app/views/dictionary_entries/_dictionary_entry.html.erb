@@ -23,17 +23,11 @@
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <% if current_user %>
-      <%= render "dictionary_entries/inline_edit", model: entry, method: :tag_list, current_user: current_user do %>
-        <% entry.tag_list.each do |tag| %>
-          <%= content_tag :span, tag, class: "rounded-full px-2 py-1 bg-gray-200" %>
-        <% end %>
-        <%= content_tag :span, "add", class: "rounded-full px-2 py-1 bg-yellow-200" if entry.tag_list.empty? %>
-      <% end %>
-    <% else %>
+    <%= render "dictionary_entries/inline_edit", model: entry, method: :tag_list, current_user: current_user do %>
       <% entry.tag_list.each do |tag| %>
         <%= link_to tag, dictionary_entries_path(tag: tag), class: "hover:text-blue hover:underline rounded-full px-2 py-1 bg-gray-200 hover:bg-gray-300" %>
       <% end %>
+      <%= content_tag :span, "add", class: "rounded-full px-2 py-1 bg-yellow-200" if entry.tag_list.empty? %>
     <% end %>
   </td>
   <td data-controller="entry" class="px-6 py-4">

@@ -5,7 +5,7 @@
         <div class="flex justify-between px-4 py-3 sm:px-6">
           <h2 class="text-lg font-medium leading-6 text-gray-900">
             <% if other_participents.present? %>
-              With <%= other_participents.join(', ') %> | <%= link_to "chat settings and participants", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
+              With <%= other_participents.join(', ') %> <%= link_to "| chat settings and participants", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" if policy(@rang).edit?%>
             <% elsif policy(@rang).edit? %>
               No one to chat with! Add students <%= link_to "here", edit_rang_path(@rang), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
             <% end %>
