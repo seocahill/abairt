@@ -7,13 +7,17 @@ class RegistrationsController < ApplicationController
   end
 
   def create
-    @user = User.new(user_params.merge(password: SecureRandom.uuid))
-    authorize @user, policy_class: RegistrationPolicy
-    if @user.save
-      UserMailer.new_user_email(@user).deliver
-      redirect_to root_path, notice: 'Thanks for signing up.'
+    if params["bot-field"].present?
+      redirect_to root_path
     else
-      render :new
+      @user = User.new(user_params.merge(password: SecureRandom.hex(32)))
+      authorize @user, policy_class: RegistrationPolicy
+      if @user.save
+        UserMailer.new_user_email(@user).deliver
+        redirect_to root_path, notice: 'Thanks for signing up.'
+      else
+        render :new
+      end
     end
   end
 
