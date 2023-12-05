@@ -39,7 +39,8 @@ class VoiceRecordingsController < ApplicationController
     @recording = VoiceRecording.find(params[:id])
     @regions = set_regions
     if current_user
-      @new_dictionary_entry = @recording.dictionary_entries.build
+      speaker_id = @recording.dictionary_entries.last&.speaker&.id
+      @new_dictionary_entry = @recording.dictionary_entries.build(speaker_id: speaker_id)
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
     @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil).reorder(:region_start), items: PAGE_SIZE)
