@@ -21,7 +21,7 @@
           <div class="flex space-x-4">
             <div class="flex-2 space-y-4 flex-grow">
               <label for="speaker_id" class="sr-only">Speaker</label>
-              <%= form.text_field :speaker_id, list: "speaker-list", class:  "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", placeholder: "Search for or create new speaker" %>
+              <%= form.text_field :speaker_id, list: "speaker-list", class:  "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", placeholder: "Search for or create new speaker", value: @last_speaker_name %>
               <datalist id="speaker-list">
                 <% @speaker_names.each do |name| %>
                   <option value="<%= name %>">
