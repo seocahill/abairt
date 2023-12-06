@@ -44,6 +44,12 @@
       </form>
     </div>
   </div>
+  <h2>
+    <a type="button" href="/voice_recordings/map" data-turbo-frame="recording_list_display" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3">
+      <span>View map</span>
+      <i data-feather="map"></i>
+    </a>
+  </h2>
   <h2 id="accordion-collapse-heading-2">
     <button type="button" class="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 <% if current_user&.edit? %>border-b-0<% end %>" data-accordion-target="#accordion-collapse-body-2" aria-expanded="false" aria-controls="accordion-collapse-body-2">
       <span>Tags</span>

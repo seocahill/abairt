@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :voice_recordings do
     resources :dictionary_entries, only: :create, module: :voice_recordings
     member { get :preview }
+    collection { get :map }
   end
 
   resources :rangs do

@@ -3,6 +3,10 @@ class VoiceRecordingPolicy < ApplicationPolicy
     true
   end
 
+  def map?
+    true
+  end
+
   def edit?
     # only owners can destroy dictionary entries
     true if user == record.owner

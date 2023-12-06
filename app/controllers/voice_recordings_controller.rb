@@ -35,6 +35,18 @@ class VoiceRecordingsController < ApplicationController
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
   end
 
+  def map
+    authorize(VoiceRecording)
+    @pins = VoiceRecording.all.map do |vr|
+      next unless speaker = vr.dictionary_entries.joins(:speaker).where("users.lat_lang is not null").first&.speaker
+
+      speaker.slice(:id, :name, :lat_lang).tap do |c|
+        c[:recording_id] = vr.id
+        c[:recording_title] = vr.title
+      end
+    end.compact
+  end
+
   def show
     @recording = VoiceRecording.find(params[:id])
     @regions = set_regions
