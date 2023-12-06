@@ -37,11 +37,13 @@
         play
       </button>
     </td>
-    <td class="px-6 py-4">
-      <%= button_to dictionary_entry_path(entry), title: "Delete recording", method: :patch, form: { data: { turbo_confirm: 'Delete recording?' } }, params: { dictionary_entry: { purge: true } }, class: "flex items-center" do %>
-        <i data-feather="delete"></i>
-      <% end %>
-    </td>
+    <% if policy(entry).destroy? %>
+      <td class="px-6 py-4">
+        <%= button_to dictionary_entry_path(entry), title: "Delete recording", method: :patch, form: { data: { turbo_confirm: 'Delete recording?' } }, params: { dictionary_entry: { purge: true } }, class: "flex items-center" do %>
+          <i data-feather="delete"></i>
+        <% end %>
+      </td>
+    <% end %>
   <% else %>
     <td data-controller="entry" class="px-6 py-4">
       <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
