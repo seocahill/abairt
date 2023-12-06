@@ -16,7 +16,7 @@
       <div class="flex flex-col space-y-4 w-full">
         <div id="subtitles" class="space-x-4 p-6 bg-gray-900 text-white w-full">
           <p class="text-white text-4xl" data-target="transcription.transcription">Transcript of <%= @recording&.title %></p>
-          <p><i class="text-white text-xl" data-target="transcription.translation">Translation</i></p>
+          <p><i class="text-white text-xl" data-target="transcription.translation"><%= @recording&.description %></i></p>
         </div>
         <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
           <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 w-full">
