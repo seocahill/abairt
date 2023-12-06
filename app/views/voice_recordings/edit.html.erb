@@ -1,8 +1,8 @@
 <div class="mx-auto md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing voice recording</h1>
+  <div class="max-w-sm rounded overflow-hidden shadow-lg p-4">
 
-  <%= render "form", voice_recording: @voice_recording %>
+    <%= render "form", voice_recording: @voice_recording %>
 
-  <%= link_to "Show this voice recording", @voice_recording, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-  <%= link_to "Back to voice recordings", voice_recordings_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Back", @voice_recording, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  </div>
 </div>
