@@ -31,6 +31,8 @@ export default class extends Controller {
         let content
         if (user.media_url) {
           content = `<a href="/users/${user.id}">${user.name}</a><audio controls src="${user.media_url}"></audio>`;
+        } else if (user.recording_id) {
+          content = `<a data-turbo-frame="wave_display" href="/voice_recordings/${user.recording_id}/preview">${user.recording_title}</a>`;
         } else {
           content = `<a href="/users/${user.id}">${user.name}</a>`;
         }
