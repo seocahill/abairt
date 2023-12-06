@@ -30,36 +30,39 @@
       <%= content_tag :span, "add", class: "rounded-full px-2 py-1 bg-yellow-200" if entry.tag_list.empty? %>
     <% end %>
   </td>
-  <td data-controller="entry" class="px-6 py-4">
-    <% if entry.media.attached? %>
+  <% if entry.media.attached? %>
+    <td data-controller="entry" class="px-6 py-4">
       <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
         <audio src="<%= entry.media.url %>"></audio>
         play
       </button>
-    <% else %>
+    </td>
+    <td class="px-6 py-4">
+      <%= button_to dictionary_entry_path(entry), title: "Delete recording", method: :patch, form: { data: { turbo_confirm: 'Delete recording?' } }, params: { dictionary_entry: { purge: true } }, class: "flex items-center" do %>
+        <i data-feather="delete"></i>
+      <% end %>
+    </td>
+  <% else %>
+    <td data-controller="entry" class="px-6 py-4">
+      <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
+    </td>
+    <td data-controller="entry" class="px-6 py-4">
       <% if current_user %>
         <%= form_with(model: entry) do |form| %>
           <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
         <% end %>
-      <% else %>
-        <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
       <% end %>
-    <% end %>
-  </td>
+    </td>
+  <% end %>
   <% if current_user %>
     <td class="px-6 py-4">
-      <%= render "dictionary_entries/list", entry: entry, rand: rand(1000) %>
+      <%= render "dictionary_entries/list", entry: entry %>
     </td>
   <% end %>
   <% if current_user&.admin? || (current_user && entry.speaker_id == current_user.id) %>
     <td class="px-6 py-4">
       <%= link_to dictionary_entry_path(entry) do %>
         <i data-feather="eye"></i>
-      <% end %>
-    </td>
-    <td class="px-6 py-4">
-      <%= button_to dictionary_entry_path(entry), title: "Delete recording", method: :patch, form: { data: { turbo_confirm: 'Delete recording?' } }, params: { dictionary_entry: { purge: true } }, class: "flex items-center" do %>
-        <i data-feather="delete"></i>
       <% end %>
     </td>
     <td class="px-6 py-4">
