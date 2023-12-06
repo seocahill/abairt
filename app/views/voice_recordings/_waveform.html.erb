@@ -42,6 +42,9 @@
               <span class="ml-2 text-gray-700">Playhead:</span>
               <p data-target="transcription.time">0.0 </p>
             </label>
+            <% if policy(@recording).edit? && action_name == "show" %>
+              <%= link_to "edit", edit_voice_recording_path(@recording), class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded", data: { turbo: false }  %>
+            <% end %>
           </div>
         </div>
       </div>

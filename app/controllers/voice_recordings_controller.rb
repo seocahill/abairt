@@ -30,7 +30,7 @@ class VoiceRecordingsController < ApplicationController
       records = records.joins(:users).where("users.dialect = ?", value)
     end
 
-    @pagy, @recordings = pagy(records.distinct, items: PAGE_SIZE)
+    @pagy, @recordings = pagy(records.distinct, items: 10)
     @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
   end

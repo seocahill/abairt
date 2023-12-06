@@ -21,7 +21,6 @@
                 <th scope="col" class="px-6 py-3" >Title</th>
                 <th scope="col" class="px-6 py-3" >Speakers</th>
                 <th scope="col" class="px-6 py-3" >Dialects</th>
-                <th scope="col" class="px-6 py-3" >Transcriptions</th>
                 <th scope="col" class="px-6 py-3" ></th>
                 <th scope="col" class="px-6 py-3" ></th>
               </tr>
@@ -36,7 +35,6 @@
                       <%= link_to dialect.humanize, users_path(dialect: dialect), class: "hover:text-blue-700 hover:underline" %>
                     <% end %>
                   </td>
-                  <td  class="px-6 py-4"><%= recording.dictionary_entries.size %></td>
                   <td  class="px-6 py-4">
                     <%= link_to preview_voice_recording_path(recording.id), data: { turbo_frame: 'wave_display' }, class: "underline hover:no-underline" do %>
                       <i data-feather="play-circle"></i>
