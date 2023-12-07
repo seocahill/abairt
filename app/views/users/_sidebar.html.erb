@@ -59,10 +59,10 @@
             <label for="search" class="block text-sm font-medium text-gray-700">Dialect</label>
             <%= form.select :dialect, User.dialects.keys, :prompt => 'roghnaigh', class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600" %>
           </div>
-          <div class="mt-1" data-controller="location" data-location-target="locationSearch">
+          <div class="mt-1" data-controller="location" data-location-target="locationSearch" data-location-id-value="new">
             <label class="block text-sm font-medium text-gray-700">Location</label>
             <div class="mb-1">
-              <%= form.text_area :address, id: "autoCompleteLocation", type: "search", class: "w-full"  %>
+              <%= form.text_area :address, id: "autoCompleteLocationEdit-new", type: "search", class: "w-full"  %>
               <%= form.hidden_field :lat_lang, id: "user-lat-lang" %>
             </div>
           </div>

@@ -3,15 +3,16 @@ import autoComplete from "autocomplete";
 
 export default class extends Controller {
   static targets = ["locationSearch"]
+  static values = { id: String }
 
   initialize() {
     console.log("connect to location search");
   }
 
   locationSearchTargetConnected() {
-    const id = `#${this.element.getElementsByTagName("textarea")[0].id}`
+    const id = this.idValue;
     const locSearch = new autoComplete({
-      selector: id,
+      selector: `#autoCompleteLocationEdit-${id}`,
       placeHolder: "Déan cuardach ar áit...",
       debounce: 300,
       threshold: 3,
@@ -42,7 +43,7 @@ export default class extends Controller {
         input: {
           selection: (event) => {
             locSearch.input.value = event.detail.selection.value.display_name
-            document.getElementById("user-lat-lang").value = event.detail.selection.value.lat + "," + event.detail.selection.value.lon
+            document.getElementById(`user-lat-lang-${id}`).value = event.detail.selection.value.lat + "," + event.detail.selection.value.lon
           }
         }
       }
