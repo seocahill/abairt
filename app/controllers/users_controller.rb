@@ -50,7 +50,7 @@ class UsersController < ApplicationController
 
   # GET /users/1 or /users/1.json
   def show
-    @pagy, @entries = pagy(@user.dictionary_entries, items: PAGE_SIZE)
+    @pagy, @entries = pagy(@user.all_entries, items: PAGE_SIZE)
     @starred = current_user&.starred
     @new_speaker = User.new
     @template = "profile"

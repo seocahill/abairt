@@ -11,6 +11,7 @@ class UserResource < Madmin::Resource
   attribute :lat_lang
   attribute :role
   attribute :voice
+  attribute :ability
   attribute :dialect
   attribute :password_reset_token
   attribute :password_reset_sent_at

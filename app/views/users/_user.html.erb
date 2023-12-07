@@ -19,7 +19,7 @@
       <%= user.address.present? ? user.address : "Add address" %>
     <% end %>
   </td>
-  <td class="px-6 py-4"><%= user.dictionary_entries&.size %></td>
+  <td class="px-6 py-4"><%= user.all_entries&.size %></td>
   <td class="px-6 py-4">
     <%= link_to user do %>
       <i data-feather="eye"></i>

@@ -11,6 +11,7 @@ class DictionaryEntryResource < Madmin::Resource
   attribute :user_id
   attribute :tag_list, index: false
   attribute :media, index: false
+  attribute :quality
 
   # Associations
   attribute :versions
