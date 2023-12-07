@@ -29,7 +29,7 @@
                 <tbody>
                   <% @recordings.each do |recording| %>
                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><%= recording.title %></th>
+                      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><%= link_to recording.title, recording, data: { turbo: false }, class: "" %></th>
                       <td class="px-6 py-4"><% recording.users.map do |user| %><%= link_to user.name, user_path(user), class: "hover:text-blue-700 hover:underline " %>, <% end %></td>
                       <td class="px-6 py-4">
                         <% recording.users.pluck(:dialect).uniq.map do |dialect| %>
@@ -42,7 +42,7 @@
                         <% end %>
                       </td>
                       <td  class="px-6 py-4">
-                        <%= link_to voice_recording_path(recording.id), class: "underline hover:no-underline" do %>
+                        <%= link_to voice_recording_path(recording.id), class: "underline hover:no-underline", data: { turbo: false } do %>
                           <i data-feather="eye"></i>
                         <% end %>
                       </td>
