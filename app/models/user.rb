@@ -69,8 +69,9 @@ class User < ApplicationRecord
 
         user.slice(:id, :name, :lat_lang, :role).tap do |c|
           if user.all_recordings.any?
-            sample = user.voice_recordings.with_attached_media.order("RANDOM()").limit(1).first
-            c[:media_url] = sample.media.url
+            if sample = user.voice_recordings.with_attached_media.order("RANDOM()").limit(1).first
+              c[:media_url] = sample.media.url
+            end
           end
         end
       end.compact
