@@ -19,7 +19,12 @@
           <p><i class="text-white text-xl" data-target="transcription.translation"><%= @recording&.description %></i></p>
         </div>
         <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-          <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 w-full">
+          <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 w-full justify-between">
+            <% if action_name == "show" %>
+              <%= link_to @recording.prev do %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
+              <% end %>
+            <% end %>
             <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#play">
               Play
             </button>
@@ -40,10 +45,16 @@
             </label>
             <label class="flex items-center space-x-2">
               <span class="ml-2 text-gray-700">Playhead:</span>
-              <p data-target="transcription.time">0.0 </p>
+              <p data-target="transcription.time" class="w-12 text-right"> 0.0 </p>
             </label>
             <% if policy(@recording).edit? && action_name == "show" %>
               <%= link_to "edit", edit_voice_recording_path(@recording), class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded", data: { turbo: false }  %>
+            <% end %>
+            <% if action_name == "show" %>
+              <%= link_to @recording.next do %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+
+              <% end %>
             <% end %>
           </div>
         </div>

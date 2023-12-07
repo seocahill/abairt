@@ -8,6 +8,14 @@ class VoiceRecording < ApplicationRecord
 
   acts_as_taggable_on :tags
 
+  def next
+    VoiceRecording.where("id > ?", id).first
+  end
+
+  def prev
+    VoiceRecording.where("id < ?", id).last
+  end
+
   def meeting_id
     SecureRandom.uuid
   end
