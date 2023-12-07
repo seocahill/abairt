@@ -16,9 +16,9 @@
   <% end %>
 
   <%= render "users/inline_fields", form: form, method: :address do %>
-    <div class="mt-1" data-controller="location" data-location-target="locationSearch">
-      <%= form.text_area :address, id: "autoCompleteLocationEdit", type: "search", class: "w-full"  %>
-      <%= form.hidden_field :lat_lang, id: "user-lat-lang" %>
+    <div class="mt-1" data-controller="location" data-location-target="locationSearch" data-location-id-value="<%= @user.id %>">
+      <%= form.text_area :address, id: "autoCompleteLocationEdit-#{@user.id}", type: "search", class: "w-full"  %>
+      <%= form.hidden_field :lat_lang, id: "user-lat-lang-#{@user.id}" %>
     </div>
   <% end %>
   <%= form.button %>
