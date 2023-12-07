@@ -92,4 +92,19 @@ Then change permissions `chown nonroot:root db` `chmod 755 db`
 Then add Rails
 Finally when other server is retired add back replication
 
-## SSH on server
+## FTS issues
+
+Check if the triggers have been removed for some reason (could be altering parent table?):
+
+```sql
+SELECT name, tbl_name, sql FROM sqlite_master WHERE type = 'trigger';
+```
+
+If missing re-run approprite migration
+
+Finally rebuild the index:
+
+```sql
+sqlite> INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('optimize');
+sqlite> INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('rebuild');
+```
