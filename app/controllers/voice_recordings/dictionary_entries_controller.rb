@@ -8,6 +8,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     speaker = User.where(name: dictionary_entry_params[:speaker_id]).first_or_create do |user|
       user.email = "#{dictionary_entry_params[:speaker_id]}@abairt.com"
       user.role = :speaker
+      user.ability = :native
       user.password = SecureRandom.alphanumeric
     end
 
