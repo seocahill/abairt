@@ -7,7 +7,9 @@ class RegistrationsController < ApplicationController
   end
 
   def create
+    # FIXME no need to perform authorization if bot detected.
     if params["bot-field"].present?
+      authorize User.new, policy_class: RegistrationPolicy
       redirect_to root_path
     else
       @user = User.new(user_params.merge(password: SecureRandom.hex(32)))

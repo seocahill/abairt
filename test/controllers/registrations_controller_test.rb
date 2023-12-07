@@ -19,6 +19,11 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
+  test "should redirect to root path if bot-field is present" do
+    post registrations_url, params: { "bot-field": "bot" }
+    assert_redirected_to root_path
+  end
+
   test "should not create user with invalid params" do
     assert_no_difference('User.count') do
       post registrations_url, params: { user: { name: '', email: 'test@example.com', about: 'About Test User' } }

@@ -4,6 +4,6 @@ class RegistrationPolicy < ApplicationPolicy
   end
 
   def create?
-    true
+    !record.confirmed
   end
 end
