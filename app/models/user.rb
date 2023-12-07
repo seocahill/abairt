@@ -7,7 +7,9 @@ class User < ApplicationRecord
   after_create :add_default_rang
 
   has_many :dictionary_entries #, foreign_key: :speaker_id
+  has_many :spoken_dictionary_entries, foreign_key: :speaker_id, class_name: "DictionaryEntry"
   has_many :voice_recordings, through: :dictionary_entries
+  has_many :spoken_voice_recordings, through: :spoken_dictionary_entries,  class_name: "VoiceRecording"
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
@@ -48,6 +50,13 @@ class User < ApplicationRecord
   validates :name, presence: true
   validates :role, exclusion: { in: %w(teacher admin) }, if: -> { role_changed? && Current.user&.admin? == false }
 
+  def all_entries
+    dictionary_entries.or(spoken_dictionary_entries)
+  end
+
+  def all_recordings
+    voice_recordings.or(spoken_voice_recordings)
+  end
 
   class << self
     def with_unanswered_ceisteanna
@@ -59,7 +68,7 @@ class User < ApplicationRecord
         next unless user.lat_lang.present?
 
         user.slice(:id, :name, :lat_lang, :role).tap do |c|
-          if user.voice_recordings.any?
+          if user.all_recordings.any?
             sample = user.voice_recordings.with_attached_media.order("RANDOM()").limit(1).first
             c[:media_url] = sample.media.url
           end
