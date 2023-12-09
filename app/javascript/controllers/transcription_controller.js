@@ -56,6 +56,7 @@ export default class extends Controller {
     this.waveSurfer.load(mediaFile);
 
     this.waveSurfer.on('loading', function (progress) {
+      playButton.classList.remove("cursor-not-allowed");
       if (progress < 99) {
         playButton.innerHTML = `loading ${progress}%`;
       } else {
@@ -75,7 +76,7 @@ export default class extends Controller {
         });
       })
       that.waveSurfer.play(); // Add this line to start playing automatically
-      that.toggleButton();
+      playButton.innerHTML = "Pause";
     })
 
     this.waveSurfer.on('region-in', (region) => {
