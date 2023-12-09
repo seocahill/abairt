@@ -163,7 +163,7 @@ export default class extends Controller {
     const button = this.element.querySelector('#play-pause-button')
     if (button.innerHTML === "Pause") {
       button.innerHTML = "Play"
-    } else if (button.innerHTML === "Pause") {
+    } else if (button.innerHTML === "Play") {
       button.innerHTML = "Pause"
     } else if (button.innerHTML === "Normal Speed") {
       button.innerHTML = "Pause"
