@@ -59,12 +59,12 @@ export default class extends Controller {
       if (progress < 99) {
         playButton.innerHTML = `loading ${progress}%`;
       } else {
-        playButton.innerHTML = "Play / Pause";
+        playButton.innerHTML = "Play";
       }
     })
 
     this.waveSurfer.on('ready', function() {
-      playButton.innerHTML = "Play / Pause";
+      playButton.innerHTML = "Play";
       that.regionsValue.forEach((region) => {
         that.waveSurfer.addRegion({
           id: region.region_id,
@@ -74,6 +74,8 @@ export default class extends Controller {
           data: { transcription: region.word_or_phrase, translation: region.translation }
         });
       })
+      that.waveSurfer.play(); // Add this line to start playing automatically
+      that.toggleButton();
     })
 
     this.waveSurfer.on('region-in', (region) => {
@@ -123,15 +125,6 @@ export default class extends Controller {
     })
   }
 
-
-  format(n) {
-    let mil_s = String(n % 1000).padStart(3, '0');
-    n = Math.trunc(n / 1000);
-    let sec_s = String(n % 60).padStart(2, '0');
-    n = Math.trunc(n / 60);
-    return String(n) + ' m ' + sec_s + ' s ' + mil_s + ' ms';
-  }
-
   teardown() {
     this.waveSurfer.destroy()
     this.waveSurfer = null;
@@ -140,11 +133,14 @@ export default class extends Controller {
 
   slower(event) {
     event.preventDefault()
+    const button = this.element.querySelector('#play-pause-button')
     let currentSpeed = this.waveSurfer.getPlaybackRate()
     if (currentSpeed <= 0.33) {
       this.waveSurfer.setPlaybackRate(1)
+      button.innerHTML = "Pause"
     } else {
       this.waveSurfer.setPlaybackRate((currentSpeed * 0.75))
+      button.innerHTML = "Normal Speed"
     }
   }
 
@@ -158,6 +154,16 @@ export default class extends Controller {
       this.waveSurfer.setPlaybackRate(1)
     } else {
       this.waveSurfer.playPause()
+    }
+    this.toggleButton();
+  }
+
+  toggleButton() {
+    const button = this.element.querySelector('#play-pause-button')
+    if (button.innerHTML === "Pause") {
+      button.innerHTML = "Play"
+    } else {
+      button.innerHTML = "Pause"
     }
   }
 
