@@ -1,9 +1,9 @@
 
  <turbo-frame id="wave_display" class="w-full">
   <div id="wave-controller" data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording&.media&.attached? %>" data-transcription-regions-value="<%= @regions %>" data-transcription-peaks-value="<%= @recording&.peaks || [] %>">
-    <div class="flex flex-col sm:flex-row items-center sm:space-y-4 space-y-0 space-x-0 sm:space-x-4 sm:p-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:space-y-4 sm:space-x-4 sm:p-4">
       <% if @recording&.media&.video? %>
-        <%= video_tag(@recording.media.url, size: "200", data: { "transcription-target": "video" }) %>
+        <%= video_tag(@recording.media.url, class: "h-auto sm:max-h-40 w-auto", data: { "transcription-target": "video" }) %>
       <% end %>
       <% if @recording %>
         <div id="waveform" class="flex-grow" data-transcription-target="waveform"></div>
@@ -25,8 +25,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
               <% end %>
             <% end %>
-            <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#play">
-              Play
+            <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-not-allowed" data-action="click->transcription#play">
+              No File
             </button>
             <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#slower">
               Slower
