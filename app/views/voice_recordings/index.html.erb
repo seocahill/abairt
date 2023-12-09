@@ -5,9 +5,9 @@
 
 <!-- Primary Content Area: Two Rectangles -->
 <div class="w-full md:w-3/4 p-4">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <div class="sm:p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <!-- Top Interactive Rectangle -->
-      <div class="w-full bg-white rounded-md p-4 mb-4">
+      <div class="w-full bg-white rounded-md sm:p-4 sm:mb-4">
         <%= turbo_frame_tag "wave_display" do %>
           <%= render partial: 'waveform', locals: { recording:  @recording, regions: @regions } %>
         <% end %>
