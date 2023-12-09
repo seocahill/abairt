@@ -46,9 +46,10 @@
       </div>
     </div>
     <!-- Mobile menu, show/hide based on menu state. -->
-    <div id="drawer-navigation" class="flex md:hidden items-center fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-gray w-80 dark:bg-gray-800">
+    <div id="drawer-navigation" class="flex md:hidden items-center fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-gray-800 w-80 dark:bg-gray-800">
       <div class="px-2 pt-2 pb-3 sm:px-3 space-y-1">
         <!-- ... your main navigation for mobile ... -->
+        <%= link_to 'Abairt', root_path, class: "text-2xl font-semibold text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" %>
         <%= link_to 'Transcriptions', voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" %>
         <%= link_to 'Dictionary', dictionary_entries_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" %>
         <%= link_to 'Speakers', users_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" %>
@@ -59,7 +60,7 @@
         <% if current_user.nil? %>
           <%= link_to "Login", login_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium" %>
         <% else %>
-          <%= button_to "Log out of #{current_user.name}", logout_path, method: :delete, class: "text-white block px-3 py-2 rounded-md text-base font-medium bg-gray-700" %>
+          <%= button_to "Log out", logout_path, method: :delete, class: "text-white block px-3 py-2 rounded-md text-base font-medium bg-gray-700" %>
         <% end %>
       </div>
     </div>
