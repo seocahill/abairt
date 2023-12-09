@@ -25,20 +25,25 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
               <% end %>
             <% end %>
-            <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-not-allowed" data-action="click->transcription#play">
-              No File
-            </button>
-            <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" data-action="click->transcription#slower">
-              Slower
-            </button>
-            <label class="flex items-center space-x-2">
-              <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="transcription.engSubs">
-              <span class="ml-2 text-gray-700">English</span>
-            </label>
-            <label class="flex items-center space-x-2">
-              <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="transcription.gaeSubs">
-              <span class="ml-2 text-gray-700">Irish</span>
-            </label>
+            <div class="flex flex-row space-x-4 w-full sm:w-auto mb-2">
+              <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-not-allowed w-full" data-action="click->transcription#play">
+                No File
+              </button>
+              <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full" data-action="click->transcription#slower">
+                Slower
+              </button>
+            </div>
+            <div class="flex flex-row space-x-4 w-full sm:w-auto mb-2">
+              <label class="sm:hidden">Subtitles</label>
+              <label class="flex items-center space-x-2">
+                <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="transcription.engSubs">
+                <span class="ml-2 text-gray-700">English</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="transcription.gaeSubs">
+                <span class="ml-2 text-gray-700">Irish</span>
+              </label>
+            </div>
             <label class="flex items-center space-x-2">
               <span class="ml-2 text-gray-700">Zoom</span>
               <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="50" class="w-full">
