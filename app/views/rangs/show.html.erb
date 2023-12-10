@@ -1,4 +1,4 @@
-<%= turbo_frame_tag "current_rang" do %>
+<%= turbo_frame_tag "current_rang", class: "w-full" do %>
   <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700" id="rang" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-current-user-id="<%= @current_user.id %>">
     <div class="flex-1 flex flex-col bg-gray-50">
       <header class="flex-shrink-0 bg-white border-b border-gray-200">
@@ -43,6 +43,7 @@
                   <% end %>
                   <% @messages.each do |message| %>
                     <%= next unless message.speaker %>
+
                     <%= render 'message', message: message, current_user: current_user, current_day: current_day, autoplay: false %>
                     <% current_day = message.updated_at.strftime("%a, %b %d, %Y") %>
                   <% end %>
@@ -55,9 +56,9 @@
     </div>
   </div>
   <div class="sticky bottom-0 w-full p-6 mt-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <%= form_with(model: [@rang, @new_dictionary_entry], class: "flex space-x-4", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset", "rang-target": "FixmeWordSearch"}) do |form| %>
-      <%= form.text_field :word_or_phrase, class: "flex-grow py-2 px-4 mr-2 border border-gray-300 rounded-full", placeholder: "Gaeilge amháin", id: "autoCompleteWord" %>
-      <%= form.text_field :translation, class: "flex-grow py-2 px-4 mr-2 border border-gray-300 rounded-full", placeholder: "Béarla amháin" %>
+    <%= form_with(model: [@rang, @new_dictionary_entry], class: "flex flex-col sm:flex-row space-x-4 space-y-2 sm:space-y-0", data: { controller: "reset_form", action: "turbo:submit-end->reset_form#reset", "rang-target": "FixmeWordSearch"}) do |form| %>
+      <%= form.text_field :word_or_phrase, class: "w-full sm:w-auto flex-grow py-2 px-4 mb-2 sm:mb-0 border border-gray-300 rounded-full", placeholder: "Gaeilge amháin", id: "autoCompleteWord" %>
+      <%= form.text_field :translation, class: "w-full sm:w-auto flex-grow py-2 px-4 mb-2 sm:mb-0 border border-gray-300 rounded-full", placeholder: "Béarla amháin" %>
       <%= content_tag :div, data: { controller: 'recorder' }, class: "px-4 py-2 bg-blue-500 text-white rounded-lg mr-2" do %>
         <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
         <%= link_to "#", data: { target: 'recorder.recordButton', action: 'click->recorder#record' }  do %>
