@@ -24,7 +24,7 @@
           </p>
         <% end %>
         <% if message.media.present? %>
-          <audio controls <% if autoplay %>autoplay<% end %> class="my-2">
+          <audio controls <% if autoplay %>autoplay<% end %> class="my-2 w-full">
             <source src="<%= message.media.url %>" type="audio/mpeg">
             Your browser does not support the audio element.
           </audio>
