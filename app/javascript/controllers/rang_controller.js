@@ -120,10 +120,12 @@ export default class extends Controller {
 
   startMeeting() {
     const domain = 'meet.jit.si';
+    const meetingNode = document.querySelector('#meet')
+    meetingNode.classList.add("w-full")
     const options = {
       roomName: this.meetingIdValue,
       height: 700,
-      parentNode: document.querySelector('#meet')
+      parentNode: meetingNode
     };
     this.meeting = new JitsiMeetExternalAPI(domain, options);
     document.querySelector('#call').classList.add("hidden")

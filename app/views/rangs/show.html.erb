@@ -1,5 +1,5 @@
 <% if action_name == "show" %>
-  <div id="meet" class="w-full" ></div>
+  <div id="meet"></div>
 <% end %>
 <%= turbo_frame_tag "current_rang", class: "w-full" do %>
   <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700" id="rang" data-controller="rang" data-rang-meeting-id-value="abairt-<%= @rang.meeting_id %>" data-current-user-id="<%= @current_user.id %>">
