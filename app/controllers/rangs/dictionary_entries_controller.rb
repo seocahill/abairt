@@ -21,10 +21,12 @@ class Rangs::DictionaryEntriesController < ApplicationController
   private
 
   def broadcast_to_rang
-    Turbo::StreamsChannel.broadcast_append_to("rangs",
-                                            target: "paginate_page_#{params[:page]}",
-                                            partial: "rangs/message",
-                                            locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y"), autoplay: false })
+    @dictionary_entry.rangs.each do |rang|
+      Turbo::StreamsChannel.broadcast_append_to("rangs/#{rang.id}",
+                                              target: "paginate_page_#{params[:page]}",
+                                              partial: "rangs/message",
+                                              locals: {message: @dictionary_entry, current_user: current_user, current_day: @dictionary_entry.updated_at.strftime("%d-%m-%y"), autoplay: false })
+    end
   end
 
   def set_rang

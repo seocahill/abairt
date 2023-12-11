@@ -1,3 +1,4 @@
+
 <% if action_name == "show" %>
   <div id="meet"></div>
 <% end %>
@@ -44,6 +45,7 @@
                       Loading...
                     <% end %>
                   <% end %>
+                  <%= turbo_stream_from "rangs/#{@rang.id}" %>
                   <% @messages.each do |message| %>
                     <%= next unless message.speaker %>
 
