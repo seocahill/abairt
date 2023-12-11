@@ -6,7 +6,7 @@
   </td>
   <td class="px-6 py-4">
     <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
-      <%= entry.region_start.round(1) %>-<%= entry.region_end.round(1) %>
+      <%= entry.region_start&.round(1) || 0.0 %>-<%= entry.region_end.round(1) %>
     </a>
   </td>
   <td class="px-6 py-4">
