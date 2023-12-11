@@ -1,11 +1,15 @@
 <%= content_for(:page_title, "") %>
 <div class="flex-1">
 <section class="bg-white dark:bg-gray-900">
-  <div class="grid max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 lg:pt-28">
-    <div class="mr-auto place-self-center lg:col-span-7">
+  <div class="grid max-w-screen-xl px-4 lg:pt-20 pb-8 mx-auto lg:gap-8 lg:py-16 lg:grid-cols-12 lg:pt-28">
+    <div class="mb-4 lg:mt-0 lg:col-span-5 lg:flex lg:mb-0">
+      <img src="<%= image_path('person-speaking.jpg') %>" alt="hero image">
+    </div>
+    <div class="ml-auto place-self-center lg:col-span-7">
       <h1 class="max-w-2xl mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl dark:text-white">Learn Mayo Irish<br>
         through native speech.</h1>
-      <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">To learn Mayo Irish you have to memorise words and phrases (abairtí), hear them spoken properly in the natural flow of conversation and practice  yourself with a native speaker. This website will help you with all three.</p>
+      <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
+        To learn Mayo Irish you have to memorise words and phrases (abairtí), listen to them spoken properly in the natural flow of conversation and practice yourself with a native speaker. This website will help you with all three.</p>
       <div class="space-y-4 sm:flex sm:space-y-0 sm:space-x-4">
         <a href="/registrations/new" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-white bg-blue-500 border border-blue-500 rounded-lg sm:w-auto hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
           Sign up
@@ -14,10 +18,6 @@
           Learn more
         </a>
       </div>
-
-    </div>
-    <div class="lg:mt-0 lg:col-span-5 lg:flex">
-      <img src="<%= image_path('person-speaking.jpg') %>" alt="hero image">
     </div>
   </div>
 </section>
@@ -223,7 +223,7 @@
             <svg data-accordion-icon="" class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
         </h3>
-        <div id="accordion-flush-body-1" class="" aria-labelledby="accordion-flush-heading-1">
+        <div id="accordion-flush-body-1" class="hidden" aria-labelledby="accordion-flush-heading-1">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
             <p class="mb-2 text-gray-500 dark:text-gray-400">Language learning is an inate skill everyone possesses, the rate of acquisition varies according to experience, confidence, access, commitment level and time resources. Given some basic school Irish and a medium commitment level (one or two classes per month, on and off) <b>two years</b> is a reasonable timeframe to go from no conversational ability to being able to converse with a native speaker.</p>
             <p class="text-gray-500 dark:text-gray-400 mb-2">People with better starting abilty and self-confidence can certainly managed it in half the time, likewise complete beginners might take an extra year or two.</p>
@@ -252,12 +252,12 @@
         </h3>
         <div id="accordion-flush-body-3" class="hidden" aria-labelledby="accordion-flush-heading-3">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">There are no courses per se but here are some tips on how to structure your learning.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">We are in the process of developing structured learning but in the meantime here are some tips on how to structure your learning.</p>
             <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400">
               <li>Find a native speaker to mentor you one on one, whether online or in person. This step is probably the biggest predeterminer of success.</li>
               <li>Use a spaced repetition app like Anki to acquire vocabulary. You should use lists like the ones on this site that offer native context and audio.</li>
               <li>Listen to recordings of native speakers, practice and repeat the phrases you hear, copying the sounds and syntax. Radio na Gaeltachta is a good resource for this, as are the sites linked on this page.</li>
-              <li>Learn grammar and syntax. An often recommended book for this is "Learning Irish" by Mícheál Ó Siadhail. [This site](http://nualeargais.ie/gnag/abair.htm) is also an excellent resource.</li>
+              <li>Learn grammar and syntax after you can speak to fill in gaps in your knowledge. An often recommended book for this is <a href="https://archive.org/details/learning-irish-3rd-ed">Learning Irish by Mícheál Ó Siadhail</a>. <a href="http://nualeargais.ie/gnag/gram.htm">Nualeargais</a> is also an excellent resource.</li>
               <li>Read news articles to familiarise yourself with contemporary Irish. Currently there are two sites that are updated daily - nos.ie and tuairisc.ie. You can use a browser plugin to translate and save wordlists for import into Anki, Google translate supports this for example. </li>
             </ul>
           </div>
@@ -270,9 +270,9 @@
         </h3>
         <div id="accordion-flush-body-4" class="hidden" aria-labelledby="accordion-flush-heading-4">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Right now this site is run on a shoestring, we simply don't have the capacity to allow open sign ups, so you must be invited by someone who is already a member - sorry!</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">For students, any speaker can invite you directly to a chatroom.</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Ar thaobh Cainteoirí de - tig leat chuireadh a thabhairt d'éinne ach amháin go gcaithfidh siad a bheith ina gcainteoir ón gcliabhán.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">To sign up click the link and fill out the form. You won't have instant access but an admin reach out and then grant you student login privileges. capacity to allow open sign ups, so you must be invited by someone who is already a member - sorry!</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">Dá mbeadh Gaeilge agat cheana fhéin, inis dúinn agus ceadfaidh muid cumhachtaí níos fónta dhuit.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">After you've been granted access, you just need to click on 'login' and enter your email to receive a login link. There are no passwords.</p>
           </div>
         </div>
         <h3 id="accordion-flush-heading-5">
@@ -283,7 +283,7 @@
         </h3>
         <div id="accordion-flush-body-5" class="hidden" aria-labelledby="accordion-flush-heading-5">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Yes, one of the founders of this site is a non-native speaker, Darren Ó Riagáin, who is said by native speakers from Dún Chaocháin to sound indistuinguishable from them. There are a few aspects to achieving native like fluency:</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">Yes, one of the founders of this site is a non-native speaker, Darren Ó Riagáin, who is said by native speakers from Dún Chaocháin to sound indistinguishable from them. There are a few aspects to achieving native like fluency:</p>
             <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400">
               <li>Use the sounds of Irish, don't use the sounds of English. Many monoglot English speakers will be unaware that the english language has a particular set of pronunciations that clearly distinguish it (as do all languages). If you use these sounds instead of Irish ones, you will always sound like you're speaking English, even if you use Irish words. Abairt helps here by allowing you to hear native pronunciation when learning, in a natural conversation flow.</li>
               <li>Use Irish idioms and syntax. If you translate English into Irish directly it will sound like English to people who know it (almost everyone these days, unfortunately). </li>
