@@ -7,7 +7,7 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @template = "user"
+    @template_name = "user"
     records = User.where(ability: %i[C1 C2 native]).where.not(id: nil)
 
     if params[:search].present?
@@ -53,7 +53,7 @@ class UsersController < ApplicationController
     @pagy, @entries = pagy(@user.all_entries, items: PAGE_SIZE)
     @starred = current_user&.starred
     @new_speaker = User.new
-    @template = "profile"
+    @template_name = "profile"
 
     respond_to do |format|
       format.html

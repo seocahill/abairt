@@ -1,7 +1,7 @@
 <% if policy(model).update? %>
   <% frame_id = dom_id(model, "#{method}_turbo_frame") %>
   <%= form_with model: model, class: "contents", data: { turbo_frame: frame_id } do %>
-    <%= hidden_field_tag "partial", @template %>
+    <%= hidden_field_tag "partial", (@template_name.present? ? @template_name : "user") %>
     <turbo-frame id="<%= frame_id %>" class="contents group inline-edit">
       <%= link_to edit_polymorphic_path(model), class: "hover:underline hover:text-blue-700" do %>
         <%= yield %>
