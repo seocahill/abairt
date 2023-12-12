@@ -108,3 +108,14 @@ Finally rebuild the index:
 sqlite> INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('optimize');
 sqlite> INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('rebuild');
 ```
+
+## Shrink mp3s
+
+```bash
+file=/some/mp3
+ffmpeg -i $file.mp3 -codec:a libmp3lame -qscale:a 2 $file-sm.mp3
+```
+
+```bash
+ffmpeg -i [stream URL] -acodec libmp3lame -ab 128k [output file name].mp3
+```
