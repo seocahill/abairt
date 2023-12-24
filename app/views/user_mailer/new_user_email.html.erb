@@ -6,6 +6,7 @@
   <body>
     <h1>New signup</h1>
     <p><%= @user.name %> with an email of <%= @user.email %> signed up <%= time_ago_in_words(@user.created_at) %> ago.</p>
+    <p><%= @user.about %></p>
     <p>Please review their details and confirm them <a href="<%= madmin_user_url(@user) %>">here</a>.</p>
     <p>Thank you!</p>
   </body>
