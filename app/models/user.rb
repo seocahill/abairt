@@ -14,7 +14,7 @@ class User < ApplicationRecord
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
   has_many :seomras
-  has_many :rangs, through: :seomras
+  has_many :rangs, -> { distinct }, through: :seomras
   has_many :chats, through: :rangs, source: "dictionary_entries"
 
   has_many :lectures, class_name: "Rang", foreign_key: "user_id"
