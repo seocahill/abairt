@@ -17,7 +17,7 @@ class ChatBotJob < ApplicationJob
         text = question.transcribe_audio(file.path, 'ogg')
         question.update(word_or_phrase: text)
         Turbo::StreamsChannel.broadcast_replace_to(
-          "rangs",
+          "rangs/#{rang.id}",
           target: "dictionary_entry_#{question.id}",
           partial: "rangs/message",
           locals: {
@@ -40,7 +40,7 @@ class ChatBotJob < ApplicationJob
     # add to rang and broadcast
     rang.dictionary_entries << new_entry
     current_page_number = Pagy.new(count: rang.dictionary_entries.size, items: 20).last
-    Turbo::StreamsChannel.broadcast_append_to("rangs",
+    Turbo::StreamsChannel.broadcast_append_to("rangs/#{rang.id}",
       target: "paginate_page_#{current_page_number}",
       partial: "rangs/message",
       locals: { message: new_entry, current_user: rang.teacher, current_day: new_entry.updated_at.strftime("%d-%m-%y"), autoplay: true })
