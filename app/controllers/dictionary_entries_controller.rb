@@ -63,14 +63,16 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    speaker = dictionary_entry_params["speaker_id"] ? User.find(dictionary_entry_params["speaker_id"]) : current_user
-    @dictionary_entry = speaker.dictionary_entries.build(dictionary_entry_params.merge(user_id: current_user.id, quality: current_user.quality))
+    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(user_id: current_user.id, quality: current_user.quality))
+    @dictionary_entry.speaker = entry_speaker if entry_speaker
     authorize @dictionary_entry
 
     respond_to do |format|
       if @dictionary_entry.save
         # auto_tag
-        AutoTagEntryJob.perform_later(@dictionary_entry)
+        if ENV['AUTO_TAG_ENABLED']
+          AutoTagEntryJob.perform_later(@dictionary_entry)
+        end
 
         format.html { redirect_to @dictionary_entry }
         format.turbo_stream do
@@ -93,11 +95,8 @@ class DictionaryEntriesController < ApplicationController
     end
 
     # datalist sends name over the wire, need id. Also might not exist yet.
-    speaker = User.where(name: dictionary_entry_params[:speaker_id]).first_or_create do |user|
-      user.email = "#{SecureRandom.alphanumeric}@abairt.com"
-      user.role = :speaker
-      user.password = SecureRandom.alphanumeric
-    end
+    @dictionary_entry.speaker = entry_speaker if entry_speaker
+    @dictionary_entry.quality = current_user.quality
 
     if @dictionary_entry.update dictionary_entry_params
       respond_to do |format|
@@ -129,6 +128,15 @@ class DictionaryEntriesController < ApplicationController
   end
 
   private
+
+  def entry_speaker
+    User.where(name: dictionary_entry_params[:speaker_id]&.strip).first_or_create do |user|
+      user.email = "#{SecureRandom.alphanumeric}@abairt.com"
+      user.role = :speaker
+      user.ability = :native
+      user.password = SecureRandom.alphanumeric
+    end
+  end
 
   def partial
     # hack but it'll do for now

@@ -29,7 +29,7 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create dictionary_entry" do
     assert_difference('DictionaryEntry.count') do
-      post dictionary_entries_url, params: { dictionary_entry: { translation: "something", word_or_phrase: "rud éicint" } }
+      post dictionary_entries_url, params: { dictionary_entry: {"speaker_id"=>"Seán Ó Cillín", "word_or_phrase"=>"An té nach ndeanfaidh a ghraithe in am, bíonn sé ina phleist", "translation"=>"The person who doesn't tend to their work in time is foolish", "tag_list"=>"seanchas"} }
     end
 
     assert_redirected_to dictionary_entry_url(DictionaryEntry.last)
