@@ -131,6 +131,13 @@ RUN \
 # second stage
 FROM ruby:3.0-slim as prod
 COPY --from=builder /app/ /app/
+
+# Set Bundler configuration via environment variables
+ENV BUNDLE_APP_CONFIG="/usr/local/bundle"
+ENV BUNDLE_PATH="vendor/bundle"
+ENV BUNDLE_SILENCE_ROOT_WARNING="true"
+ENV BUNDLE_WITHOUT="development:test"
+
 COPY --from=builder --chmod=777 /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
 RUN apt update && apt install -y \
   curl \
