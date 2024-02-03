@@ -100,5 +100,5 @@ deploy:
     - docker system prune -af
     - docker service ls
     - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
-    - docker service update abairt_rails --image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+    - docker service update abairt_rails --update-failure-action rollback --image ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
     - docker service inspect abairt_rails
