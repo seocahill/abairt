@@ -60,7 +60,7 @@ gem "madmin", "~> 1.2"
 
 gem "mailjet", "~> 1.7"
 
-gem "langchainrb", "~> 0.8"
+gem "langchainrb", "~> 0.8.2"
 # FIXME why do I need to specify separtely?
 gem "tiktoken_ruby", "~> 0.0.6"
 gem "mini_portile2", "~> 2.8.5"
