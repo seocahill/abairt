@@ -121,8 +121,7 @@ RUN \
   fi
 
 RUN \
-  gem update --system && \
-  gem install bundler && \
+  gem install bundler -v 2.5.5 && \
   bundle install && \
   npm install && \
   SECRET_KEY_BASE=1 bin/rails tailwindcss:build && \
