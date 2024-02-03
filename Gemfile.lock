@@ -447,7 +447,6 @@ DEPENDENCIES
   sprockets-rails
   sqlite3 (~> 1.6)
   tailwindcss-rails
-  tiktoken_ruby (~> 0.0.6)
   tzinfo-data
   web-console (>= 4.1.0)
   webdrivers
