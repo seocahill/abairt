@@ -422,6 +422,7 @@ DEPENDENCIES
   litestack (~> 0.2.3)
   madmin (~> 1.2)
   mailjet (~> 1.7)
+  mini_portile2 (~> 2.8.5)
   mocha
   multi_json (~> 1.15)
   pagy (~> 5.2.1)
@@ -436,6 +437,7 @@ DEPENDENCIES
   rack-cors (~> 1.1)
   rails (~> 7.0.0)
   rails-controller-testing
+  rb_sys (~> 0.9.87)
   redis (~> 4.0)
   ruby-openai (~> 6.3.0)
   rufus-scheduler (~> 3.8)
@@ -447,6 +449,7 @@ DEPENDENCIES
   sprockets-rails
   sqlite3 (~> 1.6)
   tailwindcss-rails
+  tiktoken_ruby (~> 0.0.6)
   tzinfo-data
   web-console (>= 4.1.0)
   webdrivers
