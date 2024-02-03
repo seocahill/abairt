@@ -1,7 +1,49 @@
-<div id="<%= dom_id word_list %>">
-  <% if action_name != "show" %>
-    <%= link_to "Show this word list", word_list, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-    <%= link_to 'Edit this word list', edit_word_list_path(word_list), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
-    <hr class="mt-6">
-  <% end %>
+<!-- Primary Content Area: Two Rectangles -->
+<% @entries = @word_list.dictionary_entries %>
+<div class="" data-controller="word">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex-grow p-4">
+      <div class="flex flex-col space-y-4">
+        <table class="w-full table-fixed">
+          <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+              <%= @word_list.name %>
+              <p id="word-description" class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400 line-clamp-3"> <%= @word_list.description %></p>
+              <a href="#" class="text-sm text-blue-500" data-action="word#toggleLineClamp">More</a>
+          </caption>
+          <thead>
+            <tr class="bg-gray-100 text-left">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Irish</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">English</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Audio</th>
+              <% if current_user && @word_list.owner == current_user%>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Practice</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Listen</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delist</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody id="dictionary_entries">
+            <% @word_list.dictionary_entries.each do |entry| %>
+              <%= render partial: "word_lists/dictionary_entry", locals: { entry: entry, current_user: current_user, list: @word_list } %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <% if @word_list.script.present? %>
+        <h2 class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">Generated script</h2>
+        <div class="flex flex-col space-y-4 p-5" data-controller="entry">
+          <%= simple_format(@word_list.script) %>
+          <% if false %>
+            <%= form_with(model: @word_list) do |form| %>
+              <%= render 'synth', form: form %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <%# footer %>
+    <div class="w-full bg-white rounded-md p-4">
+      <%#== pagy_nav(@pagy) %>
+    </div>
+  </div>
 </div>

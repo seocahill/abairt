@@ -50,3 +50,4 @@
 .pagy-combo-nav-js .next {
   @apply text-gray-900 border-r border-transparent;
 }
+@import 'actiontext.css';

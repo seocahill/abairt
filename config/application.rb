@@ -35,5 +35,9 @@ module Abairt
 
     # to_s
     config.active_support.disable_to_s_conversion = true
+
+    config.to_prepare do
+      ActionText::ContentHelper.allowed_tags << "iframe"
+    end
   end
 end

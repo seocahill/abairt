@@ -1,0 +1,12 @@
+<!-- app/views/articles/show.html.erb -->
+<div class="container mx-auto px-4">
+  <article class="prose prose-xl">
+    <h1 class="text-2xl font-bold mb-4"><%= @article.title %></h1>
+    <div class="article-content">
+      <%= @article.content %>
+    </div>
+  </article>
+</div>
+<div class="">
+  <%= link_to 'Add to Course', new_item_path(itemable_id: @article.id, itemable_type: @article.class.to_s), class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2" %>
+</div>

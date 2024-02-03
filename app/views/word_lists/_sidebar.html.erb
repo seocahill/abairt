@@ -32,21 +32,26 @@
       </button>
     </h2>
     <div id="accordion-collapse-body-3" class="hidden" aria-labelledby="accordion-collapse-heading-3">
-      <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+      <div class="p-5 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
         <%= form_with(model: @new_list) do |form| %>
           <div class="mt-1">
             <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
             <div class="mt-1">
-              <%= form.text_field :name,  class: "w-full"%>
+              <%= form.text_field :name,  class: "w-full", placeholder: "A name for your list." %>
             </div>
           </div>
           <div class="mt-1">
             <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
             <div class="mt-1">
-              <%= form.text_area :description, class: "w-full", required: false %>
+              <%= form.text_area :description, class: "w-full", required: false, placeholder: "Fill out if you want an A.I. generated vocabulary." %>
+            </div>
+            <div class="mt-4">
+              <p class="text-gray-500 text-sm">
+                This text input allows you to provide a description for the word list. If you provide a description, our AI will generate a custom vocabulary based on it. This can take some time to complete depending on the subject matter. The page will update dynamically once the vocabulary is ready. Providing a description is optional but recommended for a great starting vocabulary.
+              </p>
             </div>
           </div>
-          <div class="w-full text-center mx-auto mt-1">
+          <div class="w-full text-center mx-auto mt-2">
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 w-full rounded-md hover:bg-blue-600">Save</button>
           </div>
         <% end %>

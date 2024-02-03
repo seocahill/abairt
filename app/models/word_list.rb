@@ -10,6 +10,8 @@ class WordList < ApplicationRecord
   has_many :user_lists, dependent: :destroy
   has_many :users, through: :user_lists
 
+  validates :name, presence: true
+
   def to_csv
     CSV.generate(headers: true) do |csv|
       csv << %w[front back audio]

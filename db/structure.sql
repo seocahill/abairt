@@ -136,6 +136,24 @@ FOREIGN KEY ("dictionary_entry_id")
 );
 CREATE INDEX "index_learning_progresses_on_learning_session_id" ON "learning_progresses" ("learning_session_id");
 CREATE INDEX "index_learning_progresses_on_dictionary_entry_id" ON "learning_progresses" ("dictionary_entry_id");
+CREATE TABLE IF NOT EXISTS "courses" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "description" text, "user_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_b3c61f05ef"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_courses_on_user_id" ON "courses" ("user_id");
+CREATE TABLE IF NOT EXISTS "items" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "description" text, "course_id" integer NOT NULL, "itemable_type" varchar NOT NULL, "itemable_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_734cce7fdb"
+FOREIGN KEY ("course_id")
+  REFERENCES "courses" ("id")
+);
+CREATE INDEX "index_items_on_course_id" ON "items" ("course_id");
+CREATE INDEX "index_items_on_itemable" ON "items" ("itemable_type", "itemable_id");
+CREATE TABLE IF NOT EXISTS "articles" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar, "content" text, "user_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_3d31dad1cc"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_articles_on_user_id" ON "articles" ("user_id");
+CREATE TABLE IF NOT EXISTS "action_text_rich_texts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "body" text, "record_type" varchar NOT NULL, "record_id" bigint NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_action_text_rich_texts_uniqueness" ON "action_text_rich_texts" ("record_type", "record_id", "name");
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210210153031'),
 ('20210210175509'),
@@ -211,6 +229,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240121150633'),
 ('20240121150952'),
 ('20240121165811'),
-('20240121184454');
+('20240121184454'),
+('20240124220550'),
+('20240124220552'),
+('20240124220554'),
+('20240124220629');
 
 

@@ -1,0 +1,43 @@
+<!-- app/views/items/show.html.erb -->
+<div class="container mx-auto p-4">
+  <div class="md:flex">
+    <!-- Sidebar -->
+    <div class="w-full md:w-1/4 p-4" data-controller="sidebar">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col">
+    <!-- Course Info Box -->
+    <div class="mb-6 p-4 bg-blue-100 rounded-lg">
+      <h3 class="font-semibold text-lg mb-2"><%= @item.name %></h3>
+      <p class="text-sm text-gray-700"><%= @item.description %></p>
+    </div>
+
+    <!-- Back to Course Button -->
+    <%= link_to 'Back to Course', course_path(@item.course), class: "mb-4 text-blue-500 hover:text-blue-600" %>
+
+    <!-- Items List -->
+    <div class="flex flex-col space-y-4">
+      <ol class="relative text-gray-500 border-s border-gray-200 dark:border-gray-700 dark:text-gray-400">
+      <% @item.course.items.each do |item| %>
+        <li class="mb-10 ms-6">
+          <%= link_to item_path(item) do %>
+            <span class="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
+                <svg class="w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                </svg>
+            </span>
+            <h3 class="font-medium leading-tight"><%= item.name %></h3>
+            <p class="text-sm"><%= item.description %></p>
+          <% end %>
+        </li>
+      <% end %>
+      </ol>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Main Content Area -->
+    <div class="w-full md:w-3/4 p-4">
+      <%= render @item.itemable %>
+    </div>
+  </div>
+</div>

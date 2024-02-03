@@ -107,6 +107,7 @@
               <% end %>
             </tr>
           </thead>
+          <%= turbo_stream_from "word_lists/#{@word_list.id}" %>
           <tbody id="dictionary_entries">
             <% @entries.each do |entry| %>
               <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, list: @word_list } %>
@@ -115,15 +116,9 @@
         </table>
       </div>
       <% if @word_list.script.present? %>
-        <h2 class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">Generated script</h2>
-        <div class="flex flex-col space-y-4 p-5" data-controller="entry">
-          <%= simple_format(@word_list.script) %>
-          <% if false %>
-            <%= form_with(model: @word_list) do |form| %>
-              <%= render 'synth', form: form %>
-            <% end %>
-          <% end %>
-        </div>
+      <div id="script">
+        <%= render partial: "script", locals: { word_list: @word_list } %>
+      </div>
       <% end %>
     </div>
     <%# footer %>
