@@ -61,7 +61,7 @@ gem "madmin", "~> 1.2"
 gem "mailjet", "~> 1.7"
 
 gem "langchainrb", "~> 0.8"
-gem "tiktoken_ruby", "~> 0.0.6"
+# gem "tiktoken_ruby", "~> 0.0.6"
 
 gem "multi_json", "~> 1.15"
 
