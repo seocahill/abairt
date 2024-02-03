@@ -22,6 +22,8 @@ class User < ApplicationRecord
 
   has_many :lectures, class_name: "Rang", foreign_key: "user_id"
 
+  has_many :courses
+
 
   # lists
   has_many :own_lists, class_name: "WordList", foreign_key: "user_id", dependent: :destroy

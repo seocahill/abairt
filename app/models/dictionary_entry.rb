@@ -28,7 +28,7 @@ class DictionaryEntry < ApplicationRecord
 
   scope :has_recording, -> { joins(:media_attachment) }
 
-  validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? }
+  validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }
   # Based on CEFR scale i.e. low: < B2, fair: B2, good: C, excellent: native
   enum quality: %i[
     low
@@ -86,6 +86,7 @@ class DictionaryEntry < ApplicationRecord
     return if word_or_phrase.present?
 
     self.word_or_phrase = transcribe_audio(output_path)
+    save!
   end
 
   def chat_with_gpt(rang)

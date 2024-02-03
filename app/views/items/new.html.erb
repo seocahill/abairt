@@ -1,0 +1,47 @@
+<!-- app/views/items/new.html.erb -->
+<div class="flex justify-center items-center min-h-screen bg-gray-100">
+  <div class="w-full max-w-md px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg">
+    <%= form_with(model: @item, local: true) do |form| %>
+      <h2 class="text-2xl font-bold mb-6 text-center">Add New Item</h2>
+
+      <%= form.hidden_field :itemable_id, value: @itemable.id %>
+      <%= form.hidden_field :itemable_type, value: @itemable.class.name %>
+
+      <div class="mb-4">
+        <%= form.label :course_id, 'Select Course', class: 'block text-gray-700 text-sm font-bold mb-2' %>
+        <%= form.collection_select :course_id, @courses, :id, :name, {}, {class: 'block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline'} %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :name, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+        <%= form.text_field :name, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
+      </div>
+
+      <div class="mb-6">
+        <%= form.label :description, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+        <%= form.text_area :description, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
+      </div>
+
+      <div class="mb-6">
+        <div class="max-w-sm rounded overflow-hidden shadow-lg">
+          <div class="px-6 py-4">
+            <div class="font-bold text-xl mb-2">
+              Attachment: <%= @itemable.class.name.humanize %>
+            </div>
+            <div class="text-gray-700 text-base">
+              Title: <%= @itemable.name %>
+            </div>
+            <p class="text-gray-700 text-base">
+              Description: <%= @itemable.description %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="flex items-center justify-center">
+        <%= form.submit 'Add Item', class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline' %>
+      </div>
+    <% end %>
+  </div>
+</div>

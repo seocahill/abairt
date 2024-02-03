@@ -1,0 +1,36 @@
+<!-- app/views/courses/new.html.erb -->
+<div class="flex justify-center pt-4 min-h-screen bg-gray-100">
+  <div class="w-full max-w-2xl px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg">
+    <%= form_with(model: @article, local: true) do |form| %>
+      <h2 class="text-2xl font-bold mb-6 text-center">Create New Course</h2>
+
+      <% if @article.errors.any? %>
+        <div id="error_explanation" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong class="font-bold">Please correct the following errors:</strong>
+          <span class="block sm:inline"><%= pluralize(@article.errors.count, "error") %> prohibited this course from being saved:</span>
+          <ul class="list-disc pl-5 mt-4">
+            <% @article.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="mb-4">
+        <%= form.label :title, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+        <%= form.text_field :title, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
+      </div>
+
+      <div class="mb-6">
+        <%= form.label :content, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+        <%= form.rich_text_area :content, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
+      </div>
+
+      <%= form.hidden_field :user_id, value: current_user.id %>
+
+      <div class="flex items-center justify-between">
+        <%= form.submit 'Update', class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline' %>
+      </div>
+    <% end %>
+  </div>
+</div>

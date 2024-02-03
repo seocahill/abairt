@@ -3,6 +3,7 @@ class WordListsController < ApplicationController
 
   # GET /word_lists
   def index
+    @new_list = current_user.own_lists.new
     records = WordList.where("id is not null AND starred is not true")
 
     if params[:search].present?
@@ -49,21 +50,8 @@ class WordListsController < ApplicationController
     @word_list = current_user.own_lists.build(word_list_params)
     authorize @word_list
 
-    if @word_list.description.present?
-      results = @word_list.generate_vocab
-      results.dig('vocabulary').each do |result|
-        user = User.ai.first
-        entry = DictionaryEntry.create(
-          owner: user,
-          speaker_id: user.id,
-          word_or_phrase: result["irish_word_or_phrase"],
-          translation: result["english_translation"]
-        )
-        @word_list.dictionary_entries << entry
-      end
-    end
-
     if @word_list.save
+      GenerateWordListJob.perform_later(@word_list) if @word_list.description.present?
       redirect_to @word_list, notice: 'Word list was successfully created.'
     else
       render :new
@@ -74,9 +62,7 @@ class WordListsController < ApplicationController
   def update
     authorize @word_list
 
-    if params[:generate_script]
-      @word_list.generate_script(params[:script_type])
-    end
+    GenerateScriptJob.perform_later(@word_list, params[:generate_script]) if params[:generate_script]
 
     if params[:phrase]
       @word_list.dictionary_entries.build(word_or_phrase: params[:result], translation: params[:phrase], owner: User.ai.first)
@@ -104,6 +90,6 @@ class WordListsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def word_list_params
-      params.permit(:name, :description, :media)
+      params.require(:word_list).permit(:name, :description, :media)
     end
 end

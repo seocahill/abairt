@@ -9,6 +9,8 @@ class VoiceRecording < ApplicationRecord
 
   acts_as_taggable_on :tags
 
+  alias_attribute :name, :title
+
   def next
     VoiceRecording.where("id > ?", id).first
   end

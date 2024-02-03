@@ -35,7 +35,9 @@ Rails.application.routes.draw do
   # learning
   resources :learning_sessions, only: [:create, :show, :index]
   resources :learning_progresses, only: [:show, :update]
-
+  resources :courses
+  resources :items
+  resources :articles
 
   get 'password_resets/new'
   post 'password_resets', to: 'password_resets#create'

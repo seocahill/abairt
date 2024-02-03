@@ -3,9 +3,13 @@
     <div class="flex items-center justify-between h-16">
       <div class="flex items-center">
         <div class="flex-shrink-0">
-          <a href="/" class="text-2xl font-semibold text-white hover:text-gray-300">
-            Abairt
-          </a>
+          <% if current_user %>
+            <%= link_to 'Progress', root_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+          <% else %>
+            <a href="/" class="text-2xl font-semibold text-white hover:text-gray-300">
+              Abairt
+            </a>
+          <% end %>
         </div>
         <div class="hidden md:block">
           <div class="ml-10 flex items-baseline space-x-4">
@@ -15,9 +19,6 @@
             <%= link_to 'Lists', word_lists_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <% if current_user.present? %>
               <%= link_to "Chat", rangs_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-            <% end %>
-            <% if current_user&.admin? %>
-              <%= link_to "Admin", madmin_root_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <% end %>
           </div>
         </div>
@@ -29,7 +30,7 @@
               <%= link_to "Sign Up", new_registration_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
               <%= link_to "Login", login_path, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <% else %>
-              <%= link_to current_user.name, current_user, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
+              <%= link_to "#{current_user.name} admin", current_user, class: "text-white px-3 py-2 rounded-md text-sm font-medium" %>
               <%= button_to "Log out", logout_path, method: :delete, class: "ml-2 text-white px-3 py-2 rounded-md text-sm font-medium bg-gray-700" %>
             <% end %>
           </div>

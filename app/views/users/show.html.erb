@@ -1,4 +1,18 @@
-<div class="w-full p-4">
+<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
+  <h2>
+    <%= link_to 'Courses', courses_path, type: "button", class: 'flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3' %>
+  </h2>
+  <h2>
+    <%= link_to 'Articles', articles_path, type: "button", class: 'flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3' %>
+  </h2>
+  <% if current_user.admin? %>
+    <h2>
+      <%= link_to "Database Admin", madmin_user_path, type: "button", class: 'flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3' %>
+    </h2>
+  <% end %>
+</div>
+<!-- Primary Content Area: Two Rectangles -->
+<div class="w-full md:w-3/4 p-4">
   <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <%= render "profile" %>
     <%= render "contributions" %>

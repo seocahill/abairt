@@ -15,6 +15,7 @@
             <th scope="col" class="px-6 py-3">User</th>
             <th scope="col" class="px-6 py-3">CSV</th>
             <th scope="col" class="px-6 py-3"></th>
+            <th scope="col" class="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody>
@@ -26,6 +27,7 @@
               <td class="px-6 py-4"><%= list.owner.name %></td>
               <td class="px-6 py-4"><%= link_to word_list_path(list, format: :csv) do %><i data-feather="download"></i><% end %></td>
               <td class="px-6 py-4"><%= link_to list do %><i data-feather="eye"></i><% end %></td>
+              <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: list.id, itemable_type: list.class.to_s) %></td>
             </tr>
           <% end %>
         </tbody>

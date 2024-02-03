@@ -51,7 +51,6 @@ gem "sprockets-rails"
 gem "litestack", "~> 0.2.3"
 gem "ruby-openai", "~> 6.3.0"
 
-
 gem "pundit", "~> 2.3"
 
 gem "paper_trail", "~> 15.0"
