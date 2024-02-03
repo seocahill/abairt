@@ -1,0 +1,68 @@
+<div class="w-full p-4">
+  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div id="<%= dom_id(@user) %>" class="m-10">
+  <div class="px-4 sm:px-0">
+    <h3 class="text-base font-semibold leading-7 text-gray-900">
+      <%= @user.name %>
+      <span class="bg-green-200 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-700 dark:text-green-300"><%= @user.role.humanize %></span>
+    </h3>
+  </div>
+
+  <div class="mt-6 border-t border-gray-100">
+    <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Progress</p>
+    <dl class="divide-y divide-gray-100">
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">
+          <a href="/dictionary_entries">Vocabulary</a> (<%= @vocab_progress_count %> / 3500 words)
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <div class="w-full bg-gray-200 rounded-full">
+            <div class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-l-full" style="width: <%= @vocab_progress %>%;"> <%= @vocab_progress %>%</div>
+          </div>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900"><a href="/rangs">Speaking</a> (<%= @speaking_progress_count %> / 9000 chats)</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <div class="w-full bg-gray-200 rounded-full">
+            <div class="bg-green-600 text-xs font-medium text-green-100 text-center p-0.5 leading-none rounded-l-full" style="width: <%= @speaking_progress %>%;"> <%= @speaking_progress %>%</div>
+            </div>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900"><a href="/voice_recordings">Listening</a> (<%= @listening_progress_count %> / 700 recordings)</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <div class="w-full bg-gray-200 rounded-full">
+            <div class="bg-orange-600 text-xs font-medium text-orange-100 text-center p-0.5 leading-none rounded-l-full" style="width: <%= @listening_progress %>%;"> <%= @listening_progress %>%</div>
+          </div>
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="flex-grow p-4">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+          Learning Sessions
+        </caption>
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3" >Type</th>
+            <th scope="col" class="px-6 py-3" >Details</th>
+            <th scope="col" class="px-6 py-3" >Unseen</th>
+            <th scope="col" class="px-6 py-3" >Reviews</th>
+            <th scope="col" class="px-6 py-3" >Done</th>
+            <th scope="col" class="px-6 py-3" ></th>
+          </tr>
+        </thead>
+        <tbody id="dictionary_entries">
+          <%= render @learning_sessions %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="w-full bg-white rounded-md p-4">
+    <%== pagy_nav(@pagy) %>
+  </div>
+</div>

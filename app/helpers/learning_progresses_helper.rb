@@ -1,0 +1,2 @@
+module LearningProgressesHelper
+end

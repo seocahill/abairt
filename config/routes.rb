@@ -32,6 +32,11 @@ Rails.application.routes.draw do
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
 
+  # learning
+  resources :learning_sessions, only: [:create, :show, :index]
+  resources :learning_progresses, only: [:show, :update]
+
+
   get 'password_resets/new'
   post 'password_resets', to: 'password_resets#create'
 

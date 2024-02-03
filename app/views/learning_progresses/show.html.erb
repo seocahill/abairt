@@ -1,0 +1,72 @@
+<div class="container mx-auto p-4">
+  <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Heading and Description -->
+    <div class="text-center p-6 border-b border-gray-200">
+      <h1 class="text-3xl md:text-4xl font-bold">Spaced Repetition Learning</h1>
+      <p class="text-md mt-2">
+        SPR is a learning technique that increases intervals of time between each subsequent review of previously learned material. It's an efficient learning method that maximizes long term recall.
+        <a href="https://en.wikipedia.org/wiki/Spaced_repetition" target="_blank" class="text-blue-600 hover:text-blue-800">Learn more</a>
+      </p>
+    </div>
+
+    <div class="p-6">
+      <% if @learning_progress.dictionary_entry.voice_recording_id %>
+        <p>Translate each audio clip and rate your answer.</p>
+        <div id="question" class="p-4 mb-4" data-controller="entry">
+          <button data-action="entry#play" class="bg-purple-500 hover:bg-purple-700 mt-2 text-white py-2 px-4 font-bold rounded">
+            <audio src="<%= @learning_progress.dictionary_entry.media.url %>"></audio>
+            Play Audio Clip
+          </button>
+        </div>
+        <!-- Hidden Answer -->
+        <div id="answer" class="hidden text-lg md:text-2xl p-4 mb-4">
+          <p>Ga: <%= @learning_progress.dictionary_entry.word_or_phrase %></p>
+          <p>En: <%= @learning_progress.dictionary_entry.translation %></p>
+        </div>
+      <% else %>
+        <p>Translate each word and rate your answer.</p>
+        <div id="question" class="text-xl md:text-3xl p-4 mb-4">
+          <%= @learning_progress.dictionary_entry.word_or_phrase %>
+        </div>
+        <!-- Hidden Answer -->
+        <div id="answer" class="hidden text-lg md:text-2xl p-4 mb-4">
+          <%= @learning_progress.dictionary_entry.translation %>
+        </div>
+      <% end %>
+
+      <!-- Reveal Answer Button -->
+      <button id="reveal-answer" class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded m-4">
+        Reveal Answer
+      </button>
+      <a href="/" class="text-blue-600 hover:text-blue-800">Finish session</a>
+
+      <div id="rating-form" class="hidden">
+        <%= form_with model: @learning_progress, method: :patch do %>
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <%= hidden_field_tag '_method', 'patch' %>
+          <!-- Rating Buttons -->
+          <% [
+              ["Excellent", 5, "bg-green-600 hover:bg-green-800"],
+              ["Good", 4, "bg-green-400 hover:bg-green-600"],
+              ["Fair", 3, "bg-yellow-400 hover:bg-yellow-600"],
+              ["Poor", 2, "bg-orange-400 hover:bg-orange-600"],
+              ["No Recall", 1, "bg-red-600 hover:bg-red-800"]
+            ].each do |(rating, quality, color)| %>
+              <%= button_tag type: 'submit', name: 'quality', value: quality, class: "#{color} text-white font-bold py-2 px-4 rounded m-2" do %>
+                <%= rating %>
+              <% end %>
+            <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.getElementById('reveal-answer').addEventListener('click', function() {
+    document.getElementById('answer').classList.remove('hidden');
+    document.getElementById('rating-form').classList.remove('hidden');
+    this.classList.add('hidden');
+  });
+</script>

@@ -11,6 +11,9 @@ class User < ApplicationRecord
   has_many :voice_recordings, through: :dictionary_entries
   has_many :spoken_voice_recordings, through: :spoken_dictionary_entries,  class_name: "VoiceRecording", source: :voice_recording
 
+  has_many :learning_sessions
+  has_many :learning_progresses, through: :learning_sessions
+
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
   has_many :seomras

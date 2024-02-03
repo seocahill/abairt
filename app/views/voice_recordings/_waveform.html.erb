@@ -56,6 +56,8 @@
             </label>
             <% if policy(@recording).edit? && action_name == "show" %>
               <%= link_to "edit", edit_voice_recording_path(@recording), class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded", data: { turbo: false }  %>
+            <% elsif current_user %>
+              <%= button_to "Start Learning", learning_sessions_path, method: :post, params: { word_list_id: @recording&.id, learnable: "VoiceRecording" }, class: "w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2",  data: { turbo: false } %>
             <% end %>
             <% if action_name == "show" %>
               <%= link_to @recording.next, data: { turbo: false } do %>

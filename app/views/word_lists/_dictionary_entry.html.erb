@@ -4,7 +4,7 @@
   <td data-controller="entry" class="px-6 py-4">
     <% if entry.media.attached? %>
       <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
-        <audio src="<%= entry.media.url %>"></audio>
+        <audio data-target="audio-comparison.nativeAudio" src="<%= entry.media.url %>"></audio>
         play
       </button>
     <% else %>
@@ -13,25 +13,31 @@
           <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
         <% end %>
       <% else %>
-        <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
+        <% if current_user %>
+          <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
+        <% else %>
+          Log in to hear
+        <% end %>
       <% end %>
     <% end %>
   </td>
   <% if current_user && list.owner == current_user %>
     <% list_entry = WordListDictionaryEntry.find_by(dictionary_entry_id: entry.id, word_list_id: list.id) %>
     <td data-controller="entry" class="px-6 py-4">
-      <div class="flex">
-        <% if list_entry&.media&.attached? %>
-          <button class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
-            <audio src="<%= list_entry.media.url %>"></audio>
-            play
-          </button>
-        <% end %>
         <%= form_with(model: list_entry) do |form| %>
           <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
         <% end %>
-      </div>
     </td>
+    <% if list_entry&.media&.attached? %>
+      <td data-controller="entry" class="px-6 py-4">
+          <button class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
+            <audio data-target="audio-comparison.userAudio" src="<%= list_entry.media.url %>"></audio>
+            play
+          </button>
+      </td>
+    <% else %>
+      <td class="px-6 py-4"></td>
+    <% end %>
     <td class="px-6 py-4">
       <%= button_to word_list_dictionary_entries_path, method: :post, form: { data: { turbo_confirm: 'Are you sure?' } }, params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: list.id }}, class: "flex items-center" do %>
         <i data-feather="trash"></i>

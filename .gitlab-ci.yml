@@ -38,15 +38,12 @@ build test image:
       --build-arg GEM_IMAGE=registry.gitlab.com/abairt/web-application:latest
       --build-arg RAILS_ENV=test
     - docker push ${CI_REGISTRY_IMAGE}:test
-  only:
-    refs:
-      - branches
-    changes:
-      - Dockerfile
-      - Gemfile.lock
-  except:
-    refs:
-      - master
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - Dockerfile
+        - Gemfile
+        - Gemfile.lock
 
 run tests:
   image: ${CI_REGISTRY_IMAGE}:test
@@ -58,10 +55,8 @@ run tests:
   - SECRET_KEY_BASE=1 bin/rails tailwindcss:build
   - bin/rails db:test:prepare assets:precompile
   - bin/rails test
-  only:
-    - branches
-  except:
-    - master
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 deploy:
   stage: deploy

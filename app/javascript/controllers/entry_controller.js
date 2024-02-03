@@ -46,30 +46,44 @@ export default class extends Controller {
   }
 
   async synth(event) {
+    event.target.disabled = true;
+    event.target.innerText = "Processing...";
     const text = event.currentTarget.dataset.audioText;
-    const response = await this.synthesizeSpeech(text);
+    const response = await this.synthesizeSpeech(text, event.target);
     const synthesizedAudioBase64 = response.audioContent;
     this.playSynthesizedAudio(synthesizedAudioBase64);
+    event.target.disabled = false;
+    event.target.innerText = "Synth";
   }
 
-  async synthesizeSpeech(text) {
-    const uri = 'https://abair.ie/api2/synthesise';
-    const requestBody = {
-      synthinput: { text: text, ssml: 'string' },
-      voiceparams: { languageCode: 'ga-IE', name: "ga_UL_anb_nemo", ssmlGender: 'UNSPECIFIED' },
-      audioconfig: { audioEncoding: 'LINEAR16', speakingRate: 1, pitch: 1, volumeGainDb: 1 },
-      outputType: 'JSON'
-    };
+  async synthesizeSpeech(text, target) {
+    try {
+      const uri = 'https://abair.ie/api2/synthesise';
+      const requestBody = {
+        synthinput: { text: text, ssml: 'string' },
+        voiceparams: { languageCode: 'ga-IE', name: "ga_UL_anb_nemo", ssmlGender: 'UNSPECIFIED' },
+        audioconfig: { audioEncoding: 'LINEAR16', speakingRate: 1, pitch: 1, volumeGainDb: 1 },
+        outputType: 'JSON'
+      };
 
-    const response = await fetch(uri, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
+      const response = await fetch(uri, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
 
-    return await response.json();  // assuming the response is directly the base64 string of the audio.
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();  // assuming the response is directly the base64 string of the audio.
+    } catch (error) {
+      alert("It seems like the abair.ie TTS API is not responding at the moment. Try again later.")
+      target.disabled = false;
+      target.innerText = "Synth";
+    }
   }
 
   playSynthesizedAudio(base64AudioData) {

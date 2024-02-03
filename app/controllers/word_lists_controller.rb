@@ -14,6 +14,15 @@ class WordListsController < ApplicationController
 
   # GET /word_lists/1
   def show
+    @vector_search = EntryEmbedding.new
+
+    if params[:phrase].present?
+      @results = @vector_search.list_grammatic_forms(params[:phrase]).split("\n")
+    end
+
+    if params[:idiom].present?
+      @idioms = @vector_search.list_idioms(params[:idiom]).split("\n")
+    end
     @pagy, @entries = pagy(@word_list.dictionary_entries, items: PAGE_SIZE)
     respond_to do |format|
       format.html
@@ -38,6 +47,20 @@ class WordListsController < ApplicationController
     @word_list = current_user.own_lists.build(word_list_params)
     authorize @word_list
 
+    if @word_list.description.present?
+      results = @word_list.generate_vocab
+      results.dig('vocabulary').each do |result|
+        user = User.ai.first
+        entry = DictionaryEntry.create(
+          owner: user,
+          speaker_id: user.id,
+          word_or_phrase: result["irish_word_or_phrase"],
+          translation: result["english_translation"]
+        )
+        @word_list.dictionary_entries << entry
+      end
+    end
+
     if @word_list.save
       redirect_to @word_list, notice: 'Word list was successfully created.'
     else
@@ -48,6 +71,14 @@ class WordListsController < ApplicationController
   # PATCH/PUT /word_lists/1
   def update
     authorize @word_list
+
+    if params[:generate_script]
+      @word_list.generate_script(params[:script_type])
+    end
+
+    if params[:phrase]
+      @word_list.dictionary_entries.build(word_or_phrase: params[:result], translation: params[:phrase], owner: User.ai.first)
+    end
 
     if @word_list.update(word_list_params)
       redirect_to @word_list, notice: 'Word list was successfully updated.'
@@ -71,6 +102,6 @@ class WordListsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def word_list_params
-      params.permit(:name, :description)
+      params.permit(:name, :description, :media)
     end
 end

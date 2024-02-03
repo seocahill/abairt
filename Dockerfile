@@ -76,12 +76,15 @@ RUN \
     libxml2 \
     libxml2-dev \
     libxslt1-dev \
+    libpq-dev \
     make \
     netcat \
     netcat-traditional \
     nodejs \
     npm \
     pkg-config \
+    postgresql \
+    postgresql-client \
     procps \
     sqlite3 \
     sqlite3 \
@@ -118,6 +121,8 @@ RUN \
   fi
 
 RUN \
+  gem update --system && \
+  gem install bundler && \
   bundle install && \
   npm install && \
   SECRET_KEY_BASE=1 bin/rails tailwindcss:build && \
@@ -136,6 +141,7 @@ RUN apt update && apt install -y \
   libid3tag0 \
   libmad0 \
   libsndfile1 \
+  postgresql-client \
   sqlite3
 RUN useradd -r -u 1001 -g root nonroot
 RUN chown -R nonroot /app

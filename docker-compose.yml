@@ -35,5 +35,15 @@ services:
     ports:
       - 6379:6379
 
-# volumes:
-#   db:
+  pg_vector:
+    image: ankane/pgvector
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+      - .:/app
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+volumes:
+  db:

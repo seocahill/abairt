@@ -1,0 +1,39 @@
+<div id="<%= dom_id(@user) %>" class="m-10">
+  <div class="px-4 sm:px-0">
+    <h3 class="text-base font-semibold leading-7 text-gray-900">
+      <%= @user.name %>
+      <span class="bg-green-200 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-700 dark:text-green-300"><%= @user.role.humanize %></span>
+    </h3>
+  </div>
+  <div class="mt-6 border-t border-gray-100">
+    <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Progress</p>
+    <dl class="divide-y divide-gray-100">
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">
+          Vocabulary <a href=""></a>
+        </dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <div class="w-full bg-gray-200 rounded-full">
+            <div class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-l-full" style="width: 60%;"> 60%</div>
+          </div>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Speaking</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <div class="w-full bg-gray-200 rounded-full">
+            <div class="bg-green-600 text-xs font-medium text-green-100 text-center p-0.5 leading-none rounded-l-full" style="width: 30%;"> 30%</div>
+            </div>
+        </dd>
+      </div>
+      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+        <dt class="text-sm font-medium leading-6 text-gray-900">Listening</dt>
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+          <div class="w-full bg-gray-200 rounded-full">
+            <div class="bg-orange-600 text-xs font-medium text-orange-100 text-center p-0.5 leading-none rounded-l-full" style="width: 10%;"> 10%</div>
+          </div>
+        </dd>
+      </div>
+    </div>
+  </div>
+</div>

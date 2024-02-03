@@ -49,7 +49,7 @@ gem "geocoder", "~> 1.8"
 gem "yui-compressor", "~> 0.12.0"
 gem "sprockets-rails"
 gem "litestack", "~> 0.2.3"
-gem "ruby-openai", "~> 4.2"
+gem "ruby-openai", "~> 6.3.0"
 
 
 gem "pundit", "~> 2.3"
@@ -59,3 +59,19 @@ gem "paper_trail", "~> 15.0"
 gem "madmin", "~> 1.2"
 
 gem "mailjet", "~> 1.7"
+
+gem "langchainrb", "~> 0.8"
+gem "tiktoken_ruby", "~> 0.0.6"
+
+gem "multi_json", "~> 1.15"
+
+
+gem "pg", "~> 1.5"
+
+gem "pgvector", "~> 0.2"
+
+gem "sequel", "~> 5.76"
+
+gem "pdf-reader", "~> 2.12"
+
+gem "dotenv", "~> 2.8"
