@@ -133,6 +133,7 @@ FROM ruby:3.0-slim as prod
 COPY --from=builder /app/ /app/
 COPY --from=builder --chmod=777 /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
 RUN apt update && apt install -y \
+  curl \
   ffmpeg \
   libboost-filesystem-dev \
   libboost-program-options-dev \
@@ -149,4 +150,8 @@ USER nonroot
 WORKDIR /app
 EXPOSE 3000
 ENV RAILS_ENV="production"
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost:3000/up || exit 1
+
 CMD ["bin/rails", "server"]
