@@ -20,6 +20,8 @@ class DictionaryEntry < ApplicationRecord
   has_many :word_list_dictionary_entries, dependent: :destroy
   has_many :word_lists, through: :word_list_dictionary_entries
 
+  has_many :learning_progresses, dependent: :destroy
+
   acts_as_taggable_on :tags
 
   accepts_nested_attributes_for :rang_entries

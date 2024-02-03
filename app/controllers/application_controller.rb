@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
   def root_redirect
     authorize User
     if current_user
-      redirect_to current_user
+      redirect_to learning_sessions_path
     else
       redirect_to home_path
     end

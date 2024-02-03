@@ -2,6 +2,7 @@ class VoiceRecording < ApplicationRecord
   has_one_attached :media
   has_many :dictionary_entries
   has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: 'User'
+  has_many :learning_sessions, as: :learnable
   after_commit :enqueue_generate_peaks_job
 
   belongs_to :owner, class_name: "User", foreign_key: "user_id"

@@ -119,3 +119,13 @@ ffmpeg -i $file.mp3 -codec:a libmp3lame -qscale:a 2 $file-sm.mp3
 ```bash
 ffmpeg -i [stream URL] -acodec libmp3lame -ab 128k [output file name].mp3
 ```
+
+```bash
+pg_dump --clean --if-exists --quote-all-identifiers \
+ -h localhost -U postgres -d postgres \
+ --no-owner --no-privileges > embeddings.sql
+```
+
+```bash
+psql -h db.wtdrbfgcompphsorooqe.supabase.co -U postgres --file embeddings.sql -p 6543 -d postgres
+```

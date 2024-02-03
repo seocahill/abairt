@@ -31,4 +31,15 @@ export default class extends Controller {
     e.stopImmediatePropagation()
     document.querySelector('#tooltip').remove()
   }
+
+  toggleLineClamp(e) {
+    e.preventDefault()
+    let content = document.getElementById('word-description');
+    if (e.target.text === "More") {
+      e.target.text = "Less"
+    } else {
+      e.target.text = "More"
+    }
+    content.classList.toggle('line-clamp-3');
+  }
 }

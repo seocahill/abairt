@@ -1,0 +1,31 @@
+<div class="flex-grow p-4">
+      <div class="relative overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+            Contributions
+          </caption>
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" class="px-6 py-3" >Irish</th>
+              <th scope="col" class="px-6 py-3" >English</th>
+              <th scope="col" class="px-6 py-3" >Tags</th>
+              <th scope="col" class="px-6 py-3" >Audio</th>
+              <% if current_user %>
+                <th scope="col" class="px-6 py-3" ></th>
+                <th scope="col" class="px-6 py-3" >Add to List</th>
+                <th scope="col" class="px-6 py-3" ></th>
+                <th scope="col" class="px-6 py-3" ></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody id="dictionary_entries">
+            <% @entries.each do |entry| %>
+              <%= render partial: "dictionary_entries/dictionary_entry", locals: { entry: entry, starred: @starred, current_user: current_user } %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="w-full bg-white rounded-md p-4">
+      <%== pagy_nav(@pagy) %>
+    </div>

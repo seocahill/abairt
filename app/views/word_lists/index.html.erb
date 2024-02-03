@@ -21,7 +21,7 @@
           <% @word_lists.each do |list| %>
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td class="px-6 py-4"><%= list.name %></td>
-              <td class="px-6 py-4"><%= list.description %></td>
+              <td class="px-6 py-4"><%= truncate(list.description) %></td>
               <td class="px-6 py-4"><%= list.dictionary_entries.size %></td>
               <td class="px-6 py-4"><%= list.owner.name %></td>
               <td class="px-6 py-4"><%= link_to word_list_path(list, format: :csv) do %><i data-feather="download"></i><% end %></td>
