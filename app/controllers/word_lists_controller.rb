@@ -3,7 +3,7 @@ class WordListsController < ApplicationController
 
   # GET /word_lists
   def index
-    @new_list = current_user.own_lists.new
+    @new_list = current_user.own_lists.new if current_user
     records = WordList.where("id is not null AND starred is not true")
 
     if params[:search].present?
