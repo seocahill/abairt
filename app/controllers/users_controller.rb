@@ -54,6 +54,7 @@ class UsersController < ApplicationController
     @starred = current_user&.starred
     @new_speaker = User.new
     @template_name = "profile"
+    @pagy_users, @pending_users = pagy(User.student.where.not(confirmed: true), items: 5)
 
     respond_to do |format|
       format.html
@@ -140,6 +141,12 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:email, :name, :password, :dialect, :voice, :lat_lang, :role, :address, :about, :ability)
+    allowed_params = [:email, :name, :password, :dialect, :voice, :lat_lang, :address, :about, :ability]
+
+    if current_user&.admin?  # Assuming you have a method to check if the user is an admin
+      allowed_params << :confirmed
+    end
+
+    params.require(:user).permit(allowed_params)
   end
 end
