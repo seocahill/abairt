@@ -1,0 +1,15 @@
+<tr id="<%= dom_id(user) %>" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+  <td class="px-6 py-4">
+    <%= user.name %>
+  </td>
+  <td class="px-6 py-4">
+    <%= user.email %>
+  </td>
+  <td class="px-6 py-4">
+    <%= user.about %>
+  </td>
+  <td class="px-6 py-4 w-1/2">
+  <%= button_to "Lig isteach", user_path(user), method: :patch, form: { data: { turbo_confirm: 'An bhfuil tú cinnte?', turbo: false } }, params: { user: { confirmed: true }, partial: "pending_user" }, class: "flex items-center bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" %>
+</td>
+
+</tr>

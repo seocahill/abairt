@@ -17,6 +17,9 @@
 <div class="w-full md:w-3/4 p-4">
   <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <%= render "profile" %>
+    <% if @user&.admin? %>
+      <%= render "pending_approvals" %>
+    <% end %>
     <%= render "contributions" %>
   </div>
 </div>

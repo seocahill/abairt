@@ -1,0 +1,25 @@
+<div class="flex-grow p-4">
+  <div class="relative overflow-x-auto">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+        Usadóirí atá ag fanacht
+      </caption>
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" class="px-6 py-3" >Ainm</th>
+          <th scope="col" class="px-6 py-3" >Ríomhphost</th>
+          <th scope="col" class="px-6 py-3" >Faoí</th>
+          <th scope="col" class="px-6 py-3" ></th>
+        </tr>
+      </thead>
+      <tbody id="dictionary_entries">
+        <% @pending_users.each do |user| %>
+          <%= render partial: "pending_user", locals: { user: user } %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="w-full bg-white rounded-md p-4">
+  <%== pagy_nav(@pagy_users) %>
+</div>
