@@ -7,6 +7,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def show?
+    return user == record
+  end
+
   def update?
     return true if user&.admin?
     return true if user == record
