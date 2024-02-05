@@ -1,15 +1,15 @@
 # app/policies/course_policy.rb
 class CoursePolicy < ApplicationPolicy
   def index?
-    user.admin? || user.teacher?
+    user&.admin? || user&.teacher?
   end
 
   def show?
-    user.admin? || user.teacher?
+    user&.admin? || user&.teacher?
   end
 
   def create?
-    user.admin? || user.teacher?
+    user&.admin? || user&.teacher?
   end
 
   def new?
@@ -17,7 +17,7 @@ class CoursePolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? || (user.teacher? && record.user == user)
+    user&.admin? || (user&.teacher? && record&.user == user)
   end
 
   def edit?
@@ -25,6 +25,6 @@ class CoursePolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.admin? || (user.teacher? && record.user == user)
+    user&.admin? || (user&.teacher? && record&.user == user)
   end
 end
