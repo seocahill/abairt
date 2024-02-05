@@ -17,6 +17,18 @@ class UserPolicyTest < ActiveSupport::TestCase
     assert policy.new?
   end
 
+  def test_show
+    current_user = users(:one)
+    policy = UserPolicy.new(current_user, users(:two))
+
+    refute policy.show?
+
+    current_user = users(:two)
+    policy = UserPolicy.new(current_user, users(:two))
+
+    assert policy.show?
+  end
+
   def test_create
     current_user = users(:one)
     policy = UserPolicy.new(current_user, nil)
