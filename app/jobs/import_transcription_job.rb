@@ -1,12 +1,12 @@
 class ImportTranscriptionJob < ApplicationJob
-  queue_as :default
+  queue_as :long_running
 
   def perform(voice_recording)
      llm = Langchain::LLM::OpenAI.new(api_key: Rails.application.credentials.dig(:openai, :openai_key),  default_options: {
       chat_completion_model_name: "gpt-4-1106-preview",
       completion_model_name: "gpt-4-1106-preview"
     }, llm_options: {
-      request_timeout: 500
+      request_timeout: 20000
     })
     json_schema = {
       "$schema": "http://json-schema.org/draft-07/schema#",
