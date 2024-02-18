@@ -122,7 +122,8 @@ class VoiceRecordingsController < ApplicationController
 
   def add_region
     previous_entry = @voice_recording.dictionary_entries.where("region_end IS NOT NULL").order("region_end DESC").first
-    entry = @voice_recording.dictionary_entries.where("dictionary_entries.id > ?", previous_entry.id).first
+    entry = previous_entry ? @voice_recording.dictionary_entries.where("dictionary_entries.id > ?", previous_entry.id).first : @voice_recording.dictionary_entries.first
+
     authorize(entry)
 
     entry.region_start = previous_entry&.region_end.to_d + 0.01
