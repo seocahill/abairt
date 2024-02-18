@@ -4,14 +4,20 @@
       <% if entry.speaker_id %>
         <%= link_to_unless policy(entry).edit?, entry.speaker&.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
       <% else %>
-        "No speaker"
+        "Choose speaker"
       <% end %>
     <% end %>
   </td>
-<td class="px-6 py-4">
-    <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
-      <%= entry.region_start&.round(1) || 0.0 %>-<%= entry.region_end&.round(1) %>
-    </a>
+  <td class="px-6 py-4">
+    <% if entry.region_end %>
+      <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
+        <%= entry.region_start&.round(1) || 0.0 %>-<%= entry.region_end&.round(1) %>
+      </a>
+    <% else %>
+      <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
+        Add region
+      </a>
+    <% end %>
   </td>
   <td class="px-6 py-4">
     <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
