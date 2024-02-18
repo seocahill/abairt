@@ -15,23 +15,6 @@ export default class extends Controller {
     // this.audioTarget.play()
   }
 
-  addRegion(event) {
-    event.preventDefault();
-    const entryId = $(this).closest("tr").attr("id");
-    const currentPosition = $("#current-seek-position").html();
-    let formData = new FormData()
-    formData.append("current_position", currentPosition)
-    fetch(`/dictionary_entries/${entryId}/add_region`, {
-      body: formData,
-      method: 'PATCH',
-      credentials: "include",
-      dataType: "script",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-      },
-    })
-  }
-
   addToList(e) {
     const wordListId = e.target.dataset.listId
     let formData = new FormData()

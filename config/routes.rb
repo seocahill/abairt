@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :voice_recordings do
     resources :dictionary_entries, only: :create, module: :voice_recordings
     member { get :preview }
+    member { post :add_region }
     collection { get :map }
   end
 
@@ -28,9 +29,7 @@ Rails.application.routes.draw do
 
   resource :reify, only: :create
 
-  resources :dictionary_entries do
-    member { patch :add_region }
-  end
+  resources :dictionary_entries
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
 
