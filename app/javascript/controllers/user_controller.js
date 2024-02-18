@@ -3,7 +3,7 @@ import autoComplete from "autocomplete";
 
 export default class extends Controller {
   static targets = ["userSearch"]
-  static values = { "fieldName": String }
+  static values = { "fieldName": String, "submit": String }
 
   initialize() {
     console.log("connect to users");
@@ -55,7 +55,11 @@ export default class extends Controller {
 
             // Append the hidden input to the form
             form.appendChild(userIdInput);
-            form.requestSubmit()
+
+            // Submit form
+            if (this.submitValue !== "false") {
+              form.requestSubmit()
+            }
           }
         },
       }
