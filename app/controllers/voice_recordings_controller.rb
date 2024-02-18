@@ -1,5 +1,5 @@
 class VoiceRecordingsController < ApplicationController
-  before_action :set_voice_recording, only: %i[ show edit update destroy ]
+  before_action :set_voice_recording, only: %i[ show edit update destroy add_region ]
 
   def index
     @new_voice_recording = VoiceRecording.new
@@ -115,6 +115,25 @@ class VoiceRecordingsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to voice_recordings_url, notice: "Voice recording was successfully destroyed." }
       format.json { head :no_content }
+    end
+  end
+
+  def add_region
+    previous_entry = @voice_recording.dictionary_entries.where("region_end IS NOT NULL").order("region_end DESC").first
+    entry = @voice_recording.dictionary_entries.where("dictionary_entries.id > ?", previous_entry.id).first
+    authorize(entry)
+
+    entry.region_start = previous_entry&.region_end.to_d + 0.01
+    entry.region_end = params[:current_position]
+
+    respond_to do |format|
+      if entry.save
+        entry.create_audio_snippet
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",
+          locals: { entry: entry })
+        end
+      end
     end
   end
 

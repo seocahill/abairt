@@ -127,27 +127,6 @@ class DictionaryEntriesController < ApplicationController
     end
   end
 
-  def add_region
-    entry = DictionaryEntry.find(params[:id])
-    previous_entry = DictionaryEntry.where("region_end IS NOT NULL").order("region_end DESC").first
-
-    entry.region_start = @previous_entry.region_end ? @previous_entry.region_end + 0.01 : 0.0
-    entry.region_end = params[:current_position]
-
-    respond_to do |format|
-      if entry.save
-        entry.create_audio_snippet
-        format.html { redirect_to entry.voice_recording }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",
-          locals: { entry: entry })
-        end
-      else
-        format.html { redirect_back fallback_location: root_path, status: :unprocessable_entity }
-      end
-    end
-  end
-
   private
 
   def entry_speaker

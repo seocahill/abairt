@@ -3,7 +3,7 @@ import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
-  static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video"]
+  static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video", "position"]
   static values = { media: String, regions: Array, peaks: Array }
 
   connect() {
@@ -96,6 +96,7 @@ export default class extends Controller {
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+        that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
       }
     })
 
