@@ -1,7 +1,7 @@
 class ImportTranscriptionJob < ApplicationJob
   queue_as :long_running
 
-  def perform(voice_recording)
+  def perform(voice_recording, speaker_id)
      llm = Langchain::LLM::OpenAI.new(api_key: Rails.application.credentials.dig(:openai, :openai_key),  default_options: {
       chat_completion_model_name: "gpt-4-1106-preview",
       completion_model_name: "gpt-4-1106-preview"
@@ -29,7 +29,7 @@ class ImportTranscriptionJob < ApplicationJob
     prompt_text = prompt.format(text: voice_recording.transcription.gsub(/\s+/, ""), format_instructions: parser.get_format_instructions)
     llm_response = llm.chat(prompt: prompt_text).completion
     parser.parse(llm_response).dig('items').each do |item|
-      voice_recording.dictionary_entries.create!(word_or_phrase: item['word_or_phrase'], translation: item['translation'], user_id: voice_recording.user_id, quality: :high)
+      voice_recording.dictionary_entries.create!(word_or_phrase: item['word_or_phrase'], translation: item['translation'], user_id: voice_recording.user_id, quality: :high, speaker_id: speaker_id)
     end
   end
 end

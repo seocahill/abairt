@@ -51,7 +51,4 @@ class VoiceRecording < ApplicationRecord
     Rails.logger.warn(["Peak generation failed", e])
   end
 
-  def import_transcription
-    ImportTranscriptionJob.perform_later(self)
-  end
 end
