@@ -95,6 +95,7 @@ class VoiceRecordingsController < ApplicationController
   # PATCH/PUT /voice_recordings/1 or /voice_recordings/1.json
   def update
     authorize @voice_recording
+    @voice_recording.import_transcription if voice_recording_params.dig(:transcription).present?
     respond_to do |format|
       if @voice_recording.update(voice_recording_params)
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully updated." }
