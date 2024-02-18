@@ -28,7 +28,9 @@ Rails.application.routes.draw do
 
   resource :reify, only: :create
 
-  resources :dictionary_entries
+  resources :dictionary_entries do
+    member { patch :add_region }
+  end
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
 

@@ -14,7 +14,7 @@
         <%= entry.region_start&.round(1) || 0.0 %>-<%= entry.region_end&.round(1) %>
       </a>
     <% else %>
-      <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
+      <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#add_region">
         Add region
       </a>
     <% end %>
