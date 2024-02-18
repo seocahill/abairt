@@ -6,7 +6,7 @@ class ImportTranscriptionJob < ApplicationJob
       chat_completion_model_name: "gpt-4-1106-preview", completion_model_name: "gpt-4-1106-preview"
     })
     voice_recording.transcription.split(/\.|\?|!/).each do |text|
-      prompt_text = "translate this piece of irish text: '#{text}' into english. return the translation only, no other information is required. q"
+      prompt_text = "translate this piece of irish text: '#{text}' into english. return the translation only, no other information is required."
       llm_response = llm.chat(prompt: prompt_text).completion
       voice_recording.dictionary_entries.create!(word_or_phrase: text, translation: llm_response, user_id: voice_recording.user_id)
     end
