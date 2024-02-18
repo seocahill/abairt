@@ -142,7 +142,7 @@ export default class extends Controller {
       button.innerHTML = "Pause"
     } else {
       this.waveSurfer.setPlaybackRate((currentSpeed * 0.75))
-      button.innerHTML = "Normal Speed"
+      button.innerHTML = "Reset"
     }
   }
 
@@ -162,12 +162,12 @@ export default class extends Controller {
 
   toggleButton() {
     const button = this.element.querySelector('#play-pause-button')
-    if (button.innerHTML === "Pause") {
+    if (this.waveSurfer.isPlaying() && (this.waveSurfer.getPlaybackRate() < 1)) {
+      button.innerHTML = "Reset"
+    } else if (this.waveSurfer.isPlaying()) {
+      button.innerHTML = "Pause"
+    } else {
       button.innerHTML = "Play"
-    } else if (button.innerHTML === "Play") {
-      button.innerHTML = "Pause"
-    } else if (button.innerHTML === "Normal Speed") {
-      button.innerHTML = "Pause"
     }
   }
 
