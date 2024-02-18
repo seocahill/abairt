@@ -95,9 +95,11 @@ class VoiceRecordingsController < ApplicationController
   # PATCH/PUT /voice_recordings/1 or /voice_recordings/1.json
   def update
     authorize @voice_recording
-    ImportTranscriptionJob.perform_later(@voice_recording, params[:speaker_id]) if voice_recording_params.dig(:transcription).present?
     respond_to do |format|
       if @voice_recording.update(voice_recording_params)
+        if @voice_recording.transcription.present? && @voice_recording.dictionary_entries.empty?
+          ImportTranscriptionJob.perform_later(@voice_recording, params[:speaker_id])
+        end
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully updated." }
         format.json { render :show, status: :ok, location: @voice_recording }
       else

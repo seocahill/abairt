@@ -6,30 +6,21 @@ class ImportTranscriptionJob < ApplicationJob
       chat_completion_model_name: "gpt-4-1106-preview",
       completion_model_name: "gpt-4-1106-preview"
     }, llm_options: {
-      request_timeout: 20000
+      request_timeout: 2000
     })
-    json_schema = {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "word_or_phrase": {
-            "type": "string"
-          },
-          "translation": {
-            "type": "string"
-          }
-        },
-        "required": ["word_or_phrase", "translation"]
-      }
-    }
-    parser = Langchain::OutputParsers::StructuredOutputParser.from_json_schema(json_schema)
-    prompt = Langchain::Prompt::PromptTemplate.new(template: "Take the following text and split into phrases.  Return each phrase with an english translation.\n{format_instructions}\nIrish Text: {text}", input_variables: ["text", "format_instructions"])
-    prompt_text = prompt.format(text: voice_recording.transcription.gsub(/\s+/, ""), format_instructions: parser.get_format_instructions)
-    llm_response = llm.chat(prompt: prompt_text).completion
-    parser.parse(llm_response).dig('items').each do |item|
-      voice_recording.dictionary_entries.create!(word_or_phrase: item['word_or_phrase'], translation: item['translation'], user_id: voice_recording.user_id, quality: :high, speaker_id: speaker_id)
+    voice_recording.transcription.split(/(?<=[?.!])\s*/).each_cons(3) do |prev, current, next_sentence|
+      prompt_text = <<-PROMPT
+      Translate the following sentence from Irish to English, considering the context provided by the surrounding sentences.
+
+      Previous sentence (for context): #{prev || "N/A"}
+      Current sentence to translate: #{current}
+      Next sentence (for context): #{next_sentence || "N/A"}
+
+      Return just the translation as a string.
+      PROMPT
+
+      llm_response = llm.chat(prompt: prompt_text).completion
+      voice_recording.dictionary_entries.create!(word_or_phrase: current, translation: llm_response, user_id: voice_recording.user_id, quality: :high, speaker_id: speaker_id)
     end
   end
 end
