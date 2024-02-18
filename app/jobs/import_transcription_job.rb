@@ -29,7 +29,7 @@ class ImportTranscriptionJob < ApplicationJob
     prompt_text = prompt.format(text: voice_recording.transcription.gsub(/\s+/, ""), format_instructions: parser.get_format_instructions)
     llm_response = llm.chat(prompt: prompt_text).completion
     parser.parse(llm_response).dig('items').each do |item|
-      voice_recording.dictionary_entries.create!(word_or_phrase: item['word_or_phrase'], translation: item['translation'], user_id: voice_recording.user_id)
+      voice_recording.dictionary_entries.create!(word_or_phrase: item['word_or_phrase'], translation: item['translation'], user_id: voice_recording.user_id, quality: :high)
     end
   end
 end
