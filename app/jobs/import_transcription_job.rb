@@ -8,7 +8,9 @@ class ImportTranscriptionJob < ApplicationJob
     }, llm_options: {
       request_timeout: 2000
     })
-    voice_recording.transcription.split(/(?<=[?.!])\s*/).each_cons(3) do |prev, current, next_sentence|
+    # Add dummy to start and end to ensure they are translated
+    sentences = [""] + voice_recording.transcription.split(/(?<=[?.!])\s*/) + [""]
+    sentences.each_cons(3) do |prev, current, next_sentence|
       prompt_text = <<-PROMPT
       Translate the following sentence from Irish to English, considering the context provided by the surrounding sentences.
 
