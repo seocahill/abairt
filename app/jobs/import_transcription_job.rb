@@ -20,7 +20,8 @@ class ImportTranscriptionJob < ApplicationJob
       PROMPT
 
       llm_response = llm.chat(prompt: prompt_text).completion
-      voice_recording.dictionary_entries.create!(word_or_phrase: current, translation: llm_response, user_id: voice_recording.user_id, quality: :high, speaker_id: speaker_id)
+      Rails.logger.info("received response - #{llm_response}")
+      voice_recording.dictionary_entries.create!(word_or_phrase: current, translation: llm_response, user_id: voice_recording.user_id, quality: :good, speaker_id: speaker_id)
     end
   end
 end
