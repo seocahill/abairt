@@ -96,13 +96,18 @@ export default class extends Controller {
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-        that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
+        if (that.hasPositionTarget) {
+          that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
+        }
       }
     })
 
     this.waveSurfer.on('seek', function() {
       if (that.hasTimeTarget) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+      }
+      if (that.hasPositionTarget) {
+        that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
       }
     })
 
