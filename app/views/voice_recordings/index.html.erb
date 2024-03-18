@@ -24,6 +24,9 @@
                     <th scope="col" class="px-6 py-3" >Dialects</th>
                     <th scope="col" class="px-6 py-3" ></th>
                     <th scope="col" class="px-6 py-3" ></th>
+                    <% if current_user&.admin? %>
+                      <th scope="col" class="px-6 py-3" ></th>
+                    <% end %>
                   </tr>
                 </thead>
                 <tbody>
@@ -46,7 +49,9 @@
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         <% end %>
                       </td>
-                      <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: recording.id, itemable_type: recording.class.to_s), data: { turbo: false } %></td>
+                      <% if current_user&.admin? %>
+                        <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: recording.id, itemable_type: recording.class.to_s), data: { turbo: false } %></td>
+                      <% end %>
                     </tr>
                   <% end %>
                 </tbody>
