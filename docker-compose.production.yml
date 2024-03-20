@@ -15,7 +15,10 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:d959f11ceec07a7570c159cbde5d82fb90ffe9cd
+    image: registry.gitlab.com/abairt/web-application:9dda82f603d42b0b6d05796cfc02e97f41d683b0
+    deploy:
+      mode: replicated
+      replicas: 2
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
@@ -54,8 +57,17 @@ services:
   redis:
     image: redis:alpine
 
+  pg_vector:
+    image: ankane/pgvector
+    volumes:
+      - vector_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+
 volumes:
   db:
+  vector_db:
   caddy_data:
   caddy_config:
   # assets:
