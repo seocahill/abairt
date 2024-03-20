@@ -125,6 +125,7 @@ pg_dump --clean --if-exists --quote-all-identifiers \
  -h localhost -U postgres -d postgres \
  --no-owner --no-privileges > embeddings.sql
 ```
+# postgres
 
 ```bash
 psql -h db.wtdrbfgcompphsorooqe.supabase.co -U postgres --file embeddings.sql -p 6543 -d postgres
