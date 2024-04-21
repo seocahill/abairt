@@ -7,6 +7,14 @@ class LearningSessionPolicyTest < ActiveSupport::TestCase
   def test_show
   end
 
+  def test_index
+    policy = LearningSessionPolicy.new(nil, nil)
+    refute policy.index?
+
+    policy = LearningSessionPolicy.new(users(:one), nil)
+    assert policy.index?
+  end
+
   def test_create
   end
 

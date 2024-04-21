@@ -9,7 +9,7 @@ class ArticlePolicy < ApplicationPolicy
   end
 
   def create?
-    user.admin? || user.teacher?
+    user&.admin? || user&.teacher?
   end
 
   def new?

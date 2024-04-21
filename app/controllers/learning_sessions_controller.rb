@@ -17,6 +17,7 @@ class LearningSessionsController < ApplicationController
     #   **Speaking Time**: 150-210 hours, est 60sec average audio per chat == 9000 chats
     #   **Estimated Number of Transcriptions to Understand**: 500-700
     #   **Vocabulary Size**: Around 3500-5000 words.
+    authorize LearningSession
     @user = current_user
     @vocab_progress_count = current_user.learning_progresses
                               .joins(:learning_session)
