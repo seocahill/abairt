@@ -17,9 +17,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     respond_to do |format|
       if @dictionary_entry.save
         @dictionary_entry.create_audio_snippet
-        if ENV['AUTO_TAG_ENABLED']
-          AutoTagEntryJob.perform_later(@dictionary_entry)
-        end
+        AutoTagEntryJob.perform_later(@dictionary_entry)
         format.html { redirect_to @dictionary_entry.voice_recording }
         format.turbo_stream do
           render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",

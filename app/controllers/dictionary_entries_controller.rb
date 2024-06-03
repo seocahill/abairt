@@ -70,9 +70,7 @@ class DictionaryEntriesController < ApplicationController
     respond_to do |format|
       if @dictionary_entry.save
         # auto_tag
-        if ENV['AUTO_TAG_ENABLED']
-          AutoTagEntryJob.perform_later(@dictionary_entry)
-        end
+        AutoTagEntryJob.perform_later(@dictionary_entry)
 
         format.html { redirect_to @dictionary_entry }
         format.turbo_stream do
