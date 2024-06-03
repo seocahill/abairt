@@ -127,11 +127,14 @@ class DictionaryEntry < ApplicationRecord
     client = OpenAI::Client.new(access_token: Rails.application.credentials.dig(:openai, :openai_key),
       organization_id: Rails.application.credentials.dig(:openai, :openai_org))
 
-    prompt = "Please analyze the following phrase and generate tags with a focus on grammatical features, broader semantic categories relevant to language learners and also a mood. Keep the selected categories general and not too granular. Return up to two category tags, a single grammatical feature tag and a single mood or voice tag, the most relevant of each in your opinion. The results you return should be a single array of the tags you have chose, nothing else. Phrase: #{translation}"
+    context =  { role: 'system', content: "You are an Irish language translator. You take words and phrases and tag them using the following schema: Abstract nouns; Activities; Adjectives; Adverbs; Amount; Animals; Arguments; Astronomy; Buildings; Calendar & Seasons; Clothes; Colours; Comparatives; Conversation; Countryside; Disaster; Everyday phrases; Facial expressions; Farming life ; Feelings; Folklore; Food and drink; Games; Geographical terms; Grammar; Greetings; Health; Idioms; Interjections; Language; Life & death; Likes & dislikes; Measurement; Money; Music; Noise and sounds; Numbers; Objects; Past participle; People; Personality; Physical contact; Physical descriptions; Place names; Plants; Prepositions; Pronouns; Proverbs; Reduplication; Relationships; Religion; Rest and relaxation; School; Seashore wildlife; Shapes; Similes; Smells; Terms of endearment; The body; The city; The family; The home; The seashore; Timber; Time; To be able to; Toys; Transport; Verbs; Weather; Work. You choose as many tags from this schema as is appropriate." }
+
+    prompt = "Please analyze the following phrase and generate tags for it. The results you return should be a single array of the tags you have chosen, nothing else. Phrase: #{translation}"
 
     response = client.chat(parameters: {
       model: "gpt-4o",  # or use the appropriate model you have access to
       messages: [
+        { "role": "system", "content": context },
         { "role": "user", "content": prompt }
       ]
     })
