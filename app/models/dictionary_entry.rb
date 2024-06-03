@@ -91,7 +91,7 @@ class DictionaryEntry < ApplicationRecord
 
   def chat_with_gpt(rang)
     # set default context
-    context =  { role: 'system', content: "You are an Irish speaker called 'An Chaothernach'. You are chatting with another Irish speaker about everyday things, e.g. your job, your family, holidays, the news, the weather, hobbies, etc. Try not to give long answers. If you don't understand, say it." }
+    context =  { role: 'system', content: "You are an Irish language learning coach who helps users learn and practice new languages. You always speak in the canúint of Mayo, that is the connacht dialect with a strong ulster influence. Offer grammar explanations, vocabulary building exercises, and pronunciation tips. You can speak in English if requested but try to return to Irish as quickly as possible. Engage users in conversations to help them improve their listening and speaking skills and gain confidence in using the language." }
 
     # send recent conversation with
     messages = rang.dictionary_entries.last(10).map do |message|
@@ -108,7 +108,7 @@ class DictionaryEntry < ApplicationRecord
     response = OpenAI::Client.new(
       access_token: Rails.application.credentials.dig(:openai, :openai_key),
       organization_id: Rails.application.credentials.dig(:openai, :openai_org)).chat(parameters: {
-        model: 'gpt-4-1106-preview',
+        model: 'gpt-4o',
         messages: messages,
         temperature: 0.5
       })
@@ -130,7 +130,7 @@ class DictionaryEntry < ApplicationRecord
     prompt = "Please analyze the following phrase and generate tags with a focus on grammatical features, broader semantic categories relevant to language learners and also a mood. Keep the selected categories general and not too granular. Return up to two category tags, a single grammatical feature tag and a single mood or voice tag, the most relevant of each in your opinion. The results you return should be a single array of the tags you have chose, nothing else. Phrase: #{translation}"
 
     response = client.chat(parameters: {
-      model: "gpt-4-1106-preview",  # or use the appropriate model you have access to
+      model: "gpt-4o",  # or use the appropriate model you have access to
       messages: [
         { "role": "user", "content": prompt }
       ]

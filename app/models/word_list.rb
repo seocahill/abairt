@@ -55,7 +55,7 @@ class WordList < ApplicationRecord
     prompt = Langchain::Prompt::PromptTemplate.new(template: "You task is to generate a lexicon for this specific topic: {description}. Return a list comprising: 5 verbs, 4 adverbs, 20 nouns, 10 adjectives, 2 idioms, and 1 proverb. The language is Irish (Gaelic).\n{format_instructions}", input_variables: ["format_instructions", "description"])
     prompt_text = prompt.format(format_instructions: parser.get_format_instructions, description: description)
     llm = Langchain::LLM::OpenAI.new(api_key:Rails.application.credentials.dig(:openai, :openai_key),  default_options: {
-      chat_completion_model_name: "gpt-4-1106-preview", completion_model_name: "gpt-4-1106-preview"
+      chat_completion_model_name: "gpt-4o", completion_model_name: "gpt-4o"
     })
     llm_response = llm.chat(prompt: prompt_text).completion
     parser.parse(llm_response)
@@ -73,7 +73,7 @@ class WordList < ApplicationRecord
       ```
     EOF
     llm = Langchain::LLM::OpenAI.new(api_key:Rails.application.credentials.dig(:openai, :openai_key), default_options: {
-      chat_completion_model_name: "gpt-4-1106-preview", completion_model_name: "gpt-4-1106-preview"
+      chat_completion_model_name: "gpt-4o", completion_model_name: "gpt-4o"
     })
     llm_response = llm.chat(prompt: prompt_text).completion
     self.script = llm_response
