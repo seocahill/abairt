@@ -3,8 +3,8 @@ class ImportTranscriptionJob < ApplicationJob
 
   def perform(voice_recording, speaker_id)
      llm = Langchain::LLM::OpenAI.new(api_key: Rails.application.credentials.dig(:openai, :openai_key),  default_options: {
-      chat_completion_model_name: "gpt-4-1106-preview",
-      completion_model_name: "gpt-4-1106-preview"
+      chat_completion_model_name: "gpt-4o",
+      completion_model_name: "gpt-4o"
     }, llm_options: {
       request_timeout: 2000
     })

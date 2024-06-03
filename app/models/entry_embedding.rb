@@ -4,7 +4,7 @@ class EntryEmbedding
 
   def initialize
     @llm = Langchain::LLM::OpenAI.new(api_key: Rails.application.credentials.dig(:openai, :openai_key),  default_options: {
-      chat_completion_model_name: "gpt-4-1106-preview", completion_model_name: "gpt-4-1106-preview"
+      chat_completion_model_name: "gpt-4o", completion_model_name: "gpt-4o"
     })
     @connection_string = Rails.env.production? ? Rails.application.credentials.dig(:vector_db_url) : "postgres://postgres@localhost:5432/postgres"
   end
