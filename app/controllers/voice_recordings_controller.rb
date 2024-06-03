@@ -152,7 +152,7 @@ class VoiceRecordingsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def voice_recording_params
-      params.require(:voice_recording).permit(:title, :description, :transcription,:media, :tag_list, user_ids: [])
+      params.require(:voice_recording).permit(:title, :description, :transcription, :transcription_en, :media, :tag_list, user_ids: [])
     end
 
 end
