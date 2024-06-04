@@ -42,9 +42,9 @@
           </div>
           <!-- Hidden Fields -->
           <div class="hidden">
-            <%= form.hidden_field :region_start %>
-            <%= form.hidden_field :region_end %>
-            <%= form.hidden_field :region_id %>
+            <%= form.hidden_field :region_start, id: "prev-position" %>
+            <%= form.hidden_field :region_end, id: "current-position" %>
+            <%= form.hidden_field :region_id  %>
             <%= form.hidden_field :voice_recording_id, value: @recording.id %>
           </div>
           <div id="download-container"></div>

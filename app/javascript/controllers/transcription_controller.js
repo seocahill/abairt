@@ -91,6 +91,9 @@ export default class extends Controller {
     this.waveSurfer.on('region-out', (region) => {
       that.transcriptionTarget.innerText = "~";
       that.translationTarget.innerText = "~";
+      if (document.getElementById('prev-position')) {
+        document.getElementById('prev-position').value = parseFloat(that.waveSurfer.getCurrentTime().toFixed(2)) + 0.01;
+      }
     });
 
     this.waveSurfer.on('audioprocess', function () {
@@ -98,6 +101,9 @@ export default class extends Controller {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
         if (that.hasPositionTarget) {
           that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
+        }
+        if (document.getElementById('current-position')) {
+          document.getElementById('current-position').value = that.waveSurfer.getCurrentTime().toFixed(2);
         }
       }
     })
@@ -107,7 +113,10 @@ export default class extends Controller {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
       }
       if (that.hasPositionTarget) {
-        that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
+        that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(2)
+      }
+      if (document.getElementById('current-position')) {
+        document.getElementById('current-position').value = that.waveSurfer.getCurrentTime().toFixed(1);
       }
     })
 
