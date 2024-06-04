@@ -15,10 +15,10 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:9dda82f603d42b0b6d05796cfc02e97f41d683b0
+    image: registry.gitlab.com/abairt/web-application:a1fd629bcfefb7580a7cf4e3bd6ad52c093641a9
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_SERVE_STATIC_FILES: "true"
