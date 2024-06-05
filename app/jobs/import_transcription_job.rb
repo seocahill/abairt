@@ -1,5 +1,5 @@
 class ImportTranscriptionJob < ApplicationJob
-  queue_as :long_running
+  queue_as :default
 
   def perform(voice_recording, speaker_id)
     transcripts = voice_recording.transcription.split("\n")
