@@ -1,0 +1,4 @@
+queues:
+  - [default, 1]
+  - [urgent, 5]
+  - [critical, 10, "spawn"]
