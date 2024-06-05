@@ -24,7 +24,7 @@
               <%= link_to @recording.prev, data: { turbo: false } do %>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
               <% end %>
-              <% if @recording.transcription.present? %>
+              <% if @recording.transcription.present? && policy(@recording).edit? %>
                 <%= button_to add_region_voice_recording_path(@recording), method: :post, class: "w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded flex items-center" do %>
                   <input type="hidden" data-target="transcription.position" name="current_position">
                   Add region
