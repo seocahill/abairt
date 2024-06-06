@@ -149,7 +149,7 @@ FOREIGN KEY ("user_id")
 CREATE INDEX "index_articles_on_user_id" ON "articles" ("user_id");
 CREATE TABLE IF NOT EXISTS "action_text_rich_texts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "body" text, "record_type" varchar NOT NULL, "record_id" bigint NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_action_text_rich_texts_uniqueness" ON "action_text_rich_texts" ("record_type", "record_id", "name");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text DEFAULT NULL, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, CONSTRAINT "fk_rails_91ca04707d"
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text DEFAULT NULL, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, CONSTRAINT "fk_rails_91ca04707d"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 );
@@ -236,6 +236,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240124220629'),
 ('20240217154311'),
 ('20240603152657'),
-('20240606214028');
+('20240606214028'),
+('20240606222923');
 
 
