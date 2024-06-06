@@ -15,7 +15,7 @@ class DictionaryEntry < ApplicationRecord
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
 
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
-  belongs_to :voice_recording, optional: true
+  belongs_to :voice_recording, optional: true, counter_cache: true
 
   has_many :word_list_dictionary_entries, dependent: :destroy
   has_many :word_lists, through: :word_list_dictionary_entries

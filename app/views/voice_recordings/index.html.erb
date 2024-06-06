@@ -50,7 +50,7 @@
                         <% end %>
                       </td>
                       <% if current_user&.admin? %>
-                        <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: recording.id, itemable_type: recording.class.to_s), data: { turbo: false } %></td>
+                        <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: recording.id, itemable_type: recording.class.to_s), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal", data: { turbo: false } %></td>
                       <% end %>
                     </tr>
                   <% end %>
