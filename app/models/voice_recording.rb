@@ -54,7 +54,7 @@ class VoiceRecording < ApplicationRecord
 
   def calculate_duration(path)
     result = `ffprobe -i  #{path} -v quiet -print_format json -show_format -show_streams -hide_banner`
-    result.dig("format", "duration").to_f
+    JSON.parse(result).dig("format", "duration").to_f
   rescue => e
     Rails.logger.warn(["Duration calculation failed", e])
   end
@@ -63,6 +63,7 @@ class VoiceRecording < ApplicationRecord
     return 0 if duration_seconds.zero?
 
     # add pading between entries 0.5 seconds + sum of regions as percentage of duration.
-    (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
+    percentage = (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
+    percentage > 100 ? 100 : percentage
   end
 end
