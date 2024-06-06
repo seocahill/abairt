@@ -61,6 +61,7 @@ class VoiceRecording < ApplicationRecord
 
   def percentage_transcribed
     return 0 if duration_seconds.zero?
+    return 0 if dictionary_entries_count.zero?
 
     # add pading between entries 0.5 seconds + sum of regions as percentage of duration.
     percentage = (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
