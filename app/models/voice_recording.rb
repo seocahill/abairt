@@ -46,9 +46,23 @@ class VoiceRecording < ApplicationRecord
     json_data = File.read(output_path)
     peak_data = JSON.parse(json_data)
     self.peaks = peak_data['data']
+    self.duration_seconds = calculate_duration(file.path)
     save
   rescue => e
     Rails.logger.warn(["Peak generation failed", e])
   end
 
+  def calculate_duration(path)
+    result = `ffprobe -i  #{path} -v quiet -print_format json -show_format -show_streams -hide_banner`
+    result.dig("format", "duration").to_f
+  rescue => e
+    Rails.logger.warn(["Duration calculation failed", e])
+  end
+
+  def percentage_transcribed
+    return 0 if duration_seconds.zero?
+
+    # add pading between entries 0.5 seconds + sum of regions as percentage of duration.
+    (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
+  end
 end
