@@ -3,7 +3,7 @@ class VoiceRecordingsController < ApplicationController
 
   def index
     @new_voice_recording = VoiceRecording.new
-    records = VoiceRecording.order(:id, :desc)
+    records = VoiceRecording.order(dictionary_entries_count: :desc)
 
     if params[:preview].present?
       @recording = VoiceRecording.find(params[:preview])
