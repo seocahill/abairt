@@ -67,7 +67,7 @@ class VoiceRecording < ApplicationRecord
     percentage = (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
     if percentage > 100
       100
-    elsif percentage < 100
+    elsif percentage < 0
       0
     else
       percentage
