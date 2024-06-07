@@ -157,7 +157,7 @@ WORKDIR /app
 EXPOSE 3000
 ENV RAILS_ENV="production"
 
-HEALTHCHECK --interval=5m --timeout=3s \
+HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:3000/up || exit 1
 
 CMD ["bin/rails", "server"]
