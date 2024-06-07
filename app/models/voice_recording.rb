@@ -65,6 +65,12 @@ class VoiceRecording < ApplicationRecord
 
     # add pading between entries 0.5 seconds + sum of regions as percentage of duration.
     percentage = (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
-    percentage > 100 ? 100 : percentage
+    if percentage > 100
+      100
+    elsif percentage < 100
+      0
+    else
+      percentage
+    end
   end
 end
