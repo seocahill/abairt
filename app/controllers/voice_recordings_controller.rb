@@ -147,7 +147,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     def set_regions
-      @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase, :translation)}.to_json
+      @recording.dictionary_entries.map { |e| e.slice(:region_id, :region_start, :region_end, :word_or_phrase, :translation, :id)}.to_json
     end
 
     # Only allow a list of trusted parameters through.
