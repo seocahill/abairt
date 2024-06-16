@@ -4,10 +4,15 @@ import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
   static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video", "position"]
-  static values = { media: String, regions: Array, peaks: Array }
+  static values = { media: String, regions: Array, peaks: Array, autoplay: Boolean }
 
   connect() {
     this.element[this.identifier] = this
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+  }
+
+  disconnect() {
+    document.removeEventListener('keydown', this.handleKeyDown.bind(this));
   }
 
   initialize() {
@@ -15,6 +20,14 @@ export default class extends Controller {
       console.log("RESET!")
       this.resetForm(target)
     })
+  }
+
+  handleKeyDown(event) {
+    if (event.code === 'Space') {
+      event.preventDefault(); // Prevent the default action of the spacebar (scrolling)
+      this.waveSurfer.playPause();
+      this.toggleButton(); // Update the button text accordingly
+    }
   }
 
   resetForm(target) {
@@ -72,11 +85,13 @@ export default class extends Controller {
           start: region.region_start,
           end: region.region_end,
           drag: false,
-          data: { transcription: region.word_or_phrase, translation: region.translation }
+          data: { transcription: region.word_or_phrase, translation: region.translation, entry_id: region.id }
         });
       })
-      that.waveSurfer.play(); // Add this line to start playing automatically
-      playButton.innerHTML = "Pause";
+      if (that.autoplayValue) {
+        that.waveSurfer.play(); // Add this line to start playing automatically
+        playButton.innerHTML = "Pause";
+      }
     })
 
     this.waveSurfer.on('region-in', (region) => {
@@ -139,6 +154,40 @@ export default class extends Controller {
       document.getElementById('dictionary_entry_region_end').value = Math.round(region.end * 10) / 10
       document.getElementById('dictionary_entry_region_id').value = region.id
     })
+
+    this.waveSurfer.on('region-update-end', function (region) {
+      // Get CSRF token from meta tag
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+      // Prepare the data to be sent
+      const updateData = {
+        dictionary_entry: {
+          region_start: region.start,
+          region_end: region.end
+        }
+      };
+
+      // Construct the URL using the entry_id stored in the region's data
+      const url = `/dictionary_entries/${region.data.entry_id}`;
+
+      // Send the data to the backend using fetch API or your preferred method
+      fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken // Include CSRF token in the request header
+        },
+        body: JSON.stringify(updateData),
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Log success, no need to update UI here as it's already up-to-date
+          console.log('Dictionary entry updated:', data);
+        })
+        .catch(error => {
+          console.error('Error updating dictionary entry:', error);
+        });
+    });
   }
 
   teardown() {
