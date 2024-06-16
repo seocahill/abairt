@@ -179,10 +179,9 @@ export default class extends Controller {
         },
         body: JSON.stringify(updateData),
       })
-        .then(response => response.json())
-        .then(data => {
+        .then(_data => {
           // Log success, no need to update UI here as it's already up-to-date
-          console.log('Dictionary entry updated:', data);
+          console.log('Dictionary entry updated');
         })
         .catch(error => {
           console.error('Error updating dictionary entry:', error);
