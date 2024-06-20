@@ -58,6 +58,11 @@ class VoiceRecordingsController < ApplicationController
     @pagy, @entries = pagy(@recording.dictionary_entries.where.not(id: nil).reorder(:region_start), items: PAGE_SIZE)
   end
 
+  def peaks_data
+    recording = VoiceRecording.find(params[:id])
+    render json: recording.peaks
+  end
+
   def preview
     @recording = VoiceRecording.find(params[:id])
     authorize @recording
