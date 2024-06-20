@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
   static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video", "position"]
-  static values = { media: String, regions: Array, peaks: Array, autoplay: Boolean }
+  static values = { media: String, regions: Array, peaks: String, autoplay: Boolean }
 
   connect() {
     this.element[this.identifier] = this
@@ -78,6 +78,17 @@ export default class extends Controller {
     this.waveSurfer.zoom(Number(event.target.value));
   }
 
+  async fetchPeaksData() {
+    if (this.hasPeaksValue) {
+      try {
+        let response = await fetch(this.peaksValue);
+        await response.json();
+      } catch (error) {
+        console.error('Error fetching peaks data:', error);
+      }
+    }
+  }
+
   waveformTargetConnected() {
     let playButton = this.element.querySelector('#play-pause-button');
     playButton.innerHTML = "Preparing wave....";
@@ -90,7 +101,7 @@ export default class extends Controller {
       partialRender: false,
       pixelRatio: 1,
       scrollParent: true,
-      peaks: that.peaksValue,
+      // peaks: that.fetchPeaksData(), // FIXME
       plugins: [
         RegionsPlugin.create({
           dragSelection: true,

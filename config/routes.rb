@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     resources :dictionary_entries, only: :create, module: :voice_recordings
     member { get :preview }
     member { post :add_region }
+    member { post :peaks }
     collection { get :map }
   end
 
