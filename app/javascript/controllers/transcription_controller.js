@@ -26,7 +26,7 @@ export default class extends Controller {
   }
 
   handleKeyDown(event) {
-    if (event.code === 'Space') {
+    if (event.ctrlKey && event.code === 'KeyP') {
       event.preventDefault(); // Prevent the default action of the spacebar (scrolling)
       this.waveSurfer.playPause();
       this.toggleButton(); // Update the button text accordingly
