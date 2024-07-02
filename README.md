@@ -130,3 +130,6 @@ pg_dump --clean --if-exists --quote-all-identifiers \
 ```bash
 psql -h db.wtdrbfgcompphsorooqe.supabase.co -U postgres --file embeddings.sql -p 6543 -d postgres
 ```
+
+
+docker run -d -p 3000:8080 -e OPENAI_API_KEY=your_secret_key -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
