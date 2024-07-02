@@ -26,12 +26,27 @@ export default class extends Controller {
   }
 
   handleKeyDown(event) {
-    if (event.ctrlKey && event.code === 'KeyP') {
-      event.preventDefault(); // Prevent the default action of the spacebar (scrolling)
-      this.waveSurfer.playPause();
-      this.toggleButton(); // Update the button text accordingly
+    const seekTime = 5; // Number of seconds to seek
+
+    switch (event.code) {
+      case 'ArrowLeft':
+        event.preventDefault(); // Prevent the default action (scrolling)
+        this.waveSurfer.seekTo(Math.max(0, this.waveSurfer.getCurrentTime() - seekTime) / this.waveSurfer.getDuration());
+        break;
+      case 'ArrowRight':
+        event.preventDefault(); // Prevent the default action (scrolling)
+        this.waveSurfer.seekTo(Math.min(this.waveSurfer.getDuration(), this.waveSurfer.getCurrentTime() + seekTime) / this.waveSurfer.getDuration());
+        break;
+      case 'KeyP':
+        if (event.ctrlKey) {
+          event.preventDefault(); // Prevent the default action
+          this.waveSurfer.playPause();
+          this.toggleButton(); // Update the button text accordingly
+        }
+        break;
     }
   }
+
 
   addRegionAtCurrent() {
     // Get the current playback position
@@ -156,7 +171,7 @@ export default class extends Controller {
 
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
-        that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
+        that.timeTarget.innerText = that.formatTime(that.waveSurfer.getCurrentTime().toFixed(1))
         if (that.hasPositionTarget) {
           that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
         }
@@ -337,5 +352,11 @@ export default class extends Controller {
   seek(seekPosition) {
     const value = seekPosition / this.waveSurfer.getDuration();
     this.waveSurfer.seekTo(value);
+  }
+
+  formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   }
 }
