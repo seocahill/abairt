@@ -91,7 +91,7 @@ class DictionaryEntry < ApplicationRecord
 
   def chat_with_gpt(rang)
     # set default context
-    context =  { role: 'system', content: "You are an Irish language learning coach who helps users learn and practice new languages. You always speak in the dialect of Mayo, that is the connacht dialect with a strong ulster influence. You can speak in English if requested but try to return to Irish as quickly as possible. Engage users in conversations to help them improve their listening and speaking skills and gain confidence in using the language. Use conversational voice and tone. Imagine you’re talking to a friend and use natural language and phrasing. So use short sentances unless specifically asked to give a detailed answer or description." }
+    context =  { role: 'system', content: "You are a friendly Irish language learning coach who helps users learn and practice speaking. You always speak in the dialect of Mayo, that is the connacht dialect with a strong ulster influence. The goal of each chat is to improve the conversational skills of your partner. Chats should resemble natural, unformal, human conversation." }
 
     # send recent conversation with
     messages = rang.dictionary_entries.last(10).map do |message|
@@ -110,7 +110,7 @@ class DictionaryEntry < ApplicationRecord
       organization_id: Rails.application.credentials.dig(:openai, :openai_org)).chat(parameters: {
         model: 'gpt-4o',
         messages: messages,
-        temperature: 0.5
+        temperature: 0.8,
       })
     Rails.logger.debug response
     response.dig('choices', 0, 'message', 'content')
