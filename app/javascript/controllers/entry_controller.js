@@ -47,7 +47,7 @@ export default class extends Controller {
 
   async synth(event) {
     event.target.disabled = true;
-    event.target.innerText = "Processing...";
+    event.target.innerText = "....";
     const text = event.currentTarget.dataset.audioText;
     const response = await this.synthesizeSpeech(text, event.target);
     const synthesizedAudioBase64 = response.audioContent;
