@@ -8,6 +8,15 @@ export default class extends Controller {
   connect() {
     this.map = L.map('map', { scrollWheelZoom: false }).setView([53.9860, -9.4125], 9);
 
+    this.map.on('popupopen', (e) => {
+      const closeButton = e.popup._closeButton;
+      if (closeButton) {
+        closeButton.addEventListener('click', (event) => {
+          event.preventDefault();
+        });
+      }
+    });
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 9,
