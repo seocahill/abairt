@@ -27,7 +27,9 @@
               <td class="px-6 py-4"><%= list.owner.name %></td>
               <td class="px-6 py-4"><%= link_to word_list_path(list, format: :csv) do %><i data-feather="download"></i><% end %></td>
               <td class="px-6 py-4"><%= link_to list do %><i data-feather="eye"></i><% end %></td>
-              <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: list.id, itemable_type: list.class.to_s), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
+              <% if current_user&.admin? %>
+                <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: list.id, itemable_type: list.class.to_s), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
+              <% end %>
             </tr>
           <% end %>
         </tbody>
