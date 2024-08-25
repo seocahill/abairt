@@ -26,7 +26,7 @@ class DictionaryEntriesController < ApplicationController
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
 
-    @tags = DictionaryEntry.tag_counts_on(:tags).most_used(15)
+    @tags = DictionaryEntry.tag_counts_on(:tags).most_used(50)
 
     if current_user
       @starred = current_user.starred
