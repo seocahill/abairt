@@ -11,7 +11,7 @@
       <%= button_to "Generate Monologue", @word_list, method: :patch, params: { generate_script: "true" }, class: "w-full bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2" %>
       <%= button_to "Generate Dialogue", @word_list, method: :patch, params: { generate_script: "true", script_type: "dialogue" }, class: "w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2" %>
     <% end %>
-    <%= button_to "Start Learning", learning_sessions_path, method: :post, params: { word_list_id: @word_list.id, learnable: "WordList" }, class: "w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2", data: { disable_with: "Processing..." } %>
+    <%#= button_to "Start Learning", learning_sessions_path, method: :post, params: { word_list_id: @word_list.id, learnable: "WordList" }, class: "w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2", data: { disable_with: "Processing..." } %>
   </div>
 
   <% if current_user %>
