@@ -164,9 +164,9 @@ export default class extends Controller {
     this.waveSurfer.on('region-out', (region) => {
       that.transcriptionTarget.innerText = "~";
       that.translationTarget.innerText = "~";
-      if (document.getElementById('prev-position')) {
-        document.getElementById('prev-position').value = parseFloat(that.waveSurfer.getCurrentTime().toFixed(2)) + 0.01;
-      }
+      // if (document.getElementById('prev-position')) {
+      //   document.getElementById('prev-position').value = parseFloat(that.waveSurfer.getCurrentTime().toFixed(2)) + 0.01;
+      // }
     });
 
     this.waveSurfer.on('audioprocess', function () {
@@ -195,6 +195,10 @@ export default class extends Controller {
 
     this.waveSurfer.on('region-click', function (region, e) {
       e.stopPropagation();
+      // update form
+      document.getElementById('prev-position').value = Math.round(region.start * 10) / 10
+      document.getElementById('current-position').value = Math.round(region.end * 10) / 10
+      document.getElementById('dictionary_entry_region_id').value = region.id
       // // Play on click, loop on shift click
       if (e.altKey) {
         // alt/option + click logic here (e.g., region.remove())
