@@ -54,6 +54,14 @@
               <span class="ml-2 text-gray-700">Zoom</span>
               <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="50" class="w-full">
             </label>
+            <% if current_user && @recording&.media&.attached? %>
+              <%= link_to rails_blob_path(@recording.media, disposition: "attachment"), class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1", data: { turbo: false } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Download</span>
+              <% end %>
+            <% end %>
+
+
             <label class="flex items-center space-x-2">
               <span lass="ml-2 text-gray-700" data-feather="watch">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg>
