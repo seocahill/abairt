@@ -1,13 +1,25 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  title: Acaill
-  description: An t-oileáin
+  title: Sample Recording
   owner: one
-  peaks: []
+  peaks: [1, 2, 3]
+  duration_seconds: 10.5
+  dictionary_entries_count: 0
 
 two:
-  title: Stonefield
-  description: Cois Cladaigh
-  owner: one
-  peaks: []
+  title: Another Recording
+  owner: two
+  peaks: [4, 5, 6]
+  duration_seconds: 15.2
+  dictionary_entries_count: 2
+  diarization_status: completed
+  diarization_data:
+    job_id: "completed-job"
+    diarization:
+      - speaker: "SPEAKER_01"
+        start: 0.0
+        end: 5.0
+      - speaker: "SPEAKER_02"
+        start: 5.0
+        end: 10.0

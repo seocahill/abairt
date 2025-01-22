@@ -1,0 +1,19 @@
+I want to create a new transcribe api that will be used to transcribe audio files.
+
+The user will recive a dictionary entry to transcribe.
+
+They will have the option to listen to the whole voice recording to get context.
+
+They can skip to another one if they want.
+
+Only untranscribed dictionary entries will be shown.
+
+A user will recieve an email prompting them to transcribe the next entry.
+
+In order to be mobile friendly the user can record a voice audio "transcription instructions" to be used as a prompt for an llm to write the transcription in english and irish.
+
+The user can then review the transcriptions and confirm they are correct.
+
+There is also the option to write the transcriptions in english and irish.
+
+The user can then submit the dictionary_entry.

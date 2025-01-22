@@ -7,8 +7,9 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
+    authorize current_user
     @template_name = "user"
-    records = User.where(ability: %i[C1 C2 native]).where.not(id: nil)
+    records = policy_scope(User).active
 
     if params[:search].present?
       # records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
@@ -79,8 +80,19 @@ class UsersController < ApplicationController
     @user = User.new(user_params.merge(password: SecureRandom.uuid))
 
     respond_to do |format|
-      if @user.save!
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
+      if @user.save
+        if params[:user][:replace_speaker_id].present?
+          temp_speaker = User.find(params[:user][:replace_speaker_id])
+          voice_recording = temp_speaker.spoken_voice_recordings.first
+          DictionaryEntry.transaction do
+            DictionaryEntry.where(speaker: temp_speaker)
+                         .update_all(speaker_id: @user.id)
+          end
+
+          format.html { redirect_to voice_recording_speakers_path(voice_recording), notice: "Speaker was successfully created and entries transferred." }
+        else
+          format.html { redirect_to @user, notice: "Speaker was successfully created." }
+        end
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -141,12 +153,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    allowed_params = [:email, :name, :password, :dialect, :voice, :lat_lang, :address, :about, :ability]
-
-    if current_user&.admin?  # Assuming you have a method to check if the user is an admin
-      allowed_params << :confirmed
-    end
-
-    params.require(:user).permit(allowed_params)
+    params.require(:user).permit(:name, :email, :role, :dialect, :voice, :lat_lang)
   end
 end

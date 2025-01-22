@@ -52,6 +52,7 @@ run tests:
     RAILS_ENV: test
   script:
   - npm ci
+  - bundle check || bundle install
   - SECRET_KEY_BASE=1 bin/rails tailwindcss:build
   - bin/rails db:test:prepare assets:precompile
   - bin/rails test

@@ -6,7 +6,8 @@ Rails.application.routes.draw do
   resources :seomras, only: :destroy
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
-    resources :dictionary_entries, only: :create, module: :voice_recordings
+    resources :dictionary_entries, module: :voice_recordings
+    resources :speakers, module: :voice_recordings, only: [:index, :update]
     member { get :preview }
     member { post :add_region }
     member { post :peaks }
@@ -53,4 +54,10 @@ Rails.application.routes.draw do
   get "up" => "health#show"
 
   root to: 'application#root_redirect'
+
+  namespace :api do
+    resources :voice_recordings, only: [] do
+      post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
+    end
+  end
 end
