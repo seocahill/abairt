@@ -36,7 +36,8 @@ class User < ApplicationRecord
     :teacher,
     :admin,
     :ai,
-    :place
+    :place,
+    :temporary
   ]
   enum voice: [:male, :female]
   enum dialect: [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
@@ -54,6 +55,8 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :name, presence: true
   validates :role, exclusion: { in: %w(teacher admin) }, if: -> { role_changed? && Current.user&.admin? == false }
+
+  scope :active, -> { where.not(role: :temporary) }
 
   def all_entries
     dictionary_entries.or(spoken_dictionary_entries)

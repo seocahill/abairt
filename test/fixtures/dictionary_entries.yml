@@ -35,3 +35,10 @@ five:
   translation: "You divil!"
   speaker: one
   owner: one
+
+with_temp_speaker:
+  word_or_phrase: "A chladhaire"
+  translation: "You divil!"
+  speaker: temporary
+  owner: one
+  voice_recording: one

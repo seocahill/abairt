@@ -55,4 +55,43 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to users_url
   end
+
+  test "creates new speaker and transfers entries from temporary speaker" do
+    @user.update_columns(role: User.roles[:admin])
+    temp_speaker = users(:temporary)
+
+    entry = dictionary_entries(:with_temp_speaker)
+    voice_recording = entry.voice_recording
+
+    random_str = SecureRandom.alphanumeric
+    assert_difference('User.count', 1) do  # soft delete temp speaker
+      post users_url, params: {
+        user: {
+          name: "Real Speaker",
+          email: "#{random_str}@example.com",
+          role: "speaker",
+          dialect: "connacht_ó_thuaidh",
+          voice: "female",
+          replace_speaker_id: temp_speaker.id
+        }
+      }
+    end
+
+    # Check that entries were transferred
+    entry.reload
+    assert_equal "Real Speaker", entry.speaker.name
+  end
+
+  test "temporary users are filtered from general user lists" do
+    temp_user = User.create!(
+      name: "TEMP_USER",
+      email: "temp@temporary.abairt",
+      password: SecureRandom.hex,
+      role: :temporary
+    )
+
+    get users_url
+    assert_response :success
+    assert_no_match temp_user.name, @response.body
+  end
 end

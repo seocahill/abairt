@@ -1,4 +1,10 @@
 class UserPolicy < ApplicationPolicy
+  class Scope < Scope
+    def resolve
+      scope.active
+    end
+  end
+
   def root_redirect?
     true
   end

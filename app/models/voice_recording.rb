@@ -3,7 +3,8 @@ class VoiceRecording < ApplicationRecord
   has_many :dictionary_entries
   has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: 'User'
   has_many :learning_sessions, as: :learnable
-  after_commit :enqueue_generate_peaks_job
+  # after_commit :enqueue_generate_peaks_job # FIXME: payload is too big in browser
+  after_create_commit :enqueue_diarization_job, if: :should_diarize?
 
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
 
@@ -27,6 +28,14 @@ class VoiceRecording < ApplicationRecord
     return unless media.changed? || peaks.blank?
 
     GeneratePeaksJob.perform_later(id)
+  end
+
+  def enqueue_diarization_job
+    DiarizeVoiceRecordingJob.perform_later(id)
+  end
+
+  def should_diarize?
+    media.attached? && diarization_status.nil?
   end
 
   def generate_peaks

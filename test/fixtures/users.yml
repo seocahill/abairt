@@ -36,3 +36,8 @@ caotharnach:
   name: "An Caotharnach"
   role: "ai"
   email: "ai@abairt.com"
+
+temporary:
+  name: "Temporary"
+  role: "temporary"
+  email: "temporary@abairt.com"

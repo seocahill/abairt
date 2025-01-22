@@ -1,0 +1,60 @@
+I need you to integrate an api that will automatically segement and diarize uploade voice_recordings.
+
+Upon successful upload a job will be spawned to send the following request (this is a python example lifted from api docs, you get the idea). The ruby api interfaceadapter should be in a service that will be called by the job.
+
+```
+import requests
+
+url = "https://api.pyannote.ai/v1/diarize"
+API_KEY = "your_api_key_here"
+file_url = 'https://example.com/sample.mp3'
+webhook_url = 'https://example.com/your-webhook-url'
+headers = {
+   "Authorization": f"Bearer {API_KEY}"
+}
+data = {
+    'webhook': webhook_url,
+    'url': file_url
+}
+response = requests.post(url, headers=headers, json=data)
+
+print(response.status_code)
+# 200
+
+print(response.json())
+# {
+#  "jobId": "bd7e97c9-0742-4a19-bd5a-9df519ce8c74",
+#  "message": "Job added to queue",
+#  "status": "pending"
+# }
+```
+
+The results are sent to the webhook_url in the response. So we need to create a webhook endpoint that will receive the results and save them to the database.
+
+```
+# payload example
+{
+    "jobId": "bd7e97c9-0742-4a19-bd5a-9df519ce8c74",
+    "status": "succeeded",
+    "output": {
+        "diarization": [
+            {
+                "start": 1.2,
+                "end": 3.4,
+                "speaker": "SPEAKER_01"
+            },
+            ...
+        ]
+    }
+}
+```
+
+This payload should be saved to the database using a jsonb column on voice_recordings.
+
+Afterwards another job will be spawned to create the dictionary_entries for the voice_recordings using the diarization data.
+
+Temporary users will be created for each speaker and the dictionary_entries will be created for each speaker.
+
+The UI will expose a form to replace or edit the temporary users and the dictionary_entries on the voice_recordings show page.
+
+You should add some tests for the diarization service. You can mock the api call and test the response.

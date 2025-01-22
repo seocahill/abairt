@@ -60,33 +60,18 @@ class DictionaryEntry < ApplicationRecord
     false
   end
 
-  def create_audio_snippet
-    require 'open3'
+  def create_audio_snippet(source_file_path = nil)
+    # Create audio snippet of entry range from voice recording
+    output_path = AudioSnippetService.new(self, source_file_path).process
 
-    return unless voice_recording_id
-
-    # Select the region you want to extract
-    duration = region_end - region_start
-
-    # Set the output file path and delete cache
-    output_path = "/tmp/#{region_id}.mp3"
-    File.delete output_path rescue nil
-    voice_recording.media.open do |file|
-      if voice_recording.media.audio?
-        # Extract the selected region and save it as a new MP3 file using ffmpeg
-        stdout, stderr, status = Open3.capture3("ffmpeg -ss #{region_start} -i #{file.path} -t #{duration} -c:a copy #{output_path}")
-      else
-        stdout, stderr, status = Open3.capture3("ffmpeg -ss #{region_start} -i #{file.path} -t #{duration} -vn #{output_path}")
-      end
-      # Attach the new file to a Recording model using Active Storage
-      self.media.attach(io: File.open(output_path), filename: "#{region_id}.mp3")
-    end
-
-    # Auto transcribe if no values
+    # Return if no snippet created
+    return unless output_path.present?
+    # Auto transcribe if no values present
     return if word_or_phrase.present?
 
-    self.word_or_phrase = transcribe_audio(output_path)
-    save!
+    AudioTranscriptionService.new(self, output_path).process
+  ensure
+    File.delete output_path rescue nil
   end
 
   def chat_with_gpt(rang)
@@ -141,30 +126,6 @@ class DictionaryEntry < ApplicationRecord
     self.tag_list = JSON.parse(response.dig('choices', 0, 'message', 'content'))
     save
   end
-
-  def transcribe_audio(file_path, content_type = 'mp3')
-    audio_blob = `ffmpeg -i "#{file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
-    uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    request = Net::HTTP::Post.new(uri.path)
-
-    payload = {
-      recogniseBlob: audio_blob,
-      developer: true,
-      method: 'online2bin'
-    }
-
-    request.body = payload.to_json
-    request['Content-Type'] = 'application/json'
-
-    response = http.request(request)
-    Rails.logger.debug(response)
-    JSON.parse(response.body).dig("transcriptions", 0, "utterance")
-  rescue => e
-    "trasscríobh ar bith"
-  end
-
 
   def synthesize_text_to_speech_and_store
     uri = URI.parse('https://abair.ie/api2/synthesise')

@@ -21,12 +21,7 @@
           <div class="flex space-x-4">
             <div class="flex-2 space-y-4 flex-grow">
               <label for="speaker_id" class="sr-only">Speaker</label>
-              <%= form.text_field :speaker_id, list: "speaker-list", class:  "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", placeholder: "Search for or create new speaker", value: @last_speaker_name, required: true %>
-              <datalist id="speaker-list">
-                <% @speaker_names.each do |name| %>
-                  <option value="<%= name %>">
-                <% end %>
-              </datalist>
+              <%= form.select :speaker_id, options_from_collection_for_select(@voice_recording.users.uniq, :id, :name), { prompt: "Select a speaker" }, class: "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", required: true %>
             </div>
             <div class="flex-2 space-y-4 flex-grow">
               <label for="word_or_phrase" class="sr-only">Irish (leave blank for auto-transcription)</label>
@@ -48,6 +43,7 @@
             <%= form.hidden_field :voice_recording_id, value: @recording.id %>
           </div>
           <div id="download-container"></div>
+        <%= link_to "Manage Speakers", voice_recording_speakers_path(@recording), class: "text-blue-500 hover:text-blue-700" %>
         <% end %>
       </div>
     <% end %>
