@@ -110,7 +110,7 @@ RUN \
   ln -s /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
 
 COPY . /app
-COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
+# COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
 WORKDIR /app
 
 # Run bundle commands conditionally based on RAILS_ENV
