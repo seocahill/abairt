@@ -2,7 +2,7 @@
 ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
 
 FROM ${GEM_IMAGE} as gem-cache
-FROM ruby:3.0-slim as builder
+FROM ruby:3.1-slim as builder
 USER root
 ARG RAILS_ENV=production
 ENV RAILS_ENV=${RAILS_ENV}
@@ -47,7 +47,7 @@ RUN \
     libkeyutils1 \
     libkrb5-3 \
     libkrb5support0 \
-    libldap-2.4-2 \
+    libldap-2.5-0 \
     liblzma5 \
     libmad0 \
     libmad0-dev \
@@ -68,7 +68,7 @@ RUN \
     libsqlite3-dev \
     libssh2-1 \
     libssl-dev \
-    libssl1.1 \
+    libssl3 \
     libstdc++6 \
     libtasn1-6 \
     libtinfo6 \
@@ -78,7 +78,6 @@ RUN \
     libxslt1-dev \
     libpq-dev \
     make \
-    netcat \
     netcat-traditional \
     nodejs \
     npm \
