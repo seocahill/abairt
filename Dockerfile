@@ -2,7 +2,7 @@
 ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
 
 FROM ${GEM_IMAGE} as gem-cache
-FROM ruby:3.1-slim as builder
+FROM ruby:3.0-slim as builder
 USER root
 ARG RAILS_ENV=production
 ENV RAILS_ENV=${RAILS_ENV}
@@ -110,7 +110,7 @@ RUN \
   ln -s /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
 
 COPY . /app
-# COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
+COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
 WORKDIR /app
 
 # Run bundle commands conditionally based on RAILS_ENV
