@@ -127,7 +127,7 @@ RUN \
   SECRET_KEY_BASE=1 bin/rails assets:precompile
 
 # second stage
-FROM ruby:3.0-slim as prod
+FROM ruby:3.1-slim as prod
 COPY --from=builder /app/ /app/
 
 # Set Bundler configuration via environment variables
