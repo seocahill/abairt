@@ -56,7 +56,7 @@ class DiarizationService
   end
 
   def handle_webhook(payload)
-    return unless payload['jobId'] == @voice_recording.diarization_data['job_id']
+    return unless payload['jobId'] == @voice_recording&.diarization_data&.dig('job_id')
 
     if payload['status'] == 'succeeded'
       @voice_recording.update(
