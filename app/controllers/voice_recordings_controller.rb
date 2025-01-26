@@ -126,21 +126,18 @@ class VoiceRecordingsController < ApplicationController
   end
 
   def add_region
-    previous_entry = @voice_recording.dictionary_entries.where("region_end IS NOT NULL").order("region_end DESC").first
-    entry = previous_entry ? @voice_recording.dictionary_entries.where("dictionary_entries.id > ?", previous_entry.id).first : @voice_recording.dictionary_entries.first
+    entry = @voice_recording.dictionary_entries.new(voice_recording_params.merge(user_id: current_user.id))
 
     authorize(entry)
 
-    entry.region_start = previous_entry&.region_end.to_d + 0.01
-    entry.region_end = params[:current_position]
-
+    # add a small amount of time to the region start to avoid overlap
+    entry.region_start += 0.01
     respond_to do |format|
       if entry.save
         entry.create_audio_snippet
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",
-          locals: { entry: entry })
-        end
+        format.html { redirect_to voice_recording_url(@voice_recording), notice: "New segment added." }
+      else
+        format.html { redirect_to voice_recording_url(@voice_recording), alert: "Failed to add new segment #{entry.errors.full_messages.join(', ')}." }
       end
     end
   end
@@ -157,7 +154,7 @@ class VoiceRecordingsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def voice_recording_params
-      params.require(:voice_recording).permit(:title, :description, :transcription, :transcription_en, :media, :tag_list, user_ids: [])
+      params.require(:voice_recording).permit(:title, :description, :transcription, :transcription_en, :media, :tag_list, :region_id, :region_start, :region_end, user_ids: [])
     end
 
 end

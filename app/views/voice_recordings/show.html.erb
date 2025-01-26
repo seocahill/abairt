@@ -1,80 +1,67 @@
-<div class="w-full p-4">
-  <%# player %>
-  <div class="flex items-center space-x-4 p-4">
-    <%= render partial: 'waveform', locals: { recording:  @recording, regions: @regions } %>
-  </div>
-  <%# form %>
-  <div class="flex flex-row">
-    <% if current_user&.edit? %>
-      <div class="w-full p-4 mt-4 bg-gray-100" data-controller="sidebar">
-        <%= form_with(model: [@recording, @new_dictionary_entry], class: "space-y-4") do |form| %>
-          <% if @new_dictionary_entry.errors.any? %>
-            <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-              <h2><%= pluralize(@new_dictionary_entry.errors.count, "error") %> prohibited this @new_dictionary_entry from being saved:</h2>
-              <ul>
-                <% @new_dictionary_entry.errors.each do |error| %>
-                  <li><%= error.full_message %></li>
-                <% end %>
-              </ul>
-            </div>
-          <% end %>
-          <div class="flex space-x-4">
-            <div class="flex-2 space-y-4 flex-grow">
-              <label for="speaker_id" class="sr-only">Speaker</label>
-              <%= form.select :speaker_id, options_from_collection_for_select(@voice_recording.users.uniq, :id, :name), { prompt: "Select a speaker" }, class: "h-10 py-2 px-3 border border-gray-300 rounded-md w-full", required: true %>
-            </div>
-            <div class="flex-2 space-y-4 flex-grow">
-              <label for="word_or_phrase" class="sr-only">Irish (leave blank for auto-transcription)</label>
-              <%= form.text_area :word_or_phrase, placeholder: "Gaeilge anseo", class: "h-10 py-2 px-3 border border-gray-300 rounded-md w-full" %>
-            </div>
-            <div class="flex-2 space-y-4 flex-grow">
-              <label for="translation" class="sr-only">English</label>
-              <%= form.text_area :translation, placeholder: "Translation", class: "h-10 py-2 px-3 border border-gray-300 rounded-md w-full" %>
-            </div>
-            <div class="flex-1 flex items-end space-y-4">
-              <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Add to transcript</button>
-            </div>
-          </div>
-          <!-- Hidden Fields -->
-          <div class="hidden">
-            <%= form.hidden_field :region_start, id: "prev-position" %>
-            <%= form.hidden_field :region_end, id: "current-position" %>
-            <%= form.hidden_field :region_id  %>
-            <%= form.hidden_field :voice_recording_id, value: @recording.id %>
-          </div>
-          <div id="download-container"></div>
-        <%= link_to "Manage Speakers", voice_recording_speakers_path(@recording), class: "text-blue-500 hover:text-blue-700" %>
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-900"><%= @recording.title %></h1>
+      <% if policy(@recording).edit? %>
+        <%= link_to edit_voice_recording_path(@recording), class: "text-blue-600 hover:text-blue-800" do %>
+          <i data-feather="edit"></i>
         <% end %>
-      </div>
-    <% end %>
-  </div>
-  <%# transcript %>
-  <div class="flex-grow p-4">
-    <div class="relative overflow-x-auto">
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="px-6 py-3" >Speaker</th>
-            <th scope="col" class="px-6 py-3" >Range</th>
-            <th scope="col" class="px-6 py-3" >Irish</th>
-            <th scope="col" class="px-6 py-3" >English</th>
-            <th scope="col" class="px-6 py-3" >Audio</th>
-            <th scope="col" class="px-6 py-3" title="Based on translator's language ability" >Quality</th>
-            <% if current_user && @entries.any? { |e| current_user.id == e.user_id } %>
-              <th scope="col" class="px-6 py-3" ></th>
-              <th scope="col" class="px-6 py-3" ></th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody id="transcriptions">
-          <% @entries.each do |entry| %>
-            <%= render partial: "voice_recordings/dictionary_entries/dictionary_entry", locals: { entry: entry, current_user: current_user, starred: @starred } %>
-          <% end %>
-        </tbody>
-      </table>
+      <% end %>
     </div>
-  </div>
-  <div class="w-full bg-white rounded-md p-4">
-    <%== pagy_nav(@pagy) %>
+
+    <%= render "waveform" %>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+      <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-700">Total Segments</h3>
+          <span class="text-2xl font-bold text-blue-600"><%= @recording.dictionary_entries.count %></span>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-700">Completed Segments</h3>
+          <span class="text-2xl font-bold text-green-600">
+            <%= @recording.dictionary_entries.where(quality: ['good', 'excellent']).count %>
+          </span>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-700">Completion Rate</h3>
+          <span class="text-2xl font-bold text-purple-600">
+            <%= number_to_percentage(
+              @recording.dictionary_entries.count > 0 ?
+              (@recording.dictionary_entries.where(quality: ['good', 'excellent']).count.to_f / @recording.dictionary_entries.count * 100) : 0,
+              precision: 1
+            ) %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 flex justify-center">
+      <%= link_to voice_recording_dictionary_entries_path(@recording),
+          class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg flex items-center space-x-3 transform hover:scale-105 transition-transform duration-200" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+        <span>Start Transcribing</span>
+      <% end %>
+    </div>
+
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold mb-4">Recording Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+        <div>
+          <p><strong>Created:</strong> <%= @recording.created_at.strftime("%B %d, %Y") %></p>
+          <p><strong>Duration:</strong> <%= format_duration(@recording.dictionary_entries.maximum(:region_end)) %></p>
+        </div>
+        <div>
+          <p><strong>Owner:</strong> <%= @recording.owner.name %></p>
+          <p><strong>Last Updated:</strong> <%= time_ago_in_words(@recording.updated_at) %> ago</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

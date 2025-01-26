@@ -9,15 +9,6 @@
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <% if entry.region_end %>
-      <a class="cursor-pointer hover:text-blue-700" data-action="click->entry#seek">
-        <%= entry.region_start&.round(1) || 0.0 %>-<%= entry.region_end&.round(1) %>
-      </a>
-    <% else %>
-      No region set
-    <% end %>
-  </td>
-  <td class="px-6 py-4">
     <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
       <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase" %>
     <% end %>
@@ -32,9 +23,6 @@
       <audio src="<%= entry.media.url %>"></audio>
       play
     </button>
-  </td>
-  <td class="px-6 py-4">
-    <span title="Translated by <%= entry.owner.name %>" class="<%= pill_color(entry) %>"><%= link_to entry.quality, user_path(entry.owner) %></span>
   </td>
   <% if current_user && entry.user_id == current_user.id %>
     <td class="px-6 py-4">

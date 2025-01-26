@@ -29,6 +29,22 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     end
   end
 
+  def index
+    @recording = VoiceRecording.find(params[:voice_recording_id])
+    authorize @recording
+
+    @pagy, @entries = pagy(@recording.dictionary_entries.includes(:speaker, :owner), items: 10)
+
+
+    if current_user
+      @starred = current_user.starred
+      @lists = current_user.own_lists
+    end
+  end
+
+  private
+
+
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
     params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, :quality, rang_ids: [])
