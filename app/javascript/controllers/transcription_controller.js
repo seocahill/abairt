@@ -78,8 +78,8 @@ export default class extends Controller {
   }
 
   resetForm(target) {
-    let transcription = document.getElementById('dictionary_entry_word_or_phrase').value;
-    let translation = document.getElementById('dictionary_entry_translation').value;
+    let transcription = "pending";
+    let translation = "pending";
     let regionId = document.getElementById('dictionary_entry_region_id').value;
     let region = this.waveSurfer.regions.list[regionId];
     if (region) {
@@ -164,9 +164,6 @@ export default class extends Controller {
     this.waveSurfer.on('region-out', (region) => {
       that.transcriptionTarget.innerText = "~";
       that.translationTarget.innerText = "~";
-      // if (document.getElementById('prev-position')) {
-      //   document.getElementById('prev-position').value = parseFloat(that.waveSurfer.getCurrentTime().toFixed(2)) + 0.01;
-      // }
     });
 
     this.waveSurfer.on('audioprocess', function () {
@@ -193,12 +190,15 @@ export default class extends Controller {
       }
     })
 
+    this.waveSurfer.on('region-created', function (region) {
+      // Fill the hidden form fields with the new region's data
+      document.getElementById('prev-position').value = Math.round(region.start * 10) / 10;
+      document.getElementById('current-position').value = Math.round(region.end * 10) / 10;
+      document.getElementById('dictionary_entry_region_id').value = region.id;
+    });
+
     this.waveSurfer.on('region-click', function (region, e) {
       e.stopPropagation();
-      // update form
-      document.getElementById('prev-position').value = Math.round(region.start * 10) / 10
-      document.getElementById('current-position').value = Math.round(region.end * 10) / 10
-      document.getElementById('dictionary_entry_region_id').value = region.id
       // // Play on click, loop on shift click
       if (e.altKey) {
         // alt/option + click logic here (e.g., region.remove())
@@ -230,9 +230,14 @@ export default class extends Controller {
     });
 
     this.waveSurfer.on('region-update-end', function (region) {
-      // Early return if entry_id is not present in region data
+      // Update the form fields
+      document.getElementById('prev-position').value = Math.round(region.start * 10) / 10;
+      document.getElementById('current-position').value = Math.round(region.end * 10) / 10;
+      document.getElementById('dictionary_entry_region_id').value = region.id;
+
+      // Only proceed with AJAX update if the region is already persisted
       if (!region.data.entry_id) {
-        console.log('No entry_id present in region data.');
+        console.log('Region updated but not yet persisted');
         return;
       }
 

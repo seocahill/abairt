@@ -1,0 +1,36 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">
+        <%= link_to voice_recording_path(@recording), class: "text-blue-600 hover:text-blue-800" do %>
+          Transcribing: <%= @recording.title %>
+        <% end %>
+      </h1>
+    </div>
+
+    <div class="mt-8 overflow-x-auto relative shadow-md sm:rounded-lg">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3">Speaker</th>
+            <th scope="col" class="px-6 py-3">Word/Phrase</th>
+            <th scope="col" class="px-6 py-3">Translation</th>
+            <th scope="col" class="px-6 py-3">Audio</th>
+            <th scope="col" class="px-6 py-3" colspan="2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial: "voice_recordings/dictionary_entries/dictionary_entry",
+                     collection: @entries,
+                     as: :entry,
+                     locals: { current_user: current_user } %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# Pagination footer %>
+    <div class="w-full bg-white rounded-md p-4">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+</div>

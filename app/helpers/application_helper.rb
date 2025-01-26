@@ -26,4 +26,12 @@ module ApplicationHelper
   def page_title
     content_for(:page_title)
   end
+
+  def format_duration(seconds)
+    return "0:00" if seconds.nil?
+    total_seconds = seconds.round
+    minutes = total_seconds / 60
+    remaining_seconds = total_seconds % 60
+    "#{minutes}:#{format('%02d', remaining_seconds)}"
+  end
 end

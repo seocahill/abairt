@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     member { post :add_region }
     member { post :peaks }
     collection { get :map }
+    resource :diarization, only: [:create]
   end
 
   resources :rangs do
