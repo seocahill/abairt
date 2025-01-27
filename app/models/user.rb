@@ -4,7 +4,7 @@ class User < ApplicationRecord
   has_secure_password
 
   before_create :generate_token
-  after_create :add_default_rang
+  # after_create :add_default_rang
 
   has_many :dictionary_entries #, foreign_key: :speaker_id
   has_many :spoken_dictionary_entries, foreign_key: :speaker_id, class_name: "DictionaryEntry"
