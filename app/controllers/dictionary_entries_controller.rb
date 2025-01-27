@@ -92,10 +92,6 @@ class DictionaryEntriesController < ApplicationController
       @dictionary_entry.media.purge
     end
 
-    # datalist sends name over the wire, need id. Also might not exist yet.
-    @dictionary_entry.speaker = entry_speaker if entry_speaker
-    @dictionary_entry.quality = current_user.quality
-
     if @dictionary_entry.update dictionary_entry_params
       regenerate_media
       respond_to do |format|

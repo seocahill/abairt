@@ -12,6 +12,13 @@
       class: "block w-full pl-7 pr-12 sm:text-sm border border-gray-300 rounded-md" %>
   <% end %>
 
+  <%= render "dictionary_entries/inline_fields", form: form, method: :quality do %>
+    <%= form.select :quality,
+      DictionaryEntry.qualities.keys,
+      { include_blank: false },
+      class: "block w-full pl-7 pr-12 sm:text-sm border border-gray-300 rounded-md" %>
+  <% end %>
+
   <%= render "dictionary_entries/inline_fields", form: form, method: :tag_list do %>
     <div data-controller="tag" data-tag-target="tagSearch">
       <%= form.text_area :tag_list, class: "w-full", id: "autoCompleteTags" %>

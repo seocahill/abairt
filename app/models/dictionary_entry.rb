@@ -29,6 +29,9 @@ class DictionaryEntry < ApplicationRecord
   scope :has_recording, -> { joins(:media_attachment) }
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }
+
+  validates :quality, inclusion: { in: %w[low fair], message: "can only be set to low or fair unless speaker is B2 level or higher" }, unless: -> { Current.user&.ability&.in?(%w[B2 C1 C2 native]) }
+
   # Based on CEFR scale i.e. low: < B2, fair: B2, good: C, excellent: native
   enum quality: %i[
     low
@@ -36,6 +39,7 @@ class DictionaryEntry < ApplicationRecord
     good
     excellent
   ]
+
   class << self
     def to_csv
       attributes = %w[word_or_phrase translation media_url]
