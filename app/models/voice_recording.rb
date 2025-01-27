@@ -35,7 +35,7 @@ class VoiceRecording < ApplicationRecord
   end
 
   def should_diarize?
-    media.attached? && diarization_status.nil?
+    media.attached? && (diarization_status.nil? || diarization_status == 'not_started')
   end
 
   def generate_peaks
