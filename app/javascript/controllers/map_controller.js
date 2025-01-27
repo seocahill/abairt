@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import L from 'leaflet'
+import feather from "feather-icons"
 
 export default class extends Controller {
   static values = {
@@ -12,6 +13,11 @@ export default class extends Controller {
     console.log("Map controller connected");
     this.marker = null;
     this.initializeMap();
+    this.initializeFeather();
+  }
+
+  initializeFeather() {
+    feather.replace();
   }
 
   initializeMap() {
@@ -109,48 +115,66 @@ export default class extends Controller {
     document.getElementById('mapModal').classList.add('hidden');
   }
 
-  saveLocation() {
-    if (this.marker) {
-      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-      const latLng = this.marker.getLatLng();
+  saveLocation(event) {
+    if (!this.marker) return;
 
-      // First get the address from the coordinates using Nominatim
+    const latLng = this.marker.getLatLng();
+
+    // Check if we're just populating form fields (for new speaker form)
+    const isFormPopulate = event.params && event.params.formOnly;
+
+    if (isFormPopulate) {
+      // Just populate the form fields
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latLng.lat}&lon=${latLng.lng}`)
         .then(response => response.json())
         .then(data => {
-          // Prepare the data to be sent
-          const updateData = {
-            partial: "profile",
-            user: {
-              lat_lang: `${latLng.lat},${latLng.lng}`,
-              address: data.display_name
-            }
-          };
-
-          // Send the data to the backend using fetch API
-          return fetch(`/users/${this.userIdValue}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-Token': csrfToken
-            },
-            body: JSON.stringify(updateData),
-          });
-        })
-        .then(response => {
-          if (response.ok) {
-            this.closeModal();
-            console.log('Location updated successfully');
-            // Optionally refresh the page or update the address display
-            window.location.reload();
-          } else {
-            throw new Error('Failed to update location');
+          document.getElementById("user-lat-lang").value = `${latLng.lat},${latLng.lng}`;
+          const addressInput = document.querySelector('input[name*="[address]"]');
+          if (addressInput) {
+            addressInput.value = data.display_name;
           }
+          this.closeModal();
         })
         .catch(error => {
-          console.error('Error updating location:', error);
+          console.error('Error getting address:', error);
         });
+      return;
     }
+
+    // Original update user logic
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latLng.lat}&lon=${latLng.lng}`)
+      .then(response => response.json())
+      .then(data => {
+        const updateData = {
+          partial: "profile",
+          user: {
+            lat_lang: `${latLng.lat},${latLng.lng}`,
+            address: data.display_name
+          }
+        };
+
+        return fetch(`/users/${this.userIdValue}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify(updateData),
+        });
+      })
+      .then(response => {
+        if (response.ok) {
+          this.closeModal();
+          window.location.reload();
+        } else {
+          throw new Error('Failed to update location');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   }
 
   showMap(e) {
