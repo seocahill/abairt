@@ -12,11 +12,21 @@
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
+            <th scope="col" class="px-6 py-3">Audio</th>
             <th scope="col" class="px-6 py-3">Speaker</th>
             <th scope="col" class="px-6 py-3">Word/Phrase</th>
             <th scope="col" class="px-6 py-3">Translation</th>
-            <th scope="col" class="px-6 py-3">Audio</th>
-            <th scope="col" class="px-6 py-3" colspan="2">Actions</th>
+            <th scope="col" class="px-6 py-3 flex items-center">
+              Quality
+              <div class="relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle ml-1 text-gray-400 hover:text-gray-600"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <div class="absolute hidden group-hover:block bg-gray-500 text-white text-xs rounded py-2 px-4 left-6 transform -translate-x-1/2 w-80 z-10">
+                  Quality must be at least fair to appear in the Dictionary. All AI generated transcriptions are 'low' by default.
+                </div>
+              </div>
+            </th>
+            <th scope="col" class="px-6 py-3">Versions</th>
+            <th scope="col" class="px-6 py-3">Actions</th>
           </tr>
         </thead>
         <tbody>

@@ -1,5 +1,11 @@
 <tr data-controller="entry" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>">
   <td class="px-6 py-4">
+    <button data-action="entry#play" class="bg-green-500 hover:bg-green-700 mt-2 text-white font-bold py-2 px-4 rounded">
+      <audio src="<%= entry.media.url %>"></audio>
+      play
+    </button>
+  </td>
+  <td class="px-6 py-4">
     <%= render "dictionary_entries/inline_edit", model: entry, method: :speaker_id, current_user: current_user do %>
       <% if entry.speaker_id %>
         <%= link_to_unless policy(entry).edit?, entry.speaker&.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
@@ -19,10 +25,9 @@
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <button data-action="entry#play" class="bg-green-500 hover:bg-green-700 mt-2 text-white font-bold py-2 px-4 rounded">
-      <audio src="<%= entry.media.url %>"></audio>
-      play
-    </button>
+    <%= render "dictionary_entries/inline_edit", model: entry, method: :quality, current_user: current_user do %>
+      <%= entry.quality.present? ? entry.quality : "Set quality" %>
+    <% end %>
   </td>
   <% if current_user && entry.user_id == current_user.id %>
     <td class="px-6 py-4">

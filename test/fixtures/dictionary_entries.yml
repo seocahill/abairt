@@ -5,14 +5,14 @@ one:
   translation: "The death cowl on you"
   speaker: one
   owner: one
-  quality: good
+  quality: fair
 
 two:
   word_or_phrase: "Cén chaoi gur éirigh leat"
   translation: "How did you get on"
   speaker: one
   owner: one
-  quality: good
+  quality: fair
 
 
 three:
