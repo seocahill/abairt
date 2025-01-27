@@ -1,4 +1,4 @@
-<div id="<%= dom_id(@user) %>" class="m-10">
+<div id="<%= dom_id(@user) %>" class="m-10" data-controller="map" data-map-user-id-value="<%= @user.id %>">
   <div class="px-4 sm:px-0">
     <h3 class="text-base font-semibold leading-7 text-gray-900">
       <%= @user.name %>
@@ -44,9 +44,14 @@
       </div>
       <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
         <dt class="text-sm font-medium leading-6 text-gray-900">Location</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center">
           <%= render "users/inline_edit", model: @user, method: :address, current_user: current_user do %>
             <%= @user.address || "Add your address"  %>
+          <% end %>
+          <% if policy(@user).update? %>
+            <button type="button" class="ml-2" data-action="click->map#openModal">
+              <i data-feather="map-pin" class="text-blue-500"></i>
+            </button>
           <% end %>
         </dd>
       </div>
@@ -60,4 +65,26 @@
       </div>
     </dl>
   </div>
+
+  <!-- Modal Structure -->
+  <div id="mapModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 999;">
+    <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-md bg-white">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Select Location</h3>
+        <button class="text-gray-500 hover:text-gray-700" data-action="click->map#closeModal">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div id="map" class="h-[600px] md:min-h-[50%] lg:min-h-[75%] mt-4"></div>
+      <div class="mt-4 flex justify-end">
+        <button class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" data-action="click->map#saveLocation">
+          Save Location
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with model: @user, local: true do |form| %>
+    <%= form.hidden_field :lat_lang, id: "user-lat-lang", value: @user.lat_lang %>
+  <% end %>
 </div>
