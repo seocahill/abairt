@@ -97,6 +97,7 @@ class DictionaryEntriesController < ApplicationController
     @dictionary_entry.quality = current_user.quality
 
     if @dictionary_entry.update dictionary_entry_params
+      regenerate_media
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
@@ -149,5 +150,13 @@ class DictionaryEntriesController < ApplicationController
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
     params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :speaker_id, :tag_list, :quality, :region_start, :region_end, :region_id)
+  end
+
+  def regenerate_media
+    return unless @dictionary_entry.saved_change_to_region_start? ||
+                  @dictionary_entry.saved_change_to_region_end?
+
+    @dictionary_entry.media.purge
+    @dictionary_entry.create_audio_snippet
   end
 end
