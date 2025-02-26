@@ -45,7 +45,7 @@ class FineTuningServiceTest < ActiveSupport::TestCase
     # Set up expectation with Mocha - expect exactly one call for the entry without standard Irish
     @mock_client.expects(:chat)
                 .with { |params|
-                  params[:parameters][:model] == "gpt-4" &&
+                  params[:parameters][:model] == "gpt-4o" &&
                   params[:parameters][:response_format] == { type: "json_object" } &&
                   params[:parameters][:messages].any? { |m| m[:role] == "system" } &&
                   params[:parameters][:messages].any? { |m| m[:content].include?("rabh") }
