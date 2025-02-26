@@ -20,6 +20,7 @@
           </thead>
           <tbody id="dictionary_entries">
             <% @entries.each do |entry| %>
+              <% next if entry.word_or_phrase.blank? %>
               <%= render partial: "dictionary_entries/dictionary_entry", locals: { entry: entry, starred: @starred, current_user: current_user } %>
             <% end %>
           </tbody>
