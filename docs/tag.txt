@@ -1,0 +1,14 @@
+If missing a tag allow a user to add it and run a job on the good or better entries to see if the tag is appropriate.
+
+A tag can be a single word or a description of a scenario.
+
+E.g. "seaweed" (this would tag anything to do with seaweed, fishing etc)
+
+We can use ai to decide if the tag is appropriate or not.
+
+Would vector search be a better way to do this?
+
+E.g. "seaweed" (this would tag anything to do with seaweed, fishing etc)
+
+We can use ai to decide if the tag is appropriate or not.
+

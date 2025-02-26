@@ -4,7 +4,7 @@ class UserTest < ActiveSupport::TestCase
   test "quality method returns correct quality based on ability" do
     user = users(:one)
 
-    assert_equal user.ability, "A1"
+    user.ability = "A1"
     assert_equal "low", user.quality
 
     user.ability = "A2"
