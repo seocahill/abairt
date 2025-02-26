@@ -5,22 +5,26 @@ one:
   name: Seosamh Ó Cathail
   password_digest: MyString
   confirmed: true
+  ability: B2
 
 two:
   email: dazpatreg@yahoo.ie
   name: Darren Ó Riagáin
   password_digest: MyString
+  ability: C1
 
 three:
   email: seanoraghaille@abairt.com
   name: Seán Ó Raghallaigh
   password_digest: MyString
+  ability: native
 
 four:
   email: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair@abairt.com
   name: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair
   password_digest: MyString
   role: speaker
+  ability: native
 
 five:
   email: Padraic Ó Murachú@abairt.com

@@ -1,0 +1,205 @@
+### instructions
+
+#### **Goal**
+Generate a fine-tuning dataset in JSONL format from the `dictionary_entries` table in your Rails app database. The table contains the columns `word_or_phrase` (Mayo Irish phrase), `translation` (English translation), and `quality` ("very high"). Additionally, if missing, generate `standard_irish` (standard Irish equivalent) using OpenAI’s `chat-completion` API. The dataset will include:
+1. **English-to-Mayo Irish translations.**
+2. **Standard Irish-to-Mayo Irish dialect mappings.**
+
+Output two files:
+- `training_data.jsonl`: Training set with messages for fine-tuning conversational behavior.
+- `validation_data.jsonl`: Validation dataset split from training for overfitting prevention.
+
+---
+
+### **Steps**
+
+#### **1. Fetch `dictionary_entries`**
+Query the database for only `dictionary_entries` with:
+- `quality = 'very high'`
+- `standard_irish IS NOT NULL` (or dynamically generate it if missing).
+
+#### **2. Generate `standard_irish` (if missing)**
+For each entry missing `standard_irish`:
+- Prompt OpenAI to convert the `word_or_phrase` (Mayo Irish) into standard Irish, based on its English `translation`.
+- Update the database with the generated `standard_irish`. We'll need to add this column to the database.
+
+**Prompt Example:**
+```text
+"The following is a phrase in the Mayo dialect of Irish: '<mayo_irish>'.
+Its English translation is: '<english_translation>'.
+Please rewrite the phrase in standard Irish."
+```
+
+#### **3. Prepare JSONL Output**
+Include the following conversation-style messages in the JSONL format:
+- `system`: `"You are an Irish assistant specializing in the Mayo dialect."`
+- `user`: The input, which can be:
+  - An **English sentence** (to generate Mayo translation).
+  - A **standard Irish phrase** (to convert to Mayo dialect).
+- `assistant`: The desired Mayo Irish output.
+
+Dataset example:
+```json
+{
+  "messages": [
+    { "role": "system", "content": "You are an Irish assistant specializing in the Mayo dialect." },
+    { "role": "user", "content": "Translate the English sentence, 'It wasn't difficult.', into Mayo Irish." },
+    { "role": "assistant", "content": "Ní rabh sé deacair." }
+  ]
+}
+```
+```json
+{
+  "messages": [
+    { "role": "system", "content": "You are an Irish assistant specializing in the Mayo dialect." },
+    { "role": "user", "content": "Ní raibh sé deacair. (standard Irish)" },
+    { "role": "assistant", "content": "Ní rabh sé doiligh. (Mayo Irish)" }
+  ]
+}
+```
+
+#### **4. Validation Split**
+Split the dataset into:
+- `training_data.jsonl`: 80% of the entries.
+- `validation_data.jsonl`: 20% of the entries.
+
+Randomize the dataset to ensure a well-balanced split.
+
+---
+
+### **Code Requirements**
+- Use `ActiveRecord` to query the `dictionary_entries` table.
+- Use `OpenAI::Client` (via `langchain-rb`) to generate `standard_irish` values.
+- Write outputs as JSONL files.
+
+---
+
+### **Code Outline**
+1. Fetch high-quality `dictionary_entries` from the database.
+2. If `standard_irish` is missing, generate it using OpenAI's `chat-completion` API.
+3. Build JSONL entries with prompts and completions:
+   - English-to-Mayo Irish translations.
+   - Standard Irish-to-Mayo dialect conversions.
+4. Split into training and validation datasets.
+5. Save `training_data.jsonl` and `validation_data.jsonl`.
+
+---
+
+### **Implementation**
+Here’s the step-by-step Ruby implementation using Rails.
+
+#### **Database Query**
+```ruby
+entries = DictionaryEntry.where(quality: "very high")
+```
+
+#### **Generate Standard Irish (if missing)**:
+```ruby
+require "openai"
+
+client = OpenAI::Client.new
+
+entries.each do |entry|
+  next unless entry.standard_irish.nil?
+
+  # Construct prompt for OpenAI
+  prompt = <<~PROMPT
+    The following is a phrase in the Mayo dialect of Irish: '#{entry.word_or_phrase}'.
+    Its English translation is: '#{entry.translation}'.
+    Please rewrite the phrase in standard Irish.
+  PROMPT
+
+  response = client.chat(
+    parameters: {
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: "You are an expert linguist specializing in Irish Gaelic." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7
+    }
+  )
+
+  # Save the generated standard Irish back to the database
+  entry.update!(standard_irish: response.dig("choices", 0, "message", "content").strip)
+end
+```
+
+#### **Prepare JSONL Output**
+```ruby
+require "json"
+
+PROMPT_TEMPLATES = [
+  "Translate the English sentence, '%<sentence>s', into Mayo Irish.",
+  "What is the Mayo Irish equivalent of: '%<sentence>s'?",
+  "How would you say '%<sentence>s' in the Mayo dialect of Irish?"
+].freeze
+
+def generate_jsonl(entries, file_path)
+  File.open(file_path, "w") do |file|
+    entries.each do |entry|
+      # Randomly select a user prompt format
+      english_prompt = format(PROMPT_TEMPLATES.sample, sentence: entry.translation)
+      standard_prompt = "#{entry.standard_irish} (standard Irish)"
+
+      # English-to-Mayo JSONL
+      file.puts(
+        {
+          messages: [
+            { role: "system", content: "You are an Irish assistant specializing in the Mayo dialect." },
+            { role: "user", content: english_prompt },
+            { role: "assistant", content: entry.word_or_phrase }
+          ]
+        }.to_json
+      )
+
+      # Standard Irish-to-Mayo JSONL
+      file.puts(
+        {
+          messages: [
+            { role: "system", content: "You are an Irish assistant specializing in the Mayo dialect." },
+            { role: "user", content: standard_prompt },
+            { role: "assistant", content: entry.word_or_phrase }
+          ]
+        }.to_json
+      )
+    end
+  end
+end
+```
+
+#### **Split Dataset**
+```ruby
+# Shuffle and split into training (80%) and validation (20%)
+shuffled_entries = entries.shuffle
+split_index = (shuffled_entries.size * 0.8).floor
+
+training_set = shuffled_entries[0...split_index]
+validation_set = shuffled_entries[split_index..]
+
+# Generate Files
+generate_jsonl(training_set, "training_data.jsonl")
+generate_jsonl(validation_set, "validation_data.jsonl")
+```
+
+---
+
+### **Output**
+1. `training_data.jsonl`: 80% of data entries formatted for fine-tuning.
+2. `validation_data.jsonl`: 20% of data entries reserved for evaluation.
+
+---
+
+### **Postscript**
+- Validate JSONL files using OpenAI’s CLI:
+```bash
+openai tools fine_tunes.prepare_data -f training_data.jsonl
+```
+- Upload and fine-tune:
+```bash
+openai api fine_tunes.create -t "training_data.jsonl" -v "validation_data.jsonl" --model "gpt-3.5-turbo"
+```
+
+---
+
+End of instructions. 🚀
