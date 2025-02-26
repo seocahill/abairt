@@ -12,4 +12,5 @@ Sentry.init do |config|
     true
   end
   config.enabled_environments = %w[production]
+  config.excluded_exceptions += ["Pagy::VariableError"]
 end

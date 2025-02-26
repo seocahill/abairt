@@ -129,6 +129,7 @@ class User < ApplicationRecord
   end
 
   def password_reset_token_expired?
+    return true if password_reset_sent_at.blank?
     password_reset_sent_at < 5.minutes.ago
   end
 
