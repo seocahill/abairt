@@ -9,8 +9,9 @@ class FineTuningService
   GPT4_OUTPUT_COST_PER_1K = 0.06
   GPT35_FINETUNE_COST_PER_1K = 0.008
 
-  def initialize(client: OpenAI::Client.new)
-    @client = client
+  def initialize(client: nil)
+    @client = client || OpenAI::Client.new(access_token: Rails.application.credentials.dig(:openai, :openai_key),
+      organization_id: Rails.application.credentials.dig(:openai, :openai_org))
   end
 
   def generate_dataset
@@ -89,7 +90,7 @@ class FineTuningService
 
     @client.chat(
       parameters: {
-        model: "gpt-4",
+        model: "gpt-4o",
         response_format: { type: "json_object" },
         messages: [
           {
