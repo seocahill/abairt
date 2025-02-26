@@ -56,7 +56,7 @@ class FineTuningService
         next if standard_irish.nil? || standard_irish.empty?
 
         if is_significantly_different
-          entry.update!(standard_irish: standard_irish)
+          entry.update_columns(standard_irish: standard_irish)
           dialectal_entries << entry
         end
       rescue JSON::ParserError => e
