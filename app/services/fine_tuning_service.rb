@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class FineTuningService
   PROMPT_TEMPLATES = [
     "Translate the English sentence, '%<sentence>s', into Mayo Irish.",
@@ -9,22 +10,19 @@ class FineTuningService
   GPT4_OUTPUT_COST_PER_1K = 0.06
   GPT35_FINETUNE_COST_PER_1K = 0.008
 
-  def initialize(client: nil)
-    @client = client || OpenAI::Client.new(access_token: Rails.application.credentials.dig(:openai, :openai_key),
-      organization_id: Rails.application.credentials.dig(:openai, :openai_org))
+  def initialize
+    @entries = DictionaryEntry.where(quality: ["good", "excellent"])
   end
 
   def generate_dataset
-    entries = fetch_entries
-    dialectal_entries = generate_standard_irish(entries)
-    generate_jsonl_files(dialectal_entries)
+    create_synthetic_data
+    generate_jsonl_files
   end
 
   def estimate_cost
     require "tiktoken_ruby"
-    tokenizer = Tiktoken.encoding_for_model("gpt-3.5-turbo")
+    tokenizer = Tiktoken.encoding_for_model("gpt-4o")
 
-    entries = fetch_entries
     missing_count = entries.where(standard_irish: [nil, ""]).count
     sample_entries = entries.where(standard_irish: [nil, ""]).limit(10)
 
@@ -38,76 +36,20 @@ class FineTuningService
 
   private
 
-  def fetch_entries
-    DictionaryEntry.where(quality: ["good", "excellent"])
-  end
+  attr_reader :entries, :client
 
-  def generate_standard_irish(entries)
-    dialectal_entries = []
-
-    entries.where(standard_irish: [nil, ""]).each do |entry|
-      response = request_standard_irish(entry)
-
-      begin
-        response_data = JSON.parse(response.dig("choices", 0, "message", "content"))
-        standard_irish = response_data["standard_irish"]
-        is_significantly_different = response_data["is_significantly_different"]
-
-        next if standard_irish.nil? || standard_irish.empty?
-
-        if is_significantly_different
-          entry.update_columns(standard_irish: standard_irish)
-          dialectal_entries << entry
-        end
-      rescue JSON::ParserError => e
-        Rails.logger.error("Failed to parse response for entry #{entry.id}: #{e.message}")
-        next
-      end
+  def create_synthetic_data
+    unsynthesized_entries = entries.where("(standard_irish IS NULL OR standard_irish = '') AND (standard_irish IS NULL OR standard_irish != ?)", "not_for_training")
+    unsynthesized_entries.each do |entry|
+      SyntheticDataService.new(entry).create_synthetic_data
     end
-
-    # Add existing entries that already have standard Irish translations
-    existing_entries = entries.where.not(standard_irish: [nil, ""])
-    dialectal_entries + existing_entries.to_a
   end
 
-  def request_standard_irish(entry)
-    prompt = <<~PROMPT
-      The following is a phrase in the Mayo dialect of Irish: '#{entry.word_or_phrase}'.
-      Its English translation is: '#{entry.translation}'.
-
-      Please analyze this phrase and provide:
-      1. The standard Irish equivalent
-      2. Whether there is a significant dialectal difference between the Mayo version and standard Irish
-
-      Consider differences in:
-      - Vocabulary choice
-      - Grammatical structure
-      - Pronunciation-reflecting spelling
-      - Regional variations
-
-      Only consider it significantly different if there are meaningful dialectal variations, not just minor spelling differences.
-    PROMPT
-
-    @client.chat(
-      parameters: {
-        model: "gpt-4o",
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert linguist specializing in Irish Gaelic. Return a JSON object with keys 'standard_irish' (the standard Irish translation) and 'is_significantly_different' (boolean indicating if there are meaningful dialectal differences)."
-          },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.7
-      }
-    )
-  end
-
-  def generate_jsonl_files(dialectal_entries)
+  def generate_jsonl_files
+    dialectal_entries = entries.where.not(standard_irish: [nil, "not_for_training", ""])
     # Ensure files are created even if there are no entries
-    File.write("training_data.jsonl", "")
-    File.write("validation_data.jsonl", "")
+    File.write("public/training_data.jsonl", "")
+    File.write("public/validation_data.jsonl", "")
 
     return { training: { path: "training_data.jsonl", examples: 0 },
              validation: { path: "validation_data.jsonl", examples: 0 }
