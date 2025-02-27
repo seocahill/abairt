@@ -1,5 +1,7 @@
+# frozen_string_literal: true
 class VoiceRecording < ApplicationRecord
   has_one_attached :media
+  has_one_attached :audio_track
   has_many :dictionary_entries
   has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: 'User'
   has_many :learning_sessions, as: :learnable
@@ -81,5 +83,38 @@ class VoiceRecording < ApplicationRecord
     else
       percentage
     end
+  end
+
+  def extract_audio_track
+    return unless media.attached?
+    return media unless media.content_type.start_with?('video/')
+    return audio_track if audio_track.attached?
+
+    Tempfile.create(['audio', '.wav'], binmode: true) do |temp_audio|
+      media.open do |file|
+        # Use ffmpeg to extract audio track to WAV format
+        system(
+          'ffmpeg', '-i', file.path,
+          '-vn',        # Disable video processing
+          '-acodec', 'pcm_s16le',  # PCM 16-bit little-endian
+          '-ar', '44100',          # Sample rate
+          '-ac', '2',              # Stereo audio
+          '-y',                    # Overwrite output file
+          temp_audio.path
+        )
+
+        # Attach the audio file
+        audio_track.attach(
+          io: File.open(temp_audio.path),
+          filename: "#{media.filename.base}.wav",
+          content_type: 'audio/wav'
+        )
+      end
+    end
+
+    audio_track
+  rescue => e
+    Rails.logger.error("Audio conversion error: #{e.message}")
+    raise
   end
 end

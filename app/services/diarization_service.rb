@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DiarizationService
   def initialize(voice_recording)
     @voice_recording = voice_recording
@@ -8,9 +10,7 @@ class DiarizationService
   def diarize
     return unless @voice_recording.media.attached?
 
-    # Get the media URL
-    media_url = Rails.application.routes.url_helpers.url_for(@voice_recording.media)
-
+    media_url = Rails.application.routes.url_helpers.url_for(@voice_recording.extract_audio_track)
 
     # Get the ngrok URL from environment or fall back to production URL
     base_url = Rails.env.development? ? ENV['WEBHOOK_URL'] : "https://abairt.com"
@@ -27,7 +27,7 @@ class DiarizationService
       **url_options
     )
 
-    # Make the API request
+    # Make the API request with converted audio URL
     response = HTTParty.post(
       "#{@base_url}/diarize",
       headers: {
@@ -113,4 +113,8 @@ class DiarizationService
       File.delete temp_path rescue nil
     end
   end
+
+  private
+
+
 end
