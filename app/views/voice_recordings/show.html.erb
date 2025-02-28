@@ -14,14 +14,14 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
       <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-700">Total Segments</h3>
+          <h3 class="text-lg font-semibold text-gray-700" title="Diarized using pyannote and transcribed using abair.ie">Automatic Transcriptions</h3>
           <span class="text-2xl font-bold text-blue-600"><%= @recording.dictionary_entries.count %></span>
         </div>
       </div>
 
       <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-700">Completed Segments</h3>
+          <h3 class="text-lg font-semibold text-gray-700" title="These segments have been validated by a speaker with B2 level Irish or higher">Human Validated Transcriptions</h3>
           <span class="text-2xl font-bold text-green-600">
             <%= @recording.dictionary_entries.where(quality: ['good', 'excellent']).count %>
           </span>
