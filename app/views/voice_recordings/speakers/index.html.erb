@@ -56,6 +56,11 @@
         </div>
 
         <div>
+          <%= f.label :ability, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :ability, User.abilities.keys.map { |a| [a.humanize, a] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+        </div>
+
+        <div>
           <%= f.label :voice, "Gender", class: "block text-sm font-medium text-gray-700" %>
           <%= f.select :voice, User.voices.keys.map { |v| [v.humanize, v] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
         </div>
@@ -69,6 +74,8 @@
             </button>
           </div>
           <%= f.hidden_field :lat_lang, id: "user-lat-lang" %>
+          <%= f.hidden_field :email, value: "#{SecureRandom.hex(32)}@abairt.com" %>
+          <%= f.hidden_field :role, value: "speaker" %>
         </div>
 
         <div>
