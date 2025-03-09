@@ -1,0 +1,48 @@
+<div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-all duration-300" id="dictionary_entry_<%= entry.id %>">
+  <div class="flex items-start justify-between">
+    <div class="flex-1">
+      <!-- Transcription -->
+      <div class="mb-2">
+        <p class="text-lg font-medium text-gray-900"><%= entry.word_or_phrase %></p>
+        <p class="text-gray-600 italic"><%= entry.translation %></p>
+      </div>
+
+      <!-- Metadata -->
+      <div class="flex items-center space-x-4 text-sm text-gray-500">
+        <div class="flex items-center">
+          <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+          </svg>
+          <span><%= entry.quality.humanize %></span>
+        </div>
+        <div class="flex items-center">
+          <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          <span><%= format_duration(entry.region_start) %> - <%= format_duration(entry.region_end) %></span>
+        </div>
+        <% if entry.speaker %>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+            <span><%= entry.speaker.name %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Play Button -->
+    <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
+            data-controller="audio-player"
+            data-action="audio-player#play"
+            data-audio-player-url-value="<%= url_for(entry.media) if entry.media.attached? %>"
+            data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
+            data-audio-player-translation-value="<%= entry.translation %>">
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  </div>
+</div>

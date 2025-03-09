@@ -1,114 +1,115 @@
+<!-- Media Player Container -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+     data-controller="waveform"
+     data-waveform-url-value="<%= @recording.media.url if @recording&.media&.attached? %>"
+     data-waveform-regions-value="<%= @regions.to_json if @regions.present? %>">
 
- <turbo-frame id="wave_display" class="w-full">
-  <div id="wave-controller" data-controller="transcription" data-transcription-media-value="<%= @recording.media.url if @recording&.media&.attached? %>" data-transcription-regions-value="<%= @regions %>" data-transcription-autoplay-value="<%= action_name == "preview" %>" data-transcription-peaks-value="voice_recordings/<%= @recoding&.id %>/peaks">
-    <!-- Waveform -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:space-y-4 sm:space-x-4 sm:p-4">
-      <% if @recording&.media&.video? %>
-        <%= video_tag(@recording.media.url, class: "h-auto sm:max-h-40 w-auto", data: { "transcription-target": "video" }) %>
-      <% end %>
-      <% if @recording %>
-        <div id="waveform" class="flex-grow" data-transcription-target="waveform"></div>
-      <% else %>
-        <p>You need to load a video or audio recording.</p>
-      <% end %>
+  <!-- Video Display (if video) -->
+  <% if @recording&.media&.video? %>
+    <div class="w-full bg-gray-900">
+      <%= video_tag(@recording.media.url,
+                    class: "mx-auto max-h-[300px]",
+                    data: { waveform_target: "video" },
+                    crossorigin: "anonymous") %>
     </div>
+  <% end %>
 
-    <div class="flex items-center sm:space-x-4 sm:p-4 w-full">
-      <div class="flex flex-col sm:space-y-4 w-full">
-        <!-- Subtitles display -->
-        <div id="subtitles" class="space-x-4 p-6 bg-gray-900 text-white w-full">
-          <p class="text-white text-xl sm:text-4xl" data-target="transcription.transcription">Transcript of <%= @recording&.title %></p>
-          <p><i class="text-white text-xl sm:text-base" data-target="transcription.translation"><%= @recording&.description %></i></p>
-        </div>
+  <!-- Waveform Display -->
+  <div class="p-4">
+    <% if @recording&.media&.attached? %>
+      <div data-waveform-target="waveform" class="w-full h-24"></div>
+    <% else %>
+      <p class="text-gray-500 text-center py-4">No media file attached</p>
+    <% end %>
+  </div>
 
-        <!-- Control Bar -->
-        <div class="p-2 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-          <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 p-2 w-full justify-between">
-            <div class="flex flex-row space-x-4 w-full sm:w-auto mb-2">
-              <button id="play-pause-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-not-allowed w-full" data-action="click->transcription#play">
-                No File
-              </button>
-              <button id="speed-button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full" data-action="click->transcription#slower">
-                Slower
-              </button>
-            </div>
-            <div class="flex flex-row space-x-4 w-full sm:w-auto mb-2">
-              <label class="flex items-center space-x-2">
-                <span class="ml-2 text-gray-900">Subtitles on/off</span>
-                <input id="toggle-english" type="checkbox" class="form-checkbox" checked data-target="transcription.engSubs">
-                <span class="ml-2 text-gray-700">English</span>
-              </label>
-              <label class="flex items-center space-x-2">
-                <input id="toggle-irish" type="checkbox" class="form-checkbox" checked data-target="transcription.gaeSubs">
-                <span class="ml-2 text-gray-700">Irish</span>
-              </label>
-            </div>
-            <label class="flex items-center space-x-2">
-              <span class="ml-2 text-gray-700">Zoom</span>
-              <input data-action="input->transcription#zoom" type="range" min="0" max="100" value="50" class="w-full">
-            </label>
-            <label class="flex items-center space-x-2">
-              <span lass="ml-2 text-gray-700" data-feather="watch">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg>
-              </span>
-              <p id="current-seek-position" data-target="transcription.time" class="w-12 text-right sm:w-auto"> 0.0 </p>
-            </label>
-          </div>
-        </div>
+  <!-- Main Controls -->
+  <div class="border-t border-gray-200 p-4">
+    <div class="flex items-center justify-between">
+      <!-- Left Controls Group -->
+      <div class="flex items-center gap-6">
+        <!-- Play/Pause Button -->
+        <button data-waveform-target="playButton"
+                data-action="click->waveform#play"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 min-w-[100px] justify-center disabled:opacity-50"
+                disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          <span>Play</span>
+        </button>
 
-        <!-- Separated Control Bar -->
-        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 w-full justify-between bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mt-4">
-          <% if action_name == "show" %>
-            <%= link_to @recording.prev, data: { turbo: false } do %>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
-            <% end %>
-            <% if policy(@recording).edit? && @recording.diarization_data.blank? %>
-              <div id="diarization_button">
-                <%= button_to voice_recording_diarization_path(@recording),
-                    method: :post,
-                    class: "bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2",
-                    data: { turbo: false } do %>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                  <span>Start Diarization</span>
-                <% end %>
-              </div>
-            <% end %>
-          <% end %>
-            <% if policy(@recording).edit? %>
-              <%= link_to edit_voice_recording_path(@recording), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2", data: { turbo: false } do %>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                <span>Edit Recording</span>
-              <% end %>
-            <% end %>
-            <% if action_name == "show" %>
-
-            <% if policy(@recording).edit? %>
-              <%= button_to add_region_voice_recording_path(@recording), method: :post, class: "bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2" do %>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                <span>Add New Segment</span>s
-                <input type="hidden" id="prev-position" name="voice_recording[region_start]">
-                <input type="hidden" id="current-position" name="voice_recording[region_end]">
-                <input type="hidden" id="dictionary_entry_region_id" name="voice_recording[region_id]">
-              <% end %>
-            <% end %>
-
-            <% if current_user && @recording&.media&.attached? %>
-              <%= link_to rails_blob_path(@recording.media, disposition: "attachment"), class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2", data: { turbo: false } do %>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>Download Media</span>
-              <% end %>
-            <% end %>
-
-            <%= link_to voice_recording_speakers_path(@recording), class: "bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-2", data: { turbo: false } do %>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              <span>Manage Speakers</span>
-            <% end %>
-            <%= link_to @recording.next, data: { turbo: false } do %>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-            <% end %>
-          <% end %>
+        <!-- Time Display -->
+        <div class="flex items-center gap-2 text-gray-600 min-w-[80px]">
+          <span data-waveform-target="timeDisplay" class="font-mono">0:00</span>
         </div>
       </div>
+
+      <!-- Center Controls Group -->
+      <div class="flex items-center gap-6">
+        <!-- Playback Speed -->
+        <div class="flex items-center gap-2">
+          <label for="speed" class="text-gray-600 whitespace-nowrap">Speed:</label>
+          <select id="speed"
+                  data-waveform-target="speed"
+                  data-action="change->waveform#changeSpeed"
+                  class="form-select rounded-md border-gray-300 text-sm">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2.0">2.0x</option>
+          </select>
+        </div>
+
+        <!-- Zoom Control -->
+        <div class="flex items-center gap-2">
+          <label for="zoom" class="text-gray-600 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M5 8a1 1 0 011-1h1V6a1 1 0 012 0v1h1a1 1 0 110 2H9v1a1 1 0 11-2 0V9H6a1 1 0 01-1-1z" />
+              <path fill-rule="evenodd" d="M2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8zm6-4a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd" />
+            </svg>
+          </label>
+          <input type="range"
+                 id="zoom"
+                 data-action="input->waveform#zoom"
+                 class="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                 min="10"
+                 max="500"
+                 value="250">
+        </div>
+      </div>
+
+      <!-- Right Controls Group -->
+      <% if @regions.present? %>
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input type="checkbox"
+                   data-waveform-target="gaeSubs"
+                   checked
+                   class="form-checkbox h-4 w-4 text-blue-600 rounded">
+            <span class="text-gray-700">Ga</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox"
+                   data-waveform-target="engSubs"
+                   checked
+                   class="form-checkbox h-4 w-4 text-blue-600 rounded">
+            <span class="text-gray-700">En</span>
+          </label>
+        </div>
+      <% end %>
     </div>
   </div>
-</turbo-frame>
+
+  <!-- Subtitle Display, Disabled for now -->
+  <% if false # @regions.present? %>
+    <div class="border-t border-gray-200 p-4 bg-gray-50">
+      <div class="space-y-2 text-center">
+        <p data-waveform-target="transcription" class="text-xl font-medium text-gray-900">~</p>
+        <p data-waveform-target="translation" class="text-gray-600 italic">~</p>
+      </div>
+    </div>
+  <% end %>
+</div>

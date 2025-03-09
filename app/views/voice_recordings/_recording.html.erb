@@ -1,0 +1,141 @@
+<% if recording.media.attached? %>
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden"
+      data-controller="<%= recording.media.content_type.start_with?('video') ? 'video-player' : 'waveform' %>"
+      data-waveform-url-value="<%= url_for(recording.media) if recording.media.attached? && !recording.media.content_type.start_with?('video') %>"
+      data-waveform-regions-value="<%= recording.dictionary_entries.map { |e| e.slice(:region_start, :region_end, :word_or_phrase, :translation) }.to_json if !recording.media.content_type.start_with?('video') %>"
+      data-video-player-url-value="<%= url_for(recording.media) if recording.media.attached? && recording.media.content_type.start_with?('video') %>">
+    <div class="p-4">
+      <div class="flex justify-between items-start mb-4">
+        <h3 class="text-xl font-semibold text-gray-900"><%= recording.title %></h3>
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-500"><%= recording.percentage_transcribed %>% complete</span>
+          <div class="w-20 bg-gray-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full" style="width: <%= recording.percentage_transcribed %>%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Media Player -->
+      <div class="mb-4">
+        <% if recording.media.attached? %>
+          <% if recording.media.content_type.start_with?('video') %>
+            <!-- Video Player -->
+            <div class="relative aspect-video bg-black rounded-lg overflow-hidden">
+              <video
+                data-video-player-target="video"
+                class="w-full h-full"
+                controls
+                crossorigin="anonymous"
+                preservesPitch
+                preload="metadata">
+                <source src="<%= url_for(recording.media) %>" type="<%= recording.media.content_type %>">
+                <% if recording.dictionary_entries.any? %>
+                  <track
+                    kind="subtitles"
+                    srclang="ga"
+                    label="Irish"
+                    src="<%= subtitles_voice_recording_path(recording, format: :vtt, lang: :ga) %>"
+                    default>
+                  <track
+                    kind="subtitles"
+                    srclang="en"
+                    label="English"
+                    src="<%= subtitles_voice_recording_path(recording, format: :vtt, lang: :en) %>">
+                <% end %>
+                Your browser does not support the video tag.
+              </video>
+              <div class="absolute top-0 left-0 right-0 p-2 bg-black bg-opacity-50 flex items-center justify-end space-x-2">
+                <label class="text-white text-sm">Speed:</label>
+                <select data-video-player-target="speed" data-action="change->video-player#changeSpeed" class="bg-transparent text-white text-sm border border-white rounded px-1">
+                  <option value="0.25">0.25x</option>
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1.0" selected>1.0x</option>
+                </select>
+              </div>
+            </div>
+          <% else %>
+            <!-- Waveform Player -->
+            <div class="w-full" data-waveform-target="waveform"></div>
+            <div class="flex justify-between items-center mt-2">
+              <div class="flex items-center space-x-4">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                        data-waveform-target="playButton"
+                        data-action="click->waveform#play">
+                  Play
+                </button>
+                <div class="flex items-center space-x-2">
+                  <label class="text-sm text-gray-600">Speed:</label>
+                  <select data-waveform-target="speed" data-action="change->waveform#changeSpeed" class="text-sm border rounded px-2 py-1">
+                    <option value="0.25">0.25x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1.0" selected>1.0x</option>
+                  </select>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500" data-waveform-target="timeDisplay"></div>
+            </div>
+
+            <!-- Subtitle Display for Audio -->
+            <% if !recording.media.content_type.start_with?('video') && recording.dictionary_entries.any? %>
+              <div class="mt-4 space-y-2 p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="font-medium text-gray-700">Subtitles</h4>
+                  <div class="flex gap-2">
+                    <label class="inline-flex items-center">
+                      <input type="checkbox" class="form-checkbox" data-waveform-target="gaeSubs" checked>
+                      <span class="ml-1 mr-1 text-sm text-gray-600">Ga</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                      <input type="checkbox" class="form-checkbox" data-waveform-target="engSubs" checked>
+                      <span class="ml-1 mr-1 text-sm text-gray-600">En</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="text-center py-2 min-h-[100px] flex flex-col justify-center">
+                  <p class="text-lg font-medium text-gray-800" data-waveform-target="transcription">~</p>
+                  <p class="text-gray-600 italic" data-waveform-target="translation">~</p>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Recording Details -->
+      <div class="mt-4 space-y-2">
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <span>Speakers:</span>
+          <div class="flex flex-wrap gap-2">
+            <% recording.users.each do |user| %>
+              <span class="px-2 py-1 bg-gray-100 rounded-full">
+                <%= link_to user.name, voice_recordings_path(search: user.name), data: { turbo_frame: "recordings" } %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <span>Dialects:</span>
+          <div class="flex flex-wrap gap-2">
+            <% recording.users.pluck(:dialect).uniq.each do |dialect| %>
+              <span class="px-2 py-1 bg-gray-100 rounded-full">
+                <%= link_to dialect.humanize, voice_recordings_path(dialect: dialect), data: { turbo_frame: "recordings" } %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-4 flex justify-end space-x-2">
+        <%= link_to voice_recording_path(recording), class: "text-blue-500 hover:text-blue-700", data: { turbo_frame: "_top" } do %>
+          View Details
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

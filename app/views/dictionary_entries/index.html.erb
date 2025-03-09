@@ -1,54 +1,120 @@
-<!-- Sidebar for CRUD -->
-<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-  <%= render "sidebar" %>
-</div>
+<!-- Main Container -->
+<div class="flex flex-col md:flex-row min-h-screen">
+  <!-- Left Side - Tags -->
+  <div class="w-full md:w-1/3 h-screen flex flex-col bg-white border-r">
+    <div class="p-6 border-b">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-900">Tags</h2>
+        <span class="text-sm text-gray-500"><%= @tags.count %> tags</span>
+      </div>
 
-<!-- Primary Content Area: Two Rectangles -->
-<div class="w-full md:w-3/4 p-4">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div class="w-full bg-white rounded-md p-4">
-      <div class="relative overflow-x-auto">
-        <div class="pb-4 bg-white dark:bg-gray-900">
-          <label for="table-search" class="sr-only">Search</label>
-          <div class="relative mt-1">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                  </svg>
-              </div>
-              <form action="/dictionary_entries">
-                <input type="search" class="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="search" id="search" placeholder="Irish or English words" name="search" >
-              </form>
+      <!-- Tag Search -->
+      <div class="mt-4" data-controller="tag-filter">
+        <div class="relative">
+          <input type="text"
+                 placeholder="Filter tags..."
+                 class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                 data-tag-filter-target="input"
+                 data-action="input->tag-filter#filter">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
           </div>
         </div>
-        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" class="px-6 py-3">Irish</th>
-              <th scope="col" class="px-6 py-3">English</th>
-              <th scope="col" class="px-6 py-3">Tags</th>
-              <th scope="col" class="px-6 py-3">Audio</th>
-              <% if current_user %>
-                <th scope="col" class="px-6 py-3">Rec</th>
-              <!--  <th scope="col" class="px-6 py-3">Add to List</th> -->
-              <% end %>
-              <% if current_user&.edit?  %>
-                <th scope="col" class="px-6 py-3"></th>
-                <th scope="col" class="px-6 py-3"></th>
-              <% end %>
-            </tr>
-          </thead>
-          <tbody id="dictionary_entries">
-            <% @dictionary_entries.each do |entry| %>
-              <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, starred: @starred } %>
+
+        <!-- Tag List -->
+        <div class="mt-6 space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto">
+          <% @tags.each do |tag| %>
+            <%= link_to dictionary_entries_path(tag: tag.name, search: params[:search], media: params[:media]),
+                class: "flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-50 #{params[:tag] == tag.name ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}",
+                data: { turbo_frame: "entries", tag_filter_target: "tag" } do %>
+              <span class="text-sm font-medium"><%= tag.name %></span>
+              <span class="text-xs text-gray-500"><%= tag.taggings_count %></span>
             <% end %>
-          </tbody>
-        </table>
+          <% end %>
+        </div>
       </div>
     </div>
-    <%# footer %>
-    <div class="w-full bg-white rounded-md p-4">
-      <%== pagy_nav(@pagy) %>
+  </div>
+
+  <!-- Right Side - Entries -->
+  <div class="w-full md:w-2/3 h-screen flex flex-col">
+    <!-- Search Header -->
+    <div class="p-6 bg-white border-b">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-900">Dictionary Entries</h2>
+        <% if current_user %>
+          <%= link_to new_dictionary_entry_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New Entry
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="mt-4">
+        <%= form_tag dictionary_entries_path, method: :get,
+            data: { controller: "form", turbo_frame: "entries" } do %>
+          <div class="relative">
+            <%= text_field_tag :search, params[:search],
+                placeholder: "Search dictionary entries...",
+                class: "w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                data: { action: "input->form#submit" } %>
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <label class="inline-flex items-center">
+                <%= check_box_tag :media, "1", params[:media],
+                    class: "form-checkbox h-4 w-4 text-blue-600 rounded",
+                    data: { controller: "form", action: "change->form#submit" } %>
+                <span class="ml-2 text-sm text-gray-700">Has Audio</span>
+              </label>
+            </div>
+            <%= hidden_field_tag :tag, params[:tag] if params[:tag].present? %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Entries List -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <%= turbo_frame_tag "entries" do %>
+        <div class="space-y-4" id="entries-container">
+          <%= render partial: "dictionary_entry",
+                     collection: @dictionary_entries,
+                     as: :entry,
+                     locals: { current_user: current_user } %>
+        </div>
+
+        <!-- Pagination -->
+        <% if @pagy.pages > 1 %>
+          <div class="mt-6 border-t border-gray-200 pt-6 flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+              Showing <span class="font-medium"><%= @pagy.from %></span> to
+              <span class="font-medium"><%= @pagy.to %></span> of
+              <span class="font-medium"><%= @pagy.count %></span> entries
+            </div>
+            <div class="flex space-x-2">
+              <% if @pagy.prev %>
+                <%= link_to "Previous", dictionary_entries_path(page: @pagy.prev, search: params[:search], tag: params[:tag], media: params[:media]),
+                    class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50",
+                    data: { turbo_frame: "entries" } %>
+              <% end %>
+              <% if @pagy.next %>
+                <%= link_to "Next", dictionary_entries_path(page: @pagy.next, search: params[:search], tag: params[:tag], media: params[:media]),
+                    class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50",
+                    data: { turbo_frame: "entries" } %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
     </div>
   </div>
 </div>

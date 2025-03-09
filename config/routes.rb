@@ -8,9 +8,12 @@ Rails.application.routes.draw do
   resources :voice_recordings do
     resources :dictionary_entries, module: :voice_recordings
     resources :speakers, module: :voice_recordings, only: [:index, :update]
-    member { get :preview }
-    member { post :add_region }
-    member { post :peaks }
+    member do
+      get :preview
+      get :add_region
+      get :peaks
+      get 'subtitles(/:lang)', to: 'voice_recordings#subtitles', defaults: { format: 'vtt' }, as: :subtitles
+    end
     collection { get :map }
     resource :diarization, only: [:create]
   end

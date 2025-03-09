@@ -1,0 +1,11 @@
+  <% if pagy.next %>
+    <div id="pagination" class="mt-6 text-center" data-infinite-scroll-target="pagination">
+      <%= link_to "Load More", url_for(page: pagy.next),
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+          rel: "next" %>
+    </div>
+  <% else %>
+    <div id="pagination" class="mt-6 text-center text-gray-500">
+      <p>No more recordings to load</p>
+    </div>
+  <% end %>
