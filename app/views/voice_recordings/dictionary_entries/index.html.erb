@@ -40,28 +40,16 @@
                 </svg>
                 Add Region
               </button>
-              <button data-action="transcription#slower"
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                Slow Down
-              </button>
-            </div>
-
-            <!-- Right Controls -->
-            <div class="flex items-center gap-4">
-              <label class="flex items-center gap-2">
-                <input type="checkbox"
-                       data-transcription-target="gaeSubs"
-                       checked
-                       class="form-checkbox h-4 w-4 text-blue-600 rounded">
-                <span class="text-gray-700">Ga</span>
-              </label>
-              <label class="flex items-center gap-2">
-                <input type="checkbox"
-                       data-transcription-target="engSubs"
-                       checked
-                       class="form-checkbox h-4 w-4 text-blue-600 rounded">
-                <span class="text-gray-700">En</span>
-              </label>
+              <div class="flex items-center gap-2">
+                <label for="zoom" class="text-gray-600">Zoom:</label>
+                <input type="range"
+                       id="zoom"
+                       data-action="input->transcription#zoom"
+                       class="w-24 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                       min="10"
+                       max="500"
+                       value="250">
+              </div>
             </div>
           </div>
         </div>
@@ -86,16 +74,7 @@
             <th scope="col" class="px-6 py-3">Speaker</th>
             <th scope="col" class="px-6 py-3">Word/Phrase</th>
             <th scope="col" class="px-6 py-3">Translation</th>
-            <th scope="col" class="px-6 py-3 flex items-center">
-              Quality
-              <div class="relative group">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle ml-1 text-gray-400 hover:text-gray-600"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <div class="absolute hidden group-hover:block bg-gray-500 text-white text-xs rounded py-2 px-4 left-6 transform -translate-x-1/2 w-80 z-10">
-                  Quality must be at least fair to appear in the Dictionary. All AI generated transcriptions are 'low' by default.
-                </div>
-              </div>
-            </th>
-            <th scope="col" class="px-6 py-3">Versions</th>
+            <th scope="col" class="px-6 py-3">Quality</th>
             <th scope="col" class="px-6 py-3">Actions</th>
           </tr>
         </thead>
@@ -106,14 +85,6 @@
                      locals: { current_user: current_user } %>
         </tbody>
       </table>
-    </div>
-
-    <!-- Subtitles Display -->
-    <div class="mt-4 space-y-2 p-4 bg-gray-50 rounded-lg">
-      <div class="text-center">
-        <p data-transcription-target="transcription" class="text-xl font-medium text-gray-900">~</p>
-        <p data-transcription-target="translation" class="text-gray-600 italic">~</p>
-      </div>
     </div>
 
     <%# Pagination footer %>
