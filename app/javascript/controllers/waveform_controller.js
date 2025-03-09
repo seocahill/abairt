@@ -6,12 +6,16 @@ export default class extends Controller {
   static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation", "gaeSubs", "engSubs", "speed", "video"]
   static values = {
     url: String,
-    regionsUrl: String
+    regionsUrl: String,
+    lazy: Boolean
   }
 
   connect() {
-    if (!this.urlValue) return;
-    this.initializeWaveform();
+    if (!this.lazyValue) {
+      this.initializeWaveform();
+    } else if (this.hasPlayButtonTarget) {
+      this.playButtonTarget.textContent = "Play";
+    }
   }
 
   disconnect() {
@@ -20,70 +24,113 @@ export default class extends Controller {
     }
   }
 
-  initializeWaveform() {
-    const container = this.waveformTarget;
-    const playButton = this.playButtonTarget;
-    const timeDisplay = this.timeDisplayTarget;
+  async play() {
+    if (!this.waveSurfer) {
+      await this.initializeWaveform();
+    }
+    this.waveSurfer.playPause();
+  }
 
-    playButton.textContent = "Preparing wave...";
+  async initializeWaveform() {
+    if (this.hasPlayButtonTarget) {
+      this.playButtonTarget.textContent = "Loading...";
+      this.playButtonTarget.disabled = true;
+    }
 
-    this.waveSurfer = WaveSurfer.create({
-      container: container,
-      waveColor: '#4F46E5',
-      progressColor: '#312E81',
-      cursorColor: '#818CF8',
-      barWidth: 2,
-      barRadius: 3,
-      cursorWidth: 1,
-      height: 80,
-      barGap: 3,
-      responsive: true,
-      normalize: true,
-      backend: 'MediaElement',
-      mediaControls: false,
-      plugins: [
-        RegionsPlugin.create({
-          dragSelection: false,
-          regions: []
-        })
-      ]
-    });
+    try {
+      const container = this.waveformTarget;
 
-    // Load the appropriate media element
-    const mediaElement = this.hasVideoTarget ? this.videoTarget : this.urlValue;
-    this.waveSurfer.load(mediaElement);
+      this.waveSurfer = WaveSurfer.create({
+        container: container,
+        waveColor: '#4F46E5',
+        progressColor: '#312E81',
+        cursorColor: '#818CF8',
+        barWidth: 2,
+        barRadius: 3,
+        cursorWidth: 1,
+        height: 80,
+        barGap: 3,
+        responsive: true,
+        normalize: true,
+        backend: 'MediaElement',
+        mediaControls: false,
+        plugins: [
+          RegionsPlugin.create({
+            dragSelection: false,
+            regions: []
+          })
+        ]
+      });
 
+      // Set up event listeners
+      this.setupWaveformEventListeners();
+
+      // Load the media
+      await this.waveSurfer.load(this.urlValue);
+
+      // Fetch and add regions
+      if (this.hasRegionsUrlValue) {
+        await this.fetchAndAddRegions();
+      }
+
+      this.waveSurfer.zoom(200);
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.disabled = false;
+      }
+    } catch (error) {
+      console.error('Error initializing waveform:', error);
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.textContent = "Error";
+        this.playButtonTarget.disabled = true;
+      }
+      throw error;
+    }
+  }
+
+  setupWaveformEventListeners() {
     this.waveSurfer.on('loading', (progress) => {
-      if (progress < 99) {
-        playButton.textContent = `Loading ${progress}%`;
-      } else {
-        playButton.textContent = "Play";
+      if (this.hasPlayButtonTarget) {
+        if (progress < 99) {
+          this.playButtonTarget.textContent = `Loading ${progress}%`;
+        } else {
+          this.playButtonTarget.textContent = "Play";
+        }
       }
     });
 
     this.waveSurfer.on('ready', () => {
-      playButton.textContent = "Play";
-      playButton.disabled = false;
-      this.waveSurfer.zoom(200);
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.textContent = "Play";
+        this.playButtonTarget.disabled = false;
+      }
+    });
 
-      // Fetch and add regions after waveform is ready
-      if (this.hasRegionsUrlValue) {
-        this.fetchAndAddRegions();
+    this.waveSurfer.on('play', () => {
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.textContent = "Pause";
+      }
+    });
+
+    this.waveSurfer.on('pause', () => {
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.textContent = "Play";
       }
     });
 
     this.waveSurfer.on('audioprocess', () => {
       if (this.waveSurfer.isPlaying()) {
         const currentTime = this.waveSurfer.getCurrentTime();
-        timeDisplay.textContent = this.formatTime(currentTime);
-
-        // Find and highlight the current entry
+        if (this.hasTimeDisplayTarget) {
+          this.timeDisplayTarget.textContent = this.formatTime(currentTime);
+        }
         this.highlightCurrentEntry(currentTime);
       }
     });
 
     this.waveSurfer.on('finish', () => {
-      playButton.textContent = "Play";
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.textContent = "Play";
+      }
     });
 
     // Handle subtitles
@@ -133,73 +180,6 @@ export default class extends Controller {
       });
     } catch (error) {
       console.error('Error fetching regions:', error);
-    }
-  }
-
-  play(event) {
-    event.preventDefault();
-    const button = event.currentTarget;
-
-    if (!this.waveSurfer) return;
-
-    this.waveSurfer.playPause();
-    button.textContent = this.waveSurfer.isPlaying() ? "Pause" : "Play";
-  }
-
-  playRegion(event) {
-    event.preventDefault();
-    console.log("playRegion called");
-
-    const audioUrl = event.currentTarget.dataset.audioUrl;
-    console.log("Audio URL:", audioUrl);
-
-    if (!audioUrl) {
-      console.warn('No audio URL provided for this entry');
-      return;
-    }
-
-    const transcription = event.currentTarget.dataset.transcription;
-    const translation = event.currentTarget.dataset.translation;
-    console.log("Playing snippet with transcription:", transcription);
-
-    // Create a new audio element
-    const audio = new Audio(audioUrl);
-
-    // Add loading handler
-    audio.addEventListener('loadstart', () => {
-      console.log('Audio started loading');
-    });
-
-    // Add error handler
-    audio.addEventListener('error', (e) => {
-      console.error('Error loading audio:', e);
-    });
-
-    // Add play handler
-    audio.addEventListener('play', () => {
-      console.log('Audio started playing');
-    });
-
-    // Try to play the audio
-    audio.play().catch(error => {
-      console.error('Error playing audio:', error);
-    });
-
-    // Update subtitles if available
-    if (this.hasTranscriptionTarget && this.hasTranslationTarget) {
-      if (this.hasGaeSubsTarget && this.gaeSubsTarget.checked) {
-        this.transcriptionTarget.textContent = transcription;
-      }
-      if (this.hasEngSubsTarget && this.engSubsTarget.checked) {
-        this.translationTarget.textContent = translation;
-      }
-
-      // Reset subtitles when audio ends
-      audio.addEventListener('ended', () => {
-        console.log('Audio finished playing');
-        this.transcriptionTarget.textContent = "~";
-        this.translationTarget.textContent = "~";
-      });
     }
   }
 
