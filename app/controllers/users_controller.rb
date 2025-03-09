@@ -4,6 +4,7 @@ Pub = Struct.new(:name, :lat_lang, :url)
 
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
+  before_action :authenticate_user!, except: [:index, :show]
 
   # GET /users or /users.json
   def index
@@ -12,8 +13,7 @@ class UsersController < ApplicationController
     records = policy_scope(User).active
 
     if params[:search].present?
-      # records = records.joins(:fts_users).where("fts_users match ?", params[:search]).distinct.order('rank')
-      records = User.where("name LIKE ?", "%#{params[:search]}%")
+      records = User.where("name ILIKE ?", "%#{params[:search]}%")
     end
 
     if params[:dialect].present?
@@ -45,6 +45,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html
+      format.turbo_stream if params[:search].present? || params[:dialect].present?
       format.json { render json: records }
     end
   end
