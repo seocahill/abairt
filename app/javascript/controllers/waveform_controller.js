@@ -6,7 +6,7 @@ export default class extends Controller {
   static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation", "gaeSubs", "engSubs", "speed", "video"]
   static values = {
     url: String,
-    regions: Array
+    regionsUrl: String
   }
 
   connect() {
@@ -64,38 +64,11 @@ export default class extends Controller {
     this.waveSurfer.on('ready', () => {
       playButton.textContent = "Play";
       playButton.disabled = false;
-
-      // Set initial zoom level to match the slider's default value
       this.waveSurfer.zoom(200);
 
-      // Add regions if available
-      if (this.hasRegionsValue) {
-        let regions;
-        try {
-          // Handle both string and array inputs
-          regions = typeof this.regionsValue === 'string' ?
-            JSON.parse(this.regionsValue) :
-            this.regionsValue;
-
-          regions.forEach(region => {
-            if (region.region_start != null && region.region_end != null) {
-              this.waveSurfer.addRegion({
-                start: parseFloat(region.region_start),
-                end: parseFloat(region.region_end),
-                drag: false,
-                resize: false,
-                color: 'rgba(79, 70, 229, 0.1)',
-                data: {
-                  id: region.id,
-                  transcription: region.word_or_phrase,
-                  translation: region.translation
-                }
-              });
-            }
-          });
-        } catch (e) {
-          console.error('Error adding regions:', e);
-        }
+      // Fetch and add regions after waveform is ready
+      if (this.hasRegionsUrlValue) {
+        this.fetchAndAddRegions();
       }
     });
 
@@ -132,6 +105,34 @@ export default class extends Controller {
           this.translationTarget.textContent = "~";
         }
       });
+    }
+  }
+
+  async fetchAndAddRegions() {
+    try {
+      const response = await fetch(this.regionsUrlValue);
+      if (!response.ok) throw new Error('Failed to fetch regions');
+
+      const regions = await response.json();
+
+      regions.forEach(region => {
+        if (region.region_start != null && region.region_end != null) {
+          this.waveSurfer.addRegion({
+            start: parseFloat(region.region_start),
+            end: parseFloat(region.region_end),
+            drag: false,
+            resize: false,
+            color: 'rgba(79, 70, 229, 0.1)',
+            data: {
+              id: region.id,
+              transcription: region.word_or_phrase,
+              translation: region.translation
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching regions:', error);
     }
   }
 

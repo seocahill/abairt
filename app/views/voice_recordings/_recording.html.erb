@@ -2,7 +2,7 @@
   <div class="bg-white rounded-lg shadow-lg overflow-hidden"
       data-controller="<%= recording.media.content_type.start_with?('video') ? 'video-player' : 'waveform' %>"
       data-waveform-url-value="<%= url_for(recording.media) if recording.media.attached? && !recording.media.content_type.start_with?('video') %>"
-      data-waveform-regions-value="<%= recording.dictionary_entries.map { |e| e.slice(:region_start, :region_end, :word_or_phrase, :translation) }.to_json if !recording.media.content_type.start_with?('video') %>"
+      data-waveform-regions-url-value="<%= regions_voice_recording_path(recording) %>"
       data-video-player-url-value="<%= url_for(recording.media) if recording.media.attached? && recording.media.content_type.start_with?('video') %>">
     <div class="p-4">
       <div class="flex justify-between items-start mb-4">
