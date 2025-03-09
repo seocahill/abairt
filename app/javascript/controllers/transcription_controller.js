@@ -4,7 +4,12 @@ import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
   static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video", "position"]
-  static values = { media: String, regions: Array, peaks: String, autoplay: Boolean }
+  static values = {
+    media: String,
+    regionsUrl: String,
+    peaks: String,
+    autoplay: Boolean
+  }
 
   connect() {
     this.element[this.identifier] = this
@@ -25,85 +30,6 @@ export default class extends Controller {
     })
   }
 
-  handleKeyDown(event) {
-    const seekTime = 5; // Number of seconds to seek
-
-    switch (event.code) {
-      case 'ArrowLeft':
-        event.preventDefault(); // Prevent the default action (scrolling)
-        this.waveSurfer.seekTo(Math.max(0, this.waveSurfer.getCurrentTime() - seekTime) / this.waveSurfer.getDuration());
-        break;
-      case 'ArrowRight':
-        event.preventDefault(); // Prevent the default action (scrolling)
-        this.waveSurfer.seekTo(Math.min(this.waveSurfer.getDuration(), this.waveSurfer.getCurrentTime() + seekTime) / this.waveSurfer.getDuration());
-        break;
-      case 'KeyP':
-        if (event.ctrlKey) {
-          event.preventDefault(); // Prevent the default action
-          this.waveSurfer.playPause();
-          this.toggleButton(); // Update the button text accordingly
-        }
-        break;
-    }
-  }
-
-
-  addRegionAtCurrent() {
-    // Get the current playback position
-    const currentPosition = this.waveSurfer.getCurrentTime();
-
-    // Find the end of the last region
-    let lastRegionEnd = 0;
-    Object.keys(this.waveSurfer.regions.list).forEach(key => {
-      const region = this.waveSurfer.regions.list[key];
-      if (region.end > lastRegionEnd) {
-        lastRegionEnd = region.end;
-      }
-    });
-
-    // Ensure the new region does not start before the last region ends
-    const start = Math.max(lastRegionEnd, currentPosition - 5); // Adjust 5 seconds before current if needed
-    const end = currentPosition;
-
-    // Add the new region if it makes sense (start must be less than end)
-    if (start < end) {
-      this.waveSurfer.addRegion({
-        start: start,
-        end: end,
-        color: 'rgba(0, 255, 0, 0.1)' // Example color, change as needed
-      });
-    } else {
-      console.error('Invalid region boundaries. Start time must be less than end time.');
-    }
-  }
-
-  resetForm(target) {
-    let transcription = "pending";
-    let translation = "pending";
-    let regionId = document.getElementById('dictionary_entry_region_id').value;
-    let region = this.waveSurfer.regions.list[regionId];
-    if (region) {
-      region.update({ data: { transcription: transcription, translation: translation } })
-      target.reset()
-    }
-  }
-
-  zoom(event) {
-    event.preventDefault()
-    this.waveSurfer.zoom(Number(event.target.value));
-  }
-
-  async fetchPeaksData() {
-    if (this.hasPeaksValue) {
-      try {
-        let response = await fetch(this.peaksValue);
-        await response.json();
-      } catch (error) {
-        console.error('Error fetching peaks data:', error);
-      }
-    }
-  }
-
   waveformTargetConnected() {
     let playButton = this.element.querySelector('#play-pause-button');
     playButton.innerHTML = "Preparing wave....";
@@ -116,7 +42,6 @@ export default class extends Controller {
       partialRender: false,
       pixelRatio: 1,
       scrollParent: true,
-      // peaks: that.fetchPeaksData(), // FIXME
       plugins: [
         RegionsPlugin.create({
           dragSelection: true,
@@ -135,19 +60,36 @@ export default class extends Controller {
       }
     })
 
-    this.waveSurfer.on('ready', function() {
+    this.waveSurfer.on('ready', async function() {
       playButton.innerHTML = "Play";
-      that.regionsValue.forEach((region) => {
-        that.waveSurfer.addRegion({
-          id: region.region_id,
-          start: region.region_start,
-          end: region.region_end,
-          drag: false,
-          data: { transcription: region.word_or_phrase, translation: region.translation, entry_id: region.id }
-        });
-      })
+
+      // Fetch and add regions from the URL
+      if (that.hasRegionsUrlValue) {
+        try {
+          const response = await fetch(that.regionsUrlValue);
+          if (!response.ok) throw new Error('Failed to fetch regions');
+          const regions = await response.json();
+
+          regions.forEach((region) => {
+            that.waveSurfer.addRegion({
+              id: region.region_id,
+              start: region.region_start,
+              end: region.region_end,
+              drag: false,
+              data: {
+                transcription: region.word_or_phrase,
+                translation: region.translation,
+                entry_id: region.id
+              }
+            });
+          });
+        } catch (error) {
+          console.error('Error fetching regions:', error);
+        }
+      }
+
       if (that.autoplayValue) {
-        that.waveSurfer.play(); // Add this line to start playing automatically
+        that.waveSurfer.play();
         playButton.innerHTML = "Pause";
       }
     })
@@ -199,10 +141,8 @@ export default class extends Controller {
 
     this.waveSurfer.on('region-click', function (region, e) {
       e.stopPropagation();
-      // // Play on click, loop on shift click
+      // Play on click, loop on shift click
       if (e.altKey) {
-        // alt/option + click logic here (e.g., region.remove())
-        // Confirm dialog before proceeding with the destructive action
         if (!confirm('Are you sure you want to delete this region? This action cannot be undone.')) {
           console.log('Region deletion cancelled.');
           return;
@@ -211,23 +151,9 @@ export default class extends Controller {
       } else if (e.shiftKey) {
         region.playLoop();
       } else {
-        // Single click logic here (e.g., region.play())
         region.play();
       }
     })
-
-
-    this.waveSurfer.on('region-click', function (region) {
-      const regionStartInput = document.getElementById('dictionary_entry_region_start');
-      const regionEndInput = document.getElementById('dictionary_entry_region_end');
-      const regionIdInput = document.getElementById('dictionary_entry_region_id');
-
-      if (regionStartInput && regionEndInput && regionIdInput) {
-        regionStartInput.value = Math.round(region.start * 10) / 10;
-        regionEndInput.value = Math.round(region.end * 10) / 10;
-        regionIdInput.value = region.id;
-      }
-    });
 
     this.waveSurfer.on('region-update-end', function (region) {
       // Update the form fields
@@ -252,20 +178,16 @@ export default class extends Controller {
         }
       };
 
-      // Construct the URL using the entry_id stored in the region's data
-      const url = `/dictionary_entries/${region.data.entry_id}`;
-
-      // Send the data to the backend using fetch API or your preferred method
-      fetch(url, {
+      // Send the data to the backend using fetch API
+      fetch(`/dictionary_entries/${region.data.entry_id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken // Include CSRF token in the request header
+          'X-CSRF-Token': csrfToken
         },
         body: JSON.stringify(updateData),
       })
         .then(_data => {
-          // Log success, no need to update UI here as it's already up-to-date
           console.log('Dictionary entry updated');
         })
         .catch(error => {
@@ -274,16 +196,13 @@ export default class extends Controller {
     });
 
     this.waveSurfer.on('region-removed', function (region) {
-      // Early return if entry_id is not present in region data
       if (!region.data.entry_id) {
         console.log('No entry_id present in region data.');
         return;
       }
 
-      // Get CSRF token from meta tag
       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-      // Prepare the data to be sent
       const updateData = {
         dictionary_entry: {
           region_start: null,
@@ -292,26 +211,94 @@ export default class extends Controller {
         }
       };
 
-      // Construct the URL using the entry_id stored in the region's data
-      const url = `/dictionary_entries/${region.data.entry_id}`;
-
-      // Send the data to the backend using fetch API or your preferred method
-      fetch(url, {
+      fetch(`/dictionary_entries/${region.data.entry_id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken // Include CSRF token in the request header
+          'X-CSRF-Token': csrfToken
         },
         body: JSON.stringify(updateData),
       })
         .then(_data => {
-          // Log success, no need to update UI here as it's already up-to-date
           console.log('Dictionary entry updated');
         })
         .catch(error => {
           console.error('Error updating dictionary entry:', error);
         });
     });
+  }
+
+  handleKeyDown(event) {
+    const seekTime = 5;
+
+    switch (event.code) {
+      case 'ArrowLeft':
+        event.preventDefault();
+        this.waveSurfer.seekTo(Math.max(0, this.waveSurfer.getCurrentTime() - seekTime) / this.waveSurfer.getDuration());
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        this.waveSurfer.seekTo(Math.min(this.waveSurfer.getDuration(), this.waveSurfer.getCurrentTime() + seekTime) / this.waveSurfer.getDuration());
+        break;
+      case 'KeyP':
+        if (event.ctrlKey) {
+          event.preventDefault();
+          this.waveSurfer.playPause();
+          this.toggleButton();
+        }
+        break;
+    }
+  }
+
+  addRegionAtCurrent() {
+    const currentPosition = this.waveSurfer.getCurrentTime();
+    let lastRegionEnd = 0;
+    Object.keys(this.waveSurfer.regions.list).forEach(key => {
+      const region = this.waveSurfer.regions.list[key];
+      if (region.end > lastRegionEnd) {
+        lastRegionEnd = region.end;
+      }
+    });
+
+    const start = Math.max(lastRegionEnd, currentPosition - 5);
+    const end = currentPosition;
+
+    if (start < end) {
+      this.waveSurfer.addRegion({
+        start: start,
+        end: end,
+        color: 'rgba(0, 255, 0, 0.1)'
+      });
+    } else {
+      console.error('Invalid region boundaries. Start time must be less than end time.');
+    }
+  }
+
+  resetForm(target) {
+    let transcription = "pending";
+    let translation = "pending";
+    let regionId = document.getElementById('dictionary_entry_region_id').value;
+    let region = this.waveSurfer.regions.list[regionId];
+    if (region) {
+      region.update({ data: { transcription: transcription, translation: translation } })
+      target.reset()
+    }
+  }
+
+  zoom(event) {
+    event.preventDefault()
+    this.waveSurfer.zoom(Number(event.target.value));
+  }
+
+  async fetchPeaksData() {
+    if (this.hasPeaksValue) {
+      try {
+        let response = await fetch(this.peaksValue);
+        await response.json();
+      } catch (error) {
+        console.error('Error fetching peaks data:', error);
+      }
+    }
   }
 
   teardown() {
