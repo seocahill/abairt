@@ -3,56 +3,59 @@ import L from 'leaflet'
 import feather from "feather-icons"
 
 export default class extends Controller {
+  static targets = ["desktopContainer", "modalContainer", "modal"]
   static values = {
     pins: Array,
     pubs: Array,
-    userId: String
+    userId: { type: String, default: '' }
   }
 
   connect() {
     console.log("Map controller connected");
     this.marker = null;
-    this.initializeMap();
+    this.initializeMap(this.desktopContainerTarget);
     this.initializeFeather();
+  }
+
+  disconnect() {
+    if (this.map) {
+      this.map.remove()
+      this.map = null
+    }
   }
 
   initializeFeather() {
     feather.replace();
   }
 
-  initializeMap() {
-    this.map = L.map('map', { scrollWheelZoom: true }).setView([53.9860, -9.4125], 9);
-
-    this.map.on('popupopen', (e) => {
-      const closeButton = e.popup._closeButton;
-      if (closeButton) {
-        closeButton.addEventListener('click', (event) => {
-          event.preventDefault();
-        });
-      }
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      minZoom: 9,
-      attribution: '© OpenStreetMap'
-    }).addTo(this.map);
-
-    // If user already has a location, show it on the map
-    const latLangInput = document.getElementById("user-lat-lang");
-    if (latLangInput && latLangInput.value) {
-      const [lat, lng] = latLangInput.value.split(',');
-      this.addMarker(L.latLng(parseFloat(lat), parseFloat(lng)));
-      this.map.setView([lat, lng], 12);
+  initializeMap(container) {
+    if (this.map) {
+      this.map.remove()
+      this.map = null
     }
 
-    // Add click handler to map
-    this.map.on('click', (e) => {
-      this.addMarker(e.latlng);
-    });
+    this.map = L.map(container, {
+      scrollWheelZoom: true
+    }).setView([53.9860, -9.4125], 9)
 
-    // Fix map display issues when modal opens
-    this.map.invalidateSize();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map)
+
+    // Only try to get lat-lang input if we're in user profile mode
+    if (this.hasUserIdValue) {
+      const latLangInput = document.getElementById("user-lat-lang");
+      if (latLangInput && latLangInput.value) {
+        const [lat, lng] = latLangInput.value.split(',');
+        this.addMarker(L.latLng(parseFloat(lat), parseFloat(lng)));
+        this.map.setView([lat, lng], 12);
+      }
+
+      // Add click handler to map only in user profile mode
+      this.map.on('click', (e) => {
+        this.addMarker(e.latlng);
+      });
+    }
 
     const icon = new L.Icon({
       iconUrl:
@@ -84,11 +87,14 @@ export default class extends Controller {
     if (this.hasPubsValue) {
       this.pubsValue.forEach((pub) => {
         let marker = L.marker(pub.lat_lang.split(','), { icon })
-        let content = `<a target=”_blank” href="${pub.url}">${pub.name}</a>`;
+        let content = `<a target="_blank" href="${pub.url}">${pub.name}</a>`;
         marker.bindPopup(content).openPopup();
         marker.addTo(this.map);
       });
     }
+
+    // Fix map display issues
+    this.map.invalidateSize()
   }
 
   addMarker(latlng) {
@@ -96,27 +102,63 @@ export default class extends Controller {
       this.marker.remove();
     }
     this.marker = L.marker(latlng).addTo(this.map);
-    document.getElementById("user-lat-lang").value = `${latlng.lat},${latlng.lng}`;
+    const latLangInput = document.getElementById("user-lat-lang");
+    if (latLangInput) {
+      latLangInput.value = `${latlng.lat},${latlng.lng}`;
+    }
   }
 
   openModal() {
-    document.getElementById('mapModal').classList.remove('hidden');
-    // Fix map display issues when modal opens
+    this.modalTarget.classList.remove("hidden")
+    document.body.style.overflow = "hidden"
+
+    // Ensure the modal container is visible and has dimensions
+    this.modalContainerTarget.style.width = '100%'
+    this.modalContainerTarget.style.height = '100%'
+
+    // Initialize map in modal
+    this.initializeMap(this.modalContainerTarget)
+
+    // Force a resize after a short delay to ensure proper rendering
     setTimeout(() => {
-      this.map.invalidateSize();
-      // If there's an existing marker, center on it
-      if (this.marker) {
-        this.map.setView(this.marker.getLatLng(), 12);
-      }
-    }, 100);
+      this.map.invalidateSize()
+    }, 100)
+
+    // Add escape key handler
+    this.escapeHandler = (e) => {
+      if (e.key === "Escape") this.closeModal()
+    }
+    document.addEventListener("keydown", this.escapeHandler)
+
+    // Add click outside handler
+    this.clickOutsideHandler = (e) => {
+      if (e.target === this.modalTarget) this.closeModal()
+    }
+    document.addEventListener("click", this.clickOutsideHandler)
   }
 
   closeModal() {
-    document.getElementById('mapModal').classList.add('hidden');
+    this.modalTarget.classList.add("hidden")
+    document.body.style.overflow = ""
+
+    // Clean up the map
+    if (this.map) {
+      this.map.remove()
+      this.map = null
+    }
+
+    // Reinitialize map in desktop container if on desktop
+    if (window.innerWidth >= 768) {
+      this.initializeMap(this.desktopContainerTarget)
+    }
+
+    // Remove event listeners
+    document.removeEventListener("keydown", this.escapeHandler)
+    document.removeEventListener("click", this.clickOutsideHandler)
   }
 
   saveLocation(event) {
-    if (!this.marker) return;
+    if (!this.hasUserIdValue || !this.marker) return;
 
     const latLng = this.marker.getLatLng();
 
