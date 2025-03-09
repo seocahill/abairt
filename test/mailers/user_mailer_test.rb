@@ -10,7 +10,7 @@ class UserMailerTest < ActionMailer::TestCase
     assert_not ActionMailer::Base.deliveries.empty?
 
     assert_equal [user.email], email.to
-    assert_equal 'Password Reset Instructions', email.subject
+    assert_equal 'Login link', email.subject
     assert_equal ["abairt@abairt.com"], email.from
     assert_match user.password_reset_token, email.to_s
   end
