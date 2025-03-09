@@ -3,12 +3,10 @@ import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
-  static targets = ["time", "wordSearch", "tagSearch", "waveform", "transcription", "translation", "engSubs", "gaeSubs", "video", "position"]
+  static targets = ["time", "waveform"]
   static values = {
     media: String,
-    regionsUrl: String,
-    peaks: String,
-    autoplay: Boolean
+    regionsUrl: String
   }
 
   connect() {
@@ -48,8 +46,7 @@ export default class extends Controller {
         })
       ]
     })
-    const mediaFile = (this.hasVideoTarget ? this.videoTarget : this.mediaValue);
-    this.waveSurfer.load(mediaFile);
+    this.waveSurfer.load(this.mediaValue);
 
     this.waveSurfer.on('loading', function (progress) {
       playButton.classList.remove("cursor-not-allowed");
@@ -77,8 +74,6 @@ export default class extends Controller {
               end: region.region_end,
               drag: false,
               data: {
-                transcription: region.word_or_phrase,
-                translation: region.translation,
                 entry_id: region.id
               }
             });
@@ -87,33 +82,11 @@ export default class extends Controller {
           console.error('Error fetching regions:', error);
         }
       }
-
-      if (that.autoplayValue) {
-        that.waveSurfer.play();
-        playButton.innerHTML = "Pause";
-      }
     })
-
-    this.waveSurfer.on('region-in', (region) => {
-      if (that.gaeSubsTarget.checked) {
-        that.transcriptionTarget.innerText = region.data.transcription
-      }
-      if (that.engSubsTarget.checked) {
-        that.translationTarget.innerText = region.data.translation
-      }
-    });
-
-    this.waveSurfer.on('region-out', (region) => {
-      that.transcriptionTarget.innerText = "~";
-      that.translationTarget.innerText = "~";
-    });
 
     this.waveSurfer.on('audioprocess', function () {
       if (that.waveSurfer.isPlaying() && that.hasTimeTarget) {
         that.timeTarget.innerText = that.formatTime(that.waveSurfer.getCurrentTime().toFixed(1))
-        if (that.hasPositionTarget) {
-          that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(1)
-        }
         if (document.getElementById('current-position')) {
           document.getElementById('current-position').value = that.waveSurfer.getCurrentTime().toFixed(2);
         }
@@ -123,9 +96,6 @@ export default class extends Controller {
     this.waveSurfer.on('seek', function() {
       if (that.hasTimeTarget) {
         that.timeTarget.innerText = that.waveSurfer.getCurrentTime().toFixed(1)
-      }
-      if (that.hasPositionTarget) {
-        that.positionTarget.value = that.waveSurfer.getCurrentTime().toFixed(2)
       }
       if (document.getElementById('current-position')) {
         document.getElementById('current-position').value = that.waveSurfer.getCurrentTime().toFixed(1);
@@ -148,8 +118,6 @@ export default class extends Controller {
           return;
         }
         region.remove();
-      } else if (e.shiftKey) {
-        region.playLoop();
       } else {
         region.play();
       }
@@ -252,15 +220,7 @@ export default class extends Controller {
 
   addRegionAtCurrent() {
     const currentPosition = this.waveSurfer.getCurrentTime();
-    let lastRegionEnd = 0;
-    Object.keys(this.waveSurfer.regions.list).forEach(key => {
-      const region = this.waveSurfer.regions.list[key];
-      if (region.end > lastRegionEnd) {
-        lastRegionEnd = region.end;
-      }
-    });
-
-    const start = Math.max(lastRegionEnd, currentPosition - 5);
+    const start = Math.max(0, currentPosition - 2);
     const end = currentPosition;
 
     if (start < end) {
@@ -269,18 +229,13 @@ export default class extends Controller {
         end: end,
         color: 'rgba(0, 255, 0, 0.1)'
       });
-    } else {
-      console.error('Invalid region boundaries. Start time must be less than end time.');
     }
   }
 
   resetForm(target) {
-    let transcription = "pending";
-    let translation = "pending";
     let regionId = document.getElementById('dictionary_entry_region_id').value;
     let region = this.waveSurfer.regions.list[regionId];
     if (region) {
-      region.update({ data: { transcription: transcription, translation: translation } })
       target.reset()
     }
   }
@@ -290,44 +245,12 @@ export default class extends Controller {
     this.waveSurfer.zoom(Number(event.target.value));
   }
 
-  async fetchPeaksData() {
-    if (this.hasPeaksValue) {
-      try {
-        let response = await fetch(this.peaksValue);
-        await response.json();
-      } catch (error) {
-        console.error('Error fetching peaks data:', error);
-      }
-    }
-  }
-
-  teardown() {
-    this.waveSurfer.destroy()
-    this.waveSurfer = null;
-    this.meeting = null;
-  }
-
-  slower(event) {
-    event.preventDefault()
-    const button = this.element.querySelector('#play-pause-button')
-    let currentSpeed = this.waveSurfer.getPlaybackRate()
-    if (currentSpeed <= 0.33) {
-      this.waveSurfer.setPlaybackRate(1)
-      button.innerHTML = "Pause"
-    } else {
-      this.waveSurfer.setPlaybackRate((currentSpeed * 0.75))
-      button.innerHTML = "Reset"
-    }
-  }
-
   play(event) {
     event.preventDefault()
     const regionId = event.currentTarget.dataset.regionId;
     const region = this.waveSurfer.regions.list[regionId]
     if (region) {
       region.play()
-    } else if (this.waveSurfer.getPlaybackRate() < 1) {
-      this.waveSurfer.setPlaybackRate(1)
     } else {
       this.waveSurfer.playPause()
     }
@@ -336,18 +259,11 @@ export default class extends Controller {
 
   toggleButton() {
     const button = this.element.querySelector('#play-pause-button')
-    if (this.waveSurfer.isPlaying() && (this.waveSurfer.getPlaybackRate() < 1)) {
-      button.innerHTML = "Reset"
-    } else if (this.waveSurfer.isPlaying()) {
+    if (this.waveSurfer.isPlaying()) {
       button.innerHTML = "Pause"
     } else {
       button.innerHTML = "Play"
     }
-  }
-
-  seek(seekPosition) {
-    const value = seekPosition / this.waveSurfer.getDuration();
-    this.waveSurfer.seekTo(value);
   }
 
   formatTime(seconds) {
