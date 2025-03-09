@@ -8,7 +8,7 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    authorize current_user
+    # authorize current_user
     @template_name = "user"
     records = policy_scope(User).active
 
@@ -52,6 +52,7 @@ class UsersController < ApplicationController
 
   # GET /users/1 or /users/1.json
   def show
+    authorize current_user
     @pagy, @entries = pagy(@user.all_entries, items: PAGE_SIZE)
     @starred = current_user&.starred
     @new_speaker = User.new

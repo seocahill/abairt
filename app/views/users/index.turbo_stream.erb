@@ -5,7 +5,7 @@
         <div class="flex items-start justify-between">
           <div>
             <h3 class="text-lg font-semibold text-gray-900">
-              <%= link_to user.name, user_path(user), class: "hover:text-blue-600" %>
+              <%= link_to user.name, user_path(user), class: "hover:text-blue-600", data: { turbo: false } %>
             </h3>
             <div class="mt-2 space-y-2">
               <div class="flex items-center text-sm text-gray-600">
