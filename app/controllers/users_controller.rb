@@ -4,7 +4,7 @@ Pub = Struct.new(:name, :lat_lang, :url)
 
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
-  before_action :authenticate_user!, except: [:index, :show]
+  # before_action :authenticate_user!, except: [:index, :show]
 
   # GET /users or /users.json
   def index
