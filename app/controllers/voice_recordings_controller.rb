@@ -32,7 +32,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @pagy, @recordings = pagy(records.distinct, items: PAGE_SIZE)
-    @regions = set_regions if @voice_recording
+    # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 
     # Add map pins data
@@ -62,18 +62,6 @@ class VoiceRecordingsController < ApplicationController
         ]
       end
     end
-  end
-
-  def map
-    authorize(VoiceRecording)
-    @pins = VoiceRecording.all.map do |vr|
-      next unless speaker = vr.dictionary_entries.joins(:speaker).where("users.lat_lang is not null").first&.speaker
-
-      speaker.slice(:id, :name, :lat_lang).tap do |c|
-        c[:recording_id] = vr.id
-        c[:recording_title] = vr.title
-      end
-    end.compact
   end
 
   def show
@@ -109,18 +97,6 @@ class VoiceRecordingsController < ApplicationController
         ]
       end
     end
-  end
-
-  def peaks_data
-    recording = VoiceRecording.find(params[:id])
-    render json: recording.peaks
-  end
-
-  def preview
-    @recording = VoiceRecording.find(params[:id])
-    authorize @recording
-    @regions = set_regions
-    render partial: 'waveform', locals: { recording:  @recording, regions: @regions }
   end
 
   # GET /voice_recordings/new
@@ -210,6 +186,18 @@ class VoiceRecordingsController < ApplicationController
     response.headers["Access-Control-Allow-Origin"] = "*"
 
     render layout: false
+  end
+
+  def regions
+    @recording = VoiceRecording.find(params[:id])
+    authorize @recording, :show?
+
+    regions = @recording.dictionary_entries.map { |e|
+      e.slice(:region_id, :region_start, :region_end, :word_or_phrase, :translation, :id)
+    }
+
+    Rails.logger.debug "Sending regions: #{regions.inspect}"
+    render json: regions
   end
 
   private

@@ -2,7 +2,7 @@
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
      data-controller="waveform"
      data-waveform-url-value="<%= @recording.media.url if @recording&.media&.attached? %>"
-     data-waveform-regions-value="<%= @regions.to_json if @regions.present? %>">
+     data-waveform-regions-url-value="<%= regions_voice_recording_path(@recording) if @recording %>">
 
   <!-- Video Display (if video) -->
   <% if @recording&.media&.video? %>
