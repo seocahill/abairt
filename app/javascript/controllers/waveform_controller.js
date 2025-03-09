@@ -52,7 +52,7 @@ export default class extends Controller {
         barGap: 3,
         responsive: true,
         normalize: true,
-        backend: 'MediaElement',
+        backend: this.hasVideoTarget ? 'MediaElement' : 'WebAudio',
         mediaControls: false,
         plugins: [
           RegionsPlugin.create({
@@ -66,7 +66,11 @@ export default class extends Controller {
       this.setupWaveformEventListeners();
 
       // Load the media
-      await this.waveSurfer.load(this.urlValue);
+      if (this.hasVideoTarget) {
+        await this.waveSurfer.load(this.videoTarget);
+      } else {
+        await this.waveSurfer.load(this.urlValue);
+      }
 
       // Fetch and add regions
       if (this.hasRegionsUrlValue) {
@@ -159,24 +163,16 @@ export default class extends Controller {
     try {
       const response = await fetch(this.regionsUrlValue);
       if (!response.ok) throw new Error('Failed to fetch regions');
-
       const regions = await response.json();
 
-      regions.forEach(region => {
-        if (region.region_start != null && region.region_end != null) {
-          this.waveSurfer.addRegion({
-            start: parseFloat(region.region_start),
-            end: parseFloat(region.region_end),
-            drag: false,
-            resize: false,
-            color: 'rgba(79, 70, 229, 0.1)',
-            data: {
-              id: region.id,
-              transcription: region.word_or_phrase,
-              translation: region.translation
-            }
-          });
-        }
+      regions.forEach((region) => {
+        this.waveSurfer.addRegion({
+          id: region.region_id,
+          start: region.region_start,
+          end: region.region_end,
+          drag: false,
+          data: { entry_id: region.id }
+        });
       });
     } catch (error) {
       console.error('Error fetching regions:', error);
@@ -207,90 +203,22 @@ export default class extends Controller {
   }
 
   highlightCurrentEntry(currentTime) {
-    console.log('Current time:', currentTime);
+    if (!this.hasTranscriptionTarget || !this.hasTranslationTarget) return;
 
-    // Remove highlight from all entries
-    document.querySelectorAll('.bg-blue-50, .border-blue-500, .shadow-lg').forEach(el => {
-      el.classList.remove('bg-blue-50', 'border-blue-500', 'border-2', 'shadow-lg', 'scale-[1.02]');
+    const currentRegion = Object.values(this.waveSurfer.regions.list).find(region => {
+      return currentTime >= region.start && currentTime <= region.end;
     });
 
-    // Find the region that contains the current time
-    const regions = this.waveSurfer.regions.list;
-    console.log('Available regions:', Object.values(regions).map(r => ({
-      start: r.start,
-      end: r.end,
-      id: r.data.id
-    })));
-
-    const currentRegion = Object.values(regions).find(region =>
-      currentTime >= region.start && currentTime <= region.end
-    );
-
-    console.log('Found region:', currentRegion ? {
-      start: currentRegion.start,
-      end: currentRegion.end,
-      id: currentRegion.data.id
-    } : 'none');
-
-    if (currentRegion && currentRegion.data.id) {
-      // Find and highlight the corresponding dictionary entry
-      const entryId = `dictionary_entry_${currentRegion.data.id}`;
-      console.log('Looking for entry with ID:', entryId);
-
-      const entryElement = document.getElementById(entryId);
-      console.log('Found entry element:', entryElement ? 'yes' : 'no');
-
-      if (entryElement) {
-        // Add highlight with multiple effects
-        entryElement.classList.add('bg-blue-50', 'border-blue-500', 'border-2', 'shadow-lg', 'scale-[1.02]');
-
-        // Find the scrollable container - it's the flex-1 div with overflow-y-auto
-        const container = document.querySelector('.flex-1.overflow-y-auto');
-        console.log('Found scroll container:', container ? 'yes' : 'no');
-
-        if (container) {
-          const padding = 40; // Increased padding for better visibility
-
-          // Get the element's position relative to the container
-          const containerTop = container.scrollTop;
-          const containerBottom = containerTop + container.clientHeight;
-          const elementTop = entryElement.offsetTop;
-          const elementBottom = elementTop + entryElement.offsetHeight;
-
-          console.log('Scroll positions:', {
-            containerTop,
-            containerBottom,
-            elementTop,
-            elementBottom,
-            containerHeight: container.clientHeight,
-            elementHeight: entryElement.offsetHeight
-          });
-
-          // Check if the entry is fully visible with padding
-          const isFullyVisible = (elementTop >= containerTop + padding) &&
-                               (elementBottom <= containerBottom - padding);
-
-          if (!isFullyVisible) {
-            console.log('Entry not fully visible, scrolling...');
-
-            // Calculate position to center the element
-            const scrollPosition = elementTop - (container.clientHeight / 2) + (entryElement.offsetHeight / 2);
-
-            // Ensure we don't scroll past the bounds
-            const maxScroll = container.scrollHeight - container.clientHeight;
-            const adjustedScrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
-
-            console.log('Scrolling to:', adjustedScrollPosition);
-
-            container.scrollTo({
-              top: adjustedScrollPosition,
-              behavior: 'smooth'
-            });
-          } else {
-            console.log('Entry fully visible');
-          }
-        }
+    if (currentRegion) {
+      if (this.hasGaeSubsTarget && this.gaeSubsTarget.checked) {
+        this.transcriptionTarget.textContent = currentRegion.data.transcription || '~';
       }
+      if (this.hasEngSubsTarget && this.engSubsTarget.checked) {
+        this.translationTarget.textContent = currentRegion.data.translation || '~';
+      }
+    } else {
+      this.transcriptionTarget.textContent = '~';
+      this.translationTarget.textContent = '~';
     }
   }
 }
