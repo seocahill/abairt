@@ -1,0 +1,10 @@
+WEBVTT
+
+<% @entries.each_with_index do |entry, index| %>
+<%= index + 1 %>
+
+<%= format('%02d:%02d:%02d.%03d', entry.region_start.to_i / 3600, (entry.region_start.to_i % 3600) / 60, entry.region_start.to_i % 60, (entry.region_start % 1 * 1000).to_i) %> --> <%= format('%02d:%02d:%02d.%03d', entry.region_end.to_i / 3600, (entry.region_end.to_i % 3600) / 60, entry.region_end.to_i % 60, (entry.region_end % 1 * 1000).to_i) %>
+<%= params[:lang] == 'en' ? entry.translation : entry.word_or_phrase %>
+
+
+<% end %>

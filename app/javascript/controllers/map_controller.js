@@ -72,7 +72,7 @@ export default class extends Controller {
         if (user.media_url) {
           content = `<a href="/users/${user.id}">${user.name}</a><audio controls src="${user.media_url}"></audio>`;
         } else if (user.recording_id) {
-          content = `<a data-turbo-frame="wave_display" href="/voice_recordings/${user.recording_id}/preview">${user.recording_title}</a>`;
+          content = `<a data-turbo-frame="wave_display" href="/voice_recordings?search=${user.recording_title}">${user.recording_title}</a>`;
         } else {
           content = `<a href="/users/${user.id}">${user.name}</a>`;
         }

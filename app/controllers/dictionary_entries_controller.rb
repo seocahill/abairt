@@ -7,7 +7,7 @@ class DictionaryEntriesController < ApplicationController
   def index
     records = DictionaryEntry
       .not_low
-      .order(:id, :desc)
+      .order(id: :desc)
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
@@ -21,19 +21,17 @@ class DictionaryEntriesController < ApplicationController
       records = records.has_recording
     end
 
+    # Get all tags with counts
+    @tags = DictionaryEntry.tag_counts_on(:tags).order(taggings_count: :desc)
+
     if current_user
       @new_dictionary_entry = current_user.dictionary_entries.build(speaker: current_user)
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
-    end
-
-    @tags = DictionaryEntry.tag_counts_on(:tags).most_used(50)
-
-    if current_user
       @starred = current_user.starred
-      @lists = current_user.own_lists #.where(starred: false)
+      @lists = current_user.own_lists
     end
 
-    @pagy, @dictionary_entries = pagy(records, items: PAGE_SIZE)
+    @pagy, @dictionary_entries = pagy(records, items: 15)
 
     respond_to do |format|
       format.html

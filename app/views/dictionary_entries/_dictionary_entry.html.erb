@@ -1,82 +1,46 @@
-<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-controller="entry" data-entry-id-value="<%= entry.id %>">
-  <td class="px-6 py-4">
-    <% if current_user %>
-      <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
-        <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase"  %>
-      <% end %>
-    <% else %>
-      <% entry.word_or_phrase.split.each do |word| %>
-        <span data-controller="word">
-          <span data-action="click->word#focloir touchstart->word#focloir touchend->word#dun" data-word-target="word" class="entry-word"><%= word %></span>
-          <template data-word-target="template">
-            <div id="tooltip" class="teanglann-template">
-              <iframe data-action="mouseleave->word#dun" name="lexclickFrame" style="width: 298px; height: 348px; border: 1px inset #333333;" src="https://www.teanglann.ie/ga/?s=<%= word %>&quickie=true" frameborder="0"></iframe>
-            </div>
-          </template>
-        </span>
-      <% end %>
-    <% end %>
-  </td>
-  <td class="px-6 py-4">
-    <%= render "dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
-      <%= entry.translation.present? ? entry.translation : "Add translation" %>
-    <% end %>
-  </td>
-  <td class="px-6 py-4">
-    <%= render "dictionary_entries/inline_edit", model: entry, method: :tag_list, current_user: current_user do %>
-      <% entry.tag_list.each do |tag| %>
-        <%= link_to tag, dictionary_entries_path(tag: tag), class: "hover:text-blue hover:underline rounded-full px-2 py-1 bg-gray-200 hover:bg-gray-300", data: { turbo: false } %>
-      <% end %>
-      <%= content_tag :span, "add", class: "rounded-full px-2 py-1 bg-yellow-200" if entry.tag_list.empty? %>
-    <% end %>
-  </td>
-  <% if entry.media.attached? %>
-    <td data-controller="entry" class="px-6 py-4">
-      <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" data-action="entry#play">
-        <audio src="<%= entry.media.url %>"></audio>
-        play
+<div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-all duration-300">
+  <div class="flex items-start justify-between">
+    <div class="flex-1">
+      <!-- Word/Phrase and Translation -->
+      <div class="mb-2">
+        <p class="text-lg font-medium text-gray-900"><%= entry.word_or_phrase %></p>
+        <p class="text-gray-600 italic"><%= entry.translation %></p>
+      </div>
+
+      <!-- Tags and Recording Link -->
+      <div class="flex flex-wrap items-center gap-2 text-sm">
+        <% if entry.voice_recording %>
+          <%= link_to voice_recording_path(entry.voice_recording), class: "text-blue-600 hover:text-blue-800 flex items-center" do %>
+            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" />
+              <path d="M5.5 9.643a.75.75 0 00-1.5 0V10c0 3.06 2.29 5.585 5.25 5.954V17.5h-1.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-1.5v-1.546A6.001 6.001 0 0016 10v-.357a.75.75 0 00-1.5 0V10a4.5 4.5 0 01-9 0v-.357z" />
+            </svg>
+            From Recording
+          <% end %>
+        <% end %>
+
+        <% entry.tags.each do |tag| %>
+          <%= link_to dictionary_entries_path(tag: tag.name),
+              class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200",
+              data: { turbo_frame: "entries" } do %>
+            <%= tag.name %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Play Button -->
+    <% if entry.media.attached? %>
+      <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
+              data-controller="audio-player"
+              data-action="audio-player#play"
+              data-audio-player-url-value="<%= url_for(entry.media) %>"
+              data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
+              data-audio-player-translation-value="<%= entry.translation %>">
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+        </svg>
       </button>
-    </td>
-    <% if policy(entry).destroy? %>
-      <td class="px-6 py-4">
-        <%= button_to dictionary_entry_path(entry), title: "Delete recording", method: :patch, form: { data: { turbo_confirm: 'Delete recording?' } }, params: { dictionary_entry: { purge: true } }, class: "flex items-center" do %>
-          <i data-feather="delete"></i>
-        <% end %>
-      </td>
-    <% else %>
-      <td class="px-6 py-4"></td>
     <% end %>
-  <% else %>
-    <td data-controller="entry" class="px-6 py-4">
-      <% if current_user %>
-        <button class="bg-yellow-300 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded" data-action="entry#synth" data-audio-text="<%= entry.word_or_phrase %>">Synth</button>
-      <% else %>
-        Log in to hear
-      <% end %>
-    </td>
-    <td data-controller="entry" class="px-6 py-4">
-      <% if current_user %>
-        <%= form_with(model: entry) do |form| %>
-          <%= render 'dictionary_entries/recorder', form: form, autosave: true %>
-        <% end %>
-      <% end %>
-    </td>
-  <% end %>
-  <% if false %>
-    <td class="px-6 py-4">
-      <%= render "dictionary_entries/list", entry: entry %>
-    </td>
-  <% end %>
-  <% if current_user&.admin? || (current_user && entry.speaker_id == current_user.id) %>
-    <td class="px-6 py-4">
-      <%= link_to dictionary_entry_path(entry) do %>
-        <i data-feather="eye"></i>
-      <% end %>
-    </td>
-    <td class="px-6 py-4">
-      <%= link_to dictionary_entry_path(entry), method: :delete, data: { "turbo-method": :delete, "turbo-confirm": 'Are you sure?' }, class: "" do %>
-        <i data-feather="trash"></i>
-      <% end %>
-    </td>
-  <% end %>
-</tr>
+  </div>
+</div>

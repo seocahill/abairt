@@ -75,4 +75,8 @@ Rails.application.configure do
 
   # localtunnel
   config.hosts << ".ngrok-free.app"
+
+  # Configure ActiveStorage URL generation
+  Rails.application.routes.default_url_options = { host: 'localhost:3000', protocol: 'http' }
+  config.action_mailer.default_url_options = { host: 'localhost:3000', protocol: 'http' }
 end

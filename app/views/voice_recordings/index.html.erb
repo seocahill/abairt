@@ -1,69 +1,44 @@
-<!-- Sidebar for CRUD -->
-<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-  <%= render "sidebar" %>
-</div>
+<!-- Main Container -->
+<div class="flex flex-col md:flex-row min-h-screen">
+  <!-- Left Side - Map -->
+  <div class="w-full md:w-1/2">
+    <div id="map-container" data-controller="map" data-map-pins-value="<%= @pins.to_json %>" class="h-screen">
+      <div id="map" class="w-full h-full"></div>
+    </div>
+  </div>
 
-<!-- Primary Content Area: Two Rectangles -->
-<div class="w-full md:w-3/4 p-4">
-  <div class="sm:p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <!-- Top Interactive Rectangle -->
-      <div class="w-full bg-white rounded-md sm:p-4 sm:mb-4">
-        <%= turbo_frame_tag "wave_display" do %>
-          <%= render partial: 'waveform', locals: { recording:  @recording, regions: @regions } %>
-        <% end %>
-      </div>
-      <!-- Bottom Table Rectangle -->
-      <%= turbo_frame_tag "recording_list_display" do %>
-        <div class="w-full bg-white rounded-md p-4">
-            <div class="relative overflow-x-auto">
-              <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" class="px-6 py-3" >Title</th>
-                    <th scope="col" class="px-6 py-3" >Speakers</th>
-                    <th scope="col" class="px-6 py-3" >Dialects</th>
-                    <th scope="col" class="px-6 py-3" >Complete</th>
-                    <th scope="col" class="px-6 py-3" ></th>
-                    <th scope="col" class="px-6 py-3" ></th>
-                    <% if current_user&.admin? %>
-                      <th scope="col" class="px-6 py-3" ></th>
-                    <% end %>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% @recordings.each do |recording| %>
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                      <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= link_to recording.title, preview_voice_recording_path(recording.id), data: { turbo_frame: 'wave_display' }, class: "" %></th>
-                      <td class="px-6 py-4"><% recording.users.map do |user| %><%= link_to user.name, user_path(user), class: "hover:text-blue-700 hover:underline",  data: { turbo: false } %> <% end %></td>
-                      <td class="px-6 py-4">
-                        <% recording.users.pluck(:dialect).uniq.map do |dialect| %>
-                          <%= link_to dialect.humanize, users_path(dialect: dialect), class: "hover:text-blue-700 hover:underline",  data: { turbo: false } %>
-                        <% end %>
-                      </td>
-                      <td class="px-6 py-4"><%= recording.percentage_transcribed %>%</td>
-                      <td  class="px-6 py-4">
-                        <%= link_to preview_voice_recording_path(recording.id), data: { turbo_frame: 'wave_display' }, class: "underline hover:no-underline" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                        <% end %>
-                      </td>
-                      <td  class="px-6 py-4">
-                        <%= link_to voice_recording_path(recording.id), class: "underline hover:no-underline", data: { turbo: false } do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        <% end %>
-                      </td>
-                      <% if current_user&.admin? %>
-                        <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: recording.id, itemable_type: recording.class.to_s), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal", data: { turbo: false } %></td>
-                      <% end %>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
+  <!-- Right Side - Media Cards -->
+  <div class="w-full md:w-1/2 h-screen flex flex-col">
+    <!-- Search and Filter Controls - Fixed at top -->
+    <div class="p-6 bg-white border-b">
+      <%= form_tag voice_recordings_path, method: :get, class: "space-y-4",
+          data: { controller: "form", turbo_frame: "recordings" } do %>
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <%= text_field_tag :search, params[:search], placeholder: "Search recordings...",
+                class: "w-full px-4 py-2 border rounded-lg",
+                data: { action: "change->form#submit" } %>
+          </div>
+          <div class="flex-none">
+            <%= select_tag :dialect,
+                options_for_select(User.dialects.keys.map { |d| [d.humanize, d] }, params[:dialect]),
+                prompt: "Filter by dialect",
+                class: "px-4 py-2 border rounded-lg",
+                data: { action: "change->form#submit" } %>
+          </div>
         </div>
-        <%# footer %>
-        <div class="w-full bg-white rounded-md p-4">
-          <%== pagy_nav(@pagy) %>
+      <% end %>
+    </div>
+
+    <!-- Recording Cards - Scrollable -->
+    <div class="flex-1 overflow-y-auto px-6 py-4" data-controller="infinite-scroll">
+      <%= turbo_frame_tag "recordings" do %>
+        <div id="recordings-container" class="grid gap-6" data-infinite-scroll-target="container">
+          <%= render partial: "recording", collection: @recordings %>
         </div>
+
+        <!-- Pagination -->
+        <%= render "shared/pagination", pagy: @pagy, infinite_scroll: true %>
       <% end %>
     </div>
   </div>
