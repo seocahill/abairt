@@ -3,7 +3,7 @@
   <!-- Left Side - Map -->
   <div class="w-full md:w-1/2">
     <div id="map-container" data-controller="map" data-map-pins-value="<%= @users.map { |user| user.slice(:id, :name, :lat_lang) }.to_json %>" class="h-screen">
-      <div id="map" class="w-full h-full"></div>
+      <div id="map" data-map-target="desktopContainer" class="w-full h-full"></div>
     </div>
   </div>
 
@@ -39,7 +39,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <h3 class="text-lg font-semibold text-gray-900">
-                    <%= link_to user.name, user_path(user), class: "hover:text-blue-600" %>
+                    <%= link_to user.name, user_path(user), class: "hover:text-blue-600", data: { turbo: false } %>
                   </h3>
                   <div class="mt-2 space-y-2">
                     <div class="flex items-center text-sm text-gray-600">
