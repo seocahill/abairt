@@ -52,7 +52,7 @@ export default class extends Controller {
         barGap: 3,
         responsive: true,
         normalize: true,
-        backend: 'MediaElement',
+        backend: this.hasVideoTarget ? 'MediaElement' : 'WebAudio',
         mediaControls: false,
         plugins: [
           RegionsPlugin.create({
@@ -66,7 +66,11 @@ export default class extends Controller {
       this.setupWaveformEventListeners();
 
       // Load the media
-      await this.waveSurfer.load(this.urlValue);
+      if (this.hasVideoTarget) {
+        await this.waveSurfer.load(this.videoTarget);
+      } else {
+        await this.waveSurfer.load(this.urlValue);
+      }
 
       // Fetch and add regions
       if (this.hasRegionsUrlValue) {
