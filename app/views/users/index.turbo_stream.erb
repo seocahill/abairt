@@ -47,3 +47,9 @@
   <!-- Pagination -->
   <%= render "shared/pagination", pagy: @pagy, infinite_scroll: true %>
 <% end %>
+
+<%= turbo_stream.update "map" do %>
+  <div id="map" data-map-target="desktopContainer" class="w-full h-full"
+       data-map-pins-value="<%= @pins.to_json %>"
+       data-map-pubs-value="<%= @pubs.to_json %>"></div>
+<% end %>
