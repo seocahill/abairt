@@ -10,20 +10,21 @@ class UsersController < ApplicationController
   def index
     # authorize current_user
     @template_name = "user"
-    records = policy_scope(User).active
+    records = policy_scope(User).speaker
 
     if params[:search].present?
-      records = User.where("name ILIKE ?", "%#{params[:search]}%")
+      records = records.where("LOWER(name) LIKE ?", "%#{params[:search].downcase}%")
     end
 
     if params[:dialect].present?
-      value =  User.dialects[params[:dialect]]
-      records = User.where("users.dialect = ?", value)
+      value = User.dialects[params[:dialect]]
+      records = records.where(dialect: value)
     end
 
-    @showmap = params[:map]
-
-    @pins = User.where(ability: %i[C1 C2 native]).where.not(lat_lang: nil).map do |g|
+    # Get pins for all qualifying users regardless of pagination
+    @pins = records
+                  .where.not(lat_lang: nil)
+                  .map do |g|
       g.slice(:id, :name, :lat_lang).tap do |c|
         if (sample = g.dictionary_entries.detect { |d| d.media&.audio? }&.media)
           c[:media_url] = Rails.application.routes.url_helpers.rails_blob_url(sample)
@@ -45,7 +46,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.turbo_stream if params[:search].present? || params[:dialect].present?
+      format.turbo_stream
       format.json { render json: records }
     end
   end
