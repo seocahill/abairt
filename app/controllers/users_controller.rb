@@ -42,12 +42,24 @@ class UsersController < ApplicationController
       @new_speaker = User.new(role: :speaker)
     end
 
-    @pagy, @users = pagy(records, items: PAGE_SIZE)
+    @pagy, @users = pagy(records, items: 5)
 
     respond_to do |format|
       format.html
-      format.turbo_stream
-      format.json { render json: records }
+      format.turbo_stream do
+       render turbo_stream: [
+         turbo_stream.append(
+           "users-container",
+           partial: "user",
+           collection: @users
+         ),
+         turbo_stream.replace(
+           "pagination",
+           partial: "shared/pagination",
+           locals: { pagy: @pagy, infinite_scroll: true }
+         )
+       ]
+     end
     end
   end
 
