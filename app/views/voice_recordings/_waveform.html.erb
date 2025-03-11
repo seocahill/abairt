@@ -82,7 +82,7 @@
       </div>
 
       <!-- Right Controls Group -->
-      <% if @regions.present? %>
+      <% if @regions.present? && controller.action_name == "index" %>
         <div class="flex items-center gap-4">
           <label class="flex items-center gap-2">
             <input type="checkbox"
