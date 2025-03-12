@@ -1,162 +1,78 @@
-# first stage
-ARG GEM_IMAGE=registry.gitlab.com/abairt/web-application:master
+# syntax=docker/dockerfile:1
+# check=error=true
 
-# FROM ${GEM_IMAGE} as gem-cache
-FROM ruby:3.1-slim as builder
-USER root
-ARG RAILS_ENV=production
-ENV RAILS_ENV=${RAILS_ENV}
-RUN \
-  apt update && apt install -y \
-    acl \
-    build-essential \
-    ca-certificates \
-    cmake \
-    curl \
-    default-libmysqlclient-dev \
-    ffmpeg \
-    g++ \
-    gcc \
-    ghostscript \
-    git \
-    gosu \
-    gzip \
-    imagemagick \
-    libaudit1 \
-    libboost-filesystem-dev \
-    libboost-program-options-dev \
-    libboost-regex-dev \
-    libbz2-1.0 \
-    libc6 \
-    libcap-ng0 \
-    libcom-err2 \
-    libcurl4 \
-    libgcc1 \
-    libgcrypt20 \
-    libgd-dev \
-    libgmp-dev \
-    libgmp10 \
-    libgnutls30 \
-    libgpg-error0 \
-    libgssapi-krb5-2 \
-    libid3tag0 \
-    libid3tag0-dev \
-    libidn2-0 \
-    libjemalloc2 \
-    libk5crypto3 \
-    libkeyutils1 \
-    libkrb5-3 \
-    libkrb5support0 \
-    libldap-2.5-0 \
-    liblzma5 \
-    libmad0 \
-    libmad0-dev \
-    libmariadb3 \
-    libncurses6 \
-    libncursesw6 \
-    libnghttp2-14 \
-    libp11-kit0 \
-    libpam0g \
-    libpq5 \
-    libpsl5 \
-    libreadline-dev \
-    librtmp1 \
-    libsasl2-2 \
-    libsndfile1 \
-    libsndfile1-dev \
-    libsqlite3-0 \
-    libsqlite3-dev \
-    libssh2-1 \
-    libssl-dev \
-    libssl3 \
-    libstdc++6 \
-    libtasn1-6 \
-    libtinfo6 \
-    libunistring2 \
-    libxml2 \
-    libxml2-dev \
-    libxslt1-dev \
-    libpq-dev \
-    make \
-    netcat-traditional \
-    nodejs \
-    npm \
-    pkg-config \
-    postgresql \
-    postgresql-client \
-    procps \
-    sqlite3 \
-    sqlite3 \
-    sudo \
-    tar \
-    unzip \
-    wget \
-    wget \
-    yui-compressor \
-    zlib1g \
-    zlib1g-dev
+# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
+# docker build -t turas_siar_archive .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name abairt abairt
 
-RUN \
-  git clone https://github.com/bbc/audiowaveform.git && \
-  cd audiowaveform && \
-  wget https://github.com/google/googletest/archive/release-1.12.1.tar.gz && \
-  tar xzf release-1.12.1.tar.gz && \
-  ln -s googletest-release-1.12.1 googletest && \
-  mkdir build && \
-  cd build && \
-  cmake .. && \
-  make package && \
-  ln -s /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
+# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
-COPY . /app
-# COPY --from=gem-cache /app/vendor/bundle /app/vendor/bundle
-WORKDIR /app
+# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
+ARG RUBY_VERSION=3.4.1
+FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
-# Run bundle commands conditionally based on RAILS_ENV
-RUN \
-  if [ "$RAILS_ENV" = "production" ]; then \
-    bundle config set deployment 'true' && \
-    bundle config set without 'development test'; \
-  fi
+# Rails app lives here
+WORKDIR /rails
 
-RUN \
-  gem install bundler -v 2.5.5 && \
-  bundle install && \
-  npm install && \
-  SECRET_KEY_BASE=1 bin/rails tailwindcss:build && \
-  SECRET_KEY_BASE=1 bin/rails assets:precompile
+# Install base packages
+RUN apt-get update -qq && \
+  apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
+  rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# second stage
-FROM ruby:3.1-slim as prod
-COPY --from=builder /app/ /app/
+# Set production environment
+ENV RAILS_ENV="production" \
+  BUNDLE_DEPLOYMENT="1" \
+  BUNDLE_PATH="/usr/local/bundle" \
+  BUNDLE_WITHOUT="development,test"
 
-# Set Bundler configuration via environment variables
-ENV BUNDLE_APP_CONFIG="/usr/local/bundle"
-ENV BUNDLE_PATH="vendor/bundle"
-ENV BUNDLE_SILENCE_ROOT_WARNING="true"
-ENV BUNDLE_WITHOUT="development:test"
+# Throw-away build stage to reduce size of final image
+FROM base AS build
 
-COPY --from=builder --chmod=777 /audiowaveform/build/audiowaveform /usr/local/bin/audiowaveform
-RUN apt update && apt install -y \
-  curl \
-  ffmpeg \
-  libboost-filesystem-dev \
-  libboost-program-options-dev \
-  libboost-regex-dev \
-  libgd-dev \
-  libid3tag0 \
-  libmad0 \
-  libsndfile1 \
-  postgresql-client \
-  sqlite3
-RUN useradd -r -u 1001 -g root nonroot
-RUN chown -R nonroot /app
-USER nonroot
-WORKDIR /app
-EXPOSE 3000
-ENV RAILS_ENV="production"
+# Install packages needed to build gems
+RUN apt-get update -qq && \
+  apt-get install --no-install-recommends -y build-essential git pkg-config ffmpeg && \
+  rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:3000/up || exit 1
+# Install application gems
+COPY Gemfile Gemfile.lock package.json package-lock.json ./
+RUN bundle install && \
+  rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
+  bundle exec bootsnap precompile --gemfile && \
+  npm install
 
-CMD ["bin/rails", "server"]
+# Copy application code
+COPY . .
+
+# Precompile bootsnap code for faster boot times
+RUN bundle exec bootsnap precompile app/ lib/
+
+# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+
+
+
+
+# Final stage for app image
+FROM base
+
+# Copy built artifacts: gems, application
+COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --from=build /rails /rails
+
+# Install packages needed to run the app
+RUN apt-get update -qq && \
+  apt-get install --no-install-recommends -y libffi-dev ffmpeg && \
+  rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Run and own only the runtime files as a non-root user for security
+RUN groupadd --system --gid 1000 rails && \
+  useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+  chown -R rails:rails db log storage tmp
+USER 1000:1000
+
+# Entrypoint prepares the database.
+ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+
+# Start server via Thruster by default, this can be overwritten at runtime
+EXPOSE 80
+CMD ["./bin/thrust", "./bin/rails", "server"]

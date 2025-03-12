@@ -40,9 +40,8 @@ module Api
       end
 
       test "handles non-existent voice recording" do
-        assert_raises(ActiveRecord::RecordNotFound) do
-          post api_voice_recording_diarization_webhook_url(-1)
-        end
+        post api_voice_recording_diarization_webhook_url(-1)
+        assert_response :not_found
       end
     end
   end
