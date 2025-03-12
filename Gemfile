@@ -4,13 +4,14 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # Essential gems
-ruby '~> 3.1'
+ruby '~> 3.4'
 gem 'bcrypt', '~> 3.1.7'
 gem 'puma', '~> 6.0'
-gem 'rails', '~> 7.0.0'
+gem 'rails', '~> 7.1.0'
 gem 'redis', '~> 4.0'
 gem 'sassc-rails'
 gem 'bootsnap', '>= 1.4.4', require: false
+gem 'ostruct'
 
 # Other gems
 gem 'acts-as-taggable-on'
@@ -30,8 +31,8 @@ gem 'multi_json', '~> 1.15'
 gem 'pagy', '~> 5.2.1'
 gem 'paper_trail', '~> 15.0'
 gem 'pdf-reader', '~> 2.12'
-gem 'pg', '~> 1.5'
-gem 'pgvector', '~> 0.2'
+# gem 'pg', '~> 1.5'
+# gem 'pgvector', '~> 0.2'
 gem 'pundit', '~> 2.3'
 gem 'rack-cors', '~> 1.1'
 gem 'rb_sys', '~> 0.9.87'
@@ -45,7 +46,7 @@ gem 'sqlite3', '~> 1.6'
 gem 'tailwindcss-rails'
 gem 'tiktoken_ruby', '~> 0.0.6'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
-gem 'yui-compressor', '~> 0.12.0'
+# gem 'yui-compressor', '~> 0.12.0'
 
 # Development gems
 group :development do
@@ -68,3 +69,5 @@ group :development, :test do
   gem 'pry-byebug', '~> 3.8'
   gem 'pry-rails', '~> 0.3.9'
 end
+
+gem "activerecord-enhancedsqlite3-adapter", "~> 0.8.0"

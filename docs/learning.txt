@@ -1,0 +1,13 @@
+I'd like to add two new interfaces to the app:
+
+1. A quiz/exercise interface
+2. A chat interface
+
+The quiz interface will used spaced repetition to help the user learn.
+
+The chat interface is the class chatgpt style ui.
+
+Both interfaces are scoped to the logged in current user.
+
+Can you build out the initial UI for these features?  The more complex business logic can be added later.
+

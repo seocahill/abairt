@@ -11,7 +11,8 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  CI_DEPLOY_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+  CI_DEPLOY_IMAGE: ${CI_REGISTRY_IMAGE}:3.4.1-${CI_COMMIT_REF_SLUG}
+  CI_TEST_IMAGE: ${CI_REGISTRY_IMAGE}:3.4.1-${CI_COMMIT_REF_SLUG}-test
   DOCKER_BUILDKIT: 1
 
 build deploy image:
@@ -31,22 +32,22 @@ build test image:
   stage: build
   script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker pull ${CI_REGISTRY_IMAGE}:test || true
-    - docker build --target builder
-      --cache-from ${CI_REGISTRY_IMAGE}:test
-      --tag ${CI_REGISTRY_IMAGE}:test .
-      --build-arg GEM_IMAGE=registry.gitlab.com/abairt/web-application:latest
+    - docker pull $CI_TEST_IMAGE || true
+    - docker build
+      --file Dockerfile.test
+      --cache-from $CI_TEST_IMAGE
+      --tag $CI_TEST_IMAGE .
       --build-arg RAILS_ENV=test
-    - docker push ${CI_REGISTRY_IMAGE}:test
+    - docker push $CI_TEST_IMAGE
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-        - Dockerfile
+        - Dockerfile.test
         - Gemfile
         - Gemfile.lock
 
 run tests:
-  image: ${CI_REGISTRY_IMAGE}:test
+  image: $CI_TEST_IMAGE
   stage: test
   variables:
     RAILS_ENV: test

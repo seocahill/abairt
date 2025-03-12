@@ -13,7 +13,15 @@ export default class extends Controller {
   connect() {
     console.log("Map controller connected");
     this.marker = null;
-    this.initializeMap(this.desktopContainerTarget);
+
+    // Initialize map in the appropriate container
+    if (this.hasDesktopContainerTarget) {
+      this.initializeMap(this.desktopContainerTarget);
+    } else if (this.element.id === "map") {
+      // Fallback for simple map cases (like in forms)
+      this.initializeMap(this.element);
+    }
+
     this.initializeFeather();
   }
 
@@ -109,6 +117,8 @@ export default class extends Controller {
   }
 
   openModal() {
+    if (!this.hasModalTarget || !this.hasModalContainerTarget) return;
+
     this.modalTarget.classList.remove("hidden")
     document.body.style.overflow = "hidden"
 
@@ -138,6 +148,8 @@ export default class extends Controller {
   }
 
   closeModal() {
+    if (!this.hasModalTarget) return;
+
     this.modalTarget.classList.add("hidden")
     document.body.style.overflow = ""
 
@@ -148,7 +160,7 @@ export default class extends Controller {
     }
 
     // Reinitialize map in desktop container if on desktop
-    if (window.innerWidth >= 768) {
+    if (window.innerWidth >= 768 && this.hasDesktopContainerTarget) {
       this.initializeMap(this.desktopContainerTarget)
     }
 

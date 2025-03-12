@@ -1,4 +1,14 @@
 <%= form_with model: @dictionary_entry, class: "" do |form| %>
+  <% if @dictionary_entry.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@dictionary_entry.errors.count, "error") %> prohibited this dictionary entry from being saved:</h2>
+      <ul>
+        <% @dictionary_entry.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
   <%= render "dictionary_entries/inline_fields", form: form, method: :word_or_phrase do %>
     <%= form.text_area :word_or_phrase %>
   <% end %>

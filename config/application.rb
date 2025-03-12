@@ -9,8 +9,12 @@ Bundler.require(*Rails.groups)
 module Abairt
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 7.1
 
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w(assets tasks))
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -28,16 +32,16 @@ module Abairt
     config.active_record.schema_format = :sql
 
     # assets issue
-    config.assets.css_compressor = :yui
+    config.assets.css_compressor = nil
 
     # new cache format
-    config.active_support.cache_format_version = 7.0
+    # config.active_support.cache_format_version = 7.0
 
     # to_s
-    config.active_support.disable_to_s_conversion = true
+    # config.active_support.disable_to_s_conversion = true
 
-    config.to_prepare do
-      ActionText::ContentHelper.allowed_tags << "iframe"
-    end
+    # config.to_prepare do
+    #   ActionText::ContentHelper.allowed_tags << "iframe"
+    # end
   end
 end
