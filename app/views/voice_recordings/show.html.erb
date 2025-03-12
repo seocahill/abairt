@@ -1,145 +1,147 @@
 <!-- Main Container -->
 <div class="flex flex-col md:flex-row min-h-screen">
   <!-- Left Side - Media Player and Controls -->
-  <div class="w-full md:w-1/2 h-screen flex flex-col bg-white border-r">
-    <div class="p-6">
+  <div class="w-full md:w-1/2 md:h-screen flex flex-col bg-white border-r">
+    <div class="p-1 md:p-6">
       <!-- Media Player -->
       <%= render "waveform" %>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 gap-4 mt-6">
-        <!-- Recording Title & Description -->
-        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h1 class="text-lg font-semibold text-gray-900"><%= @recording.title %></h1>
-              <% if @recording.description.present? %>
-                <p class="mt-1 text-sm text-gray-600"><%= @recording.description %></p>
-              <% else %>
-                <p class="mt-1 text-sm text-gray-600">No description</p>
+      <div class="hidden md:block">
+        <div class="grid grid-cols-1 gap-4 mt-6">
+          <!-- Recording Title & Description -->
+          <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <h1 class="text-lg font-semibold text-gray-900"><%= @recording.title %></h1>
+                <% if @recording.description.present? %>
+                  <p class="mt-1 text-sm text-gray-600"><%= @recording.description %></p>
+                <% else %>
+                  <p class="mt-1 text-sm text-gray-600">No description</p>
+                <% end %>
+              </div>
+              <% if policy(@recording).edit? %>
+                <div class="flex items-center gap-2">
+                  <%= link_to voice_recording_speakers_path(@recording),
+                      class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0",
+                      title: "Edit Speakers" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                    </svg>
+                  <% end %>
+                  <%= link_to edit_voice_recording_path(@recording),
+                      class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0",
+                      title: "Edit Recording" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                  <% end %>
+                  <% if @recording.diarization_status.nil? && current_user.admin? %>
+                    <%= button_to voice_recording_diarization_path(@recording),
+                        class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0",
+                        title: "Start Diarization",
+                        form: { data: { turbo_confirm: "Start diarization?" } } do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                      </svg>
+                    <% end %>
+                  <% end %>
+                </div>
               <% end %>
             </div>
-            <% if policy(@recording).edit? %>
-              <div class="flex items-center gap-2">
+          </div>
+
+          <!-- Duration -->
+          <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-700">Duration</h3>
+              <span class="text-xl font-bold text-blue-600">
+                <%= format_duration(@recording.dictionary_entries.maximum(:region_end)) %>
+              </span>
+            </div>
+          </div>
+
+          <!-- Speakers -->
+          <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm" data-controller="collapse">
+            <div class="flex items-center justify-between">
+              <button class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                      data-action="collapse#toggle">
+                <h3>Speakers</h3>
+                <svg data-collapse-target="icon" class="w-5 h-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+              <% if policy(@recording).edit? %>
                 <%= link_to voice_recording_speakers_path(@recording),
-                    class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0",
-                    title: "Edit Speakers" do %>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                  </svg>
-                <% end %>
-                <%= link_to edit_voice_recording_path(@recording),
-                    class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0",
-                    title: "Edit Recording" do %>
+                    class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0" do %>
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 <% end %>
-                <% if @recording.diarization_status.nil? && current_user.admin? %>
-                  <%= button_to voice_recording_diarization_path(@recording),
-                      class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0",
-                      title: "Start Diarization",
-                      form: { data: { turbo_confirm: "Start diarization?" } } do %>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                    </svg>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Duration -->
-        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-700">Duration</h3>
-            <span class="text-xl font-bold text-blue-600">
-              <%= format_duration(@recording.dictionary_entries.maximum(:region_end)) %>
-            </span>
-          </div>
-        </div>
-
-        <!-- Speakers -->
-        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm" data-controller="collapse">
-          <div class="flex items-center justify-between">
-            <button class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900"
-                    data-action="collapse#toggle">
-              <h3>Speakers</h3>
-              <svg data-collapse-target="icon" class="w-5 h-5 text-gray-500 transform transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <% if policy(@recording).edit? %>
-              <%= link_to voice_recording_speakers_path(@recording),
-                  class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0" do %>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
               <% end %>
-            <% end %>
-          </div>
+            </div>
 
-          <div class="mt-4 space-y-3 hidden" data-collapse-target="content">
-            <% @recording.users.each do |speaker| %>
-              <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <div class="flex items-center">
-                  <div class="mr-3">
-                    <% if speaker.role == "temporary" %>
-                      <span class="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
-                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                      </span>
-                    <% else %>
-                      <span class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
-                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                        </svg>
-                      </span>
-                    <% end %>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-900"><%= speaker.name %></p>
-                    <p class="text-xs text-gray-500">
-                      <%= pluralize(@recording.dictionary_entries.where(speaker: speaker).count, 'entry') %>
-                      <% if speaker.dialect.present? %>
-                        • <%= speaker.dialect.humanize %>
+            <div class="mt-4 space-y-3 hidden" data-collapse-target="content">
+              <% @recording.users.each do |speaker| %>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div class="flex items-center">
+                    <div class="mr-3">
+                      <% if speaker.role == "temporary" %>
+                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-600">
+                          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                          </svg>
+                        </span>
+                      <% else %>
+                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                          </svg>
+                        </span>
                       <% end %>
-                    </p>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-900"><%= speaker.name %></p>
+                      <p class="text-xs text-gray-500">
+                        <%= pluralize(@recording.dictionary_entries.where(speaker: speaker).count, 'entry') %>
+                        <% if speaker.dialect.present? %>
+                          • <%= speaker.dialect.humanize %>
+                        <% end %>
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            <% end %>
+              <% end %>
+            </div>
           </div>
-        </div>
 
-        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-700" title="Diarized using pyannote and transcribed using abair.ie">Automatic Transcriptions</h3>
-            <span class="text-xl font-bold text-blue-600"><%= @recording.dictionary_entries.count %></span>
+          <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-700" title="Diarized using pyannote and transcribed using abair.ie">Automatic Transcriptions</h3>
+              <span class="text-xl font-bold text-blue-600"><%= @recording.dictionary_entries.count %></span>
+            </div>
           </div>
-        </div>
 
-        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-700" title="These segments have been validated by a speaker with B2 level Irish or higher">Validated</h3>
-            <span class="text-xl font-bold text-green-600">
-              <%= @recording.dictionary_entries.where(quality: ['good', 'excellent']).count %>
-            </span>
+          <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-700" title="These segments have been validated by a speaker with B2 level Irish or higher">Validated</h3>
+              <span class="text-xl font-bold text-green-600">
+                <%= @recording.dictionary_entries.where(quality: ['good', 'excellent']).count %>
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-700">Completion</h3>
-            <span class="text-xl font-bold text-purple-600">
-              <%= number_to_percentage(
-                @recording.dictionary_entries.count > 0 ?
-                (@recording.dictionary_entries.where(quality: ['good', 'excellent']).count.to_f / @recording.dictionary_entries.count * 100) : 0,
-                precision: 1
-              ) %>
-            </span>
+          <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-700">Completion</h3>
+              <span class="text-xl font-bold text-purple-600">
+                <%= number_to_percentage(
+                  @recording.dictionary_entries.count > 0 ?
+                  (@recording.dictionary_entries.where(quality: ['good', 'excellent']).count.to_f / @recording.dictionary_entries.count * 100) : 0,
+                  precision: 1
+                ) %>
+              </span>
+            </div>
           </div>
         </div>
       </div>
