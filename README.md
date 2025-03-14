@@ -92,6 +92,14 @@ Then change permissions `chown nonroot:root db` `chmod 755 db`
 Then add Rails
 Finally when other server is retired add back replication
 
+Local restore
+
+```bash
+litestream restore -config litestream.yml -o ./local_backup.sqlite3 /data/production.sqlite3
+```
+
+
+
 ## FTS issues
 
 Check if the triggers have been removed for some reason (could be altering parent table?):

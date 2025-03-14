@@ -7,7 +7,7 @@ services:
       - "80:80"
       - "443:443"
     configs:
-      - source: caddyfile_v6
+      - source: caddyfile_v7
         target: /etc/caddy/Caddyfile
     volumes:
       - caddy_data:/data
@@ -52,6 +52,13 @@ services:
       - -c
       - |
         litestream restore -if-replica-exists -v /data/production.sqlite3
+        # Fix permissions - ensure Rails user can access
+        chown -R 1000:1000 /data
+        chmod -R 755 /data
+
+        # Wait a moment to ensure file operations complete
+        sleep 2
+        # start replication
         litestream replicate
 
   redis:
@@ -73,7 +80,7 @@ volumes:
   # assets:
 
 configs:
-  caddyfile_v6:
+  caddyfile_v7:
     file: ./Caddyfile
 
 secrets:
