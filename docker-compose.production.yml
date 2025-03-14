@@ -27,10 +27,10 @@ services:
       BUNDLE_WITHOUT: "development:test"
     secrets:
       - source: master_key
-        target: /app/config/master.key
+        target: /rails/config/master.key
     volumes:
-      - db:/app/db
-      # - assets:/app/public
+      - db:/rails/db
+      # - assets:/rails/public
     command:
       - /bin/bash
       - -c
