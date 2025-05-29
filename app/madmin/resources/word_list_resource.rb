@@ -8,7 +8,6 @@ class WordListResource < Madmin::Resource
   attribute :updated_at, form: false
 
   # Associations
-  attribute :owner
   attribute :dictionary_entries
   attribute :users
 

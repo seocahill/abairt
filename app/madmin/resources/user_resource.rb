@@ -21,10 +21,6 @@ class UserResource < Madmin::Resource
   # Associations
   attribute :dictionary_entries
   attribute :voice_recordings
-  attribute :rangs
-  attribute :chats
-  attribute :lectures
-  attribute :own_lists
 
   # Uncomment this to customize the display name of records in the admin area.
   # def self.display_name(record)

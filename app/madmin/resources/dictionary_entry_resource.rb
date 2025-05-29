@@ -14,12 +14,9 @@ class DictionaryEntryResource < Madmin::Resource
   attribute :quality
 
   # Associations
-  attribute :versions
-  attribute :rangs
   attribute :speaker
   attribute :owner
   attribute :voice_recording
-  attribute :word_lists
   attribute :tags
 
   # Uncomment this to customize the display name of records in the admin area.
