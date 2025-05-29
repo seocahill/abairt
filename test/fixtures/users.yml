@@ -6,6 +6,7 @@ one:
   password_digest: MyString
   confirmed: true
   ability: B2
+  role: teacher
 
 two:
   email: dazpatreg@yahoo.ie

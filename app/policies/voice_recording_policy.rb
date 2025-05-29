@@ -3,6 +3,14 @@ class VoiceRecordingPolicy < ApplicationPolicy
     true
   end
 
+  def create?
+    user.teacher? || user.admin?
+  end
+
+  def new?
+    create?
+  end
+
   def map?
     true
   end

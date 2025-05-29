@@ -28,10 +28,6 @@ Rails.application.routes.draw do
     resource :diarization, only: [:create]
   end
 
-  resources :rangs do
-    resources :dictionary_entries, only: :create, module: :rangs
-  end
-
   resources :tags
 
   resources :users
