@@ -65,7 +65,7 @@ class UsersController < ApplicationController
 
   # GET /users/1 or /users/1.json
   def show
-    authorize current_user
+    authorize @user
     @pagy, @entries = pagy(@user.all_entries, items: PAGE_SIZE)
     @new_speaker = User.new
     @template_name = "profile"
@@ -79,8 +79,8 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    authorize(current_user)
     @user = User.new
+    authorize @user
   end
 
   # GET /users/1/edit
@@ -90,8 +90,8 @@ class UsersController < ApplicationController
 
   # POST /users or /users.json
   def create
-    authorize current_user
     @user = User.new(user_params.merge(password: SecureRandom.uuid))
+    authorize @user
 
     respond_to do |format|
       if @user.save

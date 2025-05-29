@@ -13,6 +13,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def new?
+    create?
+  end
+
   def show?
     return user == record
   end
@@ -21,6 +25,10 @@ class UserPolicy < ApplicationPolicy
     return true if user&.admin?
     return true if user == record
     true if (user && record.speaker? && !user.student?)
+  end
+
+  def edit?
+    update?
   end
 
   def destroy?
