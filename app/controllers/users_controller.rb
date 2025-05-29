@@ -85,7 +85,7 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    authorize current_user
+    authorize @user
   end
 
   # POST /users or /users.json
@@ -117,7 +117,7 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1 or /users/1.json
   def update
-    authorize current_user
+    authorize @user
 
     respond_to do |format|
       if @user.update(user_params)
@@ -139,7 +139,7 @@ class UsersController < ApplicationController
 
   # DELETE /users/1 or /users/1.json
   def destroy
-    authorize current_user
+    authorize @user
     # FIXME implement soft delete
     # render head :ok
     # @user.destroy
