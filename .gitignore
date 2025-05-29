@@ -38,3 +38,4 @@ queue.db-wal
 *queue*
 *.sql
 training-data/*
+DS_Store

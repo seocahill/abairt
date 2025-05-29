@@ -2,11 +2,17 @@ import { Controller } from "@hotwired/stimulus"
 import { DirectUpload } from "@rails/activestorage";
 
 export default class extends Controller {
-  static targets = ["input", "synthesizeButton", "word", "media"]
+  static targets = ["input", "synthesizeButton", "word", "media", "content"]
   static values = { url: String }
 
   connect() {
     console.info("connected to tts controller")
+    // Find all Irish language spans and make them clickable for TTS
+    this.element.querySelectorAll('span[lang="ga"]').forEach(span => {
+      span.classList.add('cursor-pointer', 'hover:underline')
+      span.setAttribute('title', 'Click to listen')
+      span.addEventListener('click', (event) => this.speakIrish(event.target.textContent))
+    })
   }
 
   async synthesizeAndUpload(event) {
@@ -53,22 +59,62 @@ export default class extends Controller {
   }
 
   async synthesizeSpeech(text) {
-    const uri = 'https://abair.ie/api2/synthesise';
-    const requestBody = {
-      synthinput: { text: text, ssml: 'string' },
-      voiceparams: { languageCode: 'ga-IE', name: "ga_UL_anb_nemo", ssmlGender: 'UNSPECIFIED' },
-      audioconfig: { audioEncoding: 'LINEAR16', speakingRate: 1, pitch: 1, volumeGainDb: 1 },
-      outputType: 'JSON'
-    };
+    try {
+      const response = await fetch('/api/text_to_speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ text: text })
+      });
 
-    const response = await fetch(uri, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    return await response.json();  // assuming the response is directly the base64 string of the audio.
+      return await response.json();
+    } catch (error) {
+      console.error("TTS API error:", error);
+      throw error;
+    }
+  }
+
+  // Play TTS for any text with lang="ga" attribute
+  playIrish(event) {
+    const text = event.currentTarget.textContent
+    this.speakIrish(text)
+  }
+
+  // Speak Irish text using the abair.ie API
+  async speakIrish(text) {
+    try {
+      const response = await this.synthesizeSpeech(text)
+      const synthesizedAudioBase64 = response.audioContent
+      this.playSynthesizedAudio(synthesizedAudioBase64)
+    } catch (error) {
+      console.error("Error synthesizing speech:", error)
+    }
+  }
+
+  playSynthesizedAudio(base64AudioData) {
+    const audioContext = new AudioContext()
+    const audioBuffer = this.base64ToArrayBuffer(base64AudioData)
+
+    audioContext.decodeAudioData(audioBuffer, (buffer) => {
+      const source = audioContext.createBufferSource()
+      source.buffer = buffer
+      source.connect(audioContext.destination)
+      source.start(0)
+    })
+  }
+
+  base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64)
+    const bytes = new Uint8Array(binaryString.length)
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i)
+    }
+    return bytes.buffer
   }
 }

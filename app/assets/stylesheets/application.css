@@ -14,7 +14,7 @@
  *= require_self
  */
 
-
+/* Range Input Styles */
 /* Webkit browsers */
 input[type="range"]::-webkit-slider-runnable-track {
   background: #E5E7EB;
@@ -55,4 +55,166 @@ input[type="range"]::-moz-range-thumb {
   /* bg-blue-500 in Tailwind */
   border-radius: 50%;
   cursor: pointer;
+}
+
+/* Animation Styles */
+.animate-fade-in-down {
+  animation: fade-in-down 0.5s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Chat Message Styles */
+.message-bubble {
+  position: relative;
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  margin-bottom: 4px;
+}
+
+.message-bubble.user {
+  background-color: #10B981;
+  color: white;
+  border-bottom-right-radius: 4px;
+  margin-left: auto;
+}
+
+.message-bubble.assistant {
+  background-color: #F3F4F6;
+  color: #1F2937;
+  border-bottom-left-radius: 4px;
+}
+
+.message-timestamp {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  margin-top: 2px;
+}
+
+/* Textarea Auto-resize */
+textarea.auto-resize {
+  overflow: hidden;
+  resize: none;
+  min-height: 38px;
+}
+
+/* Drawer Styles */
+#drawer-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  height: 100vh;
+  width: 80%;
+  max-width: 320px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+#drawer-navigation.drawer-show {
+  transform: translateX(0);
+}
+
+body.drawer-open {
+  overflow: hidden;
+}
+
+/* Drawer backdrop */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.drawer-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Language-tagged text styles */
+span[lang="ga"] {
+  font-weight: 500;
+  position: relative;
+}
+
+span[lang="ga"]:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+span[lang="ga"]::after {
+  content: '🔊';
+  font-size: 0.8em;
+  margin-left: 0.2em;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+span[lang="ga"]:hover::after {
+  opacity: 1;
+}
+
+span[lang="en"] {
+  font-style: italic;
+  color: rgba(107, 114, 128, 0.8); /* text-gray-500 with some transparency */
+}
+
+/* Clickable Irish text in messages */
+.message-content span[lang="ga"] {
+  position: relative;
+  display: inline-block;
+}
+
+/* Highlight Irish text when clicked */
+.tts-playing {
+  background-color: rgba(16, 185, 129, 0.1); /* Light green background */
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
 }

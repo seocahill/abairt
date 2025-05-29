@@ -101,9 +101,7 @@ CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
         INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
         INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
       END;
-CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
-CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
-CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "versions" json DEFAULT '[]', "standard_irish" varchar, CONSTRAINT "fk_rails_43cc55d212"
+CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "versions" json DEFAULT '[]', "standard_irish" varchar, "notes" text, CONSTRAINT "fk_rails_43cc55d212"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 );
@@ -155,7 +153,35 @@ CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id
 CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
 CREATE TABLE IF NOT EXISTS "versions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "item_type" varchar NOT NULL, "item_id" bigint NOT NULL, "event" varchar NOT NULL, "whodunnit" varchar, "object" json, "created_at" datetime(6));
 CREATE INDEX "index_versions_on_item_type_and_item_id" ON "versions" ("item_type", "item_id");
+CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255), "metadata" text, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255), "created_at" datetime NOT NULL);
+CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key") /*application='Abairt'*/;
+CREATE TABLE IF NOT EXISTS "chat_dictionaries" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "chat_id" integer NOT NULL, "dictionary_entry_id" integer NOT NULL, "pronunciation_media" varchar, "recall_rating" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_a4cfeaee05"
+FOREIGN KEY ("chat_id")
+  REFERENCES "chats" ("id")
+, CONSTRAINT "fk_rails_4567af3df4"
+FOREIGN KEY ("dictionary_entry_id")
+  REFERENCES "dictionary_entries" ("id")
+);
+CREATE INDEX "index_chat_dictionaries_on_chat_id" ON "chat_dictionaries" ("chat_id");
+CREATE INDEX "index_chat_dictionaries_on_dictionary_entry_id" ON "chat_dictionaries" ("dictionary_entry_id");
+CREATE TABLE IF NOT EXISTS "chats" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "chat_type_id" integer NOT NULL, "messages" json, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_e555f43151"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_40e4ded3e1"
+FOREIGN KEY ("chat_type_id")
+  REFERENCES "chat_types" ("id")
+);
+CREATE INDEX "index_chats_on_user_id" ON "chats" ("user_id");
+CREATE INDEX "index_chats_on_chat_type_id" ON "chats" ("chat_type_id");
+CREATE TABLE IF NOT EXISTS "chat_types" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "role_prompt" text, "few_shot_prompts" json, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 INSERT INTO "schema_migrations" (version) VALUES
+('20250317123416'),
+('20250315151133'),
+('20250315151052'),
+('20250315145103'),
+('20250302190209'),
+('20250302190208'),
+('20250302190207'),
 ('20250202125612'),
 ('20250123223453'),
 ('20250116000000'),

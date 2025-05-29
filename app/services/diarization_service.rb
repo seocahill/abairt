@@ -113,8 +113,4 @@ class DiarizationService
       File.delete temp_path rescue nil
     end
   end
-
-  private
-
-
 end

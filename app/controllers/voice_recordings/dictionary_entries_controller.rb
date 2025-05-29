@@ -34,12 +34,6 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     authorize @recording
 
     @pagy, @entries = pagy(@recording.dictionary_entries.includes(:speaker, :owner), items: 10)
-
-
-    if current_user
-      @starred = current_user.starred
-      @lists = current_user.own_lists
-    end
   end
 
   private

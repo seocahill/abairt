@@ -1,5 +1,5 @@
 class WordList < ApplicationRecord
-  belongs_to :owner, class_name: "User", foreign_key: "user_id"
+  belongs_to :user
 
   # entries
   has_many :word_list_dictionary_entries, dependent: :destroy
@@ -10,7 +10,7 @@ class WordList < ApplicationRecord
   has_many :user_lists, dependent: :destroy
   has_many :users, through: :user_lists
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { scope: :user }
 
   def to_csv
     CSV.generate(headers: true) do |csv|

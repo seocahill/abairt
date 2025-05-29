@@ -4,7 +4,7 @@ class WordListsController < ApplicationController
   # GET /word_lists
   def index
     @new_list = current_user.own_lists.new if current_user
-    records = WordList.where("id is not null AND starred is not true")
+    records = WordList.where("id is not null")
 
     if params[:search].present?
       records = WordList.where(starred: nil).where("name LIKE ? OR description LIKE ?", "%#{params[:search]}%", "%#{params[:search]}%")

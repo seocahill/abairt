@@ -41,10 +41,10 @@ build test image:
     - docker push $CI_TEST_IMAGE
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - Dockerfile.test
-        - Gemfile
-        - Gemfile.lock
+      # changes:
+      #   - Dockerfile.test
+      #   - Gemfile
+      #   - Gemfile.lock
 
 run tests:
   image: $CI_TEST_IMAGE

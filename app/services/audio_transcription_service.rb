@@ -5,12 +5,20 @@ class AudioTranscriptionService
   end
 
   def process
-    irish_text = transcribe_audio
-    return nil unless irish_text.present?
+    if @dictionary_entry.word_or_phrase.blank?
+      irish_text = transcribe_audio
+      # no point continuing if no transcription
+      return nil unless irish_text.present?
+      @dictionary_entry.word_or_phrase = irish_text
+    end
 
-    @dictionary_entry.word_or_phrase = irish_text
-    @dictionary_entry.translation = translate_to_english(irish_text)
-    @dictionary_entry.save!
+    if @dictionary_entry.translation.blank?
+      @dictionary_entry.translation = TranslationService.new(@dictionary_entry).translate
+    end
+
+    if @dictionary_entry.changed?
+      @dictionary_entry.save!
+    end
   rescue => e
     Rails.logger.error("Auto transcription failed: #{e.message}")
     nil
@@ -39,27 +47,6 @@ class AudioTranscriptionService
     JSON.parse(response.body).dig("transcriptions", 0, "utterance")
   rescue => e
     Rails.logger.error("Transcription failed: #{e.message}")
-    nil
-  end
-
-  def translate_to_english(irish_text)
-    client = OpenAI::Client.new(
-      access_token: Rails.application.credentials.dig(:openai, :openai_key),
-      organization_id: Rails.application.credentials.dig(:openai, :openai_org)
-    )
-
-    response = client.chat(parameters: {
-      model: 'gpt-4o',
-      messages: [
-        { role: "system", content: "You are an Irish (Gaeilge) to English translator. Provide only the direct translation, no additional commentary." },
-        { role: "user", content: "Translate this Irish text to English: #{irish_text}" }
-      ],
-      temperature: 0.3,
-    })
-
-    response.dig('choices', 0, 'message', 'content')
-  rescue => e
-    Rails.logger.error("Translation failed: #{e.message}")
     nil
   end
 end

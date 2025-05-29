@@ -1,13 +1,86 @@
-I'd like to add two new interfaces to the app:
+Design Specification for the "Irish Language Learning Chat" feature in the Application
 
-1. A quiz/exercise interface
-2. A chat interface
+1. **Overview:**
+The feature is titled "Irish Language Learning Chat". This feature will provide structured and interactive dialogues for learning the Mayo dialect of the Irish language.
 
-The quiz interface will used spaced repetition to help the user learn.
+2. **Objectives:**
+The aim is to stimulate language learning by creating chat interfaces focused on different thematic language scenarios. This approach encourages active engagement, expands vocabulary, and aids in language retention.
 
-The chat interface is the class chatgpt style ui.
+3. **Database Schema:**
 
-Both interfaces are scoped to the logged in current user.
+3.1 **ChatTypes Table**:
+- id (Primary Key)
+- type (Type of the chat e.g. greetings, common phrases, travel vocabulary, etc.)
+- role_prompt (Role the AI bot should play)
+- few_shot_prompts (jsonb/SQLite equivalent to store example prompts for the chat)
 
-Can you build out the initial UI for these features?  The more complex business logic can be added later.
+3.2 **Chats Table**:
+- id (Primary Key)
+- user_id (Foreign Key references Users table)
+- chat_type_id (Foreign Key references ChatTypes table)
+- messages (jsonb/SQLite equivalent to store the messages in the chat)
 
+3.3 **ChatDictionary Join Table**:
+- id (Primary Key)
+- chat_id (Foreign Key references Chats table)
+- dictionary_entry_id (Foreign Key references Dictionary Entries table)
+- pronunciation_media (links to pronunciation practice media)
+- recall_rating (recall stats, e.g., good, bad)
+
+4. **Requirements**:
+
+4.1 **Functionality:**
+- The system should be able to create different chat types from the ChatTypes table.
+- When a chat is initiated, the chat history should be loaded from the 'messages' column in the Chats table.
+- The AI bot should be able to pick up the role and prompts defined in the ChatTypes associated with the chat.
+- The bot should be able to engage in the chat based on the role and few_shot_prompts from the ChatTypes.
+- Users should be able to interact (send and receive messages) with the bot.
+- All messages should be saved in the 'messages' column (in the Chats table) for historical reference.
+- The bot and users can make use of words or phrases from the Dictionary Entries table to generate messages.
+
+example chat types:
+- greetings
+- common phrases
+- travel vocabulary
+- food vocabulary
+- shopping vocabulary
+- weather vocabulary
+- grammar lessons
+- pronunciation practice
+- vocabulary drills
+- conversation practice
+- reading practice
+- writing practice
+
+
+4.2 **User Interface:**
+- A chat interface where chats will be displayed in a user-friendly messaging forma a la chatgpt or openwebui style.
+- Users should be able to select chat types from available options.
+- Past messages should be loaded when a chat is selected.
+- The chat interface should support both text and voice input (phone style calls).
+4.3 **Performance:**
+- Chats and messages should load promptly.
+- Users should be able to interact with the bot with minimal latency.
+
+4.4 **Observability:**
+- The system should be observable and provide metrics for user learning progress.
+
+
+
+- add to vocab button (use LLM)
+- play button for anythng in ga tags
+
+Should we have more chat settings?
+- model
+- style [conversation, teaching, questions]
+- tone [formal, informal, technical, casual, friendly]
+- dialect [mayo, sligo, roscommon, leitrim, donegal, conway, galway, dublin, cork, limerick]
+- accent [mayo, sligo, roscommon, leitrim, donegal, conway, galway, dublin, cork, limerick]
+- speed [slow, medium, fast]
+- vocabulary [specific, general]
+- complexity [simple, intermediate, advanced]
+- repetition [none, once, twice, three times]
+- spacing [none, once, twice, three times]
+- spacing [none, once, twice, three times]
+- spacing [none, once, twice, three times]
+- spacing [none, once, twice, three times]

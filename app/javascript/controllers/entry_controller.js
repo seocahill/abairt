@@ -58,29 +58,22 @@ export default class extends Controller {
 
   async synthesizeSpeech(text, target) {
     try {
-      const uri = 'https://abair.ie/api2/synthesise';
-      const requestBody = {
-        synthinput: { text: text, ssml: 'string' },
-        voiceparams: { languageCode: 'ga-IE', name: "ga_UL_anb_nemo", ssmlGender: 'UNSPECIFIED' },
-        audioconfig: { audioEncoding: 'LINEAR16', speakingRate: 1, pitch: 1, volumeGainDb: 1 },
-        outputType: 'JSON'
-      };
-
-      const response = await fetch(uri, {
+      const response = await fetch('/api/text_to_speech', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({ text: text })
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();  // assuming the response is directly the base64 string of the audio.
+      return await response.json();
     } catch (error) {
-      alert("It seems like the abair.ie TTS API is not responding at the moment. Try again later.")
+      alert("It seems like the text-to-speech service is not responding at the moment. Try again later.")
       target.disabled = false;
       target.innerText = "Synth";
     }

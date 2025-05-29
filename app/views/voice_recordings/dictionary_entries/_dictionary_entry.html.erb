@@ -28,8 +28,22 @@
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <%= render "dictionary_entries/inline_edit", model: entry, method: :quality, current_user: current_user do %>
-      <%= entry.quality.present? ? entry.quality : "Set quality" %>
+    <% if policy(entry).update? %>
+      <% if ["low", "fair"].include?(entry.quality) %>
+        <%= button_to "Pending", dictionary_entry_path(entry),
+            method: :patch,
+            params: { dictionary_entry: { quality: "good" } },
+            class: "px-3 py-1 text-sm font-medium text-white bg-orange-500 rounded hover:bg-orange-600",
+            form: { data: { turbo: true } } %>
+      <% else %>
+        <%= button_to "Validated", dictionary_entry_path(entry),
+            method: :patch,
+            params: { dictionary_entry: { quality: "fair" } },
+            class: "px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600",
+            form: { data: { turbo: true } } %>
+      <% end %>
+    <% else %>
+      <span class="text-gray-600"><%= entry.quality.present? ? entry.quality : "No quality set" %></span>
     <% end %>
   </td>
   <% if current_user && entry.user_id == current_user.id %>
