@@ -1,0 +1,101 @@
+/* Chat Interface Styles */
+
+.message-bubble {
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message-bubble::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+}
+
+.assistant-message .message-bubble::before {
+  left: -15px;
+  border-right-color: #ecfdf5; /* Green-100 */
+}
+
+.user-message .message-bubble::before {
+  right: -15px;
+  border-left-color: #eff6ff; /* Blue-100 */
+}
+
+.message-content p {
+  margin-bottom: 0.5rem;
+}
+
+.message-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Chat container with custom scrollbar */
+[data-chat-target="container"] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+[data-chat-target="container"]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-chat-target="container"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-chat-target="container"]::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+/* Auto-resizing textarea */
+[data-chat-target="input"] {
+  min-height: 40px;
+  max-height: 120px;
+  transition: height 0.1s ease-in-out;
+}
+
+/* Dictionary entries section */
+.recall-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.recall-good {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.recall-medium {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.recall-bad {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Voice input button animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.recording {
+  animation: pulse 1.5s infinite;
+  background-color: #ef4444 !important;
+}

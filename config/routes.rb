@@ -2,8 +2,18 @@
 
 Rails.application.routes.draw do
   draw :madmin
+  namespace :api do
+    resources :voice_recordings, only: [] do
+      post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
+    end
+
+    # Speech to Text API endpoint
+    post 'speech_to_text', to: 'speech_to_text#create'
+
+    # Text to Speech API endpoint
+    resources :text_to_speech, only: [:create]
+  end
   resources :word_lists
-  resources :seomras, only: :destroy
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
     resources :dictionary_entries, module: :voice_recordings
@@ -37,16 +47,10 @@ Rails.application.routes.draw do
 
   resources :dictionary_entries do
     post :update_region, on: :member
+    post :generate_audio, on: :member
   end
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
-
-  # learning
-  resources :learning_sessions, only: [:create, :show, :index]
-  resources :learning_progresses, only: [:show, :update]
-  resources :courses
-  resources :items
-  resources :articles
 
   get 'password_resets/new'
   post 'password_resets', to: 'password_resets#create'
@@ -58,10 +62,4 @@ Rails.application.routes.draw do
   get "up" => "health#show"
 
   root to: 'application#root_redirect'
-
-  namespace :api do
-    resources :voice_recordings, only: [] do
-      post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
-    end
-  end
 end

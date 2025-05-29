@@ -1,8 +1,0 @@
-<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(learning_session) %>">
-  <td class="px-6 py-4"><%= learning_session.learnable_type %></td>
-  <td class="px-6 py-4"><%= link_to learning_session.name, learning_session.learnable %></td>
-  <td class="px-6 py-4"><%= learning_session.learning_progresses.where(repetition_number: 0).count %></td>
-  <td class="px-6 py-4"><%= learning_session.learning_progresses.where.not(repetition_number: 0, completed: true).count %></td>
-  <td class="px-6 py-4"><%= learning_session.learning_progresses.where(completed: true).count %></td>
-  <td class="px-6 py-4"><%= link_to "Study now", learning_session %></td
-</tr>

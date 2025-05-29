@@ -117,6 +117,7 @@ class VoiceRecordingsController < ApplicationController
 
     respond_to do |format|
       if @voice_recording.save
+        handle_transcription
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully created." }
         format.json { render :show, status: :created, location: @voice_recording }
       else
@@ -131,9 +132,7 @@ class VoiceRecordingsController < ApplicationController
     authorize @voice_recording
     respond_to do |format|
       if @voice_recording.update(voice_recording_params)
-        if @voice_recording.transcription.present? && @voice_recording.dictionary_entries.empty?
-          ImportTranscriptionJob.perform_later(@voice_recording, params[:speaker_id])
-        end
+        handle_transcription
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully updated." }
         format.json { render :show, status: :ok, location: @voice_recording }
       else
@@ -215,6 +214,17 @@ class VoiceRecordingsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def voice_recording_params
       params.require(:voice_recording).permit(:title, :description, :transcription, :transcription_en, :media, :tag_list, :region_id, :region_start, :region_end, user_ids: [])
+    end
+
+    def handle_transcription
+      return unless @voice_recording.transcription.present?
+      return unless @voice_recording.saved_change_to_transcription? || @voice_recording.saved_change_to_transcription_en?
+
+      if @voice_recording.dictionary_entries.empty?
+        ImportTranscriptionJob.perform_later(@voice_recording, params[:speaker_id])
+      else
+        CorrectTranscriptionsJob.perform_later(@voice_recording.id)
+      end
     end
 
 end

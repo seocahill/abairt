@@ -20,7 +20,7 @@ class WordListDictionaryEntriesController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("dictionary_entry_#{entry.id}", partial: "dictionary_entries/dictionary_entry",
-        locals: { entry: entry, current_user: current_user, starred: list })
+        locals: { entry: entry, current_user: current_user })
       end
       format.html { redirect_to :back }
     end

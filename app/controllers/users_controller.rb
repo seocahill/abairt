@@ -67,7 +67,6 @@ class UsersController < ApplicationController
   def show
     authorize current_user
     @pagy, @entries = pagy(@user.all_entries, items: PAGE_SIZE)
-    @starred = current_user&.starred
     @new_speaker = User.new
     @template_name = "profile"
     @pagy_users, @pending_users = pagy(User.student.where.not(confirmed: true), items: 5)

@@ -7,6 +7,7 @@ class DictionaryEntriesController < ApplicationController
   def index
     records = DictionaryEntry
       .not_low
+      .not_fair
       .order(id: :desc)
 
     if params[:search].present?
@@ -27,8 +28,6 @@ class DictionaryEntriesController < ApplicationController
     if current_user
       @new_dictionary_entry = current_user.dictionary_entries.build(speaker: current_user)
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
-      @starred = current_user.starred
-      @lists = current_user.own_lists
     end
 
     @pagy, @dictionary_entries = pagy(records, items: 15)
@@ -42,10 +41,6 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries/1 or /dictionary_entries/1.json
   def show
-    if current_user
-      @starred = current_user.starred
-      @lists = current_user.own_lists #.where(starred: false)
-    end
   end
 
   # GET /dictionary_entries/new
@@ -73,7 +68,7 @@ class DictionaryEntriesController < ApplicationController
         format.html { redirect_to @dictionary_entry }
         format.turbo_stream do
           render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
-          locals: { entry: @dictionary_entry, current_user: current_user, starred: current_user.starred })
+          locals: { entry: @dictionary_entry, current_user: current_user })
         end
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -97,7 +92,7 @@ class DictionaryEntriesController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             @dictionary_entry,
             partial: partial,
-            locals: { entry: @dictionary_entry, current_user: current_user, starred: current_user.starred }
+            locals: { entry: @dictionary_entry, current_user: current_user }
           )
         end
         format.html { redirect_to @dictionary_entry, notice: 'entry was successfully updated.' }
@@ -110,13 +105,29 @@ class DictionaryEntriesController < ApplicationController
   # DELETE /dictionary_entries/1 or /dictionary_entries/1.json
   def destroy
     authorize @dictionary_entry
-    broadcast = @dictionary_entry.rangs.any?
     @dictionary_entry.destroy
-    Turbo::StreamsChannel.broadcast_remove_to("rangs", target: @dictionary_entry) if broadcast
-
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.remove(@dictionary_entry) }
       format.html         { redirect_to dictionary_entries_url }
+    end
+  end
+
+  # POST /dictionary_entries/1/generate_audio
+  def generate_audio
+    @dictionary_entry = DictionaryEntry.find(params[:id])
+
+    # Use the synthesize_text_to_speech_and_store method from the DictionaryEntry model
+    @dictionary_entry.synthesize_text_to_speech_and_store
+
+    respond_to do |format|
+      format.html { redirect_to @dictionary_entry, notice: 'Audio was successfully generated.' }
+      format.json { render json: { success: true, audio_url: url_for(@dictionary_entry.media) } }
+    end
+  rescue => e
+    Rails.logger.error("Error generating audio: #{e.message}")
+    respond_to do |format|
+      format.html { redirect_to @dictionary_entry, alert: 'Failed to generate audio.' }
+      format.json { render json: { success: false, error: e.message }, status: :unprocessable_entity }
     end
   end
 
