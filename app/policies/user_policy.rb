@@ -18,7 +18,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    return user == record
+    create? || user == record
   end
 
   def update?
