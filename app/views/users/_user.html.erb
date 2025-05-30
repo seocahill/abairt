@@ -10,14 +10,14 @@
             <path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" />
             <path d="M5.5 9.643a.75.75 0 00-1.5 0V10c0 3.06 2.29 5.585 5.25 5.954V17.5h-1.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-1.5v-1.546A6.001 6.001 0 0016 10v-.357a.75.75 0 00-1.5 0V10a4.5 4.5 0 01-9 0v-.357z" />
           </svg>
-          <%= pluralize(user.voice_recordings.count, 'recording') %>
+          <%= pluralize(user.spoken_voice_recordings.count, 'recording') %>
         </div>
         <div class="flex items-center text-sm text-gray-600">
           <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
             <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
           </svg>
-          <%= pluralize(user.dictionary_entries.count, 'entry') %>
+          <%= pluralize(user.spoken_dictionary_entries.count, 'entry') %>
         </div>
         <% if user.dialect.present? %>
           <div class="flex items-center text-sm text-gray-600">
