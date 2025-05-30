@@ -28,6 +28,8 @@ Rails.application.routes.draw do
     resource :diarization, only: [:create]
   end
 
+  resource :import, only: [:new, :create], module: :voice_recordings
+
   resources :tags
 
   resources :users
