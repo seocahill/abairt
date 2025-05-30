@@ -8,6 +8,6 @@ class VoiceRecordings::ImportsController < ApplicationController
     voice_recording = Importers::CanuintIe.import(params[:url])
     redirect_to voice_recording_path(voice_recording), notice: "Voice recording imported successfully"
   rescue StandardError => e
-    redirect_to new_voice_recording_import_path, alert: "Failed to import voice recording: #{e.message}"
+    redirect_to new_import_path, alert: "Failed to import voice recording: #{e.message}"
   end
 end
