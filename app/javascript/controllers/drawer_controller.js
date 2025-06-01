@@ -4,18 +4,24 @@ export default class extends Controller {
   static targets = ["drawer", "backdrop"]
 
   connect() {
-    // Create backdrop if it doesn't exist
-    // if (!this.hasBackdropTarget) {
-    //   const backdrop = document.createElement('div')
-    //   backdrop.classList.add('drawer-backdrop')
-    //   backdrop.setAttribute('data-drawer-target', 'backdrop')
-    //   backdrop.addEventListener('click', () => this.close())
-    //   document.body.appendChild(backdrop)
-    // }
+    // Add event listener for ESC key to close drawer
+    document.addEventListener('keydown', this.handleKeyDown.bind(this))
   }
 
-  toggle() {
-    if (this.drawerTarget.classList.contains('drawer-show')) {
+  disconnect() {
+    // Remove event listener when controller is disconnected
+    document.removeEventListener('keydown', this.handleKeyDown.bind(this))
+  }
+
+  handleKeyDown(event) {
+    if (event.key === 'Escape' && this.drawerTarget.classList.contains('translate-x-0')) {
+      this.close()
+    }
+  }
+
+  toggle(event) {
+    event.preventDefault()
+    if (this.drawerTarget.classList.contains('translate-x-0')) {
       this.close()
     } else {
       this.open()
@@ -23,13 +29,15 @@ export default class extends Controller {
   }
 
   open() {
-    this.drawerTarget.classList.add('drawer-show')
+    this.drawerTarget.classList.remove('translate-x-full')
+    this.drawerTarget.classList.add('translate-x-0')
     this.backdropTarget.classList.add('show')
     document.body.classList.add('drawer-open')
   }
 
   close() {
-    this.drawerTarget.classList.remove('drawer-show')
+    this.drawerTarget.classList.remove('translate-x-0')
+    this.drawerTarget.classList.add('translate-x-full')
     this.backdropTarget.classList.remove('show')
     document.body.classList.remove('drawer-open')
   }

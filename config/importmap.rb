@@ -19,7 +19,6 @@ pin "soundtouchjs", to: "https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/s
 pin "leaflet", to: "https://ga.jspm.io/npm:leaflet@1.8.0/dist/leaflet-src.js"
 pin "lamejs", to: "https://ga.jspm.io/npm:lamejs@1.2.1/src/js/index.js"
 pin "feather-icons", to: "https://ga.jspm.io/npm:feather-icons@4.29.0/dist/feather.js"
-pin "flowbite", to: "https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.turbo.min.js"
 pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.7/lib/index.js"
 pin "trix"
 pin "@rails/actiontext", to: "actiontext.js"
