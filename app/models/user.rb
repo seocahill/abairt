@@ -5,8 +5,8 @@ class User < ApplicationRecord
 
   has_many :dictionary_entries #, foreign_key: :speaker_id
   has_many :spoken_dictionary_entries, foreign_key: :speaker_id, class_name: "DictionaryEntry"
-  has_many :voice_recordings, through: :dictionary_entries
-  has_many :spoken_voice_recordings, through: :spoken_dictionary_entries,  class_name: "VoiceRecording", source: :voice_recording
+  has_many :voice_recordings, -> { distinct }, through: :dictionary_entries
+  has_many :spoken_voice_recordings, -> { distinct }, through: :spoken_dictionary_entries,  class_name: "VoiceRecording", source: :voice_recording
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
@@ -45,7 +45,7 @@ class User < ApplicationRecord
   end
 
   def all_recordings
-    voice_recordings.or(spoken_voice_recordings)
+    voice_recordings.or(spoken_voice_recordings.distinct)
   end
 
   class << self
