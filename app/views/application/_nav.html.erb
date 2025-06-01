@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="flex md:hidden items-center">
-        <button type="button" data-action="drawer#toggle" class="text-gray-300 hover:text-white focus:text-white focus:outline-none">
+        <button type="button" data-action="click->drawer#toggle" class="text-gray-300 hover:text-white focus:text-white focus:outline-none">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
@@ -43,9 +43,9 @@
   </div>
 
   <!-- Mobile menu drawer -->
-  <div id="drawer" data-drawer-target="drawer" class="fixed top-0 left-0 z-50 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-gray-800 w-80">
+  <div data-drawer-target="drawer" class="fixed top-0 right-0 z-[60] h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-gray-800 w-80">
     <h5 class="text-base font-semibold text-white uppercase">Menu</h5>
-    <button type="button" data-action="drawer#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center">
+    <button type="button" data-action="click->drawer#close" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center">
       <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
@@ -70,16 +70,10 @@
             <%= link_to current_user.name, current_user, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
           </li>
         <% end %>
-        <% if current_user.nil? %>
-          <li>
-            <%= link_to "Login", login_path, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
-          </li>
-        <% else %>
-          <li>
-            <%= button_to "Log out", logout_path, method: :delete, class: "flex w-full items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
-          </li>
-        <% end %>
       </ul>
     </div>
   </div>
+
+  <!-- Drawer backdrop -->
+  <div data-drawer-target="backdrop" class="drawer-backdrop z-[55]" data-action="click->drawer#close"></div>
 </nav>
