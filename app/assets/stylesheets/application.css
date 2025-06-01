@@ -159,25 +159,6 @@ body.drawer-open {
   overflow: hidden;
 }
 
-/* Drawer backdrop */
-.drawer-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9998;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-
-.drawer-backdrop.show {
-  opacity: 1;
-  visibility: visible;
-}
-
 /* Language-tagged text styles */
 span[lang="ga"] {
   font-weight: 500;
