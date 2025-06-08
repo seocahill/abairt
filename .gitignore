@@ -39,3 +39,4 @@ queue.db-wal
 *.sql
 training-data/*
 DS_Store
+*.sqlite3
