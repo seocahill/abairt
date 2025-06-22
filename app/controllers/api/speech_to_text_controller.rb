@@ -2,7 +2,6 @@ module Api
   class SpeechToTextController < ApplicationController
     # Skip CSRF protection for API endpoints
     skip_before_action :verify_authenticity_token
-    # before_action :authenticate_user!
 
     def create
       authorize Chat

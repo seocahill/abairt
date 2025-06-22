@@ -4,7 +4,6 @@ Pub = Struct.new(:name, :lat_lang, :url)
 
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
-  # before_action :authenticate_user!, except: [:index, :show]
 
   # GET /users or /users.json
   def index
@@ -30,16 +29,6 @@ class UsersController < ApplicationController
           c[:media_url] = Rails.application.routes.url_helpers.rails_blob_url(sample)
         end
       end
-    end
-
-    @pubs = User.place.where.not(lat_lang: nil).map do |g|
-      g.slice(:id, :name, :lat_lang).tap do |c|
-        c[:url] = g.about
-      end
-    end
-
-    if current_user&.edit?
-      @new_speaker = User.new(role: :speaker)
     end
 
     @pagy, @users = pagy(records, items: 5)
@@ -167,6 +156,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :role, :dialect, :voice, :lat_lang, :address, :ability)
+    params.require(:user).permit(:name, :email, :role, :dialect, :voice, :lat_lang, :address, :ability, :about)
   end
 end

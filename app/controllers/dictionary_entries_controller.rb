@@ -28,6 +28,7 @@ class DictionaryEntriesController < ApplicationController
     if current_user
       @new_dictionary_entry = current_user.dictionary_entries.build(speaker: current_user)
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
+      @practice_word_list = current_user.word_lists.find_or_create_by!(name: 'Practice')
     end
 
     @pagy, @dictionary_entries = pagy(records, items: 15)
@@ -65,11 +66,7 @@ class DictionaryEntriesController < ApplicationController
         # auto_tag
         AutoTagEntryJob.perform_later(@dictionary_entry)
 
-        format.html { redirect_to @dictionary_entry }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.prepend(:dictionary_entries, partial: "dictionary_entry",
-          locals: { entry: @dictionary_entry, current_user: current_user })
-        end
+        format.html { redirect_to dictionary_entries_path, notice: 'Dictionary entry was successfully created.' }
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -85,13 +82,13 @@ class DictionaryEntriesController < ApplicationController
       @dictionary_entry.media.purge
     end
 
-    if @dictionary_entry.update dictionary_entry_params
+    if @dictionary_entry.update dictionary_entry_params.merge(translator_id: current_user.id)
       regenerate_media
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             @dictionary_entry,
-            partial: partial,
+            partial: "dictionary_entry",
             locals: { entry: @dictionary_entry, current_user: current_user }
           )
         end
@@ -107,7 +104,7 @@ class DictionaryEntriesController < ApplicationController
     authorize @dictionary_entry
     @dictionary_entry.destroy
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove(@dictionary_entry) }
+      format.turbo_stream { redirect_to dictionary_entries_url }
       format.html         { redirect_to dictionary_entries_url }
     end
   end
@@ -142,11 +139,6 @@ class DictionaryEntriesController < ApplicationController
     end
   end
 
-  def partial
-    # hack but it'll do for now
-    @dictionary_entry.voice_recording_id ? "voice_recordings/dictionary_entries/dictionary_entry" : "dictionary_entry"
-  end
-
   # Use callbacks to share common setup or constraints between actions.
   def set_dictionary_entry
     @dictionary_entry = DictionaryEntry.find(params[:id])
@@ -154,7 +146,7 @@ class DictionaryEntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :speaker_id, :tag_list, :quality, :region_start, :region_end, :region_id)
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :speaker_id, :tag_list, :quality, :region_start, :region_end, :region_id, :translator_id)
   end
 
   def regenerate_media

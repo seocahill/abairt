@@ -1,129 +1,245 @@
-<!-- Sidebar for CRUD -->
-<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col">
-    <%= link_to word_list_path(@word_list, format: :csv), class: "flex items-center space-x-1 hover:text-blue-700 hover:underline py-2 px-4 bg-gray-100 rounded-lg mb-2" do %>
-      <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path clip-rule="evenodd" d="M4.5 2A1.5 1.5 0 003 3.5v13A1.5 1.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V7.621a1.5 1.5 0 00-.44-1.06l-4.12-4.122A1.5 1.5 0 0011.378 2H4.5zm4.75 6.75a.75.75 0 011.5 0v2.546l.943-1.048a.75.75 0 011.114 1.004l-2.25 2.5a.75.75 0 01-1.114 0l-2.25-2.5a.75.75 0 111.114-1.004l.943 1.048V8.75z" fill-rule="evenodd"></path>
-      </svg>
-      Download list as CSV file
-    <% end %>
-    <% if policy(@word_list).update? %>
-      <%= button_to "Generate Monologue", @word_list, method: :patch, params: { generate_script: "true" }, class: "w-full bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2" %>
-      <%= button_to "Generate Dialogue", @word_list, method: :patch, params: { generate_script: "true", script_type: "dialogue" }, class: "w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2" %>
-    <% end %>
-    <%#= button_to "Start Learning", learning_sessions_path, method: :post, params: { word_list_id: @word_list.id, learnable: "WordList" }, class: "w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded flex items-center space-x-1 mb-2", data: { disable_with: "Processing..." } %>
-  </div>
+<!-- Main Container -->
+<div class="flex flex-col min-h-screen">
 
-  <% if current_user %>
-
-    <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col mt-2">
-      <form>
-        <div class="mb-4">
-          <label for="phrase" class="block text-gray-700 text-sm font-bold mb-2">
-            How do you say?
-          </label>
-          <input
-            id="phrase"
-            name="phrase"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            type="text"
-            placeholder="It's raining">
+  <!-- Right Side - Word List Content -->
+  <div class="w-full h-screen flex flex-col" data-controller="word">
+    <!-- Header -->
+    <div class="p-6 bg-white border-b">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <h1 class="text-2xl font-bold text-gray-900"><%= @word_list.name %></h1>
+          <% if @word_list.description.present? %>
+            <div class="mt-2">
+              <p id="word-description" class="text-gray-600 line-clamp-3"><%= @word_list.description %></p>
+              <button class="text-sm text-blue-600 hover:text-blue-800 mt-1" data-action="click->word#toggleLineClamp">
+                Show more
+              </button>
+            </div>
+          <% end %>
         </div>
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-          type="submit" data-turbo-submits-with="Processing...">
-          Generate options
-        </button>
-      </form>
-      <% if @results %>
-        <h3 class="m-2">Click to add to current list</h3>
-        <ul class="divide-y divide-gray-200 mt-2">
-        <% @results.each do |result| %>
-          <li class="p-3 hover:bg-gray-50">
-            <%= button_to @word_list, method: :patch, params: { phrase: params[:phrase], result: result }, data: { disable_with: "Processing..." }, class: "w-full py-2 px-4 rounded flex space-x-1 mb-2" do %>
-              <%= result %>
+        <div class="flex items-center space-x-2 ml-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <%= @entries.count %> words
+          </span>
+          <% if current_user %>
+            <%= link_to edit_word_list_path(@word_list),
+                class: "inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              Edit
             <% end %>
-          </li>
-        <% end %>
-        </ul>
-      <% end %>
+          <% end %>
+        </div>
+      </div>
     </div>
 
-    <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col mt-2">
-      <form>
-        <div class="mb-4">
-          <label for="idiom" class="block text-gray-700 text-sm font-bold mb-2">
-            What's another way to say:
-          </label>
-          <input
-            id="idiom"
-            name="idiom"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            type="text"
-            placeholder="I've a really bad hangover.">
-        </div>
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-          type="submit" data-turbo-submits-with="Processing...">
-          Search
-        </button>
-      </form>
-      <% if @idioms %>
-        <h3 class="m-2">Click to add to current list</h3>
-        <ul class="divide-y divide-gray-200 mt-2">
-        <% @idioms.each do |result| %>
-          <li class="p-3 hover:bg-gray-50">
-            <%= button_to @word_list, method: :patch, params: { phrase: result.split('-').last, result: result.split('-').first }, class: "w-full py-2 px-4 rounded flex space-x-1 mb-2" do %>
-              <%= result %>
-            <% end %>
-          </li>
-        <% end %>
-        </ul>
-      <% end %>
-    </div>
-  <% end %>
-</div>
+    <!-- Entries Content -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <%= turbo_stream_from "word_lists/#{@word_list.id}" %>
+      
+      <div class="space-y-4" id="dictionary_entries">
+        <% @entries.each do |entry| %>
+          <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6" id="<%= dom_id(entry) %>">
+            <!-- Entry Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900"><%= entry.word_or_phrase %></h3>
+                <p class="text-gray-600 mt-1"><%= entry.translation %></p>
+              </div>
+            </div>
 
-<!-- Primary Content Area: Two Rectangles -->
-<div class="w-full md:w-3/4 p-4" data-controller="word">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div class="flex-grow p-4">
-      <div class="flex flex-col space-y-4">
-        <table class="w-full table-fixed">
-          <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-              <%= @word_list.name %>
-              <p id="word-description" class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400 line-clamp-3"> <%= @word_list.description %></p>
-              <a href="#" class="text-sm text-blue-500" data-action="word#toggleLineClamp">More</a>
-          </caption>
-          <thead>
-            <tr class="bg-gray-100 text-left">
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Irish</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">English</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Audio</th>
-              <% if current_user && @word_list.owner == current_user%>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Practice</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Listen</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delist</th>
+            <!-- Original Audio with Waveform -->
+            <% if entry.media.attached? %>
+              <div class="mb-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Original Recording</h4>
+                <div class="bg-gray-50 rounded-lg p-4" 
+                     data-controller="voice-recordings-index"
+                     data-voice-recordings-index-media-value="<%= url_for(entry.media) %>">
+                  <div data-voice-recordings-index-target="waveform" class="w-full h-16 mb-3"></div>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <button data-voice-recordings-index-target="playButton"
+                              data-action="click->voice-recordings-index#play"
+                              class="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              disabled>
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                        </svg>
+                        Play
+                      </button>
+                      <select data-voice-recordings-index-target="speed" 
+                              data-action="change->voice-recordings-index#changeSpeed"
+                              class="text-sm border-gray-300 rounded-md">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1.0" selected>1.0x</option>
+                        <option value="1.25">1.25x</option>
+                      </select>
+                    </div>
+                    <div class="text-sm text-gray-500" data-voice-recordings-index-target="timeDisplay">0:00</div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <% if current_user %>
+              <!-- Practice Recording Controls -->
+              <div class="border-t border-gray-200 pt-4">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-sm font-medium text-gray-700">Practice Recording</h4>
+                  <% list_entry = WordListDictionaryEntry.find_by(dictionary_entry_id: entry.id, word_list_id: @word_list.id) %>
+                  <% if list_entry&.recordings&.attached? %>
+                    <button data-controller="collapse" data-action="click->collapse#toggle"
+                            class="text-sm text-blue-600 hover:text-blue-800">
+                      <span data-collapse-target="toggleText">View recordings</span>
+                      <svg data-collapse-target="icon" class="inline w-4 h-4 ml-1 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                  <% end %>
+                </div>
+
+                <!-- Recording Controls -->
+                <div class="flex items-center space-x-3">
+                  <%= form_with(url: practice_recordings_path, 
+                               html: { 
+                                 multipart: true, 
+                                 class: 'inline-flex items-center space-x-2',
+                                 id: "practice_recording_form_#{entry.id}",
+                                 data: { 
+                                   controller: "recorder",
+                                   recorder_autosave_value: true,
+                                   turbo: true,
+                                   turbo_frame: "_top"
+                                 }
+                               }) do |form| %>
+                    <%= form.hidden_field :dictionary_entry_id, value: entry.id %>
+                    <%= form.file_field :media, 
+                                       hidden: true, 
+                                       direct_upload: true, 
+                                       data: { target: 'recorder.input' } %>
+                    
+                    <button type="button" 
+                            data-recorder-target="recordButton" 
+                            data-action="click->recorder#record"
+                            class="inline-flex items-center px-3 py-1 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="6" />
+                      </svg>
+                      Record
+                    </button>
+                    
+                    <button type="button" 
+                            data-recorder-target="stopButton" 
+                            data-action="click->recorder#stop"
+                            class="inline-flex items-center px-3 py-1 border border-transparent rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 hidden">
+                      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <rect x="6" y="6" width="12" height="12" rx="2" />
+                      </svg>
+                      Stop
+                    </button>
+                  <% end %>
+
+                  <!-- Play latest recording button -->
+                  <% if list_entry&.recordings&.attached? %>
+                    <button data-controller="audio-player"
+                            data-action="click->audio-player#play"
+                            data-audio-player-url-value="<%= url_for(list_entry.recordings.last) %>"
+                            class="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                      </svg>
+                      Play Latest
+                    </button>
+                  <% end %>
+                </div>
+
+                <!-- Collapsible Practice Recordings List -->
+                <% if list_entry&.recordings&.attached? %>
+                  <div class="hidden mt-4 border-t border-gray-200 pt-4" data-collapse-target="content">
+                    <h5 class="text-sm font-medium text-gray-700 mb-3">All Practice Recordings</h5>
+                    <div class="space-y-2">
+                      <% list_entry.recordings.each_with_index do |recording, index| %>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-600">Recording #<%= index + 1 %></span>
+                            <span class="text-xs text-gray-500"><%= recording.created_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+                          </div>
+                          <div class="flex items-center space-x-2">
+                            <button data-controller="audio-player"
+                                    data-action="click->audio-player#play"
+                                    data-audio-player-url-value="<%= url_for(recording) %>"
+                                    class="inline-flex items-center px-2 py-1 border border-gray-300 rounded text-xs text-gray-700 bg-white hover:bg-gray-50">
+                              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                              </svg>
+                              Play
+                            </button>
+                            <%= link_to url_for(recording), 
+                                class: "inline-flex items-center px-2 py-1 border border-gray-300 rounded text-xs text-gray-700 bg-white hover:bg-gray-50" do %>
+                              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                              </svg>
+                              Download
+                            <% end %>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+
+              <!-- Remove from list option for list owner -->
+              <% if @word_list.user == current_user %>
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                  <%= button_to word_list_dictionary_entries_path, 
+                      method: :post, 
+                      form: { data: { turbo_confirm: 'Are you sure you want to remove this word from the list?' } }, 
+                      params: { word_list_dictionary_entry: { dictionary_entry_id: entry.id, word_list_id: @word_list.id }},
+                      class: "inline-flex items-center px-3 py-1 border border-red-300 rounded-md text-sm text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" do %>
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Remove from list
+                  <% end %>
+                </div>
               <% end %>
-            </tr>
-          </thead>
-          <%= turbo_stream_from "word_lists/#{@word_list.id}" %>
-          <tbody id="dictionary_entries">
-            <% @entries.each do |entry| %>
-              <%= render partial: "dictionary_entry", locals: { entry: entry, current_user: current_user, list: @word_list } %>
             <% end %>
-          </tbody>
-        </table>
+          </div>
+        <% end %>
       </div>
+
+      <!-- AI Generated Script -->
       <% if @word_list.script.present? %>
-      <div id="script">
-        <%= render partial: "script", locals: { word_list: @word_list } %>
-      </div>
+        <div class="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <%= render partial: "script", locals: { word_list: @word_list } %>
+        </div>
       <% end %>
-    </div>
-    <%# footer %>
-    <div class="w-full bg-white rounded-md p-4">
-      <%== pagy_nav(@pagy) %>
+
+      <!-- Pagination -->
+      <% if @pagy.pages > 1 %>
+        <div class="mt-8 border-t border-gray-200 pt-6 flex items-center justify-between">
+          <div class="text-sm text-gray-700">
+            Showing <span class="font-medium"><%= @pagy.from %></span> to
+            <span class="font-medium"><%= @pagy.to %></span> of
+            <span class="font-medium"><%= @pagy.count %></span> entries
+          </div>
+          <div class="flex space-x-2">
+            <% if @pagy.prev %>
+              <%= link_to "Previous", word_list_path(@word_list, page: @pagy.prev),
+                  class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+            <% end %>
+            <% if @pagy.next %>
+              <%= link_to "Next", word_list_path(@word_list, page: @pagy.next),
+                  class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+      <% end %>
     </div>
   </div>
 </div>

@@ -4,7 +4,7 @@
       <%= yield %>
     </div>
     <div data-inline-edit-target="form" class="hidden absolute top-0 left-0 w-full bg-white rounded-lg shadow-lg p-4 z-10">
-      <%= form_with(model: model, class: "space-y-4") do |form| %>
+      <%= form_with(model: model, url: voice_recording_dictionary_entry_path(model.voice_recording, model), class: "space-y-4") do |form| %>
         <div>
           <%= form.label method, class: "block text-sm font-medium text-gray-700" %>
           <%= form.text_field method, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
@@ -21,4 +21,3 @@
 <% else %>
   <%= yield %>
 <% end %>
-

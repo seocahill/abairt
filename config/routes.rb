@@ -55,6 +55,8 @@ Rails.application.routes.draw do
 
   get 'home', to: 'home#index'
 
+  resources :practice_recordings, only: [:create]
+
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # health
   get "up" => "health#show"

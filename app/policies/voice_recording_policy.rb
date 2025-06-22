@@ -20,6 +20,10 @@ class VoiceRecordingPolicy < ApplicationPolicy
     true if user == record.owner
   end
 
+  def speakers?
+    user.admin? || user.teacher?
+  end
+
   def destroy?
     # only owners can destroy dictionary entries
     true if user == record.owner

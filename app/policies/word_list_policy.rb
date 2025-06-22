@@ -1,9 +1,9 @@
 class WordListPolicy < ApplicationPolicy
   def update?
-    user == record.owner
+    user == record.user
   end
 
   def destroy?
-    user == record.owner
+    user == record.user
   end
 end

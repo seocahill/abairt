@@ -3,7 +3,7 @@ module VoiceRecordings
     before_action :set_voice_recording
 
     def index
-      authorize @voice_recording, :edit?
+      authorize @voice_recording, :speakers?
       @temp_speakers = @voice_recording.users.where(role: :temporary)
       @speakers = User.active
 
@@ -17,7 +17,7 @@ module VoiceRecordings
     end
 
     def update
-      authorize @voice_recording, :edit?
+      authorize @voice_recording, :speakers?
       @temp_speaker = User.find(params[:id])
       @new_speaker = User.find(params[:speaker_id])
       DictionaryEntry.transaction do

@@ -1,5 +1,5 @@
 <!-- Main Container -->
-<div class="flex flex-col md:flex-row min-h-screen" data-controller="map" data-map-pins-value="<%= @pins.to_json %>" data-map-pubs-value="<%= @pubs.to_json %>">
+<div class="flex flex-col md:flex-row min-h-screen" data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
   <!-- Left Side - Map Container (moves between desktop and modal) -->
   <div class="hidden md:block md:w-1/2" data-map-target="desktopContainer">
     <div id="map" class="h-screen w-full"></div>

@@ -7,4 +7,4 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 # Load chat types seed data
-load(Rails.root.join('db', 'seeds', 'chat_types.rb'))
+# load(Rails.root.join('db', 'seeds', 'chat_types.rb'))

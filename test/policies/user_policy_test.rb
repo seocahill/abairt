@@ -21,7 +21,7 @@ class UserPolicyTest < ActiveSupport::TestCase
     current_user = users(:one)
     policy = UserPolicy.new(current_user, users(:two))
 
-    refute policy.show?
+    assert policy.show?
 
     current_user = users(:two)
     policy = UserPolicy.new(current_user, users(:two))
@@ -53,10 +53,10 @@ class UserPolicyTest < ActiveSupport::TestCase
     policy = UserPolicy.new(current_user, speaker)
     assert policy.update?
 
-    # Scenario: else false
+    # Scenario: any role can update a speaker
     current_user.role = :student
     policy = UserPolicy.new(current_user, speaker)
-    refute policy.update?
+    assert policy.update?
   end
 
   def test_destroy

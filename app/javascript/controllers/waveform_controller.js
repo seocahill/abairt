@@ -13,8 +13,11 @@ export default class extends Controller {
   connect() {
     if (!this.lazyValue) {
       this.initializeWaveform();
-    } else if (this.hasPlayButtonTarget) {
-      this.playButtonTarget.textContent = "Play";
+    } else {
+      this.showDummyWaveform();
+      if (this.hasPlayButtonTarget) {
+        this.playButtonTarget.textContent = "Play";
+      }
     }
   }
 
@@ -24,11 +27,51 @@ export default class extends Controller {
     }
   }
 
+  showDummyWaveform() {
+    const container = this.waveformTarget;
+    const width = container.offsetWidth || 800;
+    const height = 80;
+    
+    // Create SVG for dummy waveform
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.style.cssText = "display: block; width: 100%; background: transparent;";
+    
+    // Generate random waveform bars
+    const barWidth = 2;
+    const barGap = 3;
+    const totalBarWidth = barWidth + barGap;
+    const barCount = Math.floor(width / totalBarWidth);
+    
+    for (let i = 0; i < barCount; i++) {
+      const barHeight = Math.random() * (height - 20) + 10; // Random height between 10 and height-10
+      const x = i * totalBarWidth;
+      const y = (height - barHeight) / 2;
+      
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", x);
+      rect.setAttribute("y", y);
+      rect.setAttribute("width", barWidth);
+      rect.setAttribute("height", barHeight);
+      rect.setAttribute("rx", "3");
+      rect.setAttribute("fill", "#E5E7EB"); // Gray color for dummy waveform
+      
+      svg.appendChild(rect);
+    }
+    
+    container.innerHTML = '';
+    container.appendChild(svg);
+  }
+
   async play() {
     if (!this.waveSurfer) {
+      this.shouldAutoPlay = true;
       await this.initializeWaveform();
+    } else {
+      this.waveSurfer.playPause();
     }
-    this.waveSurfer.playPause();
   }
 
   async initializeWaveform() {
@@ -39,6 +82,8 @@ export default class extends Controller {
 
     try {
       const container = this.waveformTarget;
+      // Clear the container (removes dummy waveform)
+      container.innerHTML = '';
 
       this.waveSurfer = WaveSurfer.create({
         container: container,
@@ -52,7 +97,7 @@ export default class extends Controller {
         barGap: 3,
         responsive: true,
         normalize: true,
-        backend: this.hasVideoTarget ? 'MediaElement' : 'WebAudio',
+        backend: 'MediaElement',
         mediaControls: false,
         plugins: [
           RegionsPlugin.create({
@@ -107,6 +152,15 @@ export default class extends Controller {
         this.playButtonTarget.textContent = "Play";
         this.playButtonTarget.disabled = false;
       }
+      
+      // Set up pitch preservation on the underlying media element
+      this.setupPitchPreservation();
+      
+      // Auto-play if requested
+      if (this.shouldAutoPlay) {
+        this.shouldAutoPlay = false;
+        this.waveSurfer.play();
+      }
     });
 
     this.waveSurfer.on('play', () => {
@@ -150,10 +204,10 @@ export default class extends Controller {
 
       this.waveSurfer.on('region-out', () => {
         if (this.hasTranscriptionTarget) {
-          this.transcriptionTarget.textContent = "~";
+          this.transcriptionTarget.textContent = "";
         }
         if (this.hasTranslationTarget) {
-          this.translationTarget.textContent = "~";
+          this.translationTarget.textContent = "";
         }
       });
     }
@@ -187,12 +241,30 @@ export default class extends Controller {
     }
   }
 
+  setupPitchPreservation() {
+    // Access the underlying media element for MediaElement backend
+    if (this.waveSurfer.backend && this.waveSurfer.backend.media) {
+      const mediaElement = this.waveSurfer.backend.media;
+      mediaElement.preservesPitch = true;
+      mediaElement.mozPreservesPitch = true;
+      mediaElement.webkitPreservesPitch = true;
+    }
+  }
+
   changeSpeed(event) {
     event.preventDefault();
     if (!this.waveSurfer) return;
 
     const speed = parseFloat(event.currentTarget.value);
-    this.waveSurfer.setPlaybackRate(speed);
+    
+    // Use the underlying media element for pitch preservation
+    if (this.waveSurfer.backend && this.waveSurfer.backend.media) {
+      const mediaElement = this.waveSurfer.backend.media;
+      mediaElement.playbackRate = speed;
+    } else {
+      // Fallback to WaveSurfer method
+      this.waveSurfer.setPlaybackRate(speed);
+    }
   }
 
   zoom(event) {

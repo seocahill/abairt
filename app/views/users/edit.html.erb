@@ -2,6 +2,9 @@
   <%= render "users/inline_fields", form: form, method: :name do %>
     <%= form.text_field :name %>
   <% end %>
+  <%= render "users/inline_fields", form: form, method: :email do %>
+    <%= form.email_field :email %>
+  <% end %>
   <%= render "users/inline_fields", form: form, method: :voice do %>
     <%= form.select :voice, User.voices.keys.map { |voice| [voice.humanize, voice] }, {}, {} %>
   <% end %>

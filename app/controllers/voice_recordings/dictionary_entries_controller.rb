@@ -36,11 +36,31 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     @pagy, @entries = pagy(@recording.dictionary_entries.includes(:speaker, :owner), items: 10)
   end
 
+  def update
+    @dictionary_entry = DictionaryEntry.find(params[:id])
+    authorize @dictionary_entry
+
+    if @dictionary_entry.update dictionary_entry_params.merge(translator_id: current_user.id)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            @dictionary_entry,
+            partial: "voice_recordings/dictionary_entries/dictionary_entry",
+            locals: { entry: @dictionary_entry, current_user: current_user }
+          )
+        end
+        format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry was successfully updated.' }
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
 
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, :quality, rang_ids: [])
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, :quality, :translator_id, rang_ids: [])
   end
 end
