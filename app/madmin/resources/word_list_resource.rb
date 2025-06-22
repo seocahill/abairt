@@ -9,7 +9,6 @@ class WordListResource < Madmin::Resource
 
   # Associations
   attribute :dictionary_entries
-  attribute :users
 
   # Uncomment this to customize the display name of records in the admin area.
   # def self.display_name(record)
