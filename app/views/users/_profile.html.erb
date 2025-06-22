@@ -1,90 +1,114 @@
-<div id="<%= dom_id(@user) %>" class="m-10" data-controller="map" data-map-user-id-value="<%= @user.id %>">
-  <div class="px-4 sm:px-0">
-    <h3 class="text-base font-semibold leading-7 text-gray-900">
-      <%= @user.name %>
-      <span class="bg-green-200 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-700 dark:text-green-300"><%= @user.role.humanize %></span>
-    </h3>
-  </div>
-  <div class="mt-6 border-t border-gray-100">
-    <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">Profile</p>
-    <dl class="divide-y divide-gray-100">
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm font-medium leading-6 text-gray-900">Full name</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-          <%= render "users/inline_edit", model: @user, method: :name, current_user: current_user do %>
-            <%= @user.name  %>
-          <% end %>
-        </dd>
-      </div>
-      <% if current_user == @user %>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm font-medium leading-6 text-gray-900">Email address</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-          <%= render "users/inline_edit", model: @user, method: :email, current_user: current_user do %>
-            <%= @user.email  %>
-          <% end %>
-        </dd>
-      </div>
-      <% end %>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm font-medium leading-6 text-gray-900">About</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-          <%= render "users/inline_edit", model: @user, method: :about, current_user: current_user do %>
-            <%= @user.about || "Add information" %>
-          <% end %>
-        </dd>
-      </div>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm font-medium leading-6 text-gray-900">Voice</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-          <%= render "users/inline_edit", model: @user, method: :voice, current_user: current_user do %>
-            <%= @user.voice  %>
-          <% end %>
-        </dd>
-      </div>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm font-medium leading-6 text-gray-900">Location</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center">
-          <%= render "users/inline_edit", model: @user, method: :address, current_user: current_user do %>
-            <%= @user.address || "Add your address"  %>
-          <% end %>
-          <% if policy(@user).update? %>
-            <button type="button" class="ml-2" data-action="click->map#openModal">
-              <i data-feather="map-pin" class="text-blue-500"></i>
-            </button>
-          <% end %>
-        </dd>
-      </div>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt class="text-sm font-medium leading-6 text-gray-900">Language ability</dt>
-        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-          <%= render "users/inline_edit", model: @user, method: :ability, current_user: current_user do %>
-            <%= @user.ability&.humanize || "Add your ability"  %>
-          <% end %>
-        </dd>
-      </div>
-    </dl>
-  </div>
+<!-- Primary Content Area: Two Rectangles -->
 
-  <!-- Modal Structure -->
-  <div id="mapModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 999;">
-    <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-md bg-white">
-      <div class="flex justify-between items-center">
-        <h3 class="text-lg font-medium text-gray-900">Select Location</h3>
-        <button class="text-gray-500 hover:text-gray-700" data-action="click->map#closeModal">
-          <i data-feather="x"></i>
-        </button>
+
+<!-- Main Container -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="user_<%= @user.id %>">
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden" data-controller="map" data-map-user-id-value="<%= @user.id %>">
+    <!-- User Header -->
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-gray-900"><%= @user.name %></h1>
+          <span class="bg-green-200 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded"><%= @user.role.humanize %></span>
+        </div>
+    <% if current_user&.admin? %>
+          <%= link_to "Admin", madmin_user_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
+        <% end %>
       </div>
-      <div id="map" class="h-[600px] md:min-h-[50%] lg:min-h-[75%] mt-4"></div>
-      <div class="mt-4 flex justify-end">
-        <button class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" data-action="click->map#saveLocation">
-          Save Location
-        </button>
+      <div class="mt-2">
+        <%= render "users/inline_edit", model: @user, method: :about, current_user: current_user do %>
+          <p class="text-gray-600"><%= @user.about.present? ? @user.about : "Not specified" %></p>
+        <% end %>
       </div>
     </div>
-  </div>
 
-  <%= form_with model: @user, local: true do |form| %>
-    <%= form.hidden_field :lat_lang, id: "user-lat-lang", value: @user.lat_lang %>
-  <% end %>
+    <!-- Profile Information -->
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Column -->
+        <div class="space-y-6">
+          <% if current_user == @user %>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500">Email</h3>
+              <div class="mt-1">
+                <%= render "users/inline_edit", model: @user, method: :email, current_user: current_user do %>
+                  <p class="text-base text-gray-900"><%= @user.email %></p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Voice</h3>
+            <div class="mt-1">
+              <%= render "users/inline_edit", model: @user, method: :voice, current_user: current_user do %>
+                <p class="text-base text-gray-900"><%= @user.voice || "Not specified" %></p>
+              <% end %>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Language Ability</h3>
+            <div class="mt-1">
+              <%= render "users/inline_edit", model: @user, method: :ability, current_user: current_user do %>
+                <p class="text-base text-gray-900"><%= @user.ability&.humanize || "Not specified" %></p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Dialect</h3>
+            <div class="mt-1">
+              <%= render "users/inline_edit", model: @user, method: :dialect, current_user: current_user do %>
+                <p class="text-base text-gray-900"><%= @user.dialect&.humanize || "Not specified" %></p>
+              <% end %>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Location</h3>
+            <div class="mt-1 flex items-center">
+              <%= render "users/inline_edit", model: @user, method: :address, current_user: current_user do %>
+                <p class="text-base text-gray-900"><%= @user.address || "Not specified" %></p>
+              <% end %>
+              <% if policy(@user).update? %>
+                <button type="button" class="ml-2" data-action="click->map#openModal">
+                  <svg class="w-5 h-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 999;" data-map-target="modal">
+      <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-medium text-gray-900">Select Location</h3>
+          <button class="text-gray-500 hover:text-gray-700" data-action="click->map#closeModal">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div id="map" class="h-[600px] md:min-h-[50%] lg:min-h-[75%] mt-4" data-map-target="modalContainer"></div>
+        <div class="mt-4 flex justify-end">
+          <button class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" data-action="click->map#saveLocation">
+            Save Location
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <%= form_with model: @user, local: true do |form| %>
+      <%= form.hidden_field :lat_lang, id: "user-lat-lang", value: @user.lat_lang %>
+    <% end %>
+  </div>
 </div>

@@ -124,15 +124,20 @@ export default class extends Controller {
 
     // Ensure the modal container is visible and has dimensions
     this.modalContainerTarget.style.width = '100%'
-    this.modalContainerTarget.style.height = '100%'
+    this.modalContainerTarget.style.height = '600px'
+    this.modalContainerTarget.style.display = 'block'
 
-    // Initialize map in modal
-    this.initializeMap(this.modalContainerTarget)
-
-    // Force a resize after a short delay to ensure proper rendering
+    // Wait for the modal to be fully rendered before initializing map
     setTimeout(() => {
-      this.map.invalidateSize()
-    }, 100)
+      this.initializeMap(this.modalContainerTarget)
+      
+      // Force another resize after map initialization
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize()
+        }
+      }, 100)
+    }, 50)
 
     // Add escape key handler
     this.escapeHandler = (e) => {

@@ -33,13 +33,20 @@
 
             <!-- Center Controls -->
             <div class="flex items-center gap-4">
-              <button data-action="transcription#addRegionAtCurrent"
-                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                </svg>
-                Add Region
-              </button>
+              <% if @recording.diarization_data.blank? && current_user.admin? %>
+                <%= button_to "Diarize", voice_recording_diarization_path(@recording), 
+                    method: :post,
+                    data: { 
+                      turbo_confirm: "Are you sure you want to start diarization? This will identify different speakers in the recording." 
+                    },
+                    class: "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2" %>
+              <% end %>
+              
+              <% if policy(@recording).edit? %>
+                <%= link_to "Edit", edit_voice_recording_path(@recording), 
+                    class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2" %>
+              <% end %>
+              
               <div class="flex items-center gap-2">
                 <label for="zoom" class="text-gray-600">Zoom:</label>
                 <input type="range"
@@ -74,6 +81,7 @@
             <th scope="col" class="px-6 py-3">Speaker</th>
             <th scope="col" class="px-6 py-3">Word/Phrase</th>
             <th scope="col" class="px-6 py-3">Translation</th>
+            <th scope="col" class="px-6 py-3">Translator</th>
             <th scope="col" class="px-6 py-3">Quality</th>
             <th scope="col" colspan="2" class="px-6 py-3 text-center"></th>
           </tr>

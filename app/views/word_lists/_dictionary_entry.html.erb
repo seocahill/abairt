@@ -21,7 +21,7 @@
       <% end %>
     <% end %>
   </td>
-  <% if current_user && list.owner == current_user %>
+  <% if current_user && list.user == current_user %>
     <% list_entry = WordListDictionaryEntry.find_by(dictionary_entry_id: entry.id, word_list_id: list.id) %>
     <td data-controller="entry" class="px-6 py-4">
         <%= form_with(model: list_entry) do |form| %>

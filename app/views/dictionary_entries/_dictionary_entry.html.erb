@@ -1,16 +1,44 @@
-<div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-all duration-300">
+<div id="dictionary_entry_<%= entry.id %>" class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-all duration-300 relative">
   <div class="flex items-start justify-between">
     <div class="flex-1">
       <!-- Word/Phrase and Translation -->
       <div class="mb-2">
-        <p class="text-lg font-medium text-gray-900"><%= entry.word_or_phrase %></p>
-        <p class="text-gray-600 italic"><%= entry.translation %></p>
+        <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
+          <p class="text-lg font-medium text-gray-900"><%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase" %></p>
+        <% end %>
+        <%= render "dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
+          <p class="text-gray-600 italic"><%= entry.translation.present? ? entry.translation : "Add translation" %></p>
+        <% end %>
+      </div>
+
+      <!-- Metadata -->
+      <div class="mb-3 text-xs text-gray-500 space-y-1">
+        <% if entry.speaker %>
+          <div>
+            <span class="font-medium">Speaker:</span> 
+            <%= link_to entry.speaker.name, user_path(entry.speaker), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>
+          </div>
+        <% end %>
+        <div>
+          <span class="font-medium">Owner:</span> 
+          <%= link_to entry.owner.name, user_path(entry.owner), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>
+        </div>
+        <div>
+          <span class="font-medium">Translator:</span> 
+          <%= link_to entry.translator.name, user_path(entry.translator), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>
+        </div>
+        <% if entry.quality %>
+          <div>
+            <span class="font-medium">Quality:</span> 
+            <span class="capitalize"><%= entry.quality %></span>
+          </div>
+        <% end %>
       </div>
 
       <!-- Tags and Recording Link -->
       <div class="flex flex-wrap items-center gap-2 text-sm">
         <% if entry.voice_recording %>
-          <%= link_to voice_recording_path(entry.voice_recording), class: "text-blue-600 hover:text-blue-800 flex items-center" do %>
+          <%= link_to voice_recording_path(entry.voice_recording), class: "text-blue-600 hover:text-blue-800 flex items-center", data: { turbo_frame: "_top" } do %>
             <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" />
               <path d="M5.5 9.643a.75.75 0 00-1.5 0V10c0 3.06 2.29 5.585 5.25 5.954V17.5h-1.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-1.5v-1.546A6.001 6.001 0 0016 10v-.357a.75.75 0 00-1.5 0V10a4.5 4.5 0 01-9 0v-.357z" />
@@ -20,36 +48,53 @@
         <% end %>
 
         <% entry.tags.each do |tag| %>
-          <%= link_to dictionary_entries_path(tag: tag.name),
-              class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200",
-              data: { turbo_frame: "entries" } do %>
+          <%= link_to dictionary_entries_path(tag: tag.name, search: params[:search], media: params[:media]),
+              class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200" do %>
             <%= tag.name %>
           <% end %>
+        <% end %>
+
+        <%= link_to dictionary_entry_path(entry), class: "text-gray-500 hover:text-gray-700 flex items-center", data: { turbo_frame: "_top" } do %>
+          <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          Versions
         <% end %>
       </div>
     </div>
 
-    <!-- Play Button -->
-    <% if entry.media.attached? %>
-      <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
-              data-controller="audio-player"
-              data-action="audio-player#play"
-              data-audio-player-url-value="<%= url_for(entry.media) %>"
-              data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
-              data-audio-player-translation-value="<%= entry.translation %>">
-        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-        </svg>
-      </button>
-    <% elsif current_user %>
-      <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
-              data-controller="entry"
-              data-action="entry#synth"
-              data-audio-text="<%= entry.word_or_phrase %>">
-        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10 3.75a.75.75 0 00-1.264-.546L4.703 7H3.167a.75.75 0 00-.75.75v4.5c0 .414.336.75.75.75h1.536l4.033 3.796A.75.75 0 0010 16.25V3.75zM15.95 10a4.25 4.25 0 00-1.227-3.034.75.75 0 00-1.071 1.047A2.75 2.75 0 0114.5 10c0 .76-.31 1.445-.809 1.938a.75.75 0 001.071 1.047A4.25 4.25 0 0015.95 10z"/>
-        </svg>
-      </button>
-    <% end %>
+    <div class="flex flex-col items-end space-y-2">
+      <% if entry.media.attached? %>
+        <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
+                data-controller="audio-player"
+                data-action="audio-player#play"
+                data-audio-player-url-value="<%= url_for(entry.media) %>"
+                data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
+                data-audio-player-translation-value="<%= entry.translation %>">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      <% else %>
+        <% if current_user %>
+          <button class="flex-shrink-0 bg-yellow-100 text-yellow-600 hover:bg-yellow-200 p-2 rounded-full transition-colors duration-200" 
+                  data-controller="entry" 
+                  data-action="entry#synth" 
+                  data-audio-text="<%= entry.word_or_phrase %>"
+                  data-entry-id="<%= entry.id %>"
+                  title="Generate speech using TTS">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        <% else %>
+          <span class="flex-shrink-0 bg-gray-100 text-gray-400 p-2 rounded-full" title="Log in to hear pronunciation">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 </div>

@@ -18,13 +18,14 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    create? || user == record
+    true
   end
 
   def update?
-    return true if user&.admin?
+    # if it's your own record, you can edit it
     return true if user == record
-    true if (user && record.speaker? && !user.student?)
+    # if it's a speaker, anyone can edit it
+    user && record.speaker?
   end
 
   def edit?

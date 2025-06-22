@@ -6,7 +6,7 @@ pin "@hotwired/stimulus", to: "stimulus.js", preload: true
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
 pin_all_from "app/javascript/controllers", under: "controllers"
 
-pin "process", to: "https://ga.jspm.io/npm:@jspm/core@2.0.0-beta.12/nodelibs/browser/process-production.js"
+pin "process", to: "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/process-production.js"
 pin "util", to: "https://ga.jspm.io/npm:@jspm/core@2.0.0-beta.12/nodelibs/browser/util.js"
 pin "wavesurferjs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/wavesurfer.js"
 pin "wavesurferregionsjs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/plugin/wavesurfer.regions.min.js"
@@ -22,3 +22,4 @@ pin "feather-icons", to: "https://ga.jspm.io/npm:feather-icons@4.29.0/dist/feath
 pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.7/lib/index.js"
 pin "trix"
 pin "@rails/actiontext", to: "actiontext.js"
+pin "recordrtc", to: "https://ga.jspm.io/npm:recordrtc@5.6.2/RecordRTC.js"

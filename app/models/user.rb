@@ -12,6 +12,8 @@ class User < ApplicationRecord
 
   has_many :vocabulary_entries, through: :word_lists, source: :dictionary_entries
 
+  has_many :word_lists
+
   enum role: [
     :student,
     :speaker,

@@ -70,7 +70,9 @@
           <div class="flex items-center">
             <%= f.text_field :address, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
             <button type="button" class="ml-2" data-action="click->map#openModal">
-              <i data-feather="map-pin" class="text-blue-500"></i>
+              <svg class="w-5 h-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+              </svg>
             </button>
           </div>
           <%= f.hidden_field :lat_lang, id: "user-lat-lang" %>
@@ -90,16 +92,18 @@
         <%= f.submit "Create Speaker", class: "w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" %>
       <% end %>
 
-      <!-- Modal Structure -->
-      <div id="mapModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 999;">
+      <!-- Map Modal -->
+      <div id="mapModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 999;" data-map-target="modal">
         <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-md bg-white">
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-medium text-gray-900">Select Location</h3>
             <button class="text-gray-500 hover:text-gray-700" data-action="click->map#closeModal">
-              <i data-feather="x"></i>
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-          <div id="map" class="h-[600px] md:min-h-[50%] lg:min-h-[75%] mt-4"></div>
+          <div id="map" class="h-[600px] md:min-h-[50%] lg:min-h-[75%] mt-4" data-map-target="modalContainer"></div>
           <div class="mt-4 flex justify-end">
             <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
                     data-action="click->map#saveLocation"

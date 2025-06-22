@@ -5,11 +5,6 @@ class WordList < ApplicationRecord
   has_many :word_list_dictionary_entries, dependent: :destroy
   has_many :dictionary_entries, through: :word_list_dictionary_entries
 
-  has_many :learning_sessions, as: :learnable
-
-  has_many :user_lists, dependent: :destroy
-  has_many :users, through: :user_lists
-
   validates :name, presence: true, uniqueness: { scope: :user }
 
   def to_csv

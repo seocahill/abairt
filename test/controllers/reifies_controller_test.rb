@@ -13,7 +13,11 @@ class ReifiesControllerTest < ActionDispatch::IntegrationTest
   test "should reify the version and redirect to items page with success notice" do
     post reify_url, params: { version_id: @version.id }
 
-    assert_redirected_to @version.item
+    # The controller reifies and saves the item, then redirects to it
+    # We need to find the reified item to check the redirect
+    reified_item = DictionaryEntry.find_by(word_or_phrase: @entry.word_or_phrase)
+    
+    assert_redirected_to reified_item
     assert_equal "Successfully reified", flash[:notice]
   end
 

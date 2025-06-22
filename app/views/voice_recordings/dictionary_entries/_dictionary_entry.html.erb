@@ -9,34 +9,37 @@
     </button>
   </td>
   <td class="px-6 py-4">
-    <%= render "dictionary_entries/inline_edit", model: entry, method: :speaker_id, current_user: current_user do %>
+    <%= render "voice_recordings/dictionary_entries/inline_edit", model: entry, method: :speaker_id, current_user: current_user do %>
       <% if entry.speaker_id %>
-        <%= link_to_unless policy(entry).edit?, entry.speaker&.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline" %>
+        <%= link_to_unless policy(entry).edit?, entry.speaker&.name, user_path(entry.speaker), class: "cursor-pointer hover:text-blue-700 hover:underline", data: { turbo_frame: "_top" } %>
       <% else %>
         "Choose speaker"
       <% end %>
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <%= render "dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
+    <%= render "voice_recordings/dictionary_entries/inline_edit", model: entry, method: :word_or_phrase, current_user: current_user do %>
       <%= entry.word_or_phrase.present? ? entry.word_or_phrase : "Add word or phrase" %>
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <%= render "dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
+    <%= render "voice_recordings/dictionary_entries/inline_edit", model: entry, method: :translation, current_user: current_user do %>
       <%= entry.translation.present? ? entry.translation : "Add translation" %>
     <% end %>
   </td>
   <td class="px-6 py-4">
+    <%= link_to_unless policy(entry).edit?, entry.translator&.name, user_path(entry.translator), class: "cursor-pointer hover:text-blue-700 hover:underline", data: { turbo_frame: "_top" } %>
+  </td>
+  <td class="px-6 py-4">
     <% if policy(entry).update? %>
       <% if ["low", "fair"].include?(entry.quality) %>
-        <%= button_to "Pending", dictionary_entry_path(entry),
+        <%= button_to "Unreviewed", voice_recording_dictionary_entry_path(entry.voice_recording, entry),
             method: :patch,
             params: { dictionary_entry: { quality: "good" } },
             class: "px-3 py-1 text-sm font-medium text-white bg-orange-500 rounded hover:bg-orange-600",
             form: { data: { turbo: true } } %>
       <% else %>
-        <%= button_to "Validated", dictionary_entry_path(entry),
+        <%= button_to "Correct", voice_recording_dictionary_entry_path(entry.voice_recording, entry),
             method: :patch,
             params: { dictionary_entry: { quality: "fair" } },
             class: "px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600",

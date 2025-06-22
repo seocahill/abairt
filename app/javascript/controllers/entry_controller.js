@@ -47,24 +47,59 @@ export default class extends Controller {
 
   async synth(event) {
     event.target.disabled = true;
+    const originalText = event.target.innerText;
     event.target.innerText = "....";
     const text = event.currentTarget.dataset.audioText;
-    const response = await this.synthesizeSpeech(text, event.target);
-    const synthesizedAudioBase64 = response.audioContent;
-    this.playSynthesizedAudio(synthesizedAudioBase64);
-    event.target.disabled = false;
-    event.target.innerText = "Synth";
+    const entryId = event.currentTarget.dataset.entryId;
+    
+    try {
+      const response = await this.synthesizeSpeech(text, entryId, event.target);
+      
+      // Check if we have a cached audio URL
+      if (response.audioUrl) {
+        // Play from cached URL
+        this.playAudioFromUrl(response.audioUrl);
+        
+        // Show cache status briefly, then refresh if newly cached
+        if (response.cached) {
+          event.target.innerText = "Cached";
+          setTimeout(() => {
+            event.target.innerText = originalText;
+          }, 1000);
+        } else {
+          // New audio was attached to this entry, refresh to show regular player
+          event.target.innerText = "Saved!";
+          setTimeout(() => {
+            Turbo.visit(window.location.href, { action: "replace" });
+          }, 1500);
+        }
+      } else if (response.audioContent) {
+        // Fallback to base64 format for temporary TTS
+        this.playSynthesizedAudio(response.audioContent);
+        event.target.innerText = originalText;
+      }
+    } catch (error) {
+      console.error("TTS error:", error);
+      event.target.innerText = originalText;
+    } finally {
+      event.target.disabled = false;
+    }
   }
 
-  async synthesizeSpeech(text, target) {
+  async synthesizeSpeech(text, entryId, target) {
     try {
+      const body = { text: text };
+      if (entryId) {
+        body.entry_id = entryId;
+      }
+      
       const response = await fetch('/api/text_to_speech', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
         },
-        body: JSON.stringify({ text: text })
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) {
@@ -77,6 +112,14 @@ export default class extends Controller {
       target.disabled = false;
       target.innerText = "Synth";
     }
+  }
+
+  playAudioFromUrl(audioUrl) {
+    const audio = new Audio(audioUrl);
+    audio.play().catch(error => {
+      console.error("Error playing cached audio:", error);
+      alert("Error playing audio. Please try again.");
+    });
   }
 
   playSynthesizedAudio(base64AudioData) {

@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurferregionsjs';
 import L from 'leaflet';
 
 export default class extends Controller {
-  static targets = ["map", "waveform", "playButton", "timeDisplay"]
+  static targets = ["map", "waveform", "playButton", "timeDisplay", "speed"]
   static values = {
     pins: Array,
     media: String
@@ -113,6 +113,14 @@ export default class extends Controller {
 
     this.waveSurfer.playPause();
     button.textContent = this.waveSurfer.isPlaying() ? "Pause" : "Play";
+  }
+
+  changeSpeed(event) {
+    event.preventDefault();
+    if (!this.waveSurfer) return;
+
+    const speed = parseFloat(event.currentTarget.value);
+    this.waveSurfer.setPlaybackRate(speed);
   }
 
   formatTime(seconds) {

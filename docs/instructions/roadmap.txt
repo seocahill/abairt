@@ -1,0 +1,6 @@
+# Roadmap
+- cache synth requests
+- versions to allow non-destructive transcription
+- verify transcript import somehow
+- export to csv for anki
+- practice alongside recording

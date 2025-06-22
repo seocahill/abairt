@@ -32,7 +32,7 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
       post dictionary_entries_url, params: { dictionary_entry: {"speaker_id"=>"Seán Ó Cillín", "word_or_phrase"=>"An té nach ndeanfaidh a ghraithe in am, bíonn sé ina phleist", "translation"=>"The person who doesn't tend to their work in time is foolish", "tag_list"=>"seanchas"} }
     end
 
-    assert_redirected_to dictionary_entry_url(DictionaryEntry.last)
+    assert_redirected_to dictionary_entries_url
   end
 
   test "should show dictionary_entry" do

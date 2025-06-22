@@ -12,9 +12,11 @@ class DictionaryEntry < ApplicationRecord
 
   belongs_to :speaker, class_name: "User", foreign_key: "speaker_id", optional: true
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
+  belongs_to :translator, class_name: "User", foreign_key: "translator_id", optional: true
+  belongs_to :voice_recording, optional: true, counter_cache: true
 
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
-  belongs_to :voice_recording, optional: true, counter_cache: true
+  has_many :word_list_dictionary_entries, dependent: :destroy
 
   acts_as_taggable_on :tags
 
@@ -35,6 +37,8 @@ class DictionaryEntry < ApplicationRecord
     good
     excellent
   ]
+
+  alias_attribute :region_id, :id
 
   def media_url
     return "" unless media.attached?
@@ -78,5 +82,9 @@ class DictionaryEntry < ApplicationRecord
 
   def post_process
     PostProcessEntryJob.perform_later(self)
+  end
+
+  def translator
+    super || User.find_by(id: versions.last&.whodunnit) || owner
   end
 end

@@ -1,43 +1,102 @@
-<!-- Sidebar for CRUD -->
-<div class="w-full md:w-1/4 p-4"  data-controller="sidebar">
-  <%= render "sidebar" %>
-</div>
-<!-- Primary Content Area: Two Rectangles -->
-<div class="w-full md:w-3/4 p-4">
-  <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <div class="relative overflow-x-auto">
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="px-6 py-3">Name</th>
-            <th scope="col" class="px-6 py-3">Description</th>
-            <th scope="col" class="px-6 py-3">Words</th>
-            <th scope="col" class="px-6 py-3">User</th>
-            <th scope="col" class="px-6 py-3">CSV</th>
-            <th scope="col" class="px-6 py-3"></th>
-            <th scope="col" class="px-6 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @word_lists.each do |list| %>
-            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <td class="px-6 py-4"><%= list.name %></td>
-              <td class="px-6 py-4"><%= truncate(list.description) %></td>
-              <td class="px-6 py-4"><%= list.dictionary_entries.size %></td>
-              <td class="px-6 py-4"><%= list.owner.name %></td>
-              <td class="px-6 py-4"><%= link_to word_list_path(list, format: :csv) do %><i data-feather="download"></i><% end %></td>
-              <td class="px-6 py-4"><%= link_to list do %><i data-feather="eye"></i><% end %></td>
-              <% if current_user&.admin? %>
-                <td class="px-6 py-4"><%= link_to 'Add to Course', new_item_path(itemable_id: list.id, itemable_type: list.class.to_s), class: "text-blue-500 hover:text-blue-700 underline hover:underline font-bold hover:font-normal" %></td>
-              <% end %>
-            </tr>
+<!-- Main Container -->
+<div class="flex flex-col md:flex-row min-h-screen">
+  <!-- Right Side - Word Lists -->
+  <div class="w-full h-screen flex flex-col">
+    <!-- Header -->
+    <div class="p-6 bg-white border-b">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-900">Word Lists</h2>
+        <% if current_user %>
+          <%= link_to new_word_list_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New List
           <% end %>
-        </tbody>
-      </table>
+        <% end %>
+      </div>
     </div>
-    <%# footer %>
-    <div class="w-full bg-white rounded-md p-4">
-      <%== pagy_nav(@pagy) %>
+
+    <!-- Lists Content -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Words</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @word_lists.each do |list| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900"><%= list.name %></div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900"><%= truncate(list.description, length: 100) %></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <%= list.dictionary_entries.size %> words
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900"><%= list.user.name %></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium space-x-2">
+                    <%= link_to word_list_path(list),
+                        class: "inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                        title: "View List" do %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      <span class="ml-1">View</span>
+                    <% end %>
+                    <%= link_to word_list_path(list, format: :csv),
+                        class: "inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                        title: "Download CSV" do %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                      <span class="ml-1">CSV</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <% if @pagy.pages > 1 %>
+        <div class="mt-6 border-t border-gray-200 pt-6 flex items-center justify-between">
+          <div class="text-sm text-gray-700">
+            Showing <span class="font-medium"><%= @pagy.from %></span> to
+            <span class="font-medium"><%= @pagy.to %></span> of
+            <span class="font-medium"><%= @pagy.count %></span> lists
+          </div>
+          <div class="flex space-x-2">
+            <% if @pagy.prev %>
+              <%= link_to "Previous", word_lists_path(page: @pagy.prev),
+                  class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+            <% end %>
+            <% if @pagy.next %>
+              <%= link_to "Next", word_lists_path(page: @pagy.next),
+                  class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+      <% end %>
     </div>
   </div>
 </div>
