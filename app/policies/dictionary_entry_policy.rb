@@ -13,6 +13,7 @@ class DictionaryEntryPolicy < ApplicationPolicy
   end
 
   def destroy?
+    return unless user
     # only owners can destroy dictionary entries
     true if user == record.owner || user.admin?
   end
