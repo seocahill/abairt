@@ -157,5 +157,6 @@ class DictionaryEntriesController < ApplicationController
 
     @dictionary_entry.media.purge
     @dictionary_entry.create_audio_snippet
+    AutoTagEntryJob.perform_later(@dictionary_entry)
   end
 end
