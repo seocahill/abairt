@@ -38,7 +38,7 @@
               <div class="mb-4 p-3 bg-blue-50 rounded-lg">
                 <div class="flex items-center justify-between">
                   <span class="text-sm font-medium text-blue-700">Filtered by: <%= params[:tag] %></span>
-                  <%= link_to dictionary_entries_path(search: params[:search], media: params[:media]),
+                  <%= link_to dictionary_entries_path(search: params[:search], media: params[:media], show_all: params[:show_all]),
                       class: "text-xs text-blue-600 hover:text-blue-800 underline" do %>
                     Clear filter
                   <% end %>
@@ -46,7 +46,7 @@
               </div>
             <% end %>
             <% @tags.each do |tag| %>
-              <%= link_to dictionary_entries_path(tag: tag.name, search: params[:search], media: params[:media]),
+              <%= link_to dictionary_entries_path(tag: tag.name, search: params[:search], media: params[:media], show_all: params[:show_all]),
                   class: "flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-50 #{params[:tag] == tag.name ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}",
                   data: { tag_filter_target: "tag" } do %>
                 <span class="text-sm font-medium"><%= tag.name %></span>
@@ -91,6 +91,15 @@
             </div>
             <%= hidden_field_tag :tag, params[:tag] if params[:tag].present? %>
           </div>
+          
+          <!-- Show All Toggle -->
+          <div class="mt-3 flex items-center">
+            <%= check_box_tag :show_all, "1", params[:show_all] == "1",
+                class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded",
+                data: { action: "change->form#submit" } %>
+            <%= label_tag :show_all, "Show all entries (including machine-generated, unreviewed transcriptions)", 
+                class: "ml-2 text-sm text-gray-600" %>
+          </div>
         <% end %>
       </div>
     </div>
@@ -115,12 +124,12 @@
             </div>
             <div class="flex space-x-2">
               <% if @pagy.prev %>
-                <%= link_to "Previous", dictionary_entries_path(page: @pagy.prev, search: params[:search], tag: params[:tag], media: params[:media]),
+                <%= link_to "Previous", dictionary_entries_path(page: @pagy.prev, search: params[:search], tag: params[:tag], media: params[:media], show_all: params[:show_all]),
                     class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50",
                     data: { turbo_frame: "entries" } %>
               <% end %>
               <% if @pagy.next %>
-                <%= link_to "Next", dictionary_entries_path(page: @pagy.next, search: params[:search], tag: params[:tag], media: params[:media]),
+                <%= link_to "Next", dictionary_entries_path(page: @pagy.next, search: params[:search], tag: params[:tag], media: params[:media], show_all: params[:show_all]),
                     class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50",
                     data: { turbo_frame: "entries" } %>
               <% end %>

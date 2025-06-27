@@ -5,10 +5,12 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry
-      .not_low
-      .not_fair
-      .order(id: :desc)
+    records = DictionaryEntry.order(id: :desc)
+    
+    # Only filter out low/fair quality entries if "show all" is not checked
+    unless params[:show_all] == "1"
+      records = records.not_low.not_fair
+    end
 
     if params[:search].present?
       records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
