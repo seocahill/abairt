@@ -31,6 +31,8 @@ class AudioTranscriptionService
     uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
+    http.read_timeout = 30
+    http.open_timeout = 30
     request = Net::HTTP::Post.new(uri.path)
 
     payload = {
