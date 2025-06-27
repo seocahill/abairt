@@ -33,7 +33,7 @@
 
             <!-- Center Controls -->
             <div class="flex items-center gap-4">
-              <% if @recording.diarization_data.blank? && current_user.admin? %>
+              <% if @recording.diarization_data.blank? && current_user&.admin? %>
                 <%= button_to "Diarize", voice_recording_diarization_path(@recording), 
                     method: :post,
                     data: { 
