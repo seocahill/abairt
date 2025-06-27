@@ -86,6 +86,7 @@ class DictionaryEntriesController < ApplicationController
 
     if @dictionary_entry.update dictionary_entry_params.merge(translator_id: current_user.id)
       regenerate_media
+      AutoTagEntryJob.perform_later(@dictionary_entry)
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
@@ -157,6 +158,5 @@ class DictionaryEntriesController < ApplicationController
 
     @dictionary_entry.media.purge
     @dictionary_entry.create_audio_snippet
-    AutoTagEntryJob.perform_later(@dictionary_entry)
   end
 end
