@@ -5,7 +5,7 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
-    records = DictionaryEntry.order(id: :desc)
+    records = DictionaryEntry.order(id: :desc).where.not(word_or_phrase: nil)
     
     # Only filter out low/fair quality entries if "show all" is not checked
     unless params[:show_all] == "1"
