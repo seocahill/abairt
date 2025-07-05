@@ -7,13 +7,15 @@ class ServiceMonitoringServiceTest < ActiveSupport::TestCase
     @service = ServiceMonitoringService.new
   end
 
-  test "monitor_all_services returns hash with tts and asr keys" do
+  test "monitor_all_services returns hash with tts, asr, and pyannote keys" do
     result = @service.monitor_all_services
     
     assert_includes result.keys, :tts
     assert_includes result.keys, :asr
+    assert_includes result.keys, :pyannote
     assert_includes result[:tts].keys, :status
     assert_includes result[:asr].keys, :status
+    assert_includes result[:pyannote].keys, :status
   end
 
   test "monitor_tts_service creates service status record" do
@@ -33,6 +35,16 @@ class ServiceMonitoringServiceTest < ActiveSupport::TestCase
     
     status = ServiceStatus.last
     assert_equal 'asr', status.service_name
+    assert_includes ['up', 'down'], status.status
+  end
+
+  test "monitor_pyannote_service creates service status record" do
+    assert_difference 'ServiceStatus.count', 1 do
+      @service.monitor_pyannote_service
+    end
+    
+    status = ServiceStatus.last
+    assert_equal 'pyannote', status.service_name
     assert_includes ['up', 'down'], status.status
   end
 

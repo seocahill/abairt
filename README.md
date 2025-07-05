@@ -90,6 +90,7 @@ The application monitors the health of critical external services:
 
 - **TTS (Text-to-Speech)**: Monitors the Abair.ie API for Irish text-to-speech synthesis
 - **ASR (Automatic Speech Recognition)**: Monitors the TCD phonetics service for speech recognition
+- **Pyannote (Speaker Diarization)**: Monitors the Pyannote.ai API for speaker identification and separation
 
 ### Monitoring Features
 

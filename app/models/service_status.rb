@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ServiceStatus < ApplicationRecord
-  validates :service_name, presence: true, inclusion: { in: %w[tts asr] }
+  validates :service_name, presence: true, inclusion: { in: %w[tts asr pyannote] }
   validates :status, presence: true, inclusion: { in: %w[up down] }
   validates :response_time, numericality: { greater_than: 0 }, allow_nil: true
 
