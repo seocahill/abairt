@@ -21,3 +21,8 @@ s.cron '00 09 * * *' do
     NotificationsMailer.with(user: user).recent_messages.deliver
   end
 end
+
+# Monitor TTS and ASR services every hour
+s.cron '0 * * * *' do
+  MonitorServicesJob.perform_later
+end

@@ -84,6 +84,34 @@ Lists can be downloaded as csvs for use in spaced repition apps like anki.
 - Rufus for wrapping cron
 - yui-compressor to get around sassc tailwind incompatibility
 
+## Service Monitoring
+
+The application monitors the health of critical external services:
+
+- **TTS (Text-to-Speech)**: Monitors the Abair.ie API for Irish text-to-speech synthesis
+- **ASR (Automatic Speech Recognition)**: Monitors the TCD phonetics service for speech recognition
+
+### Monitoring Features
+
+- **Automatic Monitoring**: Services are checked every hour via scheduled jobs
+- **Status Page**: Visit `/status` to view current service status and 24-hour history
+- **Response Time Tracking**: Monitors and logs response times for performance analysis
+- **Error Logging**: Captures and displays error messages when services are down
+
+### Manual Monitoring
+
+To manually trigger service monitoring:
+
+```bash
+bundle exec rake cron:monitor_services
+```
+
+### Service Status
+
+- **Operational**: Service is responding with 2xx status codes
+- **Down**: Service is not responding or returning error status codes
+- **Uptime**: Percentage of successful checks in the last 24 hours
+
 
 ## Restoring
 

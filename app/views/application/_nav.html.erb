@@ -16,6 +16,7 @@
             <%= link_to 'Transcriptions', voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <%= link_to 'Dictionary', dictionary_entries_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <%= link_to 'Speakers', users_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+            <%= link_to 'Status', status_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
           </div>
         </div>
       </div>
@@ -64,6 +65,9 @@
         </li>
         <li>
           <%= link_to 'Speakers', users_path, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
+        </li>
+        <li>
+          <%= link_to 'Status', status_path, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
         </li>
         <% if current_user.present? %>
           <li>
