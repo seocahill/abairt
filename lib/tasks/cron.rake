@@ -19,4 +19,10 @@ namespace :cron do
       NotificationsMailer.with(rang: rang).ceád_rang_eile.deliver
     end
   end
+
+  task monitor_services: :environment do
+    puts "Running service monitoring..."
+    MonitorServicesJob.perform_now
+    puts "Service monitoring completed!"
+  end
 end

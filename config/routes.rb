@@ -60,6 +60,9 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # health
   get "up" => "health#show"
+  
+  # Service status
+  get "status" => "status#index"
 
   root to: 'application#root_redirect'
 end

@@ -1,0 +1,128 @@
+# frozen_string_literal: true
+
+class ServiceMonitoringService
+  def initialize
+    @tts_url = 'https://api.abair.ie/v3/synthesis'
+    @asr_url = 'https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise'
+  end
+
+  def monitor_all_services
+    {
+      tts: monitor_tts_service,
+      asr: monitor_asr_service
+    }
+  end
+
+  def monitor_tts_service
+    start_time = Time.current
+    
+    begin
+      # Create a minimal TTS request with a simple Irish word
+      uri = URI.parse(@tts_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.read_timeout = 30
+      http.open_timeout = 10
+      
+      request = Net::HTTP::Post.new(uri.path)
+      request.body = {
+        synthinput: { text: 'dia', ssml: 'string' },
+        voiceparams: { languageCode: 'ga-IE', name: 'ga_UL_anb_piper', ssmlGender: 'UNSPECIFIED' },
+        audioconfig: {
+          audioEncoding: 'LINEAR16',
+          speakingRate: 1,
+          pitch: 1,
+          volumeGainDb: 1,
+          htsParams: 'string',
+          sampleRateHertz: 0,
+          effectsProfileId: []
+        },
+        outputType: 'JSON'
+      }.to_json
+      request['Content-Type'] = 'application/json'
+      
+      response = http.request(request)
+      response_time = (Time.current - start_time) * 1000 # Convert to milliseconds
+      
+      if response.code.to_i.between?(200, 299)
+        ServiceStatus.create!(
+          service_name: 'tts',
+          status: 'up',
+          response_time: response_time
+        )
+        { status: 'up', response_time: response_time, error: nil }
+      else
+        ServiceStatus.create!(
+          service_name: 'tts',
+          status: 'down',
+          response_time: response_time,
+          error_message: "HTTP #{response.code}: #{response.body}"
+        )
+        { status: 'down', response_time: response_time, error: "HTTP #{response.code}" }
+      end
+    rescue => e
+      response_time = (Time.current - start_time) * 1000
+      ServiceStatus.create!(
+        service_name: 'tts',
+        status: 'down',
+        response_time: response_time,
+        error_message: e.message
+      )
+      { status: 'down', response_time: response_time, error: e.message }
+    end
+  end
+
+  def monitor_asr_service
+    start_time = Time.current
+    
+    begin
+      # Create a minimal ASR request with a small audio blob
+      # We'll use a very short base64-encoded audio sample
+      minimal_audio_blob = 'UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT'
+      
+      uri = URI.parse(@asr_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.read_timeout = 30
+      http.open_timeout = 10
+      
+      request = Net::HTTP::Post.new(uri.path)
+      request.body = {
+        recogniseBlob: minimal_audio_blob,
+        developer: true,
+        method: 'online2bin'
+      }.to_json
+      request['Content-Type'] = 'application/json'
+      
+      response = http.request(request)
+      response_time = (Time.current - start_time) * 1000 # Convert to milliseconds
+      
+      if response.code.to_i.between?(200, 299)
+        ServiceStatus.create!(
+          service_name: 'asr',
+          status: 'up',
+          response_time: response_time
+        )
+        { status: 'up', response_time: response_time, error: nil }
+      else
+        ServiceStatus.create!(
+          service_name: 'asr',
+          status: 'down',
+          response_time: response_time,
+          error_message: "HTTP #{response.code}: #{response.body}"
+        )
+        { status: 'down', response_time: response_time, error: "HTTP #{response.code}" }
+      end
+    rescue => e
+      response_time = (Time.current - start_time) * 1000
+      ServiceStatus.create!(
+        service_name: 'asr',
+        status: 'down',
+        response_time: response_time,
+        error_message: e.message
+      )
+      { status: 'down', response_time: response_time, error: e.message }
+    end
+  end
+end 
