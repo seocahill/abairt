@@ -81,7 +81,8 @@ class ServiceMonitoringService
     begin
       # Create a minimal ASR request with a small audio blob
       # We'll use a very short base64-encoded audio sample
-      minimal_audio_blob = 'UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT'
+      file_path = DictionaryEntry.with_attached_media.last.media.url
+      audio_blob = `ffmpeg -i "#{file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
       
       uri = URI.parse(@asr_url)
       http = Net::HTTP.new(uri.host, uri.port)
@@ -91,7 +92,7 @@ class ServiceMonitoringService
       
       request = Net::HTTP::Post.new(uri.path)
       request.body = {
-        recogniseBlob: minimal_audio_blob,
+        recogniseBlob: audio_blob,
         developer: true,
         method: 'online2bin'
       }.to_json
