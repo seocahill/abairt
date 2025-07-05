@@ -1,7 +1,7 @@
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-3xl font-bold text-gray-900 mb-8">Service Status</h1>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <!-- TTS Service Status -->
     <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center justify-between mb-4">
@@ -87,10 +87,78 @@
         <% end %>
       </div>
     </div>
+
+    <!-- Pyannote Service Status -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900">Speaker Diarization (Pyannote)</h2>
+        <div class="flex items-center space-x-2">
+          <% if @pyannote_status&.up? %>
+            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span class="text-green-600 font-medium">Operational</span>
+          <% else %>
+            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span class="text-red-600 font-medium">Down</span>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Last Check:</span>
+          <span class="font-medium">
+            <%= @pyannote_status ? time_ago_in_words(@pyannote_status.created_at) + ' ago' : 'Never' %>
+          </span>
+        </div>
+        
+        <% if @pyannote_status&.response_time %>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Response Time:</span>
+            <span class="font-medium"><%= @pyannote_status.response_time.round(2) %>ms</span>
+          </div>
+        <% end %>
+        
+        <div class="flex justify-between">
+          <span class="text-gray-600">24h Uptime:</span>
+          <span class="font-medium"><%= @pyannote_uptime %>%</span>
+        </div>
+        
+        <% if @pyannote_status&.error_message %>
+          <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+            <p class="text-sm text-red-700"><%= @pyannote_status.error_message %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Pyannote History -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Pyannote Service History (Last 24h)</h3>
+      <div class="space-y-2">
+        <% @pyannote_history.each do |status| %>
+          <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 <%= status.up? ? 'bg-green-500' : 'bg-red-500' %> rounded-full"></div>
+              <span class="text-sm text-gray-600"><%= status.created_at.strftime('%H:%M') %></span>
+            </div>
+            <div class="text-sm text-gray-500">
+              <% if status.response_time %>
+                <%= status.response_time.round(2) %>ms
+              <% else %>
+                -
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <% if @pyannote_history.empty? %>
+          <p class="text-gray-500 text-sm">No recent data</p>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <!-- Service History -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <!-- TTS History -->
     <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">TTS Service History (Last 24h)</h3>

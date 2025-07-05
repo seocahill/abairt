@@ -6,12 +6,15 @@ class StatusController < ApplicationController
     
     @tts_status = ServiceStatus.current_status('tts')
     @asr_status = ServiceStatus.current_status('asr')
+    @pyannote_status = ServiceStatus.current_status('pyannote')
     
     @tts_history = ServiceStatus.for_service('tts').recent.limit(24)
     @asr_history = ServiceStatus.for_service('asr').recent.limit(24)
+    @pyannote_history = ServiceStatus.for_service('pyannote').recent.limit(24)
     
     @tts_uptime = calculate_uptime('tts')
     @asr_uptime = calculate_uptime('asr')
+    @pyannote_uptime = calculate_uptime('pyannote')
   end
 
   private
