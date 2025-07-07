@@ -13,7 +13,8 @@ class AudioTranscriptionService
     end
 
     if @dictionary_entry.translation.blank?
-      @dictionary_entry.translation = TranslationService.new(@dictionary_entry).translate
+      translation_text = TranslationService.new(@dictionary_entry).translate
+      @dictionary_entry.translation = translation_text if translation_text.present?
     end
 
     if @dictionary_entry.changed?

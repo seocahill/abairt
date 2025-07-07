@@ -77,7 +77,10 @@ class DictionaryEntry < ApplicationRecord
   end
 
   def translate
-    TranslationService.new(self).translate
+    translation_text = TranslationService.new(self).translate
+    if translation_text.present?
+      update!(translation: translation_text)
+    end
   end
 
   def post_process
