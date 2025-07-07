@@ -28,6 +28,9 @@ class AudioTranscriptionService
   private
 
   def transcribe_audio
+    # Additional rate limiting before hitting abair.ie API
+    Rails.logger.info("Starting transcription request to abair.ie API")
+    
     audio_blob = `ffmpeg -i "#{@file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
     uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
     http = Net::HTTP.new(uri.host, uri.port)
@@ -46,7 +49,14 @@ class AudioTranscriptionService
     request['Content-Type'] = 'application/json'
 
     response = http.request(request)
-    Rails.logger.debug(response)
+    Rails.logger.info("Transcription API response: #{response.code}")
+    
+    if response.code == '429' || response.code == '503'
+      Rails.logger.warn("API rate limited, sleeping before retry")
+      sleep(5)
+      raise "Rate limited by abair.ie API"
+    end
+    
     JSON.parse(response.body).dig("transcriptions", 0, "utterance")
   rescue => e
     Rails.logger.error("Transcription failed: #{e.message}")

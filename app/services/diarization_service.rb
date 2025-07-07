@@ -89,24 +89,14 @@ class DiarizationService
 
       speakers = diarization_segments.map { |segment| segment['speaker'] }.uniq
       speakers.each do |speaker_id|
-        name = "#{speaker_id}_#{@voice_recording.id}"
-        temp_user = User.find_or_create_by(email: "#{name.downcase}@temporary.abairt") do |user|
-          user.name = name
-          user.password = SecureRandom.hex(16)
-          user.role = :temporary
-        end
-
         speaker_segments = diarization_segments.select { |segment| segment['speaker'] == speaker_id }
         speaker_segments.each do |segment|
-          entry = DictionaryEntry.create!(
-            speaker: temp_user,
-            voice_recording: @voice_recording,
-            owner: @voice_recording.owner,
-            region_start: segment['start'],
-            region_end: segment['end']
+          # Queue each segment for processing with rate limiting and overlap detection
+          ProcessDiarizationSegmentJob.perform_later(
+            @voice_recording.id,
+            segment,
+            speaker_id
           )
-
-          entry.create_audio_snippet(temp_path)
         end
       end
     ensure

@@ -3,6 +3,8 @@ require "test_helper"
 class VoiceRecordings::DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
   setup do
     ApplicationController.any_instance.stubs(:current_user).returns(users(:one))
+    # Mock audio snippet creation to avoid file system dependencies in tests
+    DictionaryEntry.any_instance.stubs(:create_audio_snippet).returns(true)
   end
 
   test "should create dictionary_entry" do

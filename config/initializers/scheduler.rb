@@ -26,3 +26,8 @@ end
 s.cron '0 * * * *' do
   MonitorServicesJob.perform_later
 end
+
+# Nightly job to diarize the last un-diarized voice recording
+s.cron '0 2 * * *' do
+  NightlyTranscribeJob.perform_later
+end
