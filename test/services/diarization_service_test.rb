@@ -69,6 +69,18 @@ class DiarizationServiceTest < ActiveSupport::TestCase
     @voice_recording.update(diarization_data: { 'job_id' => '123' })
     @voice_recording.dictionary_entries.delete_all
 
+    # Attach a test media file to avoid FileNotFoundError
+    @voice_recording.media.attach(
+      io: File.open(Rails.root.join('test/fixtures/files/deasaigh.mp3')),
+      filename: 'test_audio.mp3',
+      content_type: 'audio/mpeg'
+    )
+
+    # Mock audio snippet creation to avoid file system dependencies
+    DictionaryEntry.any_instance.stubs(:create_audio_snippet).returns(true)
+    # Mock sleep to speed up tests
+    ProcessDiarizationSegmentJob.any_instance.stubs(:sleep).returns(true)
+
     payload = {
       'jobId' => '123',
       'status' => 'succeeded',
