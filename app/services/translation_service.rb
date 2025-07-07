@@ -21,7 +21,7 @@ class TranslationService
     })
 
     translation = response.dig('choices', 0, 'message', 'content')
-    @entry.update!(translation: translation) if translation.present?
+    return translation if translation.present?
   rescue => e
     Rails.logger.error("Translation failed: #{e.message}")
     nil

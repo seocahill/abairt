@@ -81,7 +81,7 @@ class ServiceMonitoringService
     begin
       # Create a minimal ASR request with a small audio blob
       # We'll use a very short base64-encoded audio sample
-      file_path = DictionaryEntry.with_attached_media.last.media.url
+      file_path = DictionaryEntry.with_attached_media.last.media.url || Rails.root.join('test/fixtures/files/deasaigh.mp3').to_s
       audio_blob = `ffmpeg -i "#{file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
       
       uri = URI.parse(@asr_url)
