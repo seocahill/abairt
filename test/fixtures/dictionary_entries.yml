@@ -5,6 +5,7 @@ one:
   translation: "The death cowl on you"
   speaker: one
   owner: one
+  translator: one
   quality: fair
 
 two:
@@ -12,6 +13,7 @@ two:
   translation: "How did you get on"
   speaker: one
   owner: one
+  translator: one
   quality: good
 
 
@@ -20,6 +22,7 @@ three:
   translation: "you can't do two things at once"
   speaker: one
   owner: one
+  translator: one
   quality: excellent
 
 four:
@@ -27,6 +30,7 @@ four:
   translation: "i miss you"
   speaker: one
   owner: one
+  translator: one
   quality: good
 
 
@@ -35,10 +39,18 @@ five:
   translation: "You divil!"
   speaker: one
   owner: one
+  translator: one
+
+six:
+  word_or_phrase: "Test nil translator"
+  translation: "Test translation"
+  speaker: one
+  owner: one
 
 with_temp_speaker:
   word_or_phrase: "A chladhaire"
   translation: "You divil!"
   speaker: temporary
   owner: one
+  translator: one
   voice_recording: one

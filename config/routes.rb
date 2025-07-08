@@ -54,6 +54,8 @@ Rails.application.routes.draw do
   post 'password_resets', to: 'password_resets#create'
 
   get 'home', to: 'home#index'
+  
+  get 'translator_leaderboard', to: 'translator_leaderboard#index'
 
   resources :practice_recordings, only: [:create]
 

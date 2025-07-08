@@ -87,7 +87,4 @@ class DictionaryEntry < ApplicationRecord
     PostProcessEntryJob.perform_later(self)
   end
 
-  def translator
-    super || User.find_by(id: versions.last&.whodunnit) || owner
-  end
 end
