@@ -52,7 +52,11 @@
               </div>
               <div>
                 <span class="font-medium">Translator:</span> 
-                <%= link_to @dictionary_entry.translator.name, user_path(@dictionary_entry.translator), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>
+                <% if @dictionary_entry.translator %>
+                  <%= link_to @dictionary_entry.translator.name, user_path(@dictionary_entry.translator), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>
+                <% else %>
+                  <span class="text-gray-500">Unknown</span>
+                <% end %>
               </div>
               <% if @dictionary_entry.quality %>
                 <div>
