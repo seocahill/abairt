@@ -1,5 +1,5 @@
 class ProcessDiarizationSegmentJob < ApplicationJob
-  queue_as :transcription_queue
+  queue_as :default
 
   # Rate limit to avoid pounding abair.ie APIs
   RATE_LIMIT_DELAY = 3.seconds
