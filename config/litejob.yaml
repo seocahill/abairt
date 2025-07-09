@@ -1,4 +1,9 @@
 queues:
   - [default, 1]
+  - [transcription_queue, 1]
   - [urgent, 5]
   - [critical, 10, "spawn"]
+workers: 2 # how many threads/fibers to spawn for queue processing
+retries: 5 # 
+retry_delay: 60 # seconds
+retry_delay_multiplier: 10 # 60 -> 600 -> 6000 and so on 
