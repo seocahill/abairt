@@ -86,4 +86,9 @@ class VoiceRecording < ApplicationRecord
     Rails.logger.error("Audio conversion error: #{e.message}")
     raise
   end
+
+  # Import a new voice recording from the archive
+  def self.import_from_archive(media_file_path: nil)
+    ArchiveImportService.new(media_file_path: media_file_path).import_next_recording
+  end
 end

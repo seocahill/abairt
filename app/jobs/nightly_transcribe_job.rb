@@ -9,6 +9,8 @@ class NightlyTranscribeJob < ApplicationJob
       .order(created_at: :desc)
       .first
 
+    voice_recording ||= VoiceRecording.import_from_archive
+
     return unless voice_recording
 
     Rails.logger.info("Starting nightly diarization for VoiceRecording #{voice_recording.id}")

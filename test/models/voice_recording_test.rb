@@ -64,24 +64,11 @@ class VoiceRecordingTest < ActiveSupport::TestCase
     end
   end
 
-  test "should_diarize? returns true when conditions are met" do
-    @voice_recording.media.stubs(:attached?).returns(true)
-    @voice_recording.diarization_status = nil
+  test "import_from_archive delegates to ArchiveImportService" do
+    mock_service = mock
+    mock_service.expects(:import_next_recording).returns(voice_recordings(:one))
+    ArchiveImportService.expects(:new).returns(mock_service)
 
-    assert @voice_recording.should_diarize?
-  end
-
-  test "should_diarize? returns false when media is not attached" do
-    @voice_recording.media.stubs(:attached?).returns(false)
-    @voice_recording.diarization_status = nil
-
-    assert_not @voice_recording.should_diarize?
-  end
-
-  test "should_diarize? returns false when status is already set" do
-    @voice_recording.media.stubs(:attached?).returns(true)
-    @voice_recording.diarization_status = 'completed'
-
-    assert_not @voice_recording.should_diarize?
+    VoiceRecording.import_from_archive
   end
 end

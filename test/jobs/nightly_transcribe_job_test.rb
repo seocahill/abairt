@@ -1,6 +1,15 @@
 require 'test_helper'
 
 class NightlyTranscribeJobTest < ActiveJob::TestCase
+  def setup
+    @test_media_file = Tempfile.new(['test_media', '.json'])
+    @media_file_path = @test_media_file.path
+  end
+
+  def teardown
+    @test_media_file.close
+    @test_media_file.unlink
+  end
   test "performs diarization for most recent un-diarized recording" do
     # Create recordings with different statuses
     old_recording = voice_recordings(:one)
@@ -24,6 +33,9 @@ class NightlyTranscribeJobTest < ActiveJob::TestCase
   test "handles case when no recordings need diarization" do
     VoiceRecording.update_all(diarization_status: 'completed')
     
+    # Stub import to prevent modifying production file
+    VoiceRecording.stubs(:import_from_archive).returns(nil)
+    
     # Should not call DiarizationService
     DiarizationService.expects(:new).never
     
@@ -34,6 +46,9 @@ class NightlyTranscribeJobTest < ActiveJob::TestCase
     # Make sure no recordings have media attached
     VoiceRecording.all.each { |vr| vr.media.purge if vr.media.attached? }
     VoiceRecording.update_all(diarization_status: nil)
+    
+    # Stub import to prevent modifying production file
+    VoiceRecording.stubs(:import_from_archive).returns(nil)
     
     # Should not call DiarizationService
     DiarizationService.expects(:new).never
