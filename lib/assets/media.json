@@ -786,28 +786,10 @@
       "description": null
     },
     {
-      "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/444",
-      "title": "Turas Siar 444",
-      "headline": "John and Brigit Reilly Inis Cé (hiberno-english)",
-      "description": null
-    },
-    {
-      "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/445",
-      "title": "Turas Siar 445",
-      "headline": "Obair, iascaireacht, Inis Cé (hiberno-english)",
-      "description": null
-    },
-    {
       "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/446",
       "title": "Turas Siar 446",
       "headline": "Seán Ó hÉilidhe le fear Ros Dúmhach",
       "description": "sound quality varies due to condition of original tape recording"
-    },
-    {
-      "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/451",
-      "title": "Turas Siar 451",
-      "headline": "Pap faoí cursaí siopadóireacht",
-      "description": "Irish first ten minutes"
     },
     {
       "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/460",
@@ -822,12 +804,6 @@
       "description": null
     },
     {
-      "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/469",
-      "title": "Turas Siar 469",
-      "headline": "Cnuasach Poirt",
-      "description": null
-    },
-    {
       "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/470",
       "title": "Turas Siar 470",
       "headline": "Báidóireacht, húcéirí srl",
@@ -838,12 +814,6 @@
       "title": "Turas Siar 472",
       "headline": "Séan Ó hÉilidhe le MTS",
       "description": null
-    },
-    {
-      "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/53",
-      "title": "Turas Siar 53",
-      "headline": "Cur Síos ar an tSeandrisiúr / Desription of Old Dresser",
-      "description": "Pap describes history of old dresser built for Gaughan family, Termon."
     },
     {
       "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/59",
@@ -882,211 +852,9 @@
       "description": "Le caoinchead RTÉ Raidió an Gaeltachta"
     },
     {
-      "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/95",
-      "title": "Turas Siar 95",
-      "headline": "Scéal - Pílí Cat agus Caolchat na Luathadh (cuid 1)",
-      "description": "Inste ag Pádraic S. Ó Murchú as an gCartúr."
-    },
-    {
       "url": "https://archive-turas-siar.s3.eu-west-1.amazonaws.com/p/av/96",
       "title": "Turas Siar 96",
       "headline": "Scéal - Pílí Cat agus CaolChat na Luathadh (cuid 2)",
       "description": "Part 2Inste ag Pádraic S. Ó Murchú as an gCartúr."
-    },
-    {
-      "url": "https://assets.abairt.com/s7kk4ewwuiyyi0ty3zvdw1uega31",
-      "title": "Scéal Chlainne Lir"
-    },
-    {
-      "url": "https://assets.abairt.com/c9q2ou0tq9lb1doe75w4yu6pyjd3",
-      "title": " Return to Inishkea, 1988  part 1/3"
-    },
-    {
-      "url": "https://assets.abairt.com/9en8rrr66aq0wjy3fwe3fv91ow75",
-      "title": " Seanleaganacha Cainte part 1"
-    },
-    {
-      "url": "https://assets.abairt.com/qu6vd7avac0ijcntlbzzu55ns8e0",
-      "title": "Irish in Achill Part 1"
-    },
-    {
-      "url": "https://assets.abairt.com/q15y0k8lb7uvpb8zutrx0a2mwp76",
-      "title": "Irish in Achill Part II"
-    },
-    {
-      "url": "https://assets.abairt.com/ttfh1lh8d2bj2t2cxl1kbe822gmz",
-      "title": " Return to Inishkea, 1988 part 2/3"
-    },
-    {
-      "url": "https://assets.abairt.com/i2e4byr1lrqru9fszt28chd5deuc",
-      "title": " Return to Inishkea, 1988 part 3/3"
-    },
-    {
-      "url": "https://assets.abairt.com/fkrjq74q700ok8vt6nffmxj1764p",
-      "title": "Storytelling Mayo, Donegal Part 1"
-    },
-    {
-      "url": "https://assets.abairt.com/3ccmauvaqm328m5etq82snotoomr",
-      "title": "Scéalta Chois Cladaigh"
-    },
-    {
-      "url": "https://assets.abairt.com/0vb0x9ywbgoeqhydk39qug3x82om",
-      "title": "Scéal - Pílí Cat agus Caolchat na Luathadh (cuid 1)"
-    },
-    {
-      "url": "https://assets.abairt.com/jy8exc6vo4ux8qblqxnkx8vufln6",
-      "title": "An Comhmhargadh, Graithí Iascaireacht agus eile"
-    },
-    {
-      "url": "https://assets.abairt.com/kn1skmodv1az1vkfvspccpnup9w5",
-      "title": "Na Rubálaidhe"
-    },
-    {
-      "url": "https://assets.abairt.com/h0td1254tj8wwam0ns1zmwmgvvl2",
-      "title": "An Bréag is mó sa Domhan"
-    },
-    {
-      "url": "https://assets.abairt.com/je0rry2hpt5niby1q4mnimp2jffl",
-      "title": "An tslua sí"
-    },
-    {
-      "url": "https://assets.abairt.com/uxi0zjfcy5tj3wdakzt5u0ku71xi",
-      "title": "Aingle na dTrí Sciathán"
-    },
-    {
-      "url": "https://assets.abairt.com/7ln1xsux55k44rdeuc80mwhezkam",
-      "title": "Bean a tugadh as "
-    },
-    {
-      "url": "https://assets.abairt.com/40znlrys2p846t8g4xjvuj773akl",
-      "title": "Páiste a tugadh as"
-    },
-    {
-      "url": "https://assets.abairt.com/82mezqyb4hybh4uq8mpfabbuc982",
-      "title": "Gearrchaile a tugadh as"
-    },
-    {
-      "url": "https://assets.abairt.com/g40m0gbxyep2pxg27shxujfbq1y0",
-      "title": "An Dílleachta agus an tSíogróg "
-    },
-    {
-      "url": "https://assets.abairt.com/ax2om6mk1xylu5qvxyi62qrgy4ov",
-      "title": "Tugaí Domhsa é! –"
-    },
-    {
-      "url": "https://assets.abairt.com/94ceio1a5y5y055s1uw9tvxisfoo",
-      "title": "An Bhó Dhroimfhionn-Bó a tugadh as"
-    },
-    {
-      "url": "https://assets.abairt.com/0qbfyv530skxnkg1imc0280ju4m7",
-      "title": "Bodógaí na Sí Ruaidhe"
-    },
-    {
-      "url": "https://assets.abairt.com/4dbmulz2gkwdhon93pbnytuttims",
-      "title": "Na Siógaí agus anbheirt a raibh cruit orthu"
-    },
-    {
-      "url": "https://assets.abairt.com/c2gjojuxts300tsdn53h18suru4o",
-      "title": "Neamhchuid Chlann agus a Phota Óir"
-    },
-    {
-      "url": "https://assets.abairt.com/l1ix0v7wf23ipkfm2gm4903j1c4h",
-      "title": "Bean a thug cíoch do Pháiste Sí "
-    },
-    {
-      "url": "https://assets.abairt.com/o2eysds964wyjeacmnhaau84niib",
-      "title": "Soithíoch dhá Chrann i mBarr na hAscaille"
-    },
-    {
-      "url": "https://assets.abairt.com/l3pfvvbk098ukmpprd8n5wkivc9s",
-      "title": "An Fharraige"
-    },
-    {
-      "url": "https://assets.abairt.com/gho6uto7k1n7uq8bthtooa155j0b",
-      "title": "Colann gan Cheann"
-    },
-    {
-      "url": "https://assets.abairt.com/umgscxv3f4te5kljwjif4bnirmm0",
-      "title": "An Chailleach a bháigh an Curach"
-    },
-    {
-      "url": "https://assets.abairt.com/2olv6tg7lhngw8sss688ixdn0dji",
-      "title": "Gabáiste aníos ó Thóin na Farraige"
-    },
-    {
-      "url": "https://assets.abairt.com/8u7aegb3i3g3gfvcwcfpndqfj0a1",
-      "title": "Páiste aníos ó Thóin na Farraige"
-    },
-    {
-      "url": "https://assets.abairt.com/th21vfot9olaygmbox0syehect6t",
-      "title": " Na Cruaigh Sí "
-    },
-    {
-      "url": "https://assets.abairt.com/8tnuwsydx3y9w741z4cusofvh9m4",
-      "title": "Na Rónta"
-    },
-    {
-      "url": "https://assets.abairt.com/na9hzh13zbb7cd6xurf28plf6ok9",
-      "title": "Cé mharaigh Anna?"
-    },
-    {
-      "url": "https://assets.abairt.com/vdfrnmem7hmj4heyyh5skftnsgm8",
-      "title": "A Eoghain Ruaidh, ná buail, ná buail"
-    },
-    {
-      "url": "https://assets.abairt.com/ji1flob388beulguu1g3ooffcs3b",
-      "title": " An tAthair Mánus Mac Suibhne"
-    },
-    {
-      "url": "https://assets.abairt.com/0x8nhkey1cb7sxupro1azm6epd6a",
-      "title": " ‘Rí na mBréag’ inste ag Peadar Ó Raghallaigh"
-    },
-    {
-      "url": "https://assets.abairt.com/ag2l2d27vek1kcvw2r7cieiuigu6",
-      "title": "Pádraic Thomáis Ó Raghallaigh i dTenerife"
-    },
-    {
-      "url": "https://assets.abairt.com/lc7cq5li4trxfli82d0x9ep59vnm",
-      "title": "Céadach agus an cat"
-    },
-    {
-      "url": "https://assets.abairt.com/6esfv526pm0ikduttdoi3qehvqj9",
-      "title": "Mac Rí Chonnacht "
-    },
-    {
-      "url": "https://assets.abairt.com/kb3aotqkt9e0at4ubxr7r47xnp6p",
-      "title": "Na cait fhiáine"
-    },
-    {
-      "url": "https://assets.abairt.com/w81a3lspitoc7cq3lug92p9ygem2",
-      "title": "An bhéarthóg"
-    },
-    {
-      "url": "https://assets.abairt.com/7hdivak3js8kdczc1jorz25gc6v0",
-      "title": "An giorria ar bhord an tsléibhe"
-    },
-    {
-      "url": "https://assets.abairt.com/z1posylsejrhkfn9tjjym70141rx",
-      "title": "An fear beag riabhach rua (cuid 1)"
-    },
-    {
-      "url": "https://assets.abairt.com/rym4dcj1tp9be4dtpeng8395iuii",
-      "title": "An fear beag riabhach rua (cuid 2)"
-    },
-    {
-      "url": "https://assets.abairt.com/wuayklqitf43bz2wz3sbo9kwgkao",
-      "title": "Maidin fhómhair is mé ag triall go hEochaill"
-    },
-    {
-      "url": "https://assets.abairt.com/xf5hwenmhicdivsf7wh8lhverpu7",
-      "title": "Tomás The Doc Ó Máile i dTeach Tuathail"
-    },
-    {
-      "url": "https://assets.abairt.com/owtwvurloakbyiqyrjg6vktfjvjn",
-      "title": " Seán Ó Lachtnáin, Béal Átha an Fheadha, Gaeilig Oirthuaisceart Mhaigh Eo "
-    },
-    {
-      "url": "https://assets.abairt.com/6bb1ztttsnglxqggm385a10h4ljc",
-      "title": "Agallamh le Mícheál Ó Neachtain (30/05/1988)"
     }
   ]
