@@ -4,12 +4,16 @@ class NightlyTranscribeJobTest < ActiveJob::TestCase
   def setup
     @test_media_file = Tempfile.new(['test_media', '.json'])
     @media_file_path = @test_media_file.path
+    # Mock services as operational by default for all tests
+    ServiceStatus.stubs(:is_up?).with('asr').returns(true)
+    ServiceStatus.stubs(:is_up?).with('pyannote').returns(true)
   end
 
   def teardown
     @test_media_file.close
     @test_media_file.unlink
   end
+
   test "performs diarization for most recent un-diarized recording" do
     # Create recordings with different statuses
     old_recording = voice_recordings(:one)
@@ -49,6 +53,39 @@ class NightlyTranscribeJobTest < ActiveJob::TestCase
     
     # Stub import to prevent modifying production file
     VoiceRecording.stubs(:import_from_archive).returns(nil)
+    
+    # Should not call DiarizationService
+    DiarizationService.expects(:new).never
+    
+    NightlyTranscribeJob.perform_now
+  end
+
+  test "skips execution when services are down" do
+    # Mock services as down
+    ServiceStatus.stubs(:is_up?).with('asr').returns(false)
+    ServiceStatus.stubs(:is_up?).with('pyannote').returns(true)
+    
+    # Should not call DiarizationService
+    DiarizationService.expects(:new).never
+    
+    NightlyTranscribeJob.perform_now
+  end
+
+  test "skips execution when pyannote service is down" do
+    # Mock services as down
+    ServiceStatus.stubs(:is_up?).with('asr').returns(true)
+    ServiceStatus.stubs(:is_up?).with('pyannote').returns(false)
+    
+    # Should not call DiarizationService
+    DiarizationService.expects(:new).never
+    
+    NightlyTranscribeJob.perform_now
+  end
+
+  test "skips execution when both services are down" do
+    # Mock services as down
+    ServiceStatus.stubs(:is_up?).with('asr').returns(false)
+    ServiceStatus.stubs(:is_up?).with('pyannote').returns(false)
     
     # Should not call DiarizationService
     DiarizationService.expects(:new).never
