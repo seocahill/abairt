@@ -34,7 +34,18 @@ export default class extends Controller {
   seek(event) {
     event.preventDefault()
     const seekPosition = this.seekValue;
-    document.getElementById("wave-controller").transcription.seek(seekPosition)
+    const regionId = this.idValue; // This should be the entry ID which corresponds to region ID
+    
+    // Dispatch a custom event that the transcription controller can listen for
+    const seekEvent = new CustomEvent('waveform:seek', {
+      detail: { 
+        position: seekPosition,
+        regionId: regionId
+      },
+      bubbles: true
+    });
+    
+    this.element.dispatchEvent(seekEvent);
   }
 
   show() {

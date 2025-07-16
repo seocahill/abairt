@@ -1,15 +1,28 @@
-<tr data-controller="entry" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>">
+<tr data-controller="entry" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>" data-entry-id-value="<%= entry.id %>">
   <td class="px-6 py-4">
-    <button class="text-blue-600 hover:text-blue-800"
-            data-controller="audio-player"
-            data-action="audio-player#play"
-            data-audio-player-url-value="<%= url_for(entry.media) if entry.media.attached? %>"
-            data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
-            data-audio-player-translation-value="<%= entry.translation %>">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-      </svg>
-    </button>
+    <div class="flex space-x-2">
+      <!-- Play button for individual entry media -->
+      <button class="text-blue-600 hover:text-blue-800"
+              data-controller="audio-player"
+              data-action="audio-player#play"
+              data-audio-player-url-value="<%= url_for(entry.media) if entry.media.attached? %>"
+              data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
+              data-audio-player-translation-value="<%= entry.translation %>"
+              title="Play this entry's audio">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      
+      <!-- Seek button to jump to this region in the main waveform -->
+      <button class="text-green-600 hover:text-green-800"
+              data-action="entry#seek"
+              title="Seek to this region in waveform">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
   </td>
   <td class="px-6 py-4">
     <%= render "voice_recordings/dictionary_entries/inline_edit", model: entry, method: :speaker_id, current_user: current_user do %>
