@@ -28,7 +28,11 @@
     <% end %>
   </td>
   <td class="px-6 py-4">
-    <%= link_to_unless policy(entry).edit?, entry.translator&.name, user_path(entry.translator), class: "cursor-pointer hover:text-blue-700 hover:underline", data: { turbo_frame: "_top" } %>
+    <% if entry.translator %>
+      <%= link_to_unless policy(entry).edit?, entry.translator.name, entry.translator ? user_path(entry.translator) : "#", class: "cursor-pointer hover:text-blue-700 hover:underline", data: { turbo_frame: "_top" } %>
+    <% else %>
+      <span class="text-gray-500">No translator</span>
+    <% end %>
   </td>
   <td class="px-6 py-4">
     <% if policy(entry).update? %>
