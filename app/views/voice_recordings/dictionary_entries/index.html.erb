@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-8" data-controller="transcription"
+<div id="wave-controller" class="container mx-auto px-4 py-8" data-controller="transcription"
      data-transcription-media-value="<%= url_for(@recording.media) if @recording.media.attached? %>"
      data-transcription-regions-url-value="<%= regions_voice_recording_path(@recording) %>">
   <div class="bg-white rounded-lg shadow-lg p-6">

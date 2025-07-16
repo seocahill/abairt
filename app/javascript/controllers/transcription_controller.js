@@ -12,10 +12,14 @@ export default class extends Controller {
   connect() {
     this.element[this.identifier] = this
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    
+    // Listen for seek events from entry controllers
+    this.element.addEventListener('waveform:seek', this.handleSeekEvent.bind(this));
   }
 
   disconnect() {
     document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    this.element.removeEventListener('waveform:seek', this.handleSeekEvent.bind(this));
   }
 
   initialize() {
@@ -255,6 +259,57 @@ export default class extends Controller {
       this.waveSurfer.playPause()
     }
     this.toggleButton();
+  }
+
+  seek(position) {
+    if (this.waveSurfer && this.waveSurfer.getDuration()) {
+      const normalizedPosition = position / this.waveSurfer.getDuration();
+      this.waveSurfer.seekTo(normalizedPosition);
+    }
+  }
+
+  handleSeekEvent(event) {
+    const position = event.detail.position;
+    const entryId = event.detail.regionId; // This is actually the dictionary entry ID
+    
+    console.log('Seek event received:', { position, entryId });
+    
+    // Seek to the position first
+    this.seek(position);
+    
+    // Find the region by entry_id in the region data
+    if (entryId !== null && entryId !== undefined && this.waveSurfer && this.waveSurfer.regions) {
+      console.log('Available regions:', Object.keys(this.waveSurfer.regions.list));
+      
+      // Find region by entry_id instead of region ID
+      let targetRegion = null;
+      Object.values(this.waveSurfer.regions.list).forEach(region => {
+        if (region.data && region.data.entry_id == entryId) {
+          targetRegion = region;
+        }
+      });
+      
+      console.log('Found region:', targetRegion);
+      
+      if (targetRegion && typeof targetRegion.play === 'function') {
+        console.log('Playing region...');
+        // Small delay to ensure seek completes before playing
+        setTimeout(() => {
+          targetRegion.play();
+          this.toggleButton(); // Update the play/pause button state
+        }, 100);
+      } else {
+        console.log(`Region with entry ID ${entryId} not found or cannot play`);
+        console.log('Region object:', targetRegion);
+        console.log('Region play function:', targetRegion ? typeof targetRegion.play : 'no region');
+      }
+    } else {
+      console.log('Missing requirements:', {
+        entryId: entryId !== null && entryId !== undefined,
+        waveSurfer: !!this.waveSurfer,
+        regions: !!(this.waveSurfer && this.waveSurfer.regions)
+      });
+    }
   }
 
   toggleButton() {
