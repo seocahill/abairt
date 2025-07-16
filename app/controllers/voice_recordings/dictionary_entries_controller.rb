@@ -34,6 +34,18 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     authorize @recording
 
     @pagy, @entries = pagy(@recording.dictionary_entries.includes(:speaker, :owner), items: 10)
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace("entries-list",
+            partial: "voice_recordings/dictionary_entries/entries_list",
+            locals: { entries: @entries, current_user: current_user, pagy: @pagy }
+          )
+        ]
+      end
+    end
   end
 
   def update

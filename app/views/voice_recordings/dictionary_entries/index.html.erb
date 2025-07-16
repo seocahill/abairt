@@ -73,31 +73,8 @@
     </div>
 
     <!-- Dictionary Entries Table -->
-    <div class="mt-8 overflow-x-auto relative shadow-md sm:rounded-lg">
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="px-6 py-3">Audio</th>
-            <th scope="col" class="px-6 py-3">Speaker</th>
-            <th scope="col" class="px-6 py-3">Word/Phrase</th>
-            <th scope="col" class="px-6 py-3">Translation</th>
-            <th scope="col" class="px-6 py-3">Translator</th>
-            <th scope="col" class="px-6 py-3">Quality</th>
-            <th scope="col" colspan="2" class="px-6 py-3 text-center"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <%= render partial: "voice_recordings/dictionary_entries/dictionary_entry",
-                     collection: @entries,
-                     as: :entry,
-                     locals: { current_user: current_user } %>
-        </tbody>
-      </table>
-    </div>
-
-    <%# Pagination footer %>
-    <div class="w-full bg-white rounded-md p-4">
-      <%== pagy_nav(@pagy) %>
-    </div>
+    <%= turbo_frame_tag "entries-list" do %>
+      <%= render "voice_recordings/dictionary_entries/entries_list", entries: @entries, current_user: current_user, pagy: @pagy %>
+    <% end %>
   </div>
 </div>
