@@ -1,8 +1,11 @@
 <tr data-controller="entry" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" id="<%= dom_id(entry) %>" data-entry-seek-value="<%= entry.region_start %>">
   <td class="px-6 py-4">
     <button class="text-blue-600 hover:text-blue-800"
-            data-action="click->transcription#play"
-            data-region-id="<%= entry.region_id %>">
+            data-controller="audio-player"
+            data-action="audio-player#play"
+            data-audio-player-url-value="<%= url_for(entry.media) if entry.media.attached? %>"
+            data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
+            data-audio-player-translation-value="<%= entry.translation %>">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
       </svg>
