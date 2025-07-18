@@ -71,7 +71,7 @@
   </td>
   <% if current_user && entry.user_id == current_user.id %>
     <td class="px-6 py-4">
-      <%= link_to dictionary_entry_path(entry) do %>
+      <%= link_to dictionary_entry_path(entry), data: { turbo_frame: "_top" } do %>
         <i data-feather="eye"></i>
       <% end %>
     </td>

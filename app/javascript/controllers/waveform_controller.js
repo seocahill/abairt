@@ -122,7 +122,7 @@ export default class extends Controller {
         await this.fetchAndAddRegions();
       }
 
-      this.waveSurfer.zoom(200);
+      this.waveSurfer.zoom(10);
       if (this.hasPlayButtonTarget) {
         this.playButtonTarget.disabled = false;
       }
