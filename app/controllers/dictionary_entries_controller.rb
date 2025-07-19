@@ -107,7 +107,7 @@ class DictionaryEntriesController < ApplicationController
     authorize @dictionary_entry
     @dictionary_entry.destroy
     respond_to do |format|
-      format.turbo_stream { redirect_to dictionary_entries_url }
+      format.turbo_stream # This will use the destroy.turbo_stream.erb template
       format.html         { redirect_to dictionary_entries_url }
     end
   end
