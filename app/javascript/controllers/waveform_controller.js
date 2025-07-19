@@ -191,6 +191,15 @@ export default class extends Controller {
       }
     });
 
+    // Update subtitle highlighting when seeking
+    this.waveSurfer.on('seek', () => {
+      const currentTime = this.waveSurfer.getCurrentTime();
+      if (this.hasTimeDisplayTarget) {
+        this.timeDisplayTarget.textContent = this.formatTime(currentTime);
+      }
+      this.highlightCurrentEntry(currentTime);
+    });
+
     // Handle subtitles
     if (this.hasTranscriptionTarget && this.hasTranslationTarget) {
       this.waveSurfer.on('region-in', (region) => {
@@ -309,63 +318,134 @@ export default class extends Controller {
     } : 'none');
 
     if (currentRegion && currentRegion.data.id) {
-      // Find and highlight the corresponding dictionary entry
-      const entryId = `dictionary_entry_${currentRegion.data.id}`;
-      console.log('Looking for entry with ID:', entryId);
+      this.findAndHighlightEntry(currentRegion.data.id);
+    }
+  }
 
-      const entryElement = document.getElementById(entryId);
-      console.log('Found entry element:', entryElement ? 'yes' : 'no');
+  async findAndHighlightEntry(entryId) {
+    const entryElementId = `dictionary_entry_${entryId}`;
+    console.log('Looking for entry with ID:', entryElementId);
 
+    let entryElement = document.getElementById(entryElementId);
+    
+    // If entry is not in DOM, try to load more entries
+    if (!entryElement) {
+      console.log('Entry not found in DOM, attempting to load more entries...');
+      
+      const success = await this.loadEntryIfNeeded(entryId);
+      if (success) {
+        entryElement = document.getElementById(entryElementId);
+      }
+    }
+
+    if (entryElement) {
+      console.log('Found entry element, highlighting...');
+      this.highlightAndScrollToEntry(entryElement);
+    } else {
+      console.log('Entry element not found even after attempting to load more entries');
+    }
+  }
+
+  async loadEntryIfNeeded(entryId) {
+    // Find the infinite scroll controller
+    const infiniteScrollElement = document.querySelector('[data-controller*="infinite-scroll"]');
+    if (!infiniteScrollElement) {
+      console.log('Infinite scroll controller not found');
+      return false;
+    }
+
+    const infiniteScrollController = this.application.getControllerForElementAndIdentifier(
+      infiniteScrollElement, 
+      'infinite-scroll'
+    );
+    
+    if (!infiniteScrollController) {
+      console.log('Could not get infinite scroll controller instance');
+      return false;
+    }
+
+    // Keep loading pages until we find the entry or run out of pages
+    let attempts = 0;
+    const maxAttempts = 10; // Prevent infinite loops
+    
+    while (attempts < maxAttempts) {
+      // Check if there's a next page available
+      const nextPageLink = document.querySelector("a[rel='next']");
+      if (!nextPageLink) {
+        console.log('No more pages available');
+        return false;
+      }
+
+      console.log(`Attempt ${attempts + 1}: Loading more entries...`);
+      
+      // Trigger loading more entries
+      await infiniteScrollController.loadMore();
+      
+      // Wait a bit for the DOM to update
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Check if our target entry is now in the DOM
+      const entryElement = document.getElementById(`dictionary_entry_${entryId}`);
       if (entryElement) {
-        // Add highlight with multiple effects
-        entryElement.classList.add('bg-blue-50', 'border-blue-500', 'border-2', 'shadow-lg', 'scale-[1.02]');
+        console.log('Target entry found after loading more entries');
+        return true;
+      }
+      
+      attempts++;
+    }
+    
+    console.log('Failed to find entry after maximum attempts');
+    return false;
+  }
 
-        // Find the scrollable container - it's the flex-1 div with overflow-y-auto
-        const container = document.querySelector('.flex-1.overflow-y-auto');
-        console.log('Found scroll container:', container ? 'yes' : 'no');
+  highlightAndScrollToEntry(entryElement) {
+    // Add highlight with multiple effects
+    entryElement.classList.add('bg-blue-50', 'border-blue-500', 'border-2', 'shadow-lg', 'scale-[1.02]');
 
-        if (container) {
-          const padding = 40; // Increased padding for better visibility
+    // Find the scrollable container - it's the flex-1 div with overflow-y-auto
+    const container = document.querySelector('.flex-1.overflow-y-auto');
+    console.log('Found scroll container:', container ? 'yes' : 'no');
 
-          // Get the element's position relative to the container
-          const containerTop = container.scrollTop;
-          const containerBottom = containerTop + container.clientHeight;
-          const elementTop = entryElement.offsetTop;
-          const elementBottom = elementTop + entryElement.offsetHeight;
+    if (container) {
+      const padding = 40; // Increased padding for better visibility
 
-          console.log('Scroll positions:', {
-            containerTop,
-            containerBottom,
-            elementTop,
-            elementBottom,
-            containerHeight: container.clientHeight,
-            elementHeight: entryElement.offsetHeight
-          });
+      // Get the element's position relative to the container
+      const containerTop = container.scrollTop;
+      const containerBottom = containerTop + container.clientHeight;
+      const elementTop = entryElement.offsetTop;
+      const elementBottom = elementTop + entryElement.offsetHeight;
 
-          // Check if the entry is fully visible with padding
-          const isFullyVisible = (elementTop >= containerTop + padding) &&
-                               (elementBottom <= containerBottom - padding);
+      console.log('Scroll positions:', {
+        containerTop,
+        containerBottom,
+        elementTop,
+        elementBottom,
+        containerHeight: container.clientHeight,
+        elementHeight: entryElement.offsetHeight
+      });
 
-          if (!isFullyVisible) {
-            console.log('Entry not fully visible, scrolling...');
+      // Check if the entry is fully visible with padding
+      const isFullyVisible = (elementTop >= containerTop + padding) &&
+                           (elementBottom <= containerBottom - padding);
 
-            // Calculate position to center the element
-            const scrollPosition = elementTop - (container.clientHeight / 2) + (entryElement.offsetHeight / 2);
+      if (!isFullyVisible) {
+        console.log('Entry not fully visible, scrolling...');
 
-            // Ensure we don't scroll past the bounds
-            const maxScroll = container.scrollHeight - container.clientHeight;
-            const adjustedScrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
+        // Calculate position to center the element
+        const scrollPosition = elementTop - (container.clientHeight / 2) + (entryElement.offsetHeight / 2);
 
-            console.log('Scrolling to:', adjustedScrollPosition);
+        // Ensure we don't scroll past the bounds
+        const maxScroll = container.scrollHeight - container.clientHeight;
+        const adjustedScrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
 
-            container.scrollTo({
-              top: adjustedScrollPosition,
-              behavior: 'smooth'
-            });
-          } else {
-            console.log('Entry fully visible');
-          }
-        }
+        console.log('Scrolling to:', adjustedScrollPosition);
+
+        container.scrollTo({
+          top: adjustedScrollPosition,
+          behavior: 'smooth'
+        });
+      } else {
+        console.log('Entry fully visible');
       }
     }
   }
