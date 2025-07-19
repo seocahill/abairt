@@ -274,15 +274,12 @@ export default class extends Controller {
     
     console.log('Seek event received:', { position, entryId });
     
-    // Seek to the position first
-    this.seek(position);
-    
-    // Find the region by entry_id in the region data
+    // Find the region by entry_id in the region data first to get zoom info
+    let targetRegion = null;
     if (entryId !== null && entryId !== undefined && this.waveSurfer && this.waveSurfer.regions) {
       console.log('Available regions:', Object.keys(this.waveSurfer.regions.list));
       
       // Find region by entry_id instead of region ID
-      let targetRegion = null;
       Object.values(this.waveSurfer.regions.list).forEach(region => {
         if (region.data && region.data.entry_id == entryId) {
           targetRegion = region;
@@ -291,18 +288,27 @@ export default class extends Controller {
       
       console.log('Found region:', targetRegion);
       
-      if (targetRegion && typeof targetRegion.play === 'function') {
-        console.log('Playing region...');
-        // Small delay to ensure seek completes before playing
-        setTimeout(() => {
-          targetRegion.play();
-          this.toggleButton(); // Update the play/pause button state
-        }, 100);
-      } else {
-        console.log(`Region with entry ID ${entryId} not found or cannot play`);
-        console.log('Region object:', targetRegion);
-        console.log('Region play function:', targetRegion ? typeof targetRegion.play : 'no region');
+      // Zoom to the region with padding before seeking
+      if (targetRegion) {
+        this.zoomToRegion(targetRegion);
       }
+    }
+    
+    // Seek to the position
+    this.seek(position);
+    
+    // Play the region if found
+    if (targetRegion && typeof targetRegion.play === 'function') {
+      console.log('Playing region...');
+      // Small delay to ensure seek and zoom complete before playing
+      setTimeout(() => {
+        targetRegion.play();
+        this.toggleButton(); // Update the play/pause button state
+      }, 200);
+    } else if (entryId !== null && entryId !== undefined) {
+      console.log(`Region with entry ID ${entryId} not found or cannot play`);
+      console.log('Region object:', targetRegion);
+      console.log('Region play function:', targetRegion ? typeof targetRegion.play : 'no region');
     } else {
       console.log('Missing requirements:', {
         entryId: entryId !== null && entryId !== undefined,
@@ -310,6 +316,41 @@ export default class extends Controller {
         regions: !!(this.waveSurfer && this.waveSurfer.regions)
       });
     }
+  }
+
+  zoomToRegion(region) {
+    if (!this.waveSurfer || !region) return;
+    
+    const duration = this.waveSurfer.getDuration();
+    const regionDuration = region.end - region.start;
+    
+    // Add padding before and after the region (2 seconds on each side, or 50% of region duration, whichever is smaller)
+    const paddingTime = Math.min(2.0, regionDuration * 0.5);
+    const zoomStart = Math.max(0, region.start - paddingTime);
+    const zoomEnd = Math.min(duration, region.end + paddingTime);
+    const zoomDuration = zoomEnd - zoomStart;
+    
+    // Calculate zoom level to fit the padded region in the visible area
+    // Aim for the region + padding to take up most of the waveform width
+    const containerWidth = this.waveSurfer.container.clientWidth;
+    const desiredPixelsPerSecond = containerWidth / zoomDuration;
+    
+    // Apply a reasonable zoom level (clamp between 50 and 2000 pixels per second)
+    const clampedZoom = Math.max(50, Math.min(2000, desiredPixelsPerSecond));
+    
+    console.log('Zooming to region:', {
+      regionStart: region.start,
+      regionEnd: region.end,
+      regionDuration: regionDuration,
+      paddingTime: paddingTime,
+      zoomStart: zoomStart,
+      zoomEnd: zoomEnd,
+      zoomDuration: zoomDuration,
+      pixelsPerSecond: clampedZoom
+    });
+    
+    // Apply zoom
+    this.waveSurfer.zoom(clampedZoom);
   }
 
   toggleButton() {
