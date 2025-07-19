@@ -73,7 +73,7 @@
     </div>
 
     <!-- Dictionary Entries Table -->
-    <%= turbo_frame_tag "entries-list" do %>
+    <%= turbo_frame_tag "entries-list", data: { controller: "pagination" } do %>
       <%= render "voice_recordings/dictionary_entries/entries_list", entries: @entries, current_user: current_user, pagy: @pagy %>
     <% end %>
   </div>
