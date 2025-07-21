@@ -72,6 +72,35 @@
       <input type="text" id="dictionary_entry_region_end" value="">
     </div>
 
+    <!-- Transcription Display -->
+    <% if @recording.transcription.present? || @recording.transcription_en.present? %>
+      <div class="mb-8">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <p class="text-sm text-gray-600 mt-1"><b>Full Transcription</b>: Use this as reference while transcribing individual segments</p>
+          </div>
+          <div class="p-4 h-40 overflow-y-auto bg-gray-50 text-sm leading-relaxed text-gray-800">
+            <% if @recording.transcription.present? && @recording.transcription_en.present? %>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <%= simple_format(@recording.transcription) %>
+                </div>
+                <div>
+                  <%= simple_format(@recording.transcription_en) %>
+                </div>
+              </div>
+            <% elsif @recording.transcription.present? %>
+              <div class="font-medium text-gray-700 mb-1">Original Transcription:</div>
+              <%= simple_format(@recording.transcription) %>
+            <% else %>
+              <div class="font-medium text-blue-700 mb-1">English Translation:</div>
+              <%= simple_format(@recording.transcription_en) %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Dictionary Entries Table -->
     <%= turbo_frame_tag "entries-list", data: { controller: "pagination" } do %>
       <%= render "voice_recordings/dictionary_entries/entries_list", entries: @entries, current_user: current_user, pagy: @pagy %>
