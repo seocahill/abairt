@@ -3,28 +3,24 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
   def create
     @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(user_id: current_user.id, quality: current_user.quality))
     authorize @dictionary_entry
-
-    # datalist sends name over the wire, need id. Also might not exist yet.
-    speaker = User.where(name: dictionary_entry_params[:speaker_id]).first_or_create do |user|
-      user.email = "#{dictionary_entry_params[:speaker_id]}@abairt.com"
-      user.role = :speaker
-      user.ability = :native
-      user.password = SecureRandom.alphanumeric
-    end
-
-    @dictionary_entry.speaker = speaker
+    
+    # just assign the first user as the speaker initially
+    @dictionary_entry.speaker = @dictionary_entry.voice_recording.users.first
+    @dictionary_entry.translator = current_user
 
     respond_to do |format|
       if @dictionary_entry.save
         @dictionary_entry.create_audio_snippet
         AutoTagEntryJob.perform_later(@dictionary_entry)
         format.html { redirect_to @dictionary_entry.voice_recording }
+        format.json { render json: { id: @dictionary_entry.id, message: 'Dictionary entry created successfully' }, status: :created }
         format.turbo_stream do
           render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",
           locals: { entry: @dictionary_entry })
         end
       else
         format.html { redirect_back fallback_location: root_path, status: :unprocessable_entity }
+        format.json { render json: { errors: @dictionary_entry.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end

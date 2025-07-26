@@ -111,6 +111,9 @@ export default class extends Controller {
       document.getElementById('prev-position').value = Math.round(region.start * 10) / 10;
       document.getElementById('current-position').value = Math.round(region.end * 10) / 10;
       document.getElementById('dictionary_entry_region_id').value = region.id;
+      
+      // Show save button for new unsaved region
+      that.showSaveButton(region);
     });
 
     this.waveSurfer.on('region-click', function (region, e) {
@@ -366,5 +369,122 @@ export default class extends Controller {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  showSaveButton(region) {
+    // Only show save button if region doesn't have an existing entry_id
+    if (region.data && region.data.entry_id) {
+      return;
+    }
+
+    // Remove any existing save button
+    this.hideSaveButton();
+
+    // Create save button container
+    const saveContainer = document.createElement('div');
+    saveContainer.id = 'save-region-container';
+    saveContainer.className = 'fixed top-4 right-4 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50';
+    
+    const message = document.createElement('p');
+    message.className = 'text-sm text-gray-700 mb-3';
+    message.textContent = 'New region created! Save as dictionary entry?';
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'flex gap-2';
+    
+    const saveButton = document.createElement('button');
+    saveButton.className = 'bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm';
+    saveButton.textContent = 'Save';
+    saveButton.onclick = () => this.saveRegion(region);
+    
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm';
+    cancelButton.textContent = 'Cancel';
+    cancelButton.onclick = () => {
+      this.hideSaveButton();
+      region.remove();
+    };
+    
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+    saveContainer.appendChild(message);
+    saveContainer.appendChild(buttonContainer);
+    
+    document.body.appendChild(saveContainer);
+  }
+
+  hideSaveButton() {
+    const existingContainer = document.getElementById('save-region-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+  }
+
+  async saveRegion(region) {
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      const voiceRecordingId = window.location.pathname.match(/voice_recordings\/(\d+)/)[1];
+      
+      const entryData = {
+        dictionary_entry: {
+          region_start: region.start,
+          region_end: region.end,
+          region_id: region.id,
+          voice_recording_id: voiceRecordingId,
+          word_or_phrase: '',
+          translation: ''
+        }
+      };
+
+      const response = await fetch(`/voice_recordings/${voiceRecordingId}/dictionary_entries`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(entryData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Update region data with the new entry_id
+        region.data = { entry_id: result.id };
+        
+        // Hide the save button
+        this.hideSaveButton();
+        
+        // Refresh the entries list
+        this.refreshEntriesList();
+        
+        console.log('Region saved successfully as dictionary entry');
+      } else {
+        throw new Error('Failed to save region');
+      }
+    } catch (error) {
+      console.error('Error saving region:', error);
+      alert('Failed to save region. Please try again.');
+    }
+  }
+
+  async refreshEntriesList() {
+    try {
+      const voiceRecordingId = window.location.pathname.match(/voice_recordings\/(\d+)/)[1];
+      const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
+      
+      const response = await fetch(`/voice_recordings/${voiceRecordingId}/dictionary_entries?page=${currentPage}`, {
+        headers: {
+          'Accept': 'text/vnd.turbo-stream.html'
+        }
+      });
+      
+      if (response.ok) {
+        const html = await response.text();
+        Turbo.renderStreamMessage(html);
+      }
+    } catch (error) {
+      console.error('Error refreshing entries list:', error);
+    }
   }
 }
