@@ -1,5 +1,5 @@
 class VoiceRecordingsController < ApplicationController
-  before_action :set_voice_recording, only: %i[ show edit update destroy add_region ]
+  before_action :set_voice_recording, only: %i[ show edit update destroy add_region import_status ]
   PAGE_SIZE = 15 # Define the constant at the top of the controller
 
   def index
@@ -97,6 +97,14 @@ class VoiceRecordingsController < ApplicationController
         ]
       end
     end
+  end
+  
+  def import_status
+    authorize @voice_recording
+    render json: { 
+      status: @voice_recording.import_status,
+      media_attached: @voice_recording.media.attached?
+    }
   end
 
   # GET /voice_recordings/new

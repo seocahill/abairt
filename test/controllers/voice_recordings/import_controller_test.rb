@@ -12,21 +12,23 @@ class VoiceRecordings::ImportControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create voice recording on successful import" do
-    voice_recording = voice_recordings(:one)
-    Importers::CanuintIe.expects(:import).with("https://canuint.ie/test").returns(voice_recording)
-
-    post import_url, params: { url: "https://canuint.ie/test" }
+    # Test should create a placeholder record and queue a job
+    assert_difference('VoiceRecording.count', 1) do
+      post import_url, params: { url: "https://canuint.ie/test" }
+    end
     
-    assert_redirected_to voice_recording_path(voice_recording)
-    assert_equal "Voice recording imported successfully", flash[:notice]
+    created_recording = VoiceRecording.last
+    assert_equal 'pending', created_recording.import_status
+    assert_equal @user, created_recording.owner
+    assert_redirected_to voice_recording_path(created_recording)
+    assert_equal "Import started! Your recording will be available shortly.", flash[:notice]
   end
 
   test "should handle failed import" do
-    Importers::CanuintIe.expects(:import).with("https://canuint.ie/bad").raises(StandardError.new("Import failed"))
-
-    post import_url, params: { url: "https://canuint.ie/bad" }
+    # Test should handle validation errors or other failures during placeholder creation
+    post import_url, params: { url: "https://unsupported-site.com/test" }
     
     assert_redirected_to new_import_path
-    assert_equal "Failed to import voice recording: Import failed", flash[:alert]
+    assert_equal "Failed to start import: Unsupported URL. Please use a URL from rte.ie or canuint.ie", flash[:alert]
   end
 end

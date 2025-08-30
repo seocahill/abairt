@@ -11,6 +11,11 @@ export default class extends Controller {
   }
 
   connect() {
+    // Only initialize if waveform target exists (media is attached)
+    if (!this.hasWaveformTarget) {
+      return; // Exit early if no waveform target exists
+    }
+    
     if (!this.lazyValue) {
       this.initializeWaveform();
     } else {

@@ -28,4 +28,9 @@ class VoiceRecordingPolicy < ApplicationPolicy
     # only owners can destroy dictionary entries
     true if user == record.owner
   end
+  
+  def import_status?
+    # Same permission as show - anyone can check import status
+    true
+  end
 end
