@@ -6,7 +6,13 @@
     <ul class="text-sm text-blue-800 space-y-1">
       <li>• <strong>RTÉ.ie:</strong> https://www.rte.ie/radio/rnag/clips/...</li>
       <li>• <strong>Canuint.ie:</strong> https://www.canuint.ie/...</li>
+      <li>• <strong>YouTube:</strong> https://www.youtube.com/watch?v=... or https://youtu.be/...</li>
     </ul>
+    <div class="mt-3 p-3 bg-yellow-50 rounded border-l-4 border-yellow-400">
+      <p class="text-xs text-yellow-800">
+        <strong>Note:</strong> YouTube import requires yt-dlp to be installed. Video will be downloaded automatically.
+      </p>
+    </div>
   </div>
   
   <%= form_with url: import_path, method: :post, local: true, class: "space-y-4", data: { turbo: false } do |f| %>
@@ -14,7 +20,7 @@
       <%= f.label :url, "Audio URL", class: "block text-sm font-medium text-gray-700" %>
       <%= f.url_field :url, 
           required: true,
-          placeholder: "https://www.rte.ie/radio/rnag/clips/... or https://www.canuint.ie/...",
+          placeholder: "https://www.rte.ie/radio/rnag/clips/..., https://www.canuint.ie/..., or https://youtube.com/watch?v=...",
           class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
       <p class="mt-1 text-sm text-gray-500">The importer will be automatically selected based on the URL</p>
     </div>

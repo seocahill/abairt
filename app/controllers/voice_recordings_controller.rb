@@ -120,7 +120,7 @@ class VoiceRecordingsController < ApplicationController
 
   # POST /voice_recordings or /voice_recordings.json
   def create
-    @voice_recording = VoiceRecording.new(voice_recording_params.merge(user_id: current_user.id))
+    @voice_recording = VoiceRecording.new(voice_recording_params.except(:trim_start, :trim_end, :should_trim).merge(user_id: current_user.id))
     authorize @voice_recording
 
     respond_to do |format|
@@ -137,6 +137,7 @@ class VoiceRecordingsController < ApplicationController
   # PATCH/PUT /voice_recordings/1 or /voice_recordings/1.json
   def update
     authorize @voice_recording
+    
     respond_to do |format|
       if @voice_recording.update(voice_recording_params)
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully updated." }
