@@ -22,8 +22,10 @@ class VoiceRecordings::ImportsController < ApplicationController
                        'Importers::RteIe'
                      elsif url.include?('canuint.ie')
                        'Importers::CanuintIe'
+                     elsif url.include?('youtube.com') || url.include?('youtu.be')
+                       'Importers::Youtube'
                      else
-                       raise "Unsupported URL. Please use a URL from rte.ie or canuint.ie"
+                       raise "Unsupported URL. Please use a URL from rte.ie, canuint.ie, or youtube.com"
                      end
     
     ImportVoiceRecordingJob.perform_later(voice_recording.id, url, importer_class, title: title)

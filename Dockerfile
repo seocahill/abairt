@@ -62,7 +62,7 @@ COPY --from=build /rails /rails
 
 # Install packages needed to run the app
 RUN apt-get update -qq && \
-  apt-get install --no-install-recommends -y libffi-dev ffmpeg && \
+  apt-get install --no-install-recommends -y libffi-dev ffmpeg yt-dlp && \
   rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Run and own only the runtime files as a non-root user for security

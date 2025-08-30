@@ -82,20 +82,79 @@ module Importers
         title = "RTÉ Raidió na Gaeltachta - #{target_clip['title'] || 'Unknown'}"
         description = "#{target_clip['description'] || 'Original source: ' + @url}"
         
-        # Prefer direct podcast_url if available, otherwise construct HLS URL
+        # Try multiple approaches to get audio URL
         audio_url = if target_clip['podcast_url']&.present?
+                      # Direct podcast URL is available
                       target_clip['podcast_url']
-                    elsif target_clip['url_stem']
-                      construct_hls_url(target_clip['url_stem'])
                     else
-                      nil
+                      # Try to get streaming URL from RTÉ API
+                      Rails.logger.info "No direct podcast URL found, trying RTÉ API..."
+                      api_url = get_streaming_url_from_api(clip_id)
+                      
+                      if api_url
+                        api_url
+                      elsif target_clip['url_stem']
+                        # Fall back to HLS URL construction
+                        construct_hls_url(target_clip['url_stem'])
+                      else
+                        nil
+                      end
                     end
 
-        Rails.logger.info "Found clip: #{title} (#{target_clip['duration_time']}) - using #{audio_url ? 'podcast URL' : 'HLS stream'}"
+        # Check if this is a full episode without podcast_url
+        is_full_episode = !target_clip['ispodcast'] && target_clip['isshow']
+        
+        if audio_url
+          source_type = if target_clip['podcast_url']
+                          'direct podcast URL'
+                        elsif api_url
+                          'RTÉ streaming API'
+                        else
+                          'constructed HLS stream'
+                        end
+          Rails.logger.info "Found clip: #{title} (#{target_clip['duration_time']}) - using #{source_type}"
+        else
+          Rails.logger.warn "No audio URL found for clip: #{title}"
+        end
+        
         [title, description, audio_url]
       rescue JSON::ParserError => e
         Rails.logger.error "Failed to parse clips JSON: #{e.message}"
         [nil, nil, nil]
+      end
+    end
+
+    def get_streaming_url_from_api(clip_id)
+      api_url = "https://www.rte.ie/rteavgen/getplaylist/?format=json&id=#{clip_id}"
+      
+      begin
+        response = HTTParty.get(api_url)
+        return nil unless response.success?
+        
+        data = JSON.parse(response.body)
+        show = data['shows']&.first
+        return nil unless show
+        
+        media_group = show['media:group']&.first
+        return nil unless media_group
+        
+        # Prefer HLS streaming URL
+        if media_group['hls_server'] && media_group['hls_url']
+          hls_url = "#{media_group['hls_server']}#{media_group['hls_url']}"
+          Rails.logger.info "Found HLS streaming URL: #{hls_url}"
+          return hls_url
+        end
+        
+        # Fall back to direct RTMP URL if available
+        if media_group['url']
+          Rails.logger.info "Found RTMP URL: #{media_group['url']}"
+          return media_group['url']
+        end
+        
+        nil
+      rescue JSON::ParserError, StandardError => e
+        Rails.logger.error "Failed to get streaming URL from API: #{e.message}"
+        nil
       end
     end
 

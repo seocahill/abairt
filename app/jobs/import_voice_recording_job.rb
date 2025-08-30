@@ -12,6 +12,8 @@ class ImportVoiceRecordingJob < ApplicationJob
         Importers::RteIe.import_to_record(voice_recording, url, title: title)
       elsif importer_class == 'Importers::CanuintIe'
         Importers::CanuintIe.import_to_record(voice_recording, url)
+      elsif importer_class == 'Importers::Youtube'
+        Importers::Youtube.import_to_record(voice_recording, url, title: title)
       end
       
       voice_recording.update!(import_status: 'completed')
