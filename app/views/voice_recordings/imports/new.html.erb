@@ -1,16 +1,37 @@
 <div class="max-w-2xl mx-auto p-6">
   <h1 class="font-bold text-4xl mb-6">Import Voice Recording</h1>
   
-  <%= form_with url: import_path, method: :post, class: "space-y-4" do |f| %>
+  <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+    <h2 class="font-semibold text-blue-900 mb-2">Supported Sources</h2>
+    <ul class="text-sm text-blue-800 space-y-1">
+      <li>• <strong>RTÉ.ie:</strong> https://www.rte.ie/radio/rnag/clips/...</li>
+      <li>• <strong>Canuint.ie:</strong> https://www.canuint.ie/...</li>
+    </ul>
+  </div>
+  
+  <%= form_with url: import_path, method: :post, local: true, class: "space-y-4", data: { turbo: false } do |f| %>
     <div>
-      <%= f.label :url, "CanuintIE URL", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.label :url, "Audio URL", class: "block text-sm font-medium text-gray-700" %>
       <%= f.url_field :url, 
           required: true,
-          placeholder: "https://canuint.ie/...",
+          placeholder: "https://www.rte.ie/radio/rnag/clips/... or https://www.canuint.ie/...",
           class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      <p class="mt-1 text-sm text-gray-500">The importer will be automatically selected based on the URL</p>
+    </div>
+
+    <div>
+      <%= f.label :title, "Custom Title (Optional)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :title, 
+          placeholder: "Leave empty to use the original title from the source",
+          class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      <p class="mt-1 text-sm text-gray-500">Override the automatically extracted title</p>
     </div>
 
     <%= f.submit "Import Recording", 
-        class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+        data: { 
+          turbo_submits_with: "Importing...",
+          disable_with: "Importing..."
+        } %>
   <% end %>
 </div>

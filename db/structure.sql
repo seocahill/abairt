@@ -117,7 +117,7 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
       END;
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, CONSTRAINT "fk_rails_91ca04707d"
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, "import_status" varchar, CONSTRAINT "fk_rails_91ca04707d"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 );
@@ -220,6 +220,7 @@ CREATE INDEX "index_service_statuses_on_service_name" ON "service_statuses" ("se
 CREATE INDEX "index_service_statuses_on_created_at" ON "service_statuses" ("created_at");
 CREATE INDEX "index_service_statuses_on_service_name_and_created_at" ON "service_statuses" ("service_name", "created_at");
 INSERT INTO "schema_migrations" (version) VALUES
+('20250830155023'),
 ('20250705152641'),
 ('20250629000640'),
 ('20250629000639'),

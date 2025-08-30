@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get :preview
       get :add_region
       get :regions
+      get :import_status
       get 'subtitles(/:lang)', to: 'voice_recordings#subtitles', defaults: { format: 'vtt' }, as: :subtitles
     end
     collection { get :map }
