@@ -1,4 +1,4 @@
-require 'json'
+require 'uri'
 
 module Importers
   class RteIe
@@ -15,8 +15,8 @@ module Importers
     end
 
     def import(title: nil)
-      response = HTTParty.get(@url)
-      return nil unless response.success?
+      response = fetch_with_retry(@url)
+      return nil unless response && response.success?
 
       doc = Nokogiri::HTML(response.body)
       extracted_title, description, audio_url = extract_audio_info(doc)
@@ -38,8 +38,8 @@ module Importers
     end
     
     def import_to_record(voice_recording, title: nil)
-      response = HTTParty.get(@url)
-      return false unless response.success?
+      response = fetch_with_retry(@url)
+      return false unless response && response.success?
 
       doc = Nokogiri::HTML(response.body)
       extracted_title, description, audio_url = extract_audio_info(doc)
@@ -128,8 +128,8 @@ module Importers
       api_url = "https://www.rte.ie/rteavgen/getplaylist/?format=json&id=#{clip_id}"
       
       begin
-        response = HTTParty.get(api_url)
-        return nil unless response.success?
+        response = fetch_with_retry(api_url)
+        return nil unless response && response.success?
         
         data = JSON.parse(response.body)
         show = data['shows']&.first
@@ -170,11 +170,15 @@ module Importers
       temp_file = Tempfile.new(['rte_audio', '.mp3'])
       
       begin
-        # Build ffmpeg command
+        # Add a small delay to avoid rapid requests
+        sleep(rand(0.5..2.0))
+        
+        # Build ffmpeg command with random user agent
         cmd = [
           'ffmpeg',
-          '-user_agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          '-user_agent', get_random_headers['User-Agent'],
           '-referer', 'https://www.rte.ie/',
+          '-headers', 'Accept-Language: en-US,en;q=0.9,ga;q=0.8',
           '-i', audio_url,
           '-c:a', 'mp3',           # Ensure MP3 format
           '-b:a', '128k',          # Set bitrate for consistency
@@ -206,6 +210,89 @@ module Importers
       # Extract the numeric ID from URLs like https://www.rte.ie/radio/rnag/clips/22540164/
       match = url.match(/clips\/(\d+)/)
       match ? match[1] : SecureRandom.hex(8)
+    end
+
+    def fetch_with_retry(url, max_retries: 3)
+      retries = 0
+      
+      begin
+        # Random delay to avoid being detected as a bot
+        sleep(rand(1.0..3.0))
+        
+        headers = get_random_headers
+        
+        Rails.logger.debug "Fetching #{url} with headers: #{headers}"
+        
+        # Add proxy support if configured
+        options = {
+          headers: headers,
+          timeout: 30,
+          follow_redirects: true,
+          verify: false  # In case of SSL issues on server
+        }
+        
+        # Add proxy if PROXY_URL environment variable is set
+        if ENV['PROXY_URL'].present?
+          proxy_uri = URI.parse(ENV['PROXY_URL'])
+          options[:http_proxyaddr] = proxy_uri.host
+          options[:http_proxyport] = proxy_uri.port
+          options[:http_proxyuser] = proxy_uri.user if proxy_uri.user
+          options[:http_proxypass] = proxy_uri.password if proxy_uri.password
+          Rails.logger.debug "Using proxy: #{proxy_uri.host}:#{proxy_uri.port}"
+        end
+        
+        response = HTTParty.get(url, options)
+        
+        if response.success?
+          return response
+        elsif response.code == 429 || response.code == 503  # Rate limited or service unavailable
+          raise "Rate limited or service unavailable"
+        else
+          Rails.logger.warn "HTTP request failed with code #{response.code} for #{url}"
+          return nil
+        end
+        
+      rescue => e
+        retries += 1
+        Rails.logger.warn "Fetch attempt #{retries} failed: #{e.message}"
+        
+        if retries < max_retries
+          # Exponential backoff with jitter
+          delay = (2 ** retries) + rand(1.0..5.0)
+          Rails.logger.info "Retrying in #{delay.round(2)} seconds..."
+          sleep(delay)
+          retry
+        else
+          Rails.logger.error "Failed to fetch #{url} after #{max_retries} retries"
+          return nil
+        end
+      end
+    end
+
+    def get_random_headers
+      user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      ]
+      
+      {
+        'User-Agent' => user_agents.sample,
+        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language' => 'en-US,en;q=0.9,ga;q=0.8',
+        'Accept-Encoding' => 'gzip, deflate, br',
+        'DNT' => '1',
+        'Connection' => 'keep-alive',
+        'Upgrade-Insecure-Requests' => '1',
+        'Sec-Fetch-Dest' => 'document',
+        'Sec-Fetch-Mode' => 'navigate',
+        'Sec-Fetch-Site' => 'none',
+        'Sec-Fetch-User' => '?1',
+        'Cache-Control' => 'max-age=0',
+        'Referer' => 'https://www.google.com/'
+      }
     end
   end
 end
