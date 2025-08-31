@@ -381,94 +381,127 @@
   <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-24 lg:px-6 ">
     <h2 id="faq" class="mb-6 p-6 text-3xl font-extrabold tracking-tight text-center text-gray-900 lg:mb-8 lg:text-3xl dark:text-white">Frequently asked questions</h2>
     <div class="max-w-screen-md mx-auto">
-      <div id="accordion-flush" data-accordion="collapse" data-active-classes="bg-white dark:bg-gray-900 text-gray-900 dark:text-white" data-inactive-classes="text-gray-500 dark:text-gray-400">
-        <h3 id="accordion-flush-heading-1">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-900 bg-white border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-white" data-accordion-target="#accordion-flush-body-1" aria-expanded="true" aria-controls="accordion-flush-body-1">
+      <div id="accordion-flush">
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-900 bg-white border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-white" data-action="click->collapse#toggle">
             <span>How long will it take me to learn to speak the Mayo dialect?</span>
-            <svg data-accordion-icon="" class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
-        </h3>
-        <div id="accordion-flush-body-1" class="hidden" aria-labelledby="accordion-flush-heading-1">
+        <div data-collapse-target="content" class="hidden">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Language learning is an inate skill everyone possesses, the rate of acquisition varies according to experience, confidence, access, commitment level and time resources. Given some basic school Irish and a medium commitment level (one or two classes per month, on and off) <b>two years</b> is a reasonable timeframe to go from no conversational ability to being able to converse with a native speaker.</p>
-            <p class="text-gray-500 dark:text-gray-400 mb-2">People with better starting abilty and self-confidence can certainly managed it in half the time, likewise complete beginners might take an extra year or two.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">Language learning is an innate skill everyone possesses. The rate of acquisition varies according to experience, confidence, access, commitment level and time resources. Given some basic school Irish and a medium commitment level (one or two classes per month, on and off) <b>two years</b> is a reasonable timeframe to go from no conversational ability to being able to converse with a native speaker.</p>
+            <p class="text-gray-500 dark:text-gray-400 mb-2">People with better starting ability and self-confidence can certainly manage it in half the time, likewise complete beginners might take an extra year or two.</p>
             <p class="text-gray-500 dark:text-gray-400  mb-2">You may give up multiple times, that's perfectly normal. Life, work intervenes. One thing is certain - if you persevere, you will succeed eventually.</p>
           </div>
         </div>
-        <h3 id="accordion-flush-heading-2">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-accordion-target="#accordion-flush-body-2" aria-expanded="false" aria-controls="accordion-flush-body-2">
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
             <span>Is Abairt free?</span>
-            <svg data-accordion-icon="" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
-        </h3>
-        <div id="accordion-flush-body-2" class="hidden" aria-labelledby="accordion-flush-heading-2">
+        <div data-collapse-target="content" class="hidden">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Yes all resources on this site are free. Speakers of course may charge for classes but that's entirely up to them and their students to decide.</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Abairt is not operated for any commerical gain, we don't track you or your data, or collect any metrics. If you sign up your email is used for login and app related notifications, that's it.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">Yes all resources on this site are free. Our goal is to provide a high quality dataset of native Irish speech for learners to use in their own learning journey. We don't wan to block anyone from using it.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400">Abairt is not operated for any commercial gain, we don't track you or your data, or collect any metrics. If you sign up your email is used for login and app related notifications, that's it.</p>
             <p class="mb-2 text-gray-500 dark:text-gray-400">We make no claim on the material on this site. It's freely shared and the copyright and licensing is the exclusive right of the owners of the original recordings.</p>
             <p class="text-gray-500 dark:text-gray-400">You are welcome to <a href="https://github.com/seocahill/abairt" class="text-purple-600 dark:text-purple-500 hover:underline">fork the code</a> and build your own language community.</p>
           </div>
         </div>
-        <h3 id="accordion-flush-heading-3">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-accordion-target="#accordion-flush-body-3" aria-expanded="false" aria-controls="accordion-flush-body-3">
-            <span>Are there any courses?</span>
-            <svg data-accordion-icon="" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
+            <span>How do I get started learning?</span>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
-        </h3>
-        <div id="accordion-flush-body-3" class="hidden" aria-labelledby="accordion-flush-heading-3">
+        <div data-collapse-target="content" class="hidden">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">We are in the process of developing a learning progression but in the meantime here are some tips on how to structure your learning.</p>
-            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400">
-              <li>Find a native speaker to mentor you one on one, whether online or in person. This step is probably the biggest predeterminer of success.</li>
-              <li>Use a spaced repetition app like Anki to acquire vocabulary. You should use lists like the ones on this site that offer native context and audio.</li>
-              <li>Listen to recordings of native speakers, practice and repeat the phrases you hear, copying the sounds and syntax. Radio na Gaeltachta is a good resource for this, as are the sites linked on this page.</li>
-              <li>Unless you are an experienced language learner it's probably better to only learn grammar and syntax after you can speak. An often recommended book for this is <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://archive.org/details/learning-irish-3rd-ed">Learning Irish by Mícheál Ó Siadhail</a>. <a href="http://nualeargais.ie/gnag/gram.htm" class="text-purple-600 dark:text-purple-500 hover:underline">Nualeargais</a> is also an excellent free resource.</li>
-              <li>Read news articles to familiarise yourself with contemporary Irish. Currently there are two sites that are updated daily - nos.ie and tuairisc.ie. You can use a browser plugin to translate and save wordlists for import into Anki, Google translate supports this for example. </li>
-            </ul>
+            <p class="mb-4 text-gray-500 dark:text-gray-400">While we're developing formal courses, here's a proven approach to learning Mayo Irish:</p>
+            <ol class="pl-5 text-gray-500 list-decimal dark:text-gray-400 space-y-2">
+              <li><strong>Find a mentor:</strong> Connect with a native speaker for one-on-one guidance, either online or in person. This is the single most important factor for success.</li>
+              <li><strong>Build vocabulary:</strong> Use spaced repetition apps like <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://apps.ankiweb.net/">Anki</a> with word lists from this site that include native audio and context.</li>
+              <li><strong>Listen actively:</strong> Study recordings on this site, repeat phrases, and copy the sounds and rhythm. Also listen to <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://rnag.ie">Raidió na Gaeltachta</a> regularly.</li>
+              <li><strong>Learn grammar later:</strong> Unless you're an experienced language learner, focus on speaking first. When ready, try <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://archive.org/details/learning-irish-3rd-ed">Learning Irish by Mícheál Ó Siadhail</a> or <a href="http://nualeargais.ie/gnag/gram.htm" class="text-purple-600 dark:text-purple-500 hover:underline">Nualeargais</a>.</li>
+              <li><strong>Read contemporary Irish:</strong> Follow <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://nos.ie">nos.ie</a> and <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://tuairisc.ie">tuairisc.ie</a> for daily news. Use browser translation tools to create vocabulary lists.</li>
+            </ol>
           </div>
         </div>
-        <h3 id="accordion-flush-heading-4">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-accordion-target="#accordion-flush-body-4" aria-expanded="false" aria-controls="accordion-flush-body-4">
-            <span>How do I sign up / log in?</span>
-            <svg data-accordion-icon="" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
+            <span>Do I need to sign up?</span>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
-        </h3>
-        <div id="accordion-flush-body-4" class="hidden" aria-labelledby="accordion-flush-heading-4">
+        <div data-collapse-target="content" class="hidden">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">To sign up click the link and fill out the form. You won't have instant access but an admin will email you and then grant you student login privileges.</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Dá mbeadh Gaeilge agat cheana fhéin, inis dúinn agus ceadfaidh muid cumhachtaí níos fónta dhuit.</p>
+            <p class="mb-2 text-gray-500 dark:text-gray-400"><strong>No:</strong> you do not need to sign up to use this site. Sign up if you want to contribute to the site.</p>
             <p class="mb-2 text-gray-500 dark:text-gray-400">After you've been granted access, you just need to click on 'login' and enter your email to receive a login link. There are no passwords.</p>
           </div>
         </div>
-        <h3 id="accordion-flush-heading-5">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-accordion-target="#accordion-flush-body-5" aria-expanded="false" aria-controls="accordion-flush-body-4">
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
             <span>Is it really possible to sound like a native speaker?</span>
-            <svg data-accordion-icon="" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
-        </h3>
-        <div id="accordion-flush-body-5" class="hidden" aria-labelledby="accordion-flush-heading-5">
+        <div data-collapse-target="content" class="hidden">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
             <p class="mb-2 text-gray-500 dark:text-gray-400">Yes, one of the founders of this site is a non-native speaker, Darren Ó Riagáin, who is said by native speakers from Dún Chaocháin to sound indistinguishable from them. There are a few aspects to achieving native like fluency:</p>
             <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400">
-              <li>Use the sounds of Irish, don't use the sounds of English. Many monoglot English speakers will be unaware that the english language has a particular set of pronunciations that clearly distinguish it (as do all languages). If you use these sounds instead of Irish ones, you will always sound like you're speaking English, even if you use Irish words. Abairt helps here by allowing you to hear native pronunciation when learning, in a natural conversation flow.</li>
-              <li>Use Irish idioms and syntax. If you translate English into Irish directly it will sound like English to people who know it (almost everyone these days, unfortunately). </li>
+              <li>Use the sounds of Irish, don't use the sounds of English. Many monoglot English speakers will be unaware that the English language has a particular set of pronunciations that clearly distinguish it (as do all languages). If you use these sounds instead of Irish ones, you will always sound like you're speaking English, even if you use Irish words. Abairt helps here by allowing you to hear native pronunciation when learning, in a natural conversation flow.</li>
+              <li>Use Irish idioms and syntax. If you translate English into Irish directly it will sound like English to people who know it (almost everyone these days, unfortunately).</li>
               <li>Time. You will be able to speak after a couple of years but achieving native fluency is a matter of time, experience and accumulation.</li>
+            </ul>
           </div>
         </div>
-        <h3 id="accordion-flush-heading-6">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-accordion-target="#accordion-flush-body-6" aria-expanded="false" aria-controls="accordion-flush-body-4">
-            <span>Troubleshooting</span>
-            <svg data-accordion-icon="" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
+            <span>How do I use this site effectively?</span>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
           </button>
-        </h3>
-        <div id="accordion-flush-body-6" class="hidden" aria-labelledby="accordion-flush-heading-6">
+        <div data-collapse-target="content" class="hidden">
           <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Some limitations to be aware of:</p>
-            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400">
-              <li>Big screen required: This site isn't intended to be used on your phone. Ideally it would, but I don't have time to work on that right now.</li>
-              <li>Performance issues / temporary unavailability: Abairt is deployed on a low powered vm to save money. It's possible you might experience laggy performance or even downtime at times. </li>
-              <li>Found a bug? Add an issue on github, I'll do my best to fix it.</li>
+            <p class="mb-4 text-gray-500 dark:text-gray-400">Here are some tips to get the most from Abairt:</p>
+            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400 space-y-2">
+              <li><strong>Start with the map:</strong> Click on locations to discover speakers from different areas and hear regional variations.</li>
+              <li><strong>Use the search:</strong> Search for specific words or phrases in Irish or English to find relevant recordings.</li>
+              <li><strong>Adjust playback:</strong> Use the speed controls to slow down speech, loop segments, and practice pronunciation.</li>
+              <li><strong>Read transcriptions:</strong> Toggle between Irish and English subtitles to understand context and meaning.</li>
+            </ul>
           </div>
+        </div>
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
+            <span>What happened to the old features?</span>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+          </button>
+        <div data-collapse-target="content" class="hidden">
+          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
+            <p class="mb-4 text-gray-500 dark:text-gray-400">Earlier versions of Abairt included features like integrated chat, spaced repetition learning, video calling, and various interactive tools. These have been removed to focus on what we do best.</p>
+            <p class="mb-4 text-gray-500 dark:text-gray-400"><strong>Why the change?</strong> While these features seemed useful in theory, they weren't very good in practice. Rather than maintain mediocre learning tools, we decided to concentrate on building the highest-quality dataset of native Irish speech possible.</p>
+            <p class="mb-4 text-gray-500 dark:text-gray-400"><strong>The new approach:</strong> By focusing exclusively on data collection, transcription, and community curation, we can provide a superior foundation that specialized tool creators can use to build much better learning applications than we ever could.</p>
+            <p class="text-gray-500 dark:text-gray-400">This means you get access to authentic, well-curated Irish language content that can be used with the learning tools and methods that work best for you - whether that's Anki, language exchange apps, or whatever new tools emerge in the future.</p>
+          </div>
+        </div>
+        </div>
+        <div data-controller="collapse">
+          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
+            <span>Technical issues & limitations</span>
+            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+          </button>
+        <div data-collapse-target="content" class="hidden">
+          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
+            <p class="mb-4 text-gray-500 dark:text-gray-400">Please be aware of these current limitations:</p>
+            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400 space-y-2">
+              <li><strong>Desktop recommended:</strong> This site works best on larger screens. Mobile support is limited but planned for future development.</li>
+              <li><strong>Performance considerations:</strong> Abairt runs on modest infrastructure to keep costs low. You may occasionally experience slower performance or brief downtime during maintenance.</li>
+              <li><strong>Service dependencies:</strong> Some features depend on external services (like abair.ie) which may be temporarily unavailable.</li>
+              <li><strong>Bug reports:</strong> Found an issue? Please <a href="https://github.com/seocahill/abairt/issues" class="text-purple-600 dark:text-purple-500 hover:underline">report it on GitHub</a> - we appreciate your feedback!</li>
+            </ul>
+          </div>
+        </div>
         </div>
       </div>
     </div>
