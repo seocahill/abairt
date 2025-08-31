@@ -90,9 +90,16 @@ module Importers
         '--user-agent', get_random_user_agent,
         '--referer', 'https://www.google.com/',
         '--sleep-interval', '1',
-        '--max-sleep-interval', '3',
-        @url
+        '--max-sleep-interval', '3'
       ]
+      
+      # Add proxy configuration for production
+      if Rails.env.production? && Rails.application.credentials.proxy_host.present?
+        proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
+        cmd += ['--proxy', proxy_url]
+      end
+      
+      cmd << @url
       
       Rails.logger.debug "Running: #{cmd.join(' ')}"
       
@@ -139,9 +146,16 @@ module Importers
           '--max-sleep-interval', '3',
           '--retries', '3',
           '--fragment-retries', '3',
-          '--abort-on-unavailable-fragment',
-          @url
+          '--abort-on-unavailable-fragment'
         ]
+        
+        # Add proxy configuration for production
+        if Rails.env.production? && Rails.application.credentials.proxy_host.present?
+          proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
+          cmd += ['--proxy', proxy_url]
+        end
+        
+        cmd << @url
         
         Rails.logger.debug "Running: #{cmd.join(' ')}"
         success = system(*cmd)
