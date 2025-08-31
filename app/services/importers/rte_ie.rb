@@ -178,7 +178,16 @@ module Importers
           'ffmpeg',
           '-user_agent', get_random_headers['User-Agent'],
           '-referer', 'https://www.rte.ie/',
-          '-headers', 'Accept-Language: en-US,en;q=0.9,ga;q=0.8',
+          '-headers', 'Accept-Language: en-US,en;q=0.9,ga;q=0.8'
+        ]
+        
+        # Add proxy configuration for production only
+        if Rails.env.production? && Rails.application.credentials.proxy_host.present?
+          proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
+          cmd += ['-http_proxy', proxy_url]
+        end
+        
+        cmd += [
           '-i', audio_url,
           '-c:a', 'mp3',           # Ensure MP3 format
           '-b:a', '128k',          # Set bitrate for consistency
@@ -231,14 +240,13 @@ module Importers
           verify: false  # In case of SSL issues on server
         }
         
-        # Add proxy if PROXY_URL environment variable is set
-        if ENV['PROXY_URL'].present?
-          proxy_uri = URI.parse(ENV['PROXY_URL'])
-          options[:http_proxyaddr] = proxy_uri.host
-          options[:http_proxyport] = proxy_uri.port
-          options[:http_proxyuser] = proxy_uri.user if proxy_uri.user
-          options[:http_proxypass] = proxy_uri.password if proxy_uri.password
-          Rails.logger.debug "Using proxy: #{proxy_uri.host}:#{proxy_uri.port}"
+        # Add proxy configuration for production only
+        if Rails.env.production? && Rails.application.credentials.proxy_host.present?
+          options[:http_proxyaddr] = Rails.application.credentials.proxy_host
+          options[:http_proxyport] = Rails.application.credentials.proxy_port || 10001
+          options[:http_proxyuser] = Rails.application.credentials.proxy_user
+          options[:http_proxypass] = Rails.application.credentials.proxy_pass
+          Rails.logger.debug "Using proxy: #{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
         end
         
         response = HTTParty.get(url, options)
