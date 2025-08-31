@@ -1,5 +1,4 @@
-require 'json'
-require 'tempfile'
+# All required libraries are auto-loaded by Rails
 
 module Importers
   class Youtube
@@ -88,6 +87,10 @@ module Importers
         'yt-dlp',
         '--dump-json',
         '--no-download',
+        '--user-agent', get_random_user_agent,
+        '--referer', 'https://www.google.com/',
+        '--sleep-interval', '1',
+        '--max-sleep-interval', '3',
         @url
       ]
       
@@ -130,7 +133,13 @@ module Importers
           '--format', 'best[ext=mp4]/best',
           '--output', output_template,
           '--no-playlist',
-          '--user-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          '--user-agent', get_random_user_agent,
+          '--referer', 'https://www.google.com/',
+          '--sleep-interval', '1',
+          '--max-sleep-interval', '3',
+          '--retries', '3',
+          '--fragment-retries', '3',
+          '--abort-on-unavailable-fragment',
           @url
         ]
         
@@ -189,6 +198,18 @@ module Importers
       end
       
       @yt_dlp_available
+    end
+
+    def get_random_user_agent
+      user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      ]
+      
+      user_agents.sample
     end
   end
 end
