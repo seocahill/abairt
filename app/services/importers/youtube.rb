@@ -1,4 +1,5 @@
 # All required libraries are auto-loaded by Rails
+require 'open3'
 
 module Importers
   class Youtube
@@ -15,31 +16,24 @@ module Importers
     end
 
     def import(title: nil)
-      return nil unless valid_youtube_url?
+      return unless valid_youtube_url?
       
       Rails.logger.info "Importing YouTube video: #{@url}"
       
-      # Extract video info first
       video_info = extract_video_info
-      return nil unless video_info
+      return unless video_info
       
-      # Use custom title if provided, otherwise use video title
-      final_title = title.present? ? title : video_info[:title]
-
-      voice_recording = VoiceRecording.create!(
-        title: final_title,
-        description: video_info[:description],
-        owner: User.first
-      )
-
-      # Download and attach audio
-      if download_and_attach_audio(voice_recording)
-        Rails.logger.info "Voice recording '#{voice_recording.title}' imported successfully with ID: #{voice_recording.id}"
-        voice_recording
-      else
-        voice_recording.destroy
-        nil
-      end
+      final_title = title.presence || video_info[:title]
+      voice_recording = create_voice_recording(final_title, video_info)
+      
+      return voice_recording if download_and_attach_audio(voice_recording)
+      
+      voice_recording.destroy
+      nil
+    rescue StandardError => e
+      voice_recording&.destroy
+      Rails.logger.error "Failed to import YouTube video: #{e.message}"
+      nil
     end
     
     def import_to_record(voice_recording, title: nil)
@@ -47,42 +41,42 @@ module Importers
       
       Rails.logger.info "Importing YouTube audio to existing recording: #{@url}"
       
-      # Extract video info
       video_info = extract_video_info
       return false unless video_info
       
-      # Use custom title if provided, otherwise use video title
-      final_title = title.present? ? title : video_info[:title]
-
-      # Update the existing record
-      voice_recording.update!(
-        title: final_title,
-        description: video_info[:description]
-      )
+      final_title = title.presence || video_info[:title]
+      update_voice_recording(voice_recording, final_title, video_info)
       
-      success = download_and_attach_audio(voice_recording)
-      
-      if success
-        Rails.logger.info "Voice recording '#{voice_recording.title}' updated successfully"
-        true
-      else
-        Rails.logger.error "Failed to download audio for YouTube video: #{@url}"
-        false
+      download_and_attach_audio(voice_recording).tap do |success|
+        if success
+          Rails.logger.info "Voice recording '#{voice_recording.title}' updated successfully"
+        else
+          Rails.logger.error "Failed to download audio for YouTube video: #{@url}"
+        end
       end
+    rescue StandardError => e
+      Rails.logger.error "Failed to import to existing recording: #{e.message}"
+      false
     end
 
     private
 
-    def valid_youtube_url?
-      # Check if URL is a valid YouTube URL
-      youtube_regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
-      @url.match?(youtube_regex)
+    def create_voice_recording(title, video_info)
+      VoiceRecording.create!(
+        title: title,
+        description: video_info[:description],
+        owner: User.first
+      )
     end
 
-    def extract_video_info
-      return nil unless yt_dlp_available?
-      
-      # Use yt-dlp to get video metadata
+    def update_voice_recording(voice_recording, title, video_info)
+      voice_recording.update!(
+        title: title,
+        description: video_info[:description]
+      )
+    end
+
+    def build_info_command
       cmd = [
         'yt-dlp',
         '--dump-json',
@@ -93,100 +87,124 @@ module Importers
         '--max-sleep-interval', '3'
       ]
       
-      # Add proxy configuration for production
-      if Rails.env.production? && Rails.application.credentials.proxy_host.present?
-        proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
-        cmd += ['--proxy', proxy_url]
-      end
-      
+      cmd += ['--proxy', proxy_url] if production_proxy_available?
       cmd << @url
+      cmd
+    end
+
+    def build_download_command(output_template)
+      cmd = [
+        'yt-dlp',
+        '--format', 'best[ext=mp4]/best',
+        '--output', output_template,
+        '--no-playlist',
+        '--user-agent', get_random_user_agent,
+        '--referer', 'https://www.google.com/',
+        '--sleep-interval', '1',
+        '--max-sleep-interval', '3',
+        '--retries', '3',
+        '--fragment-retries', '3',
+        '--abort-on-unavailable-fragment'
+      ]
       
+      cmd += ['--proxy', proxy_url] if production_proxy_available?
+      cmd << @url
+      cmd
+    end
+
+    def parse_video_info(result)
+      data = JSON.parse(result)
+      
+      {
+        title: "YouTube - #{data['title'] || 'Unknown'}",
+        description: truncate_description(data['description']),
+        duration: data['duration'],
+        uploader: data['uploader'],
+        upload_date: data['upload_date']
+      }
+    rescue JSON::ParserError => e
+      Rails.logger.error "Failed to parse yt-dlp JSON output: #{e.message}"
+      nil
+    end
+
+    def download_successful?(success, file_path)
+      success && File.exist?(file_path) && File.size(file_path) > 0
+    end
+
+    def attach_media_file(voice_recording, file_path)
+      voice_recording.media.attach(
+        io: File.open(file_path),
+        filename: "youtube_#{extract_video_id}.mp4",
+        content_type: 'video/mp4'
+      )
+      
+      Rails.logger.info "Successfully downloaded and attached YouTube video"
+      true
+    end
+
+    def cleanup_temp_directory(temp_dir)
+      return unless temp_dir && Dir.exist?(temp_dir)
+      
+      FileUtils.remove_entry_secure(temp_dir)
+    rescue StandardError => e
+      Rails.logger.debug "Error cleaning up temp files: #{e.message}"
+    end
+
+    def production_proxy_available?
+      Rails.env.production? && Rails.application.credentials.proxy_host.present?
+    end
+
+    def proxy_url
+      return unless production_proxy_available?
+      
+      "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
+    end
+
+    def valid_youtube_url?
+      # Check if URL is a valid YouTube URL
+      youtube_regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+      @url.match?(youtube_regex)
+    end
+
+    def extract_video_info
+      return unless yt_dlp_available?
+      
+      cmd = build_info_command
       Rails.logger.debug "Running: #{cmd.join(' ')}"
       
-      result = `#{cmd.join(' ')} 2>/dev/null`
+      result, stderr, status = Open3.capture3(*cmd)
       
-      if $?.success? && result.present?
-        begin
-          data = JSON.parse(result)
-          
-          {
-            title: "YouTube - #{data['title'] || 'Unknown'}",
-            description: truncate_description(data['description']),
-            duration: data['duration'],
-            uploader: data['uploader'],
-            upload_date: data['upload_date']
-          }
-        rescue JSON::ParserError => e
-          Rails.logger.error "Failed to parse yt-dlp JSON output: #{e.message}"
-          nil
-        end
-      else
-        Rails.logger.error "yt-dlp failed to extract video info for: #{@url}"
-        nil
-      end
+      return parse_video_info(result) if status.success? && result.present?
+      
+      Rails.logger.error "yt-dlp failed to extract video info for: #{@url}"
+      Rails.logger.error "yt-dlp stderr: #{stderr}" if stderr.present?
+      nil
+    rescue StandardError => e
+      Rails.logger.error "Error extracting video info: #{e.message}"
+      nil
     end
 
     def download_and_attach_audio(voice_recording)
       return false unless yt_dlp_available?
       
-      # Create a unique temporary directory
       temp_dir = Dir.mktmpdir
       output_template = File.join(temp_dir, "audio.%(ext)s")
       
-      begin
-        # Use yt-dlp to download video in MP4 format
-        cmd = [
-          'yt-dlp',
-          '--format', 'best[ext=mp4]/best',
-          '--output', output_template,
-          '--no-playlist',
-          '--user-agent', get_random_user_agent,
-          '--referer', 'https://www.google.com/',
-          '--sleep-interval', '1',
-          '--max-sleep-interval', '3',
-          '--retries', '3',
-          '--fragment-retries', '3',
-          '--abort-on-unavailable-fragment'
-        ]
-        
-        # Add proxy configuration for production
-        if Rails.env.production? && Rails.application.credentials.proxy_host.present?
-          proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
-          cmd += ['--proxy', proxy_url]
-        end
-        
-        cmd << @url
-        
-        Rails.logger.debug "Running: #{cmd.join(' ')}"
-        success = system(*cmd)
-
-        # The final file should be audio.mp4
-        actual_file_path = File.join(temp_dir, "audio.mp4")
-        
-        if success && File.exist?(actual_file_path) && File.size(actual_file_path) > 0
-          voice_recording.media.attach(
-            io: File.open(actual_file_path),
-            filename: "youtube_#{extract_video_id}.mp4",
-            content_type: 'video/mp4'
-          )
-          
-          Rails.logger.info "Successfully downloaded and attached YouTube video"
-          true
-        else
-          Rails.logger.error "Failed to download video from YouTube: #{@url}"
-          false
-        end
-      rescue => e
-        Rails.logger.error "Error downloading YouTube video: #{e.message}"
-        false
-      ensure
-        # Clean up temp directory and all files
-        begin
-          FileUtils.remove_entry_secure(temp_dir) if temp_dir && Dir.exist?(temp_dir)
-        rescue => cleanup_error
-          Rails.logger.debug "Error cleaning up temp files: #{cleanup_error.message}"
-        end
-      end
+      cmd = build_download_command(output_template)
+      Rails.logger.debug "Running: #{cmd.join(' ')}"
+      
+      success = system(*cmd)
+      actual_file_path = File.join(temp_dir, "audio.mp4")
+      
+      return attach_media_file(voice_recording, actual_file_path) if download_successful?(success, actual_file_path)
+      
+      Rails.logger.error "Failed to download video from YouTube: #{@url}"
+      false
+    rescue StandardError => e
+      Rails.logger.error "Error downloading YouTube video: #{e.message}"
+      false
+    ensure
+      cleanup_temp_directory(temp_dir)
     end
 
     def extract_video_id
