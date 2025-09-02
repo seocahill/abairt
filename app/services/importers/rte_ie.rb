@@ -173,21 +173,20 @@ module Importers
         # Add a small delay to avoid rapid requests
         sleep(rand(0.5..2.0))
         
+        # Set proxy environment variables (ffmpeg doesn't handle -http_proxy well with HLS)
+        env = {}
+        if Rails.env.production? && Rails.application.credentials.proxy_host.present?
+          proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
+          env['HTTP_PROXY'] = proxy_url
+          env['HTTPS_PROXY'] = proxy_url
+        end
+        
         # Build ffmpeg command with random user agent
         cmd = [
           'ffmpeg',
           '-user_agent', get_random_headers['User-Agent'],
           '-referer', 'https://www.rte.ie/',
-          '-headers', 'Accept-Language: en-US,en;q=0.9,ga;q=0.8'
-        ]
-        
-        # Add proxy configuration for production only
-        if Rails.env.production? && Rails.application.credentials.proxy_host.present?
-          proxy_url = "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
-          cmd += ['-http_proxy', proxy_url]
-        end
-        
-        cmd += [
+          '-headers', 'Accept-Language: en-US,en;q=0.9,ga;q=0.8',
           '-i', audio_url,
           '-c:a', 'mp3',           # Ensure MP3 format
           '-b:a', '128k',          # Set bitrate for consistency
@@ -195,7 +194,7 @@ module Importers
           temp_file.path
         ]
         
-        system(*cmd)
+        system(env, *cmd)
 
         # Check if the download was successful
         if File.size(temp_file.path) > 0
