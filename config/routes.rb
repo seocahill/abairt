@@ -34,6 +34,8 @@ Rails.application.routes.draw do
   resources :tags
 
   resources :users
+  
+  resources :admin_emails, only: [:new, :create]
 
   scope controller: :sessions do
     get "login" => :new
