@@ -9,4 +9,10 @@ class UserMailer < ApplicationMailer
     @user = user
     mail(to: User.admin.pluck(:email), subject: 'New User Signed up')
   end
+
+  def broadcast_email(user, subject, message)
+    @user = user
+    @message = message
+    mail(to: @user.email, subject: subject)
+  end
 end

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 30px;
+      }
+      .content {
+        background-color: white;
+        padding: 30px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        padding: 20px;
+        font-size: 0.9em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Teachtaireacht ó Abairt</h1>
+    </div>
+    
+    <div class="content">
+      <p>Dia dhuit <%= @user.name %>,</p>
+      
+      <div style="margin: 20px 0; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+        <%= simple_format(h(@message)) %>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>
+        Foireann Abairt<br>
+        <a href="mailto:abairt@abairt.com">abairt@abairt.com</a>
+      </p>
+    </div>
+  </body>
+</html>
