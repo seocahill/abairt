@@ -156,8 +156,13 @@ module Importers
 
     def proxy_url
       return unless production_proxy_available?
-      
-      "http://#{Rails.application.credentials.proxy_user}:#{Rails.application.credentials.proxy_pass}@#{Rails.application.credentials.proxy_host}:#{Rails.application.credentials.proxy_port || 10001}"
+
+      user = CGI.escape(Rails.application.credentials.proxy_user)
+      pass = CGI.escape(Rails.application.credentials.proxy_pass)
+      host = Rails.application.credentials.proxy_host
+      port = Rails.application.credentials.proxy_port || 10001
+
+      "http://#{user}:#{pass}@#{host}:#{port}"
     end
 
     def valid_youtube_url?
