@@ -25,7 +25,7 @@ class UserPolicy < ApplicationPolicy
     # if it's your own record, you can edit it
     return true if user == record
     # if it's a speaker, anyone can edit it
-    user && record.speaker
+    user && record.role == 'speaker'
   end
 
   def edit?
