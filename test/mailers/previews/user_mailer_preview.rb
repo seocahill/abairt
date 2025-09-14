@@ -16,9 +16,13 @@ class UserMailerPreview < ActionMailer::Preview
   # Preview this email at http://localhost:3000/rails/mailers/user_mailer/broadcast_email
   def broadcast_email
     user = User.order(updated_at: :desc).first
-    subject = "Fógra Tábhachtach ó Abairt"
-    message = "Dia dhaoibh a chairde,\n\nTá feabhsúcháin nua curtha leis an suíomh. Bígí cinnte breathnú orthu!\n\nGo raibh míle maith agaibh as bhur dtacaíocht leanúnach.\n\nSlán go fóill,\nFoireann Abairt"
-    UserMailer.broadcast_email(user, subject, message)
+    email = Email.last
+    if email.nil?
+      # Create a sample rich content for preview
+      email = Email.new(subject: "Fógra Tábhachtach ó Abairt")
+      email.rich_content = ActionText::Content.new("<p>Dia dhaoibh a chairde,</p><p>Tá <strong>feabhsúcháin nua</strong> curtha leis an suíomh. Bígí cinnte breathnú orthu!</p><p>Go raibh míle maith agaibh as bhur dtacaíocht leanúnach.</p><p>Slán go fóill,<br>Foireann Abairt</p>")
+    end
+    UserMailer.broadcast_email(user, email.subject, email.rich_content)
   end
 
 end

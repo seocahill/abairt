@@ -1,14 +1,22 @@
 <div class="container mx-auto px-4 py-8">
   <div class="max-w-2xl mx-auto">
     <div class="bg-white shadow-lg rounded-lg p-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Seol Ríomhphost chuig na hÚsáideoirí</h1>
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Cuir Ríomhphost in Eagar</h1>
+        <p class="mt-1 text-sm text-gray-600">
+          Cruthaithe ar <%= @email.created_at.strftime("%d/%m/%Y ag %H:%M") %>
+        </p>
+      </div>
       
-      <%= form_with model: @email, url: admin_emails_path, method: :post, local: true, class: "space-y-6" do |form| %>
+      <%= form_with model: @email, local: true, class: "space-y-6" do |form| %>
         <div>
           <%= form.label :subject, "Ábhar:", class: "block text-sm font-medium text-gray-700 mb-2" %>
           <%= form.text_field :subject, 
                 class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
                 placeholder: "Cuir ábhar an ríomhphoist anseo..." %>
+          <% if @email.errors[:subject].any? %>
+            <p class="mt-1 text-sm text-red-600"><%= @email.errors[:subject].first %></p>
+          <% end %>
         </div>
 
         <div class="flex-1 flex flex-col">
@@ -18,24 +26,27 @@
                   class: "w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 prose prose-sm max-w-none",
                   style: "min-height: 400px;" %>
           </div>
+          <% if @email.errors[:rich_content].any? %>
+            <p class="mt-1 text-sm text-red-600"><%= @email.errors[:rich_content].first %></p>
+          <% end %>
         </div>
 
-        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
           <div class="flex">
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-yellow-800">
-                Rabhadh
+              <h3 class="text-sm font-medium text-blue-800">
+                Nóta
               </h3>
-              <div class="mt-2 text-sm text-yellow-700">
-                <p>Seolfar an ríomhphost seo chuig gach úsáideoir gníomhach sa chóras (<%= User.active.count %> úsáideoir).</p>
+              <div class="mt-2 text-sm text-blue-700">
+                <p>Sábháil na hathruithe agus téigh ar ais chuig an réamhamharc chun an ríomhphost a sheiceáil sula seolann tú é.</p>
               </div>
             </div>
           </div>
         </div>
 
         <div class="flex justify-end space-x-3">
-          <%= link_to "Cealaigh", admin_emails_path, class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-          <%= form.submit "Cruthaigh Dréacht", 
+          <%= link_to "Cealaigh", admin_email_path(@email), class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          <%= form.submit "Sábháil Athruithe", 
                 class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
         </div>
       <% end %>
