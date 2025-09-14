@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   resources :admin_emails do
     member do
       post :send_email
+      post :send_to_self
     end
   end
 

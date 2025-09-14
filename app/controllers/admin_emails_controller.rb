@@ -2,7 +2,7 @@
 
 class AdminEmailsController < ApplicationController
   before_action :ensure_admin
-  before_action :set_email, only: [:show, :edit, :update, :send_email]
+  before_action :set_email, only: [:show, :edit, :update, :send_email, :send_to_self]
 
   def index
     authorize User
@@ -54,6 +54,13 @@ class AdminEmailsController < ApplicationController
     BroadcastEmailJob.perform_later(@email.id)
 
     redirect_to admin_email_path(@email), notice: "Ríomhphost á sheoladh chuig #{User.active.count} úsáideoirí sa chúlra."
+  end
+
+  def send_to_self
+    authorize User
+    BroadcastEmailJob.perform_later(@email.id, current_user.id)
+
+    redirect_to admin_email_path(@email), notice: "Ríomhphost á sheoladh chugat féin mar thástáil."
   end
 
   private
