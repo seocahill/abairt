@@ -35,4 +35,12 @@ class UserPolicy < ApplicationPolicy
   def destroy?
     user == record
   end
+
+  def send_email?
+    user&.admin?
+  end
+
+  def send_to_self?
+    user&.admin?
+  end
 end
