@@ -63,7 +63,7 @@ COPY --from=build /rails /rails
 # Install packages needed to run the app
 RUN apt-get update -qq && \
   apt-get install --no-install-recommends -y libffi-dev ffmpeg curl && \
-  curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
+  curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp && \
   chmod +x /usr/local/bin/yt-dlp && \
   rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
