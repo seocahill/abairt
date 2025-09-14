@@ -51,7 +51,7 @@ Abairt is an open-source platform for Irish language learning, featuring voice r
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/abairt.git
+   git clone https://gitlab.com/abairt/web-application
    cd abairt
    ```
 
