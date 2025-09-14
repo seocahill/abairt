@@ -1,169 +1,216 @@
 # Abairt
 
-https://abairt.herokuapp.com
+**A comprehensive Irish language learning and corpus platform**
 
-A simple application to share, search and download irish sentences, translations and pronunciations.
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://abairt.com)
+[![License](https://img.shields.io/badge/license-Open_Source-blue)](LICENSE)
+[![Ruby](https://img.shields.io/badge/ruby-3.4-red)](https://www.ruby-lang.org/)
+[![Rails](https://img.shields.io/badge/rails-7.1-red)](https://rubyonrails.org/)
 
-* Ruby 2.7 https://www.ruby-lang.org/en/
+Abairt is an open-source platform for Irish language learning, featuring voice recording transcription, dictionary management, and comprehensive language tools. Share, search, and download Irish sentences, translations, and pronunciations with advanced AI-powered features.
 
-* Rails 6.1 https://guides.rubyonrails.org/index.html
+## ✨ Features
 
-* Tailwind CSS 2.x https://tailwindcss.com/
+### 🎙️ Voice & Audio Processing
+- **Voice Recording Management** - Upload, transcribe, and manage Irish language recordings
+- **Speaker Diarization** - Automatically identify and separate different speakers using Pyannote.ai
+- **Audio Import** - Support for YouTube, RTÉ.ie, and Canuint.ie content import
+- **Text-to-Speech** - Generate Irish pronunciations using Abair.ie TTS
+- **Speech-to-Text** - Transcribe audio using TCD Phonetics ASR service
 
-* Hotwire https://hotwire.dev/
+### 📚 Dictionary & Language Tools
+- **Collaborative Dictionary** - User-generated Irish-English dictionary entries
+- **Smart Tagging** - AI-powered automatic tagging of content
+- **Word Lists** - Create and manage custom vocabulary lists
+- **Full-Text Search** - Fast FTS5-powered search across all content
+- **CSV Export** - Export word lists for Anki and other SRS applications
 
-* Postgresql 13 https://www.postgresql.org/
+### 🌍 Community & Learning
+- **User Authentication** - Secure user accounts and permissions
+- **Practice Mode** - Interactive pronunciation practice
+- **Translator Leaderboard** - Gamified contribution tracking
+- **Admin Panel** - Comprehensive administrative interface via Madmin
 
-* Redis https://redis.io/
+### 🔧 Technical Features
+- **AI Integration** - OpenAI GPT for vocabulary extraction and translation
+- **Service Monitoring** - Real-time health monitoring of external APIs
+- **Email System** - Mailjet-powered email notifications and broadcasts
+- **Responsive Design** - Modern UI with Tailwind CSS and Hotwire
+- **API Endpoints** - RESTful API for external integrations
 
-* Docker https://www.docker.com/
+## 🚀 Quick Start
 
-* Amazon simple object storage https://aws.amazon.com/s3/
+### Prerequisites
 
-* Deployed on Heroku PAAS https://www.heroku.com/
+- Ruby 3.4+
+- Node.js and npm
+- Docker and Docker Compose
+- SQLite 3 (primary database)
 
-* bug tracking https://sentry.io/organizations/seo-cahill/issues/?project=5656899
+### Local Development Setup
 
-## Development setup
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/abairt.git
+   cd abairt
+   ```
 
-* install docker and start the daemon
+2. **Install dependencies**
+   ```bash
+   bundle install
+   npm install
+   ```
 
-* git clone this repo && cd abairt
+3. **Start services with Docker**
+   ```bash
+   docker-compose up -d
+   ```
 
-* bundle install
+4. **Setup database**
+   ```bash
+   rails db:prepare
+   rails db:seed  # Optional: load sample data
+   ```
 
-* docker-compose up -d
+5. **Install external tools**
+   ```bash
+   # For YouTube import functionality
+   pip install yt-dlp
+   ```
 
-* rails db:prepare
+6. **Start the server**
+   ```bash
+   rails server
+   ```
 
-* rails server
+7. **Visit** http://localhost:3000
 
-The application will be accessible on http://localhost:3000
+### Environment Configuration
 
-## Note on db backup / swithing
+Create a `.env` file with required credentials:
 
-To back up remote heroku postgres to local postgres execute `pgsync`
+```bash
+# External Services
+OPENAI_ACCESS_TOKEN=your_openai_compatiable_api_key
+MAILJET_API_KEY=your_mailjet_key
+MAILJET_SECRET_KEY=your_mailjet_secret
 
-To export pg data to sqlite db execute
+# For production proxy (optional)
+PROXY_HOST=your_proxy_host
+PROXY_USER=your_proxy_user
+PROXY_PASS=your_proxy_password
+PROXY_PORT=10001
 
+# Sentry error tracking (optional)
+SENTRY_DSN=your_sentry_dsn
 ```
+
+## 🏗️ Architecture
+
+### Database
+- **Primary**: SQLite with Litestack for production performance
+- **FTS**: Full-text search via SQLite FTS5 virtual tables
+- **Backups**: Litestream for continuous backup and replication
+
+### Key Models
+- **DictionaryEntry** - Core translation pairs with metadata
+- **VoiceRecording** - Audio files with transcriptions and speakers
+- **User** - Authentication and user management
+- **WordList** - Custom vocabulary collections
+- **ServiceStatus** - Health monitoring for external APIs
+
+### External Services
+- **Abair.ie** - Irish text-to-speech synthesis
+- **TCD Phonetics** - Automatic speech recognition
+- **Pyannote.ai** - Speaker diarization and identification
+- **OpenAI GPT** - AI-powered content analysis and translation
+
+## 🔧 Development
+
+### Testing
+```bash
+# Run full test suite
+rails test
+
+# Run specific test files
+rails test test/models/dictionary_entry_test.rb
+```
+
+### Database Management
+
+**PostgreSQL to SQLite migration**:
+```bash
 gem install sequel
 sequel -C postgres://postgres@localhost:5432/abairt_development sqlite://db/development.sqlite3
 ```
 
-## NB
-
-Migration path (FIXME)
-
-I've moved it out of 'db' because of the enclosing folder is mounted (db data) and that overwrites migrations in image.
-
-Changed in 672f4759beaa7412089dc0d842be252eace66871, should revert and fix properly. Should have stored dbs in their own folder I guess but this was the easiest way to fix for now.
-
-### DM
-
-The basic unit is the dictionary_entry, which always belongs to the user that created it.
-
-Dictionary_entry also has and can belong to one or more rangs (to avoid repetition), through rang_entries
-A 'rang' is a classroom where a teacher user interacts with one or more student users.
-Rangs can have multiple users and vice versa through seomras.
-
-Dictionary_entry can also optionally belong to a voice_recording.
-
-Dictionary_entries are the corpus of the dictionary and are comprised of words and phrases from chat messages in classes and transcriptions of recordings. A recording transcript can be exported to various formats. Each dictionary adds a the portion of the media file it transcribes as an attachment for use in the corpus is a bacground job.
-
-A user can be admin, editor, viewer, list. A user has a voice, a dialect, a lat_lang.
-
-Downloadable lists include:
-- viewer lists:  current_viewer_user.rangs.dictionary_entries
-- admin/editor lists: editor.rangs.dictionary_entries
-
-Lists are private by default but can be made public, dictionary_entries are always public and included in the codex
-Lists can be downloaded as csvs for use in spaced repition apps like anki.
-
-## Notes on Libs
-- Rufus for wrapping cron
-- yui-compressor to get around sassc tailwind incompatibility
-
-## Service Monitoring
-
-The application monitors the health of critical external services:
-
-- **TTS (Text-to-Speech)**: Monitors the Abair.ie API for Irish text-to-speech synthesis
-- **ASR (Automatic Speech Recognition)**: Monitors the TCD phonetics service for speech recognition
-- **Pyannote (Speaker Diarization)**: Monitors the Pyannote.ai API for speaker identification and separation
-
-### Monitoring Features
-
-- **Automatic Monitoring**: Services are checked every hour via scheduled jobs
-- **Status Page**: Visit `/status` to view current service status and 24-hour history
-- **Response Time Tracking**: Monitors and logs response times for performance analysis
-- **Error Logging**: Captures and displays error messages when services are down
-
-### Manual Monitoring
-
-To manually trigger service monitoring:
-
+**FTS index maintenance**:
 ```bash
+rails runner "
+ActiveRecord::Base.connection.execute(\"INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('rebuild')\")
+"
+```
+
+### Service Monitoring
+```bash
+# Manual service health check
 bundle exec rake cron:monitor_services
+
+# View status page
+open http://localhost:3000/status
 ```
 
-### Service Status
+## 📦 Deployment
 
-- **Operational**: Service is responding with 2xx status codes
-- **Down**: Service is not responding or returning error status codes
-- **Uptime**: Percentage of successful checks in the last 24 hours
+The application supports Docker-based deployment and is production-ready with:
+- SQLite database with Litestack for production performance
+- Background job processing via Litequeue
+- Comprehensive error tracking and monitoring
+- Asset compilation and optimization
 
-
-## Restoring
-
-First do lightsream (restore only)
-Then change permissions `chown nonroot:root db` `chmod 755 db`
-Then add Rails
-Finally when other server is retired add back replication
-
-Local restore
-
+### Docker Deployment
 ```bash
-litestream restore -config litestream.yml -o ./local_backup.sqlite3 /data/production.sqlite3
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
+## 🤝 Contributing
 
+We welcome contributions! Please:
 
-## FTS issues
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes following Rails conventions
+4. Add tests for new functionality
+5. Ensure all tests pass (`rails test`)
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to your branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
 
-Check if the triggers have been removed for some reason (could be altering parent table?):
+### Development Guidelines
+- Follow Rails conventions and idioms
+- Use existing patterns and services
+- Write tests for new features
+- Update documentation as needed
+- Check for existing gems before creating custom solutions
 
-```sql
-SELECT name, tbl_name, sql FROM sqlite_master WHERE type = 'trigger';
-```
+## 📄 License
 
-If missing re-run approprite migration
+This project is open source. Please check the LICENSE file for specific terms.
 
-Finally rebuild the index:
+## 🙏 Acknowledgments
 
-```sql
-sqlite> INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('optimize');
-sqlite> INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('rebuild');
-```
+- **Abair.ie** - Irish TTS service
+- **TCD Phonetics** - Speech recognition
+- **Pyannote.ai** - Speaker diarization
+- **RTÉ** - Irish media content
+- **OpenAI** - AI language processing
+- Irish language community and contributors
 
-## Shrink mp3s
+## 📞 Support
 
-```bash
-file=/some/mp3
-ffmpeg -i $file.mp3 -codec:a libmp3lame -qscale:a 2 $file-sm.mp3
-```
+- **Issues**: Report bugs and request features via GitHub Issues
+- **Status Page**: Monitor service health at `/status`
 
-```bash
-ffmpeg -i [stream URL] -acodec libmp3lame -ab 128k [output file name].mp3
-```
+---
 
-```bash
-pg_dump --clean --if-exists --quote-all-identifiers \
- -h localhost -U postgres -d postgres \
- --no-owner --no-privileges > embeddings.sql
-```
-# postgres
-
-```bash
-psql -h db.wtdrbfgcompphsorooqe.supabase.co -U postgres --file embeddings.sql -p 6543 -d postgres
-```
+**Abairt** - Empowering Irish language learning through technology 🇮🇪
