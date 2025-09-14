@@ -16,23 +16,47 @@ module Importers
     end
 
     def import(title: nil)
-      return unless valid_youtube_url?
-      
-      Rails.logger.info "Importing YouTube video: #{@url}"
-      
+      Rails.logger.info "[YT-IMPORT] Starting import process for URL: #{@url}"
+
+      unless valid_youtube_url?
+        Rails.logger.error "[YT-IMPORT] Invalid YouTube URL: #{@url}"
+        return nil
+      end
+
+      Rails.logger.info "[YT-IMPORT] URL validation passed"
+      Rails.logger.info "[YT-IMPORT] Environment: #{Rails.env}"
+      Rails.logger.info "[YT-IMPORT] yt-dlp available: #{yt_dlp_available?}"
+
       video_info = extract_video_info
-      return unless video_info
-      
+      unless video_info
+        Rails.logger.error "[YT-IMPORT] Failed to extract video info, aborting import"
+        return nil
+      end
+
+      Rails.logger.info "[YT-IMPORT] Video info extracted successfully"
+      Rails.logger.info "[YT-IMPORT] Video title: #{video_info[:title]}"
+      Rails.logger.info "[YT-IMPORT] Video duration: #{video_info[:duration]} seconds"
+
       final_title = title.presence || video_info[:title]
+      Rails.logger.info "[YT-IMPORT] Final title: #{final_title}"
+
+      Rails.logger.info "[YT-IMPORT] Creating voice recording..."
       voice_recording = create_voice_recording(final_title, video_info)
-      
-      return voice_recording if download_and_attach_audio(voice_recording)
-      
+      Rails.logger.info "[YT-IMPORT] Voice recording created with ID: #{voice_recording.id}"
+
+      Rails.logger.info "[YT-IMPORT] Starting download and attach process..."
+      if download_and_attach_audio(voice_recording)
+        Rails.logger.info "[YT-IMPORT] Import completed successfully!"
+        return voice_recording
+      end
+
+      Rails.logger.error "[YT-IMPORT] Download failed, destroying voice recording"
       voice_recording.destroy
       nil
     rescue StandardError => e
+      Rails.logger.error "[YT-IMPORT] Import failed with exception: #{e.message}"
+      Rails.logger.error "[YT-IMPORT] Exception backtrace: #{e.backtrace.first(10).join(', ')}"
       voice_recording&.destroy
-      Rails.logger.error "Failed to import YouTube video: #{e.message}"
       nil
     end
     
@@ -84,10 +108,17 @@ module Importers
         '--user-agent', get_random_user_agent,
         '--referer', 'https://www.google.com/',
         '--sleep-interval', '1',
-        '--max-sleep-interval', '3'
+        '--max-sleep-interval', '3',
+        '--socket-timeout', '30',
+        '--retries', '5',
+        '--fragment-retries', '5'
       ]
-      
-      cmd += ['--proxy', proxy_url] if production_proxy_available?
+
+      if production_proxy_available?
+        cmd += ['--proxy', proxy_url]
+        cmd += ['--no-check-certificates']  # Skip SSL verification through proxy
+      end
+
       cmd << @url
       cmd
     end
@@ -102,12 +133,17 @@ module Importers
         '--referer', 'https://www.google.com/',
         '--sleep-interval', '1',
         '--max-sleep-interval', '3',
-        '--retries', '3',
-        '--fragment-retries', '3',
+        '--socket-timeout', '30',
+        '--retries', '5',
+        '--fragment-retries', '5',
         '--abort-on-unavailable-fragment'
       ]
-      
-      cmd += ['--proxy', proxy_url] if production_proxy_available?
+
+      if production_proxy_available?
+        cmd += ['--proxy', proxy_url]
+        cmd += ['--no-check-certificates']  # Skip SSL verification through proxy
+      end
+
       cmd << @url
       cmd
     end
@@ -173,42 +209,71 @@ module Importers
 
     def extract_video_info
       return unless yt_dlp_available?
-      
+
       cmd = build_info_command
-      Rails.logger.debug "Running: #{cmd.join(' ')}"
-      
+      Rails.logger.info "[YT-IMPORT] Building info command for URL: #{@url}"
+      Rails.logger.info "[YT-IMPORT] Command: #{cmd.join(' ')}"
+      Rails.logger.info "[YT-IMPORT] Using proxy: #{production_proxy_available?}"
+      Rails.logger.info "[YT-IMPORT] Proxy URL: #{proxy_url}" if production_proxy_available?
+
+      Rails.logger.info "[YT-IMPORT] Executing yt-dlp info command..."
       result, stderr, status = Open3.capture3(*cmd)
-      
-      return parse_video_info(result) if status.success? && result.present?
-      
-      Rails.logger.error "yt-dlp failed to extract video info for: #{@url}"
-      Rails.logger.error "yt-dlp stderr: #{stderr}" if stderr.present?
+
+      Rails.logger.info "[YT-IMPORT] Command completed with exit status: #{status.exitstatus}"
+      Rails.logger.info "[YT-IMPORT] Result size: #{result.length} characters" if result
+      Rails.logger.info "[YT-IMPORT] Stderr size: #{stderr.length} characters" if stderr.present?
+
+      if status.success? && result.present?
+        Rails.logger.info "[YT-IMPORT] Successfully extracted video info, parsing JSON..."
+        return parse_video_info(result)
+      end
+
+      Rails.logger.error "[YT-IMPORT] yt-dlp failed to extract video info for: #{@url}"
+      Rails.logger.error "[YT-IMPORT] Exit status: #{status.exitstatus}"
+      Rails.logger.error "[YT-IMPORT] yt-dlp stderr: #{stderr}" if stderr.present?
       nil
     rescue StandardError => e
-      Rails.logger.error "Error extracting video info: #{e.message}"
+      Rails.logger.error "[YT-IMPORT] Error extracting video info: #{e.message}"
+      Rails.logger.error "[YT-IMPORT] Backtrace: #{e.backtrace.first(5).join(', ')}"
       nil
     end
 
     def download_and_attach_audio(voice_recording)
       return false unless yt_dlp_available?
-      
+
       temp_dir = Dir.mktmpdir
       output_template = File.join(temp_dir, "audio.%(ext)s")
-      
+
       cmd = build_download_command(output_template)
-      Rails.logger.debug "Running: #{cmd.join(' ')}"
-      
+      Rails.logger.info "[YT-IMPORT] Building download command for URL: #{@url}"
+      Rails.logger.info "[YT-IMPORT] Download command: #{cmd.join(' ')}"
+      Rails.logger.info "[YT-IMPORT] Temp directory: #{temp_dir}"
+      Rails.logger.info "[YT-IMPORT] Output template: #{output_template}"
+
+      Rails.logger.info "[YT-IMPORT] Executing yt-dlp download command..."
       success = system(*cmd)
       actual_file_path = File.join(temp_dir, "audio.mp4")
-      
-      return attach_media_file(voice_recording, actual_file_path) if download_successful?(success, actual_file_path)
-      
-      Rails.logger.error "Failed to download video from YouTube: #{@url}"
+
+      Rails.logger.info "[YT-IMPORT] Download command completed with success: #{success}"
+      Rails.logger.info "[YT-IMPORT] Expected file path: #{actual_file_path}"
+      Rails.logger.info "[YT-IMPORT] File exists: #{File.exist?(actual_file_path)}"
+      Rails.logger.info "[YT-IMPORT] File size: #{File.exist?(actual_file_path) ? File.size(actual_file_path) : 'N/A'} bytes"
+
+      if download_successful?(success, actual_file_path)
+        Rails.logger.info "[YT-IMPORT] Download successful, attaching media file..."
+        return attach_media_file(voice_recording, actual_file_path)
+      end
+
+      Rails.logger.error "[YT-IMPORT] Failed to download video from YouTube: #{@url}"
+      Rails.logger.error "[YT-IMPORT] System command success: #{success}"
+      Rails.logger.error "[YT-IMPORT] File exists check: #{File.exist?(actual_file_path)}"
       false
     rescue StandardError => e
-      Rails.logger.error "Error downloading YouTube video: #{e.message}"
+      Rails.logger.error "[YT-IMPORT] Error downloading YouTube video: #{e.message}"
+      Rails.logger.error "[YT-IMPORT] Backtrace: #{e.backtrace.first(5).join(', ')}"
       false
     ensure
+      Rails.logger.info "[YT-IMPORT] Cleaning up temp directory: #{temp_dir}"
       cleanup_temp_directory(temp_dir)
     end
 
