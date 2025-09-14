@@ -1,0 +1,85 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900"><%= @email.subject %></h1>
+            <p class="mt-1 text-sm text-gray-600">
+              Cruthaithe ag <%= @email.sent_by.name %> ar <%= @email.created_at.strftime("%d/%m/%Y ag %H:%M") %>
+            </p>
+            <% if @email.sent? %>
+              <p class="mt-1 text-sm text-green-600">
+                Seolta ar <%= @email.sent_at.strftime("%d/%m/%Y ag %H:%M") %>
+              </p>
+            <% else %>
+              <span class="mt-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                Dréacht
+              </span>
+            <% end %>
+          </div>
+          
+          <div class="flex space-x-3">
+            <%= link_to "Siar", admin_emails_path, class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+            <% unless @email.sent? %>
+              <%= link_to "Cuir in Eagar", edit_admin_email_path(@email), class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Preview -->
+      <div class="px-6 py-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Réamhamharc an Ríomhphoist</h3>
+        
+        <!-- Email Preview -->
+        <div class="border rounded-lg p-6 bg-gray-50">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="border-b pb-4 mb-4">
+              <h2 class="text-xl font-semibold text-gray-900">Teachtaireacht ó Abairt</h2>
+            </div>
+            
+            <div class="space-y-4">
+              <p class="text-gray-700">Dia dhuit [Ainm an Úsáideora],</p>
+              
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <%= @email.rich_content %>
+              </div>
+              
+              <div class="text-sm text-gray-600">
+                <p>Foireann Abairt<br>
+                <a href="mailto:abairt@abairt.com" class="text-blue-600">abairt@abairt.com</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <% unless @email.sent? %>
+        <div class="px-6 py-4 bg-gray-50 border-t">
+          <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+            <div class="flex">
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800">
+                  Réidh le Seoladh
+                </h3>
+                <div class="mt-2 text-sm text-yellow-700">
+                  <p>Seolfar an ríomhphost seo chuig gach úsáideoir gníomhach sa chóras (<%= User.active.count %> úsáideoir).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-end">
+            <%= button_to "Seol Ríomhphost Anois", send_email_admin_email_path(@email), 
+                  method: :post,
+                  class: "px-6 py-2 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
+                  data: { confirm: "An bhfuil tú cinnte? Ní féidir é seo a chealú." } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

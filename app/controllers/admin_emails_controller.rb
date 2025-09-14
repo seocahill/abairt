@@ -2,28 +2,69 @@
 
 class AdminEmailsController < ApplicationController
   before_action :ensure_admin
+  before_action :set_email, only: [:show, :edit, :update, :send_email]
+
+  def index
+    authorize User
+    @emails = Email.order(created_at: :desc)
+  end
+
+  def show
+    authorize User
+  end
 
   def new
     authorize User
+    @email = Email.new
   end
 
   def create
     authorize User
-    
-    @subject = params[:subject]
-    @message = params[:message]
-    
-    if @subject.blank? || @message.blank?
-      redirect_to new_admin_email_path, alert: 'Caithfidh ábhar agus teachtaireacht a bheith ann.'
+    @email = Email.new(email_params)
+    @email.sent_by = current_user
+
+    if @email.save
+      redirect_to admin_email_path(@email), notice: 'Ríomhphost cruthaithe. Féach air agus seol é.'
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    authorize User
+  end
+
+  def update
+    authorize User
+    if @email.update(email_params)
+      redirect_to admin_email_path(@email), notice: 'Ríomhphost nuashonraithe.'
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def send_email
+    authorize User
+    if @email.sent?
+      redirect_to admin_email_path(@email), alert: 'Ríomhphost seolta cheana féin.'
       return
     end
 
-    BroadcastEmailJob.perform_later(@subject, @message)
+    @email.update!(sent_at: Time.current)
+    BroadcastEmailJob.perform_later(@email.id)
 
-    redirect_to new_admin_email_path, notice: "Ríomhphost á sheoladh chuig #{User.active.count} úsáideoirí sa chúlra."
+    redirect_to admin_email_path(@email), notice: "Ríomhphost á sheoladh chuig #{User.active.count} úsáideoirí sa chúlra."
   end
 
   private
+
+  def set_email
+    @email = Email.find(params[:id])
+  end
+
+  def email_params
+    params.require(:email).permit(:subject, :rich_content)
+  end
 
   def ensure_admin
     unless current_user&.admin?

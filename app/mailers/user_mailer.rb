@@ -10,9 +10,9 @@ class UserMailer < ApplicationMailer
     mail(to: User.admin.pluck(:email), subject: 'New User Signed up')
   end
 
-  def broadcast_email(user, subject, message)
+  def broadcast_email(user, subject, rich_content)
     @user = user
-    @message = message
+    @rich_content = rich_content
     mail(to: @user.email, subject: subject)
   end
 end

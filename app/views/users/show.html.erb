@@ -14,7 +14,7 @@
     <% if current_user&.admin? %>
           <div class="flex gap-3">
             <%= link_to "Admin", madmin_user_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
-            <%= link_to "Seol Ríomhphost", new_admin_email_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+            <%= link_to "Ríomhphoist", admin_emails_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
           </div>
         <% end %>
       </div>

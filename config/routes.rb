@@ -35,7 +35,11 @@ Rails.application.routes.draw do
 
   resources :users
   
-  resources :admin_emails, only: [:new, :create]
+  resources :admin_emails do
+    member do
+      post :send_email
+    end
+  end
 
   scope controller: :sessions do
     get "login" => :new
