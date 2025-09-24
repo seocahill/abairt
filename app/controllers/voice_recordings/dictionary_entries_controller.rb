@@ -52,9 +52,9 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
-            @dictionary_entry,
-            partial: "voice_recordings/dictionary_entries/dictionary_entry",
-            locals: { entry: @dictionary_entry, current_user: current_user }
+            "dictionary_entry_#{@dictionary_entry.id}",
+            partial: "voice_recordings/dictionary_entries/entry",
+            locals: { entry: @dictionary_entry }
           )
         end
         format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry was successfully updated.' }
