@@ -14,7 +14,7 @@
               <%= pluralize(entries.count, 'entry') %>
             </p>
 
-            <% if sample_entry = entries.with_attached_media.first %>
+            <% if sample_entry = entries.with_attached_media.where.not(word_or_phrase: [nil, ""]).first %>
               <div class="my-4 p-3 bg-gray-50 rounded">
                 <p class="text-sm text-gray-700"><%= sample_entry.word_or_phrase %></p>
                 <% if sample_entry.media.attached? %>
