@@ -27,4 +27,23 @@ class VoiceRecordings::DictionaryEntriesControllerTest < ActionDispatch::Integra
     assert_equal "Temporary", DictionaryEntry.last.speaker.name
     assert_redirected_to voice_recording_url(@voice_recording)
   end
+
+  test "should update dictionary_entry via turbo stream" do
+    @voice_recording = voice_recordings(:one)
+    @entry = dictionary_entries(:with_temp_speaker)
+
+    new_word_or_phrase = "updated word"
+    new_translation = "updated translation"
+
+    patch voice_recording_dictionary_entry_url(@voice_recording, @entry),
+          params: { dictionary_entry: { word_or_phrase: new_word_or_phrase, translation: new_translation } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+
+    @entry.reload
+    assert_equal new_word_or_phrase, @entry.word_or_phrase
+    assert_equal new_translation, @entry.translation
+  end
 end
