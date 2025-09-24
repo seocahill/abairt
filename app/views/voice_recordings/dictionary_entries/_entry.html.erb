@@ -62,7 +62,7 @@
             <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
             </svg>
-            <span><%= entry.speaker.name %></span>
+            <span><%= link_to entry.speaker.name, voice_recording_speakers_path(entry.voice_recording), class: "hover:text-blue-600 hover:underline cursor-pointer" %></span>
           </div>
         <% end %>
         <% if entry.versions.any? %>
