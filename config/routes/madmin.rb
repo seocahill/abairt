@@ -1,6 +1,5 @@
 # Below are the routes for madmin
 namespace :madmin do
-  resources :grupas
   resources :word_lists
   resources :voice_recordings
   resources :users
@@ -18,6 +17,7 @@ namespace :madmin do
   end
   resources :word_list_dictionary_entries
   resources :rang_entries
+  resources :media_imports
   namespace :active_storage do
     resources :blobs
   end

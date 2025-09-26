@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  url: https://example.com/test1.mp3
+  title: Test Recording 1
+  headline: Test headline for recording 1
+  description: Test description for recording 1
+  status: 0
+
+two:
+  url: https://example.com/test2.mp3
+  title: Test Recording 2
+  headline: Test headline for recording 2
+  description: Test description for recording 2
+  status: 1

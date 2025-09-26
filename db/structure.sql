@@ -117,6 +117,11 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
       END;
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, "import_status" varchar, CONSTRAINT "fk_rails_91ca04707d"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id");
 CREATE TABLE IF NOT EXISTS "versions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "item_type" varchar NOT NULL, "item_id" bigint NOT NULL, "event" varchar NOT NULL, "whodunnit" varchar, "object" json, "created_at" datetime(6));
 CREATE INDEX "index_versions_on_item_type_and_item_id" ON "versions" ("item_type", "item_id");
 CREATE TABLE IF NOT EXISTS "learning_sessions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "learnable_type" varchar NOT NULL, "learnable_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_e54f74cd15"
@@ -152,6 +157,7 @@ FOREIGN KEY ("user_id")
 CREATE INDEX "index_articles_on_user_id" ON "articles" ("user_id");
 CREATE TABLE IF NOT EXISTS "action_text_rich_texts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "body" text, "record_type" varchar NOT NULL, "record_id" bigint NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_action_text_rich_texts_uniqueness" ON "action_text_rich_texts" ("record_type", "record_id", "name");
+CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
 CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "standard_irish" varchar DEFAULT NULL, "notes" text DEFAULT NULL, "translator_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_43cc55d212"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -163,73 +169,23 @@ CREATE INDEX "index_dictionary_entries_on_voice_recording_id" ON "dictionary_ent
 CREATE INDEX "index_dictionary_entries_on_speaker_id" ON "dictionary_entries" ("speaker_id");
 CREATE INDEX "index_dictionary_entries_on_user_id" ON "dictionary_entries" ("user_id");
 CREATE INDEX "index_dictionary_entries_on_translator_id" ON "dictionary_entries" ("translator_id");
-CREATE TABLE IF NOT EXISTS "solid_queue_jobs" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "queue_name" varchar NOT NULL, "class_name" varchar NOT NULL, "arguments" text, "priority" integer DEFAULT 0 NOT NULL, "active_job_id" varchar, "scheduled_at" datetime(6), "finished_at" datetime(6), "concurrency_key" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
-CREATE INDEX "index_solid_queue_jobs_on_class_name" ON "solid_queue_jobs" ("class_name");
-CREATE INDEX "index_solid_queue_jobs_on_active_job_id" ON "solid_queue_jobs" ("active_job_id");
-CREATE INDEX "index_solid_queue_jobs_on_finished_at" ON "solid_queue_jobs" ("finished_at");
-CREATE INDEX "index_solid_queue_jobs_for_filtering" ON "solid_queue_jobs" ("queue_name", "finished_at");
-CREATE INDEX "index_solid_queue_jobs_for_alerting" ON "solid_queue_jobs" ("scheduled_at", "finished_at");
-CREATE TABLE IF NOT EXISTS "solid_queue_pauses" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "queue_name" varchar NOT NULL, "created_at" datetime(6) NOT NULL);
-CREATE UNIQUE INDEX "index_solid_queue_pauses_on_queue_name" ON "solid_queue_pauses" ("queue_name");
-CREATE TABLE IF NOT EXISTS "solid_queue_processes" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "kind" varchar NOT NULL, "last_heartbeat_at" datetime(6) NOT NULL, "supervisor_id" bigint, "pid" integer NOT NULL, "hostname" varchar, "metadata" text, "created_at" datetime(6) NOT NULL);
-CREATE INDEX "index_solid_queue_processes_on_last_heartbeat_at" ON "solid_queue_processes" ("last_heartbeat_at");
-CREATE INDEX "index_solid_queue_processes_on_supervisor_id" ON "solid_queue_processes" ("supervisor_id");
-CREATE TABLE IF NOT EXISTS "solid_queue_semaphores" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar NOT NULL, "value" integer DEFAULT 1 NOT NULL, "expires_at" datetime(6) NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
-CREATE UNIQUE INDEX "index_solid_queue_semaphores_on_key" ON "solid_queue_semaphores" ("key");
-CREATE INDEX "index_solid_queue_semaphores_on_expires_at" ON "solid_queue_semaphores" ("expires_at");
-CREATE INDEX "index_solid_queue_semaphores_on_key_and_value" ON "solid_queue_semaphores" ("key", "value");
-CREATE TABLE IF NOT EXISTS "solid_queue_blocked_executions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "queue_name" varchar NOT NULL, "priority" integer DEFAULT 0 NOT NULL, "concurrency_key" varchar NOT NULL, "expires_at" datetime(6) NOT NULL, "created_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_4cd34e2228"
-FOREIGN KEY ("job_id")
-  REFERENCES "solid_queue_jobs" ("id")
- ON DELETE CASCADE);
-CREATE UNIQUE INDEX "index_solid_queue_blocked_executions_on_job_id" ON "solid_queue_blocked_executions" ("job_id");
-CREATE INDEX "index_solid_queue_blocked_executions_for_maintenance" ON "solid_queue_blocked_executions" ("expires_at", "concurrency_key");
-CREATE TABLE IF NOT EXISTS "solid_queue_claimed_executions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "process_id" bigint, "created_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_9cfe4d4944"
-FOREIGN KEY ("job_id")
-  REFERENCES "solid_queue_jobs" ("id")
- ON DELETE CASCADE);
-CREATE UNIQUE INDEX "index_solid_queue_claimed_executions_on_job_id" ON "solid_queue_claimed_executions" ("job_id");
-CREATE INDEX "index_solid_queue_claimed_executions_on_process_id_and_job_id" ON "solid_queue_claimed_executions" ("process_id", "job_id");
-CREATE TABLE IF NOT EXISTS "solid_queue_failed_executions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "error" text, "created_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_39bbc7a631"
-FOREIGN KEY ("job_id")
-  REFERENCES "solid_queue_jobs" ("id")
- ON DELETE CASCADE);
-CREATE UNIQUE INDEX "index_solid_queue_failed_executions_on_job_id" ON "solid_queue_failed_executions" ("job_id");
-CREATE TABLE IF NOT EXISTS "solid_queue_ready_executions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "queue_name" varchar NOT NULL, "priority" integer DEFAULT 0 NOT NULL, "created_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_81fcbd66af"
-FOREIGN KEY ("job_id")
-  REFERENCES "solid_queue_jobs" ("id")
- ON DELETE CASCADE);
-CREATE UNIQUE INDEX "index_solid_queue_ready_executions_on_job_id" ON "solid_queue_ready_executions" ("job_id");
-CREATE INDEX "index_solid_queue_poll_all" ON "solid_queue_ready_executions" ("priority", "job_id");
-CREATE INDEX "index_solid_queue_poll_by_queue" ON "solid_queue_ready_executions" ("queue_name", "priority", "job_id");
-CREATE TABLE IF NOT EXISTS "solid_queue_scheduled_executions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "job_id" integer NOT NULL, "queue_name" varchar NOT NULL, "priority" integer DEFAULT 0 NOT NULL, "scheduled_at" datetime(6) NOT NULL, "created_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_c4316f352d"
-FOREIGN KEY ("job_id")
-  REFERENCES "solid_queue_jobs" ("id")
- ON DELETE CASCADE);
-CREATE UNIQUE INDEX "index_solid_queue_scheduled_executions_on_job_id" ON "solid_queue_scheduled_executions" ("job_id");
-CREATE INDEX "index_solid_queue_dispatch_all" ON "solid_queue_scheduled_executions" ("scheduled_at", "priority", "job_id");
-CREATE INDEX "index_solid_queue_blocked_executions_for_release" ON "solid_queue_blocked_executions" ("concurrency_key", "priority", "job_id");
 CREATE TABLE IF NOT EXISTS "service_statuses" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "service_name" varchar NOT NULL, "status" varchar NOT NULL, "response_time" decimal(10,3), "error_message" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE INDEX "index_service_statuses_on_service_name" ON "service_statuses" ("service_name");
 CREATE INDEX "index_service_statuses_on_created_at" ON "service_statuses" ("created_at");
 CREATE INDEX "index_service_statuses_on_service_name_and_created_at" ON "service_statuses" ("service_name", "created_at");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text DEFAULT NULL, "transcription_en" text DEFAULT NULL, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" json DEFAULT NULL, "diarization_status" varchar DEFAULT NULL, "import_status" varchar DEFAULT NULL, CONSTRAINT "fk_rails_91ca04707d"
-FOREIGN KEY ("user_id")
-  REFERENCES "users" ("id")
-);
-CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id");
-CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
 CREATE TABLE IF NOT EXISTS "emails" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "subject" varchar, "message" text, "sent_at" datetime(6), "sent_by_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_db2525f931"
 FOREIGN KEY ("sent_by_id")
   REFERENCES "users" ("id")
 );
 CREATE INDEX "index_emails_on_sent_by_id" ON "emails" ("sent_by_id");
+CREATE TABLE IF NOT EXISTS "media_imports" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar NOT NULL, "title" varchar NOT NULL, "headline" text, "description" text, "status" integer DEFAULT 0 NOT NULL, "error_message" text, "imported_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE INDEX "index_media_imports_on_status" ON "media_imports" ("status");
+CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
 INSERT INTO "schema_migrations" (version) VALUES
+('20250926144748'),
 ('20250914093447'),
 ('20250830155023'),
 ('20250705152641'),
-('20250629000640'),
-('20250629000639'),
 ('20250613220803'),
 ('20250317123416'),
 ('20250202125612'),
