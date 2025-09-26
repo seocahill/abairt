@@ -32,6 +32,11 @@ class VoiceRecording < ApplicationRecord
     media.attached? && (diarization_status.nil? || diarization_status == 'not_started')
   end
 
+  def segments_count
+    return 0 unless diarization_data.present? && diarization_data['diarization'].present?
+    diarization_data['diarization'].size
+  end
+
   def calculate_duration(path)
     result = `ffprobe -i  #{path} -v quiet -print_format json -show_format -show_streams -hide_banner`
     JSON.parse(result).dig("format", "duration").to_f
