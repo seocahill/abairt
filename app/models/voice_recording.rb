@@ -93,7 +93,12 @@ class VoiceRecording < ApplicationRecord
   end
 
   # Import a new voice recording from the archive
-  def self.import_from_archive(media_file_path: nil)
-    ArchiveImportService.new(media_file_path: media_file_path).import_next_recording
+  def self.import_from_archive
+    ArchiveImportService.new.import_next_recording
+  end
+
+  # Import a specific MediaImport item
+  def self.import_from_media_import(media_import_id)
+    ArchiveImportService.new.import_specific_recording(media_import_id)
   end
 end

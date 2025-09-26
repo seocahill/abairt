@@ -4,58 +4,65 @@ require 'open-uri'
 require 'json'
 
 class ArchiveImportService
-  def initialize(media_file_path: nil)
-    @media_file_path = media_file_path || Rails.root.join('lib', 'assets', 'media.json')
+  def initialize
+    # No longer need media_file_path since we use MediaImport table
   end
 
   def import_next_recording
-    return nil unless File.exist?(@media_file_path)
+    # Find the next pending MediaImport item
+    media_import = MediaImport.pending.first
+    return nil unless media_import
 
-    media_data = load_media_data
-    unimported_item = find_unimported_item(media_data)
-    return nil unless unimported_item
-
-    generated_name = generate_unique_name(unimported_item['title'], unimported_item['headline'])
+    generated_name = generate_unique_name(media_import.title, media_import.headline)
     
     # Check for existing recording
     existing_recording = VoiceRecording.find_by(title: generated_name)
     if existing_recording
-      mark_as_imported(media_data, unimported_item)
+      media_import.mark_as_imported!
       return existing_recording
     end
 
-    create_voice_recording(unimported_item, generated_name, media_data)
+    create_voice_recording(media_import, generated_name)
+  end
+
+  def import_specific_recording(media_import_id)
+    media_import = MediaImport.find(media_import_id)
+    return nil unless media_import.pending?
+
+    generated_name = generate_unique_name(media_import.title, media_import.headline)
+    
+    # Check for existing recording
+    existing_recording = VoiceRecording.find_by(title: generated_name)
+    if existing_recording
+      media_import.mark_as_imported!
+      return existing_recording
+    end
+
+    create_voice_recording(media_import, generated_name)
   end
 
   private
-
-  def load_media_data
-    JSON.parse(File.read(@media_file_path))
-  end
-
-  def find_unimported_item(media_data)
-    media_data.find { |item| !item['imported'] }
-  end
 
   def generate_unique_name(title, headline)
     combined = "#{title} - #{headline}".strip
     combined.length > 255 ? combined[0..251] + "..." : combined
   end
 
-  def create_voice_recording(item, generated_name, media_data)
+  def create_voice_recording(media_import, generated_name)
     voice_recording = VoiceRecording.create!(
       title: generated_name,
-      description: item['description'],
+      description: media_import.description,
       owner: User.first || User.create!(email: 'test@example.com', password: 'password')
     )
 
-    download_and_attach_media(voice_recording, item['url']) if item['url'].present?
-    mark_as_imported(media_data, item)
+    download_and_attach_media(voice_recording, media_import.url) if media_import.url.present?
+    media_import.mark_as_imported!
 
     Rails.logger.info("Successfully imported voice recording: #{generated_name}")
     voice_recording
   rescue StandardError => e
     Rails.logger.error("Failed to import voice recording: #{e.message}")
+    media_import.mark_as_failed!(e.message)
     voice_recording&.destroy
     nil
   end
@@ -100,11 +107,4 @@ class ArchiveImportService
     File.delete(temp_path) if temp_path && File.exist?(temp_path)
   end
 
-  def mark_as_imported(media_data, item)
-    item_index = media_data.index(item)
-    return unless item_index
-
-    media_data[item_index]['imported'] = true
-    File.write(@media_file_path, JSON.pretty_generate(media_data))
-  end
 end 
