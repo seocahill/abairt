@@ -30,6 +30,8 @@ class DictionaryEntry < ApplicationRecord
 
   validates :quality, inclusion: { in: %w[low fair], message: "can only be set to low or fair unless speaker is B2 level or higher" }, unless: -> { Current.user&.ability&.in?(%w[B2 C1 C2 native]) }
 
+  validate :dictionary_entries_cannot_exceed_segments_count
+
   # Based on CEFR scale i.e. low: < B2, fair: B2, good: C, excellent: native
   enum quality: %i[
     low
@@ -85,6 +87,23 @@ class DictionaryEntry < ApplicationRecord
 
   def post_process
     PostProcessEntryJob.perform_later(self)
+  end
+
+  private
+
+  def dictionary_entries_cannot_exceed_segments_count
+    return unless voice_recording_id && voice_recording
+
+    segments_count = voice_recording.segments_count
+    return if segments_count == 0 # Skip validation if no segments data available
+
+    current_entries_count = voice_recording.dictionary_entries.size
+    # If this is a new record, increment the count
+    current_entries_count += 1 if new_record?
+
+    if current_entries_count > segments_count
+      errors.add(:base, "Cannot create more dictionary entries (#{current_entries_count}) than available segments (#{segments_count}) for this voice recording")
+    end
   end
 
 end
