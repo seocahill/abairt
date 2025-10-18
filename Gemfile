@@ -22,6 +22,7 @@ gem 'groupdate', '~> 6.2'
 gem 'hotwire-rails', '~> 0.1.3'
 gem 'httparty'
 gem 'ferrum' # Headless Chrome for browser automation fallback
+gem 'selenium-webdriver' # Browser automation for Fotheidil
 gem 'importmap-rails', '~> 0.8.2'
 gem 'trailblazer-operation', '~> 0.10.0'
 gem 'trailblazer-developer', group: :development
@@ -62,7 +63,6 @@ group :test do
   gem 'capybara', '>= 3.26'
   gem 'mocha'
   gem 'rails-controller-testing'
-  gem 'selenium-webdriver'
   gem 'webdrivers'
 end
 
