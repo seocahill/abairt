@@ -1,14 +1,17 @@
 # frozen_string_literal: true
+
 class VoiceRecording < ApplicationRecord
   has_one_attached :media
   has_one_attached :audio_track
   has_many :dictionary_entries
-  has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: 'User'
-  after_create_commit :enqueue_diarization_job, if: :should_diarize?
+  has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: "User"
 
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
 
   acts_as_taggable_on :tags
+
+  # Provide direct access to diarization_data JSON fields
+  store_accessor :diarization_data, :segments, :source, :fotheidil_video_id
 
   alias_attribute :name, :title
 
@@ -24,17 +27,9 @@ class VoiceRecording < ApplicationRecord
     SecureRandom.uuid
   end
 
-  def enqueue_diarization_job
-    DiarizeVoiceRecordingJob.perform_later(id)
-  end
-
-  def should_diarize?
-    media.attached? && (diarization_status.nil? || diarization_status == 'not_started')
-  end
-
   def segments_count
-    return 0 unless diarization_data.present? && diarization_data['diarization'].present?
-    diarization_data['diarization'].size
+    return 0 unless diarization_data.present? && diarization_data["diarization"].present?
+    diarization_data["diarization"].size
   end
 
   def calculate_duration(path)
@@ -50,30 +45,24 @@ class VoiceRecording < ApplicationRecord
 
     # add pading between entries 0.5 seconds + sum of regions as percentage of duration.
     percentage = (((dictionary_entries_count - 1) * 0.5) + dictionary_entries.sum("region_end - region_start")).fdiv(duration_seconds).*(100).round
-    if percentage > 100
-      100
-    elsif percentage < 0
-      0
-    else
-      percentage
-    end
+    percentage.clamp(0, 100)
   end
 
   def extract_audio_track
     return unless media.attached?
-    return media unless media.content_type.start_with?('video/')
+    return media unless media.content_type.start_with?("video/")
     return audio_track if audio_track.attached?
 
-    Tempfile.create(['audio', '.wav'], binmode: true) do |temp_audio|
+    Tempfile.create(["audio", ".wav"], binmode: true) do |temp_audio|
       media.open do |file|
         # Use ffmpeg to extract audio track to WAV format
         system(
-          'ffmpeg', '-i', file.path,
-          '-vn',        # Disable video processing
-          '-acodec', 'pcm_s16le',  # PCM 16-bit little-endian
-          '-ar', '44100',          # Sample rate
-          '-ac', '2',              # Stereo audio
-          '-y',                    # Overwrite output file
+          "ffmpeg", "-i", file.path,
+          "-vn",        # Disable video processing
+          "-acodec", "pcm_s16le",  # PCM 16-bit little-endian
+          "-ar", "44100",          # Sample rate
+          "-ac", "2",              # Stereo audio
+          "-y",                    # Overwrite output file
           temp_audio.path
         )
 
@@ -81,7 +70,7 @@ class VoiceRecording < ApplicationRecord
         audio_track.attach(
           io: File.open(temp_audio.path),
           filename: "#{media.filename.base}.wav",
-          content_type: 'audio/wav'
+          content_type: "audio/wav"
         )
       end
     end

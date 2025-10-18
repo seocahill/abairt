@@ -23,7 +23,10 @@ class ImportVoiceRecordingJob < ApplicationJob
 
     voice_recording.update!(import_status: 'completed')
     Rails.logger.info "Voice recording import completed for ID: #{voice_recording.id}"
-    
+
+    # Process the imported recording with Fotheidil
+    FotheidilProcessVoiceRecordingJob.perform_later(voice_recording.id)
+
   rescue => e
     voice_recording.update!(import_status: 'failed')
     Rails.logger.error "Voice recording import failed for ID: #{voice_recording.id} - #{e.message}"

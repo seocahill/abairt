@@ -35,15 +35,26 @@ services:
     ports:
       - 6379:6379
 
-  pg_vector:
-    image: ankane/pgvector
+  # pg_vector:
+  #   image: ankane/pgvector
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - db:/var/lib/postgresql/data
+  #     - .:/app
+  #   environment:
+  #     - POSTGRES_HOST_AUTH_METHOD=trust
+
+  chrome:
+    image: seleniarm/standalone-chromium:latest
+    shm_size: 2gb
     ports:
-      - 5432:5432
-    volumes:
-      - db:/var/lib/postgresql/data
-      - .:/app
+      - "4444:4444"
+      - "7900:7900"  # VNC server for visual debugging
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_SESSION_TIMEOUT=300
+      - SE_VNC_NO_PASSWORD=1
 
 volumes:
   db:
