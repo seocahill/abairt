@@ -120,11 +120,14 @@ class VoiceRecordingsController < ApplicationController
 
   # POST /voice_recordings or /voice_recordings.json
   def create
-    @voice_recording = VoiceRecording.new(voice_recording_params.except(:trim_start, :trim_end, :should_trim).merge(user_id: current_user.id))
+    @voice_recording = VoiceRecording.new(voice_recording_params.except(:trim_start, :trim_end, :should_trim, :use_fotheidil_api).merge(user_id: current_user.id))
     authorize @voice_recording
 
     respond_to do |format|
       if @voice_recording.save
+        # Process with Fotheidil operation (handles upload or existing video_id)
+        ProcessFotheidilVideoJob.perform_later(@voice_recording.id, voice_recording_params[:fotheidil_video_id])
+
         format.html { redirect_to voice_recording_url(@voice_recording), notice: "Voice recording was successfully created." }
         format.json { render :show, status: :created, location: @voice_recording }
       else
@@ -220,6 +223,6 @@ class VoiceRecordingsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def voice_recording_params
-      params.require(:voice_recording).permit(:title, :description, :transcription, :transcription_en, :media, :tag_list, :region_id, :region_start, :region_end, user_ids: [])
+      params.require(:voice_recording).permit(:title, :description, :transcription, :transcription_en, :media, :tag_list, :region_id, :region_start, :region_end, :use_fotheidil_api, :fotheidil_video_id, user_ids: [])
     end
 end

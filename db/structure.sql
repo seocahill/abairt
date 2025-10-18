@@ -181,7 +181,10 @@ CREATE INDEX "index_emails_on_sent_by_id" ON "emails" ("sent_by_id");
 CREATE TABLE IF NOT EXISTS "media_imports" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar NOT NULL, "title" varchar NOT NULL, "headline" text, "description" text, "status" integer DEFAULT 0 NOT NULL, "error_message" text, "imported_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE INDEX "index_media_imports_on_status" ON "media_imports" ("status");
 CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
+CREATE TABLE IF NOT EXISTS "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_settings_on_key" ON "settings" ("key");
 INSERT INTO "schema_migrations" (version) VALUES
+('20251004091850'),
 ('20250926144748'),
 ('20250914093447'),
 ('20250830155023'),

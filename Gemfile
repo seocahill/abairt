@@ -21,7 +21,10 @@ gem 'geocoder', '~> 1.8'
 gem 'groupdate', '~> 6.2'
 gem 'hotwire-rails', '~> 0.1.3'
 gem 'httparty'
+gem 'ferrum' # Headless Chrome for browser automation fallback
 gem 'importmap-rails', '~> 0.8.2'
+gem 'trailblazer-operation', '~> 0.10.0'
+gem 'trailblazer-developer', group: :development
 gem 'langchainrb', '~> 0.8.2'
 gem 'litestack', '~> 0.2.3'
 gem 'madmin', '~> 1.2'
@@ -68,6 +71,8 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'pry-byebug', '~> 3.8'
   gem 'pry-rails', '~> 0.3.9'
+  gem "standard", ">= 1.35.1"
+  gem 'standard-rails'
 end
 
 gem "activerecord-enhancedsqlite3-adapter", "~> 0.8.0"

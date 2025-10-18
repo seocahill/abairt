@@ -20,49 +20,8 @@ class VoiceRecordingTest < ActiveSupport::TestCase
     end
   end
 
-  test "enqueues diarization job after create when media is attached" do
-    new_recording = VoiceRecording.new(
-      title: "Test Recording",
-      owner: users(:one)
-    )
-
-    new_recording.media.attach(
-      io: File.open(Rails.root.join("test", "fixtures", "files", "sample.mp3")),
-      filename: "sample.mp3",
-      content_type: "audio/mpeg"
-    )
-
-    assert_enqueued_with(job: DiarizeVoiceRecordingJob) do
-      new_recording.save!
-    end
-  end
-
-  test "does not enqueue diarization job when media is not attached" do
-    assert_no_enqueued_jobs(only: DiarizeVoiceRecordingJob) do
-      VoiceRecording.create!(
-        title: "Test Recording",
-        owner: users(:one)
-      )
-    end
-  end
-
-  test "does not enqueue diarization job when status is already set" do
-    new_recording = VoiceRecording.new(
-      title: "Test Recording",
-      owner: users(:one),
-      diarization_status: 'completed'
-    )
-
-    new_recording.media.attach(
-      io: File.open(Rails.root.join("test", "fixtures", "files", "sample.mp3")),
-      filename: "sample.mp3",
-      content_type: "audio/mpeg"
-    )
-
-    assert_no_enqueued_jobs(only: DiarizeVoiceRecordingJob) do
-      new_recording.save!
-    end
-  end
+  # Job enqueueing is now handled explicitly in the controller, not via callbacks
+  # See VoiceRecordingsController#create and test/controllers/voice_recordings_controller_test.rb
 
   test "import_from_archive delegates to ArchiveImportService" do
     mock_service = mock

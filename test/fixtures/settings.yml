@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  key: test_setting_one
+  value: MyText
+
+two:
+  key: test_setting_two
+  value: MyText
