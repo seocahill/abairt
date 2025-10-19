@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:65dfd284e9ed8cfa6001999dab55a75258a1b7ed
+    image: registry.gitlab.com/abairt/web-application:5de05a37b182a3a50cf5a938044c71d40939a796
     deploy:
       mode: replicated
       replicas: 1
