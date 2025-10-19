@@ -17,7 +17,11 @@ namespace :madmin do
   end
   resources :word_list_dictionary_entries
   resources :rang_entries
-  resources :media_imports
+  resources :media_imports do
+    member do
+      post :import
+    end
+  end
   namespace :active_storage do
     resources :blobs
   end

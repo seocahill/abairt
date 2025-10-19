@@ -6,8 +6,9 @@ module Fotheidil
   class ParserService
     attr_reader :browser_service
 
-    def initialize
+    def initialize(browser_service = nil)
       @browser_service = browser_service || Fotheidil::BrowserService.new
+      @owns_browser = browser_service.nil?
       ensure_authenticated if @browser_service
     end
 
@@ -19,7 +20,8 @@ module Fotheidil
       Rails.logger.info "Parsed #{segments.length} segments for video #{video_id}"
       segments
     ensure
-      cleanup
+      # Only cleanup if we created the browser ourselves
+      cleanup if @owns_browser
     end
 
     # Parse HTML content and extract segments

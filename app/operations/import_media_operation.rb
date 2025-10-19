@@ -19,8 +19,9 @@ class ImportMediaOperation < Trailblazer::Operation
   step :find_or_create_owner
   step :create_voice_recording
   step :download_and_attach_media
-  step :mark_as_imported
+  step :validate_media_attached
   step Subprocess(Fotheidil::ProcessVideoOperation)
+  step :mark_as_imported
   fail :mark_import_as_failed
   fail :cleanup_voice_recording
 
@@ -63,17 +64,21 @@ class ImportMediaOperation < Trailblazer::Operation
     existing_recording = VoiceRecording.find_by(title: generated_name)
 
     if existing_recording
-      media_import.mark_as_imported!
-
       if existing_recording.diarization_status == "completed"
+        # Only mark as imported if it's truly completed
+        media_import.mark_as_imported!
         ctx[:voice_recording] = existing_recording
         ctx[:error] = "Recording already exists and is completed"
         return false
       end
 
       # Return existing recording for reprocessing
+      # Don't mark as imported yet - wait until processing succeeds
       ctx[:voice_recording] = existing_recording
       ctx[:skip_creation] = true
+
+      # If existing recording doesn't have media, we need to download it
+      ctx[:skip_download] = existing_recording.media.attached?
     end
 
     true
@@ -111,9 +116,14 @@ class ImportMediaOperation < Trailblazer::Operation
   end
 
   # Download and attach media from MediaImport URL
-  def download_and_attach_media(ctx, skip_creation: false, voice_recording:, media_import:, **)
-    return true if skip_creation
-    return true if media_import.url.blank?
+  def download_and_attach_media(ctx, skip_creation: false, skip_download: false, voice_recording:, media_import:, **)
+    # Skip if we're reusing an existing recording that already has media
+    return true if skip_creation && skip_download
+
+    if media_import.url.blank?
+      ctx[:error] = "MediaImport has no URL for downloading media"
+      return false
+    end
 
     Rails.logger.info "Downloading media from #{media_import.url}"
 
@@ -130,6 +140,12 @@ class ImportMediaOperation < Trailblazer::Operation
       content_type: content_type
     )
 
+
+    # Verify attachment succeeded
+    unless voice_recording.media.attached?
+      ctx[:error] = "Failed to attach media to voice recording"
+      return false
+    end
     calculate_duration(voice_recording, rewindable_io, content_type, filename)
 
     Rails.logger.info "Media attached successfully"
@@ -138,6 +154,16 @@ class ImportMediaOperation < Trailblazer::Operation
     ctx[:error] = "Failed to download media: #{e.message}"
     Rails.logger.error "Download error: #{e.message}"
     false
+  end
+
+  # Validate that media is attached before processing
+  def validate_media_attached(ctx, voice_recording:, **)
+    unless voice_recording.media.attached?
+      ctx[:error] = "Voice recording must have media attached"
+      return false
+    end
+
+    true
   end
 
   # Mark MediaImport as imported
@@ -160,17 +186,22 @@ class ImportMediaOperation < Trailblazer::Operation
     true
   end
 
-  # Cleanup voice recording on failure
+  # Report on voice recording after failure
   def cleanup_voice_recording(ctx, voice_recording: nil, skip_creation: false, **)
     return true if skip_creation
     return true unless voice_recording
 
-    voice_recording.destroy
-    Rails.logger.info "Cleaned up VoiceRecording #{voice_recording.id}"
+    # Report on the state of the voice recording
+    if voice_recording.segments.blank?
+      Rails.logger.warn "VoiceRecording #{voice_recording.id} failed before Fotheidil processing - consider manual cleanup"
+    else
+      Rails.logger.info "VoiceRecording #{voice_recording.id} has segments from Fotheidil - keeping for review"
+    end
+
     true
   rescue => e
-    Rails.logger.error "Failed to cleanup voice recording: #{e.message}"
-    true # Don't fail the operation on cleanup errors
+    Rails.logger.error "Failed to report on voice recording: #{e.message}"
+    true # Don't fail the operation on reporting errors
   end
 
   private
