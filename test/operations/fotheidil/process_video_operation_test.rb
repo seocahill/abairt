@@ -86,6 +86,7 @@ module Fotheidil
       Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
       # Mock wait and post-process steps
+      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
       ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
@@ -121,6 +122,7 @@ module Fotheidil
       Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
       # Mock the wait and post-process steps
+      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
       ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
@@ -165,6 +167,9 @@ module Fotheidil
 
       Fotheidil::BrowserService.stubs(:new).returns(browser_service)
       Fotheidil::ParserService.stubs(:new).returns(parser_service)
+
+      # Mock wait_for_transcription to succeed
+      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
 
       result = ProcessVideoOperation.call(
         voice_recording: @voice_recording,

@@ -28,6 +28,7 @@ module Fotheidil
     step :check_not_already_completed, Output(:failure) => End(:already_completed)
     step :authenticate
     step :determine_video_source
+    step :wait_for_transcription
     step :parse_segments
     step :save_segments
     step :calculate_duration
@@ -140,6 +141,58 @@ module Fotheidil
       File.delete(temp_path) if temp_path && File.exist?(temp_path)
     end
 
+    # Wait for Fotheidil to generate transcription (can take several minutes)
+    def wait_for_transcription(ctx, browser_service:, timeout: 1800, **)
+      fotheidil_video_id = ctx[:fotheidil_video_id]
+
+      unless fotheidil_video_id
+        ctx[:error] = "No fotheidil_video_id available"
+        return false
+      end
+
+      Rails.logger.info "Waiting for Fotheidil transcription (video #{fotheidil_video_id}, timeout: #{timeout}s)..."
+
+      start_time = Time.current
+      url = "https://fotheidil.abair.ie/videos/#{fotheidil_video_id}"
+
+      loop do
+        # Check if we've exceeded timeout
+        if Time.current - start_time > timeout
+          ctx[:error] = "Timeout waiting for transcription to appear on Fotheidil"
+          Rails.logger.error ctx[:error]
+          return false
+        end
+
+        # Navigate to video page and check for segments
+        browser_service.driver.navigate.to url
+
+        # Wait for page to load
+        wait = Selenium::WebDriver::Wait.new(timeout: 10)
+        begin
+          wait.until { browser_service.driver.find_element(css: "div.py-5.border-b.border-gray-300.bg-white.relative") }
+        rescue Selenium::WebDriver::Error::TimeoutError
+          Rails.logger.debug "Page not loaded yet, retrying..."
+          sleep 30
+          next
+        end
+
+        # Check if segments exist in page source
+        page_source = browser_service.driver.page_source
+
+        if page_source.include?("endTimeSeconds")
+          Rails.logger.info "Transcription appeared after #{(Time.current - start_time).round}s"
+          return true
+        end
+
+        Rails.logger.debug "No segments yet, checking again in 30s..."
+        sleep 30
+      end
+    rescue => e
+      ctx[:error] = "Error waiting for transcription: #{e.message}"
+      Rails.logger.error ctx[:error]
+      false
+    end
+
     # Parse segments from Fotheidil
     def parse_segments(ctx, browser_service:, **)
       fotheidil_video_id = ctx[:fotheidil_video_id]
@@ -151,11 +204,8 @@ module Fotheidil
 
       Rails.logger.info "Parsing segments for video #{fotheidil_video_id}..."
 
-      # Clean up the upload browser session before creating a new one for parsing
-      browser_service&.cleanup
-      Rails.logger.info "Cleaned up upload browser session"
-
-      parser_service = Fotheidil::ParserService.new
+      # Reuse the authenticated browser_service from wait_for_transcription
+      parser_service = Fotheidil::ParserService.new(browser_service)
       segments = parser_service.parse_segments(fotheidil_video_id)
 
       if segments.blank?
