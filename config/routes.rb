@@ -75,4 +75,7 @@ Rails.application.routes.draw do
   get "status" => "status#index"
 
   root to: 'application#root_redirect'
+
+  # Catch-all route for unfound paths - must be last
+  match '*path', to: redirect('/'), via: :all
 end
