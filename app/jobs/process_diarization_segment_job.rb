@@ -50,6 +50,10 @@ class ProcessDiarizationSegmentJob < ApplicationJob
     # (create_audio_snippet skips transcription if word_or_phrase is already present)
     entry.create_audio_snippet
 
-    Rails.logger.info("Created dictionary entry #{entry.id} for segment #{segment_data['start']}-#{segment_data['end']}")
+    # Do translation and tagging immediately (Fotheidil provides transcription upfront)
+    entry.translate if entry.word_or_phrase.present?
+    entry.auto_tag if entry.translation.present?
+
+    Rails.logger.info("Created and processed dictionary entry #{entry.id} for segment #{segment_data['start']}-#{segment_data['end']}")
   end
 end

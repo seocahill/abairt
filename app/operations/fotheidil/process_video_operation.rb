@@ -35,7 +35,6 @@ module Fotheidil
     step :wait_for_segments
     step :create_entries
     step :wait_for_entries
-    step :post_process_entries
     step :publish
     fail :mark_as_failed
 
@@ -330,22 +329,6 @@ module Fotheidil
         Rails.logger.debug { "Dictionary entries: #{current_count}/#{expected_count}" }
         sleep 5
       end
-    end
-
-    # Post-process all entries (translation, tagging, audio snippets)
-    def post_process_entries(ctx, voice_recording:, **)
-      Rails.logger.info "Post-processing dictionary entries..."
-
-      voice_recording.dictionary_entries.find_each do |entry|
-        entry.post_process
-      end
-
-      Rails.logger.info "Queued post-processing for #{voice_recording.dictionary_entries_count} entries"
-      true
-    rescue => e
-      ctx[:error] = "Failed to post-process entries: #{e.message}"
-      Rails.logger.error "Post-process error: #{e.message}"
-      false
     end
 
     # Mark as completed
