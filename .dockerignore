@@ -30,4 +30,5 @@ litestream.yml
 queue.db
 queue.db-shm
 queue.db-wal
-*queue*
+db/queue*.sqlite3
+db/queue*.sqlite3-*

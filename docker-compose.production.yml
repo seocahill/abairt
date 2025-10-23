@@ -66,7 +66,7 @@ services:
     image: registry.gitlab.com/abairt/web-application:fc9c71ebd1267069f689ab90992194b6b3001669
     deploy:
       mode: replicated
-      replicas: 0
+      replicas: 1
     environment:
       REDIS_URL: redis://redis:6379
       RAILS_LOG_TO_STDOUT: "true"
