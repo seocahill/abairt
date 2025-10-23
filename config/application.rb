@@ -31,6 +31,10 @@ module Abairt
     # support fts
     config.active_record.schema_format = :sql
 
+    # Configure Active Job to use Solid Queue
+    config.active_job.queue_adapter = :solid_queue
+    config.solid_queue.connects_to = { database: { writing: :queue } }
+
     # assets issue
     config.assets.css_compressor = nil
 

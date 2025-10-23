@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:6270fd89f7a7644374e9447cf0a84317346de2a9
+    image: registry.gitlab.com/abairt/web-application:fc9c71ebd1267069f689ab90992194b6b3001669
     deploy:
       mode: replicated
       replicas: 1
@@ -61,6 +61,23 @@ services:
         sleep 2
         # start replication
         litestream replicate
+
+  worker:
+    image: registry.gitlab.com/abairt/web-application:fc9c71ebd1267069f689ab90992194b6b3001669
+    deploy:
+      mode: replicated
+      replicas: 0
+    environment:
+      REDIS_URL: redis://redis:6379
+      RAILS_LOG_TO_STDOUT: "true"
+      BUNDLE_PATH: "/usr/local/bundle"
+      BUNDLE_WITHOUT: "development:test"
+    secrets:
+      - source: master_key
+        target: /rails/config/master.key
+    volumes:
+      - db:/rails/db
+    command: bin/jobs
 
   redis:
     image: redis:alpine
