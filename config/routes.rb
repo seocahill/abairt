@@ -1,7 +1,21 @@
 # frozen_string_literal: true
 
+class AdminConstraint
+  def matches?(request)
+    return false unless request.session[:user_id]
+    user = User.find_by(id: request.session[:user_id], confirmed: true)
+    user&.admin?
+  end
+end
+
 Rails.application.routes.draw do
   draw :madmin
+
+  # Mission Control for job monitoring - admin only
+  constraints(AdminConstraint.new) do
+    mount MissionControl::Jobs::Engine, at: "/jobs"
+  end
+
   namespace :api do
     resources :voice_recordings, only: [] do
       post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
@@ -13,10 +27,11 @@ Rails.application.routes.draw do
     # Text to Speech API endpoint
     resources :text_to_speech, only: [:create]
   end
+
   resources :word_lists
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
-    resources :dictionary_entries, module: :voice_recordings
+    resources :dictionary_entries, module: :voice_recordings, only: [:index, :create, :update]
     resources :speakers, module: :voice_recordings, only: [:index, :update]
     member do
       get :preview

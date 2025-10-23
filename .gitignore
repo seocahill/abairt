@@ -35,8 +35,10 @@ scripts
 queue.db
 queue.db-shm
 queue.db-wal
-*queue*
-*.sql
+db/queue_development.sqlite3
+db/queue_test.sqlite3
+db/queue_production.sqlite3
+db/queue_*.sqlite3-*
 training-data/*
 DS_Store
 *.sqlite3
