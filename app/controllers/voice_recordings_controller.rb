@@ -4,7 +4,7 @@ class VoiceRecordingsController < ApplicationController
 
   def index
     @new_voice_recording = VoiceRecording.new
-    records = VoiceRecording.order(dictionary_entries_count: :desc)
+    records = VoiceRecording.all
 
     if params[:preview].present?
       @recording = VoiceRecording.find(params[:preview])
@@ -31,6 +31,17 @@ class VoiceRecordingsController < ApplicationController
       records = records.joins(:users).where("users.dialect = ?", value)
     end
 
+    # Apply sorting
+    records = case params[:order]
+    when "oldest"
+      records.order(created_at: :asc)
+    when "best"
+      records.order(dictionary_entries_count: :desc)
+    else # "newest" or default
+      records.order(created_at: :desc)
+    end
+
+    @total_count = records.distinct.count
     @pagy, @recordings = pagy(records.distinct, items: PAGE_SIZE)
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
