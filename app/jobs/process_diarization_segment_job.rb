@@ -10,6 +10,19 @@ class ProcessDiarizationSegmentJob < ApplicationJob
 
     voice_recording = VoiceRecording.find(voice_recording_id)
 
+    # Check for existing entry with same fotheidil_id (idempotency)
+    if segment_data['fotheidil_id'].present?
+      existing_by_id = DictionaryEntry.find_by(
+        voice_recording: voice_recording,
+        region_id: segment_data['fotheidil_id']
+      )
+
+      if existing_by_id
+        Rails.logger.info("Skipping segment #{segment_data['fotheidil_id']} - already exists as entry #{existing_by_id.id}")
+        return
+      end
+    end
+
     # Check for overlapping dictionary entries
     # Don't create if human version already exists in this region
     # Two segments overlap if: NOT (segment1_end <= segment2_start OR segment1_start >= segment2_end)
@@ -43,6 +56,7 @@ class ProcessDiarizationSegmentJob < ApplicationJob
       owner: voice_recording.owner,
       region_start: segment_data['start'],
       region_end: segment_data['end'],
+      region_id: segment_data['fotheidil_id'], # Store Fotheidil segment ID for idempotency
       word_or_phrase: transcription # If provided (e.g., from Fotheidil), skip transcription
     )
 
