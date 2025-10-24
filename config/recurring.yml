@@ -13,3 +13,24 @@ production:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+
+  nightly_transcribe:
+    class: NightlyTranscribeJob
+    queue: default
+    schedule: every day at 2am
+
+  fotheidil_fixer:
+    class: FotheidilFixerJob
+    queue: default
+    schedule: every day at 9am
+
+development:
+  # nightly_transcribe:
+  #   class: NightlyTranscribeJob
+  #   queue: default
+  #   schedule: every 6 hours
+
+  # fotheidil_fixer:
+  #   class: FotheidilFixerJob
+  #   queue: default
+  #   schedule: every hour

@@ -280,9 +280,14 @@ module Fotheidil
         end
 
         if Time.current - start_time > timeout
-          ctx[:error] = "Timeout waiting for segments: #{checker.status_message}"
-          Rails.logger.error ctx[:error]
-          return false
+          if voice_recording.segments.present?
+            Rails.logger.warn "Timeout waiting for segments: #{checker.status_message} - continuing with partial results"
+            return true
+          else
+            ctx[:error] = "Timeout waiting for segments - no segments found"
+            Rails.logger.error ctx[:error]
+            return false
+          end
         end
 
         Rails.logger.debug { "Segment upload status: #{checker.status_message}" }

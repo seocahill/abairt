@@ -140,6 +140,11 @@ class ImportMediaOperation < Trailblazer::Operation
       content_type: content_type
     )
 
+    # Save to persist the blob to Active Storage
+    unless voice_recording.save
+      ctx[:error] = "Failed to save voice recording with media: #{voice_recording.errors.full_messages.join(', ')}"
+      return false
+    end
 
     # Verify attachment succeeded
     unless voice_recording.media.attached?
