@@ -407,51 +407,13 @@ export default class extends Controller {
     // Add highlight with multiple effects
     entryElement.classList.add('bg-blue-50', 'border-blue-500', 'border-2', 'shadow-lg', 'scale-[1.02]');
 
-    // Find the scrollable container - it's the flex-1 div with overflow-y-auto
-    const container = document.querySelector('.flex-1.overflow-y-auto');
-    console.log('Found scroll container:', container ? 'yes' : 'no');
+    // Use scrollIntoView with block: 'start' to position element at top of scroll container
+    // The scroll-mt-20 class on the entry will provide the spacing
+    console.log('Scrolling entry into view:', entryElement.id);
 
-    if (container) {
-      const padding = 40; // Increased padding for better visibility
-
-      // Get the element's position relative to the container
-      const containerTop = container.scrollTop;
-      const containerBottom = containerTop + container.clientHeight;
-      const elementTop = entryElement.offsetTop;
-      const elementBottom = elementTop + entryElement.offsetHeight;
-
-      console.log('Scroll positions:', {
-        containerTop,
-        containerBottom,
-        elementTop,
-        elementBottom,
-        containerHeight: container.clientHeight,
-        elementHeight: entryElement.offsetHeight
-      });
-
-      // Check if the entry is fully visible with padding
-      const isFullyVisible = (elementTop >= containerTop + padding) &&
-                           (elementBottom <= containerBottom - padding);
-
-      if (!isFullyVisible) {
-        console.log('Entry not fully visible, scrolling...');
-
-        // Calculate position to center the element
-        const scrollPosition = elementTop - (container.clientHeight / 2) + (entryElement.offsetHeight / 2);
-
-        // Ensure we don't scroll past the bounds
-        const maxScroll = container.scrollHeight - container.clientHeight;
-        const adjustedScrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
-
-        console.log('Scrolling to:', adjustedScrollPosition);
-
-        container.scrollTo({
-          top: adjustedScrollPosition,
-          behavior: 'smooth'
-        });
-      } else {
-        console.log('Entry fully visible');
-      }
-    }
+    entryElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 }
