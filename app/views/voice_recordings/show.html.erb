@@ -1,12 +1,12 @@
 <!-- Main Container -->
-<div class="flex flex-col md:flex-row min-h-screen"
+<div class="flex flex-col md:flex-row h-screen overflow-hidden"
      <% if @recording.import_status&.in?(['pending', 'processing']) %>
        data-controller="import-status"
        data-import-status-url-value="<%= import_status_voice_recording_path(@recording) %>"
        data-import-status-status-value="<%= @recording.import_status %>"
      <% end %>>
   <!-- Left Side - Media Player and Controls -->
-  <div class="w-full md:w-1/2 md:h-screen flex flex-col bg-white border-r">
+  <div class="w-full md:w-1/2 flex-shrink-0 flex flex-col bg-white border-r max-h-[50vh] md:max-h-none overflow-y-auto md:overflow-visible">
     <div class="p-1 md:p-6">
       <!-- Media Player -->
       <%= render "waveform" %>
@@ -183,11 +183,11 @@
   </div>
 
   <!-- Right Side - Dictionary Entries -->
-  <div class="w-full md:w-1/2 h-screen flex flex-col">
-    <!-- Header -->
-    <div class="p-6 bg-white border-b">
+  <div class="w-full md:w-1/2 flex-1 flex flex-col min-h-0 overflow-hidden">
+    <!-- Header - Sticky to stay visible -->
+    <div class="flex-shrink-0 p-3 md:p-6 bg-white border-b">
       <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-900">Transcription Segments</h2>
+        <h2 class="text-lg md:text-xl font-semibold text-gray-900">Transcription Segments</h2>
         <% if policy(@recording).update? %>
           <%= link_to voice_recording_dictionary_entries_path(@recording),
               class: "text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0" do %>
@@ -198,8 +198,8 @@
     </div>
 
     <!-- Dictionary Entries List - Scrollable -->
-    <div class="flex-1 overflow-y-auto p-6" data-controller="infinite-scroll">
-      <div id="entries-container" class="space-y-4" data-infinite-scroll-target="container">
+    <div class="flex-1 overflow-y-auto p-3 md:p-6" data-controller="infinite-scroll">
+      <div id="entries-container" class="space-y-3 md:space-y-4" data-infinite-scroll-target="container">
         <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries %>
       </div>
 
