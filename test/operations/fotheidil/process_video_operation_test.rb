@@ -8,7 +8,8 @@ module Fotheidil
       @owner = users(:one)
       @voice_recording = VoiceRecording.create!(
         owner: @owner,
-        source: "fotheidil"
+        source: "fotheidil",
+        name: "Séamas Deasaí Béal Easa"
       )
       # Attach a dummy media file
       @voice_recording.media.attach(
