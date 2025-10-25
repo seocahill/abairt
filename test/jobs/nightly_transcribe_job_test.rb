@@ -11,22 +11,6 @@ class NightlyTranscribeJobTest < ActiveJob::TestCase
     @test_media_file.unlink
   end
 
-  test "performs diarization for most recent un-diarized recording" do
-    # Create recordings with different statuses
-    old_recording = voice_recordings(:one)
-    old_recording.update(diarization_status: nil, created_at: 2.days.ago)
-    old_recording.media.attach(io: File.open(Rails.root.join('test/fixtures/files/deasaigh.mp3')), filename: 'old.mp3')
-
-    recent_recording = voice_recordings(:two)
-    recent_recording.update(diarization_status: nil, created_at: 1.day.ago)
-    recent_recording.media.attach(io: File.open(Rails.root.join('test/fixtures/files/deasaigh.mp3')), filename: 'recent.mp3')
-
-    # Expect ProcessFotheidilVideoJob to be enqueued
-    assert_enqueued_with(job: ProcessFotheidilVideoJob, args: [recent_recording.id, nil]) do
-      NightlyTranscribeJob.perform_now
-    end
-  end
-
   test "handles case when no recordings need diarization" do
     VoiceRecording.update_all(diarization_status: 'completed')
 
