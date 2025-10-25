@@ -404,8 +404,6 @@ GEM
     ruby-rc4 (0.1.5)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
-    rufus-scheduler (3.9.1)
-      fugit (~> 1.1, >= 1.1.6)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -560,7 +558,6 @@ DEPENDENCIES
   rb_sys (~> 0.9.87)
   redis (~> 4.0)
   ruby-openai (~> 6.3.0)
-  rufus-scheduler (~> 3.8)
   sassc-rails
   selenium-webdriver
   sentry-rails (~> 4.2)
