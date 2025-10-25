@@ -103,8 +103,10 @@ module Fotheidil
     def upload_and_extract_id(ctx, voice_recording, browser_service)
       Rails.logger.info "Uploading new video to Fotheidil..."
 
-      # Download media to temp file
-      temp_path = "/tmp/voice_recording_#{voice_recording.id}#{File.extname(voice_recording.media.filename.to_s)}"
+      # Create temp filename using voice recording name
+      sanitized_name = voice_recording.name.gsub(/[^\w\s-]/, "").gsub(/\s+/, "_")
+      extension = File.extname(voice_recording.media.filename.to_s)
+      temp_path = "/tmp/#{sanitized_name}#{extension}"
 
       File.open(temp_path, "wb") do |file|
         voice_recording.media.download do |chunk|
