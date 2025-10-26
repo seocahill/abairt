@@ -16,6 +16,9 @@ module Fotheidil
     end
 
     def setup_browser
+      # Clean up any zombie browser processes before starting
+      cleanup_zombie_processes
+
       options = Selenium::WebDriver::Chrome::Options.new
       options.add_argument("--headless") unless Rails.env.development? || ENV["SELENIUM_HEADFUL"] == "true"
       options.add_argument("--no-sandbox")
@@ -77,6 +80,63 @@ module Fotheidil
     end
 
     private
+
+    def cleanup_zombie_processes
+      if ENV["SELENIUM_URL"].present?
+        # For remote Selenium, try to clean up any orphaned sessions
+        cleanup_remote_sessions
+      else
+        # For local Chrome, kill any zombie Chrome/chromedriver processes
+        cleanup_local_chrome_processes
+      end
+    rescue => e
+      Rails.logger.warn "Failed to clean up zombie processes: #{e.message}"
+    end
+
+    def cleanup_remote_sessions
+      # Connect to remote Selenium and clean up any orphaned sessions
+      require "net/http"
+      uri = URI(ENV["SELENIUM_URL"])
+
+      # Try to get sessions endpoint
+      sessions_uri = URI("#{uri.scheme}://#{uri.host}:#{uri.port}/wd/hub/sessions")
+      response = Net::HTTP.get_response(sessions_uri)
+
+      if response.is_a?(Net::HTTPSuccess)
+        sessions = JSON.parse(response.body)["value"] rescue []
+
+        sessions.each do |session|
+          session_id = session["id"]
+          delete_uri = URI("#{uri.scheme}://#{uri.host}:#{uri.port}/wd/hub/session/#{session_id}")
+          Net::HTTP.start(delete_uri.host, delete_uri.port) do |http|
+            http.delete(delete_uri.path)
+          end
+          Rails.logger.info "Cleaned up remote Selenium session: #{session_id}"
+        rescue => e
+          Rails.logger.warn "Failed to delete session #{session_id}: #{e.message}"
+        end
+      end
+    rescue => e
+      Rails.logger.debug "Could not clean up remote sessions: #{e.message}"
+    end
+
+    def cleanup_local_chrome_processes
+      # Kill zombie Chrome and chromedriver processes
+      chrome_processes = `ps aux | grep -E 'chrome|chromedriver' | grep -v grep | awk '{print $2}'`.split("\n")
+
+      chrome_processes.each do |pid|
+        begin
+          Process.kill("TERM", pid.to_i)
+          Rails.logger.info "Killed zombie browser process: #{pid}"
+        rescue Errno::ESRCH
+          # Process already dead
+        rescue Errno::EPERM
+          Rails.logger.warn "No permission to kill process #{pid}"
+        end
+      end
+    rescue => e
+      Rails.logger.debug "Could not clean up local Chrome processes: #{e.message}"
+    end
 
     def verify_login_success
       current_url = @driver.current_url
