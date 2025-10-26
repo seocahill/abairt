@@ -6,7 +6,7 @@ Sentry.init do |config|
 
   # To activate performance monitoring, set one of these options.
   # We recommend adjusting the value in production:
-  config.traces_sample_rate = 0.5
+  config.traces_sample_rate = 0.2
   # or
   config.traces_sampler = lambda do |_context|
     true
@@ -14,6 +14,12 @@ Sentry.init do |config|
   config.enabled_environments = %w[production]
   config.excluded_exceptions += ["Pagy::VariableError"]
   config.enable_logs = true
+  config.rails.structured_logging.subscribers = {
+    active_record: Sentry::Rails::LogSubscribers::ActiveRecordSubscriber,
+    action_controller: Sentry::Rails::LogSubscribers::ActionControllerSubscriber,
+    active_job: Sentry::Rails::LogSubscribers::ActiveJobSubscriber,
+    action_mailer: Sentry::Rails::LogSubscribers::ActionMailerSubscriber
+  }
   # Patch Ruby logger to forward logs
   config.enabled_patches = [:logger]
 end
