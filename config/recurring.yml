@@ -27,7 +27,7 @@ production:
   fotheidil_fixer:
     class: FotheidilFixerJob
     queue: default
-    schedule: every day at 9am
+    schedule: every 2 hours
 
 development:
   # nightly_transcribe:
