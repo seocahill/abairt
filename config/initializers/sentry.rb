@@ -13,4 +13,7 @@ Sentry.init do |config|
   end
   config.enabled_environments = %w[production]
   config.excluded_exceptions += ["Pagy::VariableError"]
+  config.enable_logs = true
+  # Patch Ruby logger to forward logs
+  config.enabled_patches = [:logger]
 end
