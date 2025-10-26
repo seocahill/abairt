@@ -421,10 +421,10 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sentry-rails (5.24.0)
-      railties (>= 5.0)
-      sentry-ruby (~> 5.24.0)
-    sentry-ruby (5.24.0)
+    sentry-rails (6.0.0)
+      railties (>= 5.2.0)
+      sentry-ruby (~> 6.0.0)
+    sentry-ruby (6.0.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
     sequel (5.77.0)
@@ -560,8 +560,8 @@ DEPENDENCIES
   ruby-openai (~> 6.3.0)
   sassc-rails
   selenium-webdriver
-  sentry-rails (~> 5.24.0)
-  sentry-ruby (~> 5.24.0)
+  sentry-rails
+  sentry-ruby
   sequel (~> 5.76)
   solid_queue (~> 1.0)
   sprockets-rails
