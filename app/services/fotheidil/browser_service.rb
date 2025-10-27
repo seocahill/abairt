@@ -26,6 +26,10 @@ module Fotheidil
       options.add_argument("--disable-gpu")
       options.add_argument("--window-size=1920,1080")
 
+      # Use unique user data directory to prevent conflicts between concurrent sessions
+      @user_data_dir = Dir.mktmpdir("chrome_profile_")
+      options.add_argument("--user-data-dir=#{@user_data_dir}")
+
       # Use remote Selenium if SELENIUM_URL is set, otherwise use local Chrome
       if ENV["SELENIUM_URL"].present?
         Rails.logger.info "Connecting to remote Selenium at #{ENV['SELENIUM_URL']}"
@@ -77,6 +81,14 @@ module Fotheidil
 
       @driver.quit
       Rails.logger.debug "Browser cleaned up"
+
+      # Clean up temporary user data directory
+      if @user_data_dir && Dir.exist?(@user_data_dir)
+        FileUtils.rm_rf(@user_data_dir)
+        Rails.logger.debug "Cleaned up user data directory: #{@user_data_dir}"
+      end
+    rescue => e
+      Rails.logger.warn "Error during cleanup: #{e.message}"
     end
 
     private

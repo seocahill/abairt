@@ -4,6 +4,9 @@
 class ProcessFotheidilVideoJob < ApplicationJob
   queue_as :default
 
+  # Limit concurrent executions to prevent browser conflicts
+  limits_concurrency to: 1, key: "fotheidil_browser"
+
   def perform(voice_recording_id, fotheidil_video_id = nil)
     voice_recording = VoiceRecording.find(voice_recording_id)
 
