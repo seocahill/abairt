@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:fc9c71ebd1267069f689ab90992194b6b3001669
+    image: registry.gitlab.com/abairt/web-application:c81b07468547d20ba1957e4b34af878d1243a6e1
     deploy:
       mode: replicated
       replicas: 1
@@ -63,12 +63,13 @@ services:
         litestream replicate
 
   worker:
-    image: registry.gitlab.com/abairt/web-application:fc9c71ebd1267069f689ab90992194b6b3001669
+    image: registry.gitlab.com/abairt/web-application:c81b07468547d20ba1957e4b34af878d1243a6e1
     deploy:
       mode: replicated
       replicas: 1
     environment:
       REDIS_URL: redis://redis:6379
+      SELENIUM_URL: http://chrome:4444/wd/hub
       RAILS_LOG_TO_STDOUT: "true"
       BUNDLE_PATH: "/usr/local/bundle"
       BUNDLE_WITHOUT: "development:test"
