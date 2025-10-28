@@ -104,9 +104,8 @@ module Fotheidil
       Rails.logger.info "Uploading new video to Fotheidil..."
 
       # Create temp filename using voice recording name
-      sanitized_name = voice_recording.name.gsub(/[^\w\s-]/, "").gsub(/\s+/, "_")
       extension = File.extname(voice_recording.media.filename.to_s)
-      temp_path = "/tmp/#{sanitized_name}#{extension}"
+      temp_path = "/tmp/#{voice_recording.name}#{extension}"
 
       File.open(temp_path, "wb") do |file|
         voice_recording.media.download do |chunk|
