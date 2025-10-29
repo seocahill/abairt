@@ -54,14 +54,23 @@ module Fotheidil
 
       Rails.logger.info "Authenticating with browser automation..."
 
-      @driver.navigate.to "https://fotheidil.abair.ie/login"
+      # Use the auth-v2 login page which has proper redirects
+      # If the main login page is unavailable, this URL will work
+      login_url = "https://auth-v2.abair.ie/?ref=https%3A%2F%2Ffotheidil.abair.ie%2Fauth%2Fcallback"
+      @driver.navigate.to login_url
 
       wait = Selenium::WebDriver::Wait.new(timeout: 10)
-      email_input = wait.until { @driver.find_element(:name, "email") }
+
+      # Try to find email input - works for both original and auth-v2 pages
+      # auth-v2 uses id="email", original may use name="email"
+      email_input = wait.until do
+        @driver.find_element(:css, 'input[type="email"], input#email, input[name="email"]')
+      end
       email_input.clear
       email_input.send_keys(@email)
 
-      password_input = @driver.find_element(:name, "password")
+      # Try to find password input - works for both pages
+      password_input = @driver.find_element(:css, 'input[type="password"], input#password, input[name="password"]')
       password_input.clear
       password_input.send_keys(@password)
 
