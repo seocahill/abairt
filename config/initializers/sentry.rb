@@ -16,7 +16,6 @@ Sentry.init do |config|
   config.excluded_exceptions += ["Pagy::VariableError"]
   config.enable_logs = true
   config.rails.structured_logging.subscribers = {
-    active_record: Sentry::Rails::LogSubscribers::ActiveRecordSubscriber,
     action_controller: Sentry::Rails::LogSubscribers::ActionControllerSubscriber,
     active_job: Sentry::Rails::LogSubscribers::ActiveJobSubscriber,
     action_mailer: Sentry::Rails::LogSubscribers::ActionMailerSubscriber
