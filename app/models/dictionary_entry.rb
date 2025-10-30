@@ -6,7 +6,7 @@ class DictionaryEntry < ApplicationRecord
   include CsvExportable
 
   # only save new version if different user
-  has_paper_trail only: [:word_or_phrase, :translation], if: Proc.new { |entry| Current.user&.id&.to_s != entry.versions.last&.whodunnit }, limit: 5, on: %i[update destroy]
+  has_paper_trail only: [:word_or_phrase, :translation], limit: 10, on: %i[update destroy]
 
   has_one_attached :media
 
