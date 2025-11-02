@@ -62,24 +62,6 @@ services:
         # start replication
         litestream replicate
 
-  worker:
-    image: registry.gitlab.com/abairt/web-application:c81b07468547d20ba1957e4b34af878d1243a6e1
-    deploy:
-      mode: replicated
-      replicas: 1
-    environment:
-      REDIS_URL: redis://redis:6379
-      SELENIUM_URL: http://chrome:4444/wd/hub
-      RAILS_LOG_TO_STDOUT: "true"
-      BUNDLE_PATH: "/usr/local/bundle"
-      BUNDLE_WITHOUT: "development:test"
-    secrets:
-      - source: master_key
-        target: /rails/config/master.key
-    volumes:
-      - db:/rails/db
-    command: bin/jobs
-
   redis:
     image: redis:alpine
 
@@ -98,13 +80,6 @@ services:
       - SE_NODE_MAX_SESSIONS=5
       - SE_NODE_SESSION_TIMEOUT=300
 
-  # pg_vector:
-  #   image: ankane/pgvector
-  #   volumes:
-  #     - vector_db:/var/lib/postgresql/data
-  #   environment:
-  #     - POSTGRES_USER=
-  #     - POSTGRES_PASSWORD=
 
 volumes:
   db:

@@ -42,3 +42,4 @@ db/queue_*.sqlite3-*
 training-data/*
 DS_Store
 *.sqlite3
+local
