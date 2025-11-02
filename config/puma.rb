@@ -44,3 +44,6 @@ preload_app!
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
+
+# Run Solid Queue supervisor with Puma in production
+plugin :solid_queue unless Rails.env.development?
