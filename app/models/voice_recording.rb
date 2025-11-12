@@ -11,7 +11,7 @@ class VoiceRecording < ApplicationRecord
   acts_as_taggable_on :tags
 
   # Provide direct access to diarization_data JSON fields
-  store_accessor :diarization_data, :segments, :source, :fotheidil_video_id
+  store_accessor :diarization_data, :segments, :source, :fotheidil_video_id, :diarization
 
   alias_attribute :name, :title
 
@@ -89,5 +89,22 @@ class VoiceRecording < ApplicationRecord
   # Import a specific MediaImport item
   def self.import_from_media_import(media_import_id)
     ArchiveImportService.new.import_specific_recording(media_import_id)
+  end
+
+  def completed?
+    return false if dictionary_entries_count.zero?
+
+    fully_transcribed? && fully_translated?
+  end
+
+  def fully_transcribed?
+    # segments refers to newer fotheidil format, diarization refers to older pyannote format
+    return false if segments.blank? && diarization.blank?
+    
+    dictionary_entries_count >= (segments || diarization).count
+  end
+
+  def fully_translated?
+    dictionary_entries.where.not(translation: [nil, ""]).count.fdiv(dictionary_entries.count).*(100).round >= 75
   end
 end

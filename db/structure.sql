@@ -145,7 +145,7 @@ CREATE INDEX "index_articles_on_user_id" ON "articles" ("user_id");
 CREATE TABLE IF NOT EXISTS "action_text_rich_texts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "body" text, "record_type" varchar NOT NULL, "record_id" bigint NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_action_text_rich_texts_uniqueness" ON "action_text_rich_texts" ("record_type", "record_id", "name");
 CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
-CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "standard_irish" varchar DEFAULT NULL, "notes" text DEFAULT NULL, "translator_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_43cc55d212"
+CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "standard_irish" varchar DEFAULT NULL, "notes" text DEFAULT NULL, "translator_id" integer DEFAULT NULL, "status" integer DEFAULT 0 NOT NULL, CONSTRAINT "fk_rails_43cc55d212"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 , CONSTRAINT "fk_rails_c0a955f533"
@@ -171,6 +171,7 @@ CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
 CREATE TABLE IF NOT EXISTS "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_settings_on_key" ON "settings" ("key");
 INSERT INTO "schema_migrations" (version) VALUES
+('20251111235455'),
 ('20251004091850'),
 ('20250926144748'),
 ('20250914093447'),

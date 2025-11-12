@@ -29,6 +29,11 @@ production:
     queue: default
     schedule: every 2 hours
 
+  process_voice_recording_entry:
+    class: ProcessVoiceRecordingEntryJob
+    queue: default
+    schedule: every minute
+
 development:
   # nightly_transcribe:
   #   class: NightlyTranscribeJob
