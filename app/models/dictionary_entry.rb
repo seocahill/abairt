@@ -40,6 +40,13 @@ class DictionaryEntry < ApplicationRecord
     excellent
   ]
 
+  enum status: {
+    pending: 0,
+    transcribed: 10,
+    translated: 20,
+    processed: 30
+  }
+
   alias_attribute :region_id, :id
 
   def media_url
