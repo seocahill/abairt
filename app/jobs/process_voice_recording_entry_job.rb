@@ -18,6 +18,7 @@ class ProcessVoiceRecordingEntryJob < ApplicationJob
     return unless entry
 
     entry.translate
+    entry.create_audio_snippet unless entry.media.attached?
     entry.auto_tag
     # Always mark as processed to avoid duplicate processing
     entry.update!(status: :processed)
