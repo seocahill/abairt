@@ -20,7 +20,7 @@ class ImportMediaOperation < Trailblazer::Operation
   step :create_voice_recording
   step :download_and_attach_media
   step :validate_media_attached
-  step Subprocess(Fotheidil::ProcessVideoOperation)
+  step Subprocess(Fotheidil::ProcessVideoOperation), Output(:already_completed) => Track(:success)
   step :mark_as_imported
   fail :mark_import_as_failed
   fail :cleanup_voice_recording
