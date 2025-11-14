@@ -67,6 +67,17 @@ module Fotheidil
     end
 
     def find_upload_button
+      # Try LLM-powered agent first for resilience
+      agent = Fotheidil::BrowserAgentService.new(driver)
+      selector = agent.find_element_selector("find the upload button that submits the file")
+
+      if selector
+        Rails.logger.info "LLM agent found selector: #{selector}"
+        return driver.find_element(:css, selector)
+      end
+
+      # Fallback to traditional method
+      Rails.logger.info "Falling back to traditional button finding"
       buttons = driver.find_elements(:tag_name, "button")
       Rails.logger.info "Found #{buttons.length} buttons on page"
 
@@ -77,6 +88,9 @@ module Fotheidil
       rescue
         false
       end
+    rescue => e
+      Rails.logger.error "Error finding upload button: #{e.message}"
+      nil
     end
 
     def log_button_details(buttons)
