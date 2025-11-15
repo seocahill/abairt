@@ -22,17 +22,17 @@ production:
   nightly_transcribe:
     class: NightlyTranscribeJob
     queue: default
-    schedule: every day at 2am
+    schedule: every day at 2:30am
 
   fotheidil_fixer:
     class: FotheidilFixerJob
     queue: default
-    schedule: every 2 hours
+    schedule: every 6 hours
 
   process_voice_recording_entry:
     class: ProcessVoiceRecordingEntryJob
     queue: default
-    schedule: every minute
+    schedule: every 5 minutes
 
 development:
   # nightly_transcribe:
