@@ -5,7 +5,7 @@ class AudioSnippetService
     @source_file_path = source_file_path
     @voice_recording = dictionary_entry.voice_recording
     @duration = dictionary_entry.region_end - dictionary_entry.region_start
-    @output_path = "/tmp/#{dictionary_entry.region_id}.mp3"
+    @output_path = "/tmp/#{dictionary_entry.id}.mp3"
   end
 
   def process
@@ -21,7 +21,7 @@ class AudioSnippetService
       end
     end
 
-    @entry.media.attach(io: File.open(@output_path), filename: "#{@entry.region_id}.mp3")
+    @entry.media.attach(io: File.open(@output_path), filename: "#{@entry.id}.mp3")
     @output_path
   end
 

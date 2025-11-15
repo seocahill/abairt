@@ -47,8 +47,6 @@ class DictionaryEntry < ApplicationRecord
     processed: 30
   }
 
-  alias_attribute :region_id, :id
-
   def media_url
     return "" unless media.attached?
 
