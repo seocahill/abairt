@@ -69,7 +69,7 @@ module Fotheidil
     def find_upload_button
       # Try LLM-powered agent first for resilience
       agent = Fotheidil::BrowserAgentService.new(driver)
-      selector = agent.find_element_selector("find the upload button that submits the file")
+      selector = agent.find_element_selector("find the upload button that submits the file, it could be in english or irish. it should be a button with the text 'Upload' or 'Uaslódáil' or similar.")
 
       if selector.present?
         Rails.logger.info "LLM agent found selector: #{selector}"
