@@ -160,6 +160,30 @@ bundle exec rake cron:monitor_services
 open http://localhost:3000/status
 ```
 
+### Visual Debugging with VNC (Production)
+
+To visually debug browser automation (e.g., Fotheidil uploads) in production:
+
+1. **Create SSH tunnel from your local machine:**
+   ```bash
+   ssh -i ~/.ssh/old/id_rsa -L 17900:127.0.0.1:7900 -N root@<your-server-ip>
+   ```
+   Keep this terminal open. The `-N` flag keeps it running without opening a shell.
+
+2. **Open VNC in your browser:**
+   ```
+   http://localhost:17900
+   ```
+   You'll see the noVNC interface showing the Selenium Grid status.
+
+3. **Enable headful mode** (if not already enabled):
+   Ensure `SELENIUM_HEADFUL: "true"` is set in `docker-compose.production.yml` rails service environment.
+
+4. **Run your operation:**
+   When you run Fotheidil operations, you'll see the browser automation happening in real-time in the VNC viewer.
+
+**Note:** The VNC service is exposed on port 7900 on the server. The SSH tunnel forwards your local port 17900 to the server's port 7900.
+
 ## 📦 Deployment
 
 The application supports Docker-based deployment and is production-ready with:
