@@ -71,9 +71,12 @@ module Fotheidil
       agent = Fotheidil::BrowserAgentService.new(driver)
       selector = agent.find_element_selector("find the upload button that submits the file")
 
-      if selector
+      if selector.present?
         Rails.logger.info "LLM agent found selector: #{selector}"
         return driver.find_element(:css, selector)
+      else
+        Rails.logger.error "LLM agent failed to find upload button"
+        log_page_debug_info
       end
 
       # Fallback to traditional method
