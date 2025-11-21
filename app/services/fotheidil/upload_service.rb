@@ -88,24 +88,34 @@ module Fotheidil
     def find_upload_button
       # Try LLM-powered agent first for resilience
       agent = Fotheidil::BrowserAgentService.new(driver)
-      selector = agent.find_element_selector("find the upload button that submits the file, it could be in english or irish. it should be a button with the text 'Upload' or 'Uaslódáil' or similar.")
+      selector = agent.find_element_selector("find the upload button that submits/uploads the file on the current upload page. It should be a button (not a navigation link) with the text 'Upload' or 'Uaslódáil'. Do not return navigation links to the upload page.")
 
       if selector.present?
         Rails.logger.info "LLM agent found selector: #{selector}"
-        return driver.find_element(:css, selector)
+        element = driver.find_element(:css, selector) rescue nil
+        if element && element.tag_name == "button" && element.displayed?
+          Rails.logger.info "LLM selector found valid button, using it"
+          return element
+        elsif element
+          Rails.logger.warn "LLM selector found element but it's not a button (tag: #{element.tag_name}), ignoring"
+        else
+          Rails.logger.warn "LLM selector '#{selector}' did not match any element"
+        end
       else
         Rails.logger.error "LLM agent failed to find upload button"
         log_page_debug_info
       end
 
-      # Fallback to traditional method
-      Rails.logger.info "Falling back to traditional button finding"
+      # Fallback to traditional method - check both buttons and clickable elements
+      Rails.logger.info "Falling back to traditional element finding"
       buttons = driver.find_elements(:tag_name, "button")
-      Rails.logger.info "Found #{buttons.length} buttons on page"
+      clickable_elements = driver.find_elements(:css, "[role='button'], button, input[type='submit']")
+      Rails.logger.info "Found #{buttons.length} buttons and #{clickable_elements.length} clickable elements on page"
 
       log_button_details(buttons)
 
-      buttons.find do |btn|
+      # Check buttons first
+      upload_element = buttons.find do |btn|
         next false unless btn.displayed?
         
         button_text = btn.text.strip.downcase
@@ -113,6 +123,19 @@ module Fotheidil
       rescue
         false
       end
+
+      # If not found, check other clickable elements
+      upload_element ||= clickable_elements.find do |elem|
+        next false unless elem.displayed?
+        next false if elem.tag_name == "a" && elem.attribute("href") == UPLOAD_URL # Skip nav links
+        
+        elem_text = elem.text.strip.downcase
+        elem_text == "upload" || elem_text == "uaslódáil"
+      rescue
+        false
+      end
+
+      upload_element
     rescue => e
       Rails.logger.error "Error finding upload button: #{e.message}"
       nil
@@ -124,7 +147,7 @@ module Fotheidil
         button_text_downcase = button_text.downcase
         Rails.logger.info "  Button #{i}: text='#{button_text}', downcase='#{button_text_downcase}', displayed=#{btn.displayed?}"
       rescue => e
-        Rails.logger.debug { "  Button #{i}: (error accessing: #{e.message})" }
+        Rails.logger.info { "  Button #{i}: (error accessing: #{e.message})" }
       end
     end
 
