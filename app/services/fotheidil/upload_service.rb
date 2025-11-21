@@ -98,15 +98,15 @@ module Fotheidil
 
     def log_button_details(buttons)
       buttons.each_with_index do |btn, i|
-        Rails.logger.debug { "  Button #{i}: text='#{btn.text.strip}', displayed=#{btn.displayed?}" }
+        Rails.logger.info { "  Button #{i}: text='#{btn.text.strip}', displayed=#{btn.displayed?}" }
       rescue
-        Rails.logger.debug { "  Button #{i}: (error accessing)" }
+        Rails.logger.info { "  Button #{i}: (error accessing)" }
       end
     end
 
     def log_page_debug_info
       page_source = driver.page_source
-      Rails.logger.debug { "Page source snippet: #{page_source[0..500]}" }
+      Rails.logger.info { "Page source snippet: #{page_source[0..500]}" }
     end
 
     def wait_for_redirect
@@ -131,7 +131,7 @@ module Fotheidil
           break
         end
 
-        Rails.logger.debug { "Still on upload page, waiting... (#{i}/#{MAX_REDIRECT_WAIT})" } if (i % 3).zero?
+        Rails.logger.info { "Still on upload page, waiting... (#{i}/#{MAX_REDIRECT_WAIT})" } if (i % 3).zero?
       end
 
       current_url
