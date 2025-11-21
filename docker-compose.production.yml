@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:c81b07468547d20ba1957e4b34af878d1243a6e1
+    image: registry.gitlab.com/abairt/web-application:342a03dcc964215288e9c8ab76024acea8425dee
     deploy:
       mode: replicated
       replicas: 1
@@ -26,6 +26,7 @@ services:
       RAILS_LOG_TO_STDOUT: "true"
       BUNDLE_PATH: "/usr/local/bundle"
       BUNDLE_WITHOUT: "development:test"
+      SELENIUM_HEADFUL: "true"
     secrets:
       - source: master_key
         target: /rails/config/master.key
@@ -67,7 +68,6 @@ services:
 
   chrome:
     image: selenium/standalone-chrome:latest
-    shm_size: 2gb
     deploy:
       mode: replicated
       replicas: 1
@@ -76,9 +76,18 @@ services:
           memory: 2G
         reservations:
           memory: 1G
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - "7900:7900"  # noVNC web interface for visual debugging
+      - "5900:5900"  # VNC port (for VNC clients)
+    tmpfs:
+      - /dev/shm:rw,noexec,nosuid,size=2g
     environment:
       - SE_NODE_MAX_SESSIONS=5
       - SE_NODE_SESSION_TIMEOUT=300
+      - SE_VNC_NO_PASSWORD=1  # Disable VNC password for easier access
 
 
 volumes:

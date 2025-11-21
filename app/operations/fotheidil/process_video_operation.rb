@@ -103,9 +103,35 @@ module Fotheidil
     def upload_and_extract_id(ctx, voice_recording, browser_service)
       Rails.logger.info "Uploading new video to Fotheidil..."
 
-      # Create temp filename using voice recording name
-      extension = File.extname(voice_recording.media.filename.to_s)
-      temp_path = "/tmp/#{voice_recording.name}#{extension}"
+      # Use Active Storage's filename methods
+      blob = voice_recording.media.blob
+      extension = blob.filename.extension.presence
+      
+      # If no extension, infer from content type
+      unless extension
+        extension = case blob.content_type
+                    when /audio\/mpeg/, /audio\/mp3/
+                      "mp3"
+                    when /video\/mp4/
+                      "mp4"
+                    when /audio\/wav/
+                      "wav"
+                    else
+                      "mp3" # Default fallback
+                    end
+        Rails.logger.info "Inferred extension .#{extension} from content_type #{blob.content_type}"
+      end
+
+      # Use blob filename base, sanitize for filesystem, fallback to voice recording name
+      base_name = blob.filename.base.presence || voice_recording.name.to_s
+      safe_base = base_name
+        .gsub(/[:\/\\]/, "_")  # Replace invalid filesystem chars
+        .gsub(/[^\w\s\-_\.]/, "")  # Remove other special chars
+        .strip
+        .truncate(200)  # Limit length
+      
+      temp_path = "/tmp/#{safe_base}.#{extension}"
+      Rails.logger.info "Creating temp file: #{temp_path}"
 
       File.open(temp_path, "wb") do |file|
         voice_recording.media.download do |chunk|
