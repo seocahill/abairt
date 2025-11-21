@@ -49,7 +49,26 @@ module Fotheidil
       Rails.logger.info "File selected: #{file_path}"
 
       Rails.logger.info "Waiting for Upload button to appear..."
-      sleep(3)
+      wait_for_upload_button_to_appear
+    end
+
+    def wait_for_upload_button_to_appear
+      wait = Selenium::WebDriver::Wait.new(timeout: 30, interval: 0.5)
+      
+      wait.until do
+        buttons = driver.find_elements(:tag_name, "button")
+        buttons.any? do |btn|
+          next false unless btn.displayed?
+          button_text = btn.text.strip.downcase
+          button_text == "upload" || button_text == "uaslódáil"
+        rescue
+          false
+        end
+      end
+      
+      Rails.logger.info "Upload button appeared"
+    rescue Selenium::WebDriver::Error::TimeoutError
+      Rails.logger.warn "Upload button did not appear within timeout, continuing anyway"
     end
 
     def click_upload_button
@@ -87,7 +106,10 @@ module Fotheidil
       log_button_details(buttons)
 
       buttons.find do |btn|
-        btn.displayed? && btn.text.strip.downcase == "upload"
+        next false unless btn.displayed?
+        
+        button_text = btn.text.strip.downcase
+        button_text == "upload" || button_text == "uaslódáil"
       rescue
         false
       end
@@ -98,9 +120,11 @@ module Fotheidil
 
     def log_button_details(buttons)
       buttons.each_with_index do |btn, i|
-        Rails.logger.info { "  Button #{i}: text='#{btn.text.strip}', displayed=#{btn.displayed?}" }
-      rescue
-        Rails.logger.info { "  Button #{i}: (error accessing)" }
+        button_text = btn.text.strip
+        button_text_downcase = button_text.downcase
+        Rails.logger.info "  Button #{i}: text='#{button_text}', downcase='#{button_text_downcase}', displayed=#{btn.displayed?}"
+      rescue => e
+        Rails.logger.debug { "  Button #{i}: (error accessing: #{e.message})" }
       end
     end
 
