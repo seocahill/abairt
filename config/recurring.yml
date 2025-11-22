@@ -32,7 +32,7 @@ production:
   process_voice_recording_entry:
     class: ProcessVoiceRecordingEntryJob
     queue: default
-    schedule: every 5 minutes
+    schedule: every 1 hour at minute 15
 
 development:
   # nightly_transcribe:
