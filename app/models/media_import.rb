@@ -1,5 +1,5 @@
 class MediaImport < ApplicationRecord
-  enum status: { pending: 0, imported: 1, skipped: 2 }
+  enum status: { pending: 0, imported: 1, skipped: 2, failed: 100}
 
   validates :url, presence: true, uniqueness: true
   validates :title, presence: true
@@ -18,7 +18,7 @@ class MediaImport < ApplicationRecord
   end
 
   def mark_as_failed!(error)
-    update!(status: :pending, error_message: error)
+    update!(status: :failed, error_message: error)
   end
 
   # Queue this MediaImport for processing
