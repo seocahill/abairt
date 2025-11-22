@@ -59,7 +59,7 @@ class MediaImportTest < ActiveSupport::TestCase
   test "should mark as failed" do
     @media_import.save!
     @media_import.mark_as_failed!("Network error")
-    assert @media_import.pending?
+    assert @media_import.failed?
     assert_equal "Network error", @media_import.error_message
   end
 
