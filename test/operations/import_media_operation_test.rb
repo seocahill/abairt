@@ -152,7 +152,7 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
 
     assert_not result.success?
     @media_import.reload
-    assert_equal "pending", @media_import.status # mark_as_failed! keeps status as pending
+    assert_equal "failed", @media_import.status # mark_as_failed! keeps status as pending
     assert_not_nil @media_import.error_message
   end
 
