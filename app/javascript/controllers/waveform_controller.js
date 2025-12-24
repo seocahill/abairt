@@ -20,9 +20,6 @@ export default class extends Controller {
       this.initializeWaveform();
     } else {
       this.showDummyWaveform();
-      if (this.hasPlayButtonTarget) {
-        this.playButtonTarget.textContent = "Play";
-      }
     }
   }
 
@@ -34,15 +31,34 @@ export default class extends Controller {
 
   showDummyWaveform() {
     const container = this.waveformTarget;
+    
+    // Don't show if placeholder already exists
+    if (document.getElementById('waveform-placeholder')) {
+      return;
+    }
+    
     const width = container.offsetWidth || 800;
     const height = 80;
+    
+    // Ensure container has fixed height to prevent layout shift
+    if (!container.style.height) {
+      container.style.height = `${height}px`;
+    }
+    if (!container.style.position) {
+      container.style.position = 'relative';
+    }
+    
+    // Create placeholder wrapper
+    const placeholder = document.createElement('div');
+    placeholder.id = 'waveform-placeholder';
+    placeholder.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; pointer-events: none; background: white;';
     
     // Create SVG for dummy waveform
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", width);
     svg.setAttribute("height", height);
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.style.cssText = "display: block; width: 100%; background: transparent;";
+    svg.style.cssText = "display: block; width: 100%; height: 100%; background: transparent;";
     
     // Generate random waveform bars
     const barWidth = 2;
@@ -66,8 +82,15 @@ export default class extends Controller {
       svg.appendChild(rect);
     }
     
-    container.innerHTML = '';
-    container.appendChild(svg);
+    placeholder.appendChild(svg);
+    container.appendChild(placeholder);
+  }
+
+  removePlaceholder() {
+    const placeholder = document.getElementById('waveform-placeholder');
+    if (placeholder) {
+      placeholder.remove();
+    }
   }
 
   async play() {
@@ -81,14 +104,13 @@ export default class extends Controller {
 
   async initializeWaveform() {
     if (this.hasPlayButtonTarget) {
-      this.playButtonTarget.textContent = "Loading...";
       this.playButtonTarget.disabled = true;
     }
 
     try {
       const container = this.waveformTarget;
-      // Clear the container (removes dummy waveform)
-      container.innerHTML = '';
+      // Show placeholder waveform
+      this.showDummyWaveform();
 
       this.waveSurfer = WaveSurfer.create({
         container: container,
@@ -115,11 +137,33 @@ export default class extends Controller {
       // Set up event listeners
       this.setupWaveformEventListeners();
 
-      // Load the media
+      // Load the media with streaming support
       if (this.hasVideoTarget) {
         await this.waveSurfer.load(this.videoTarget);
       } else {
-        await this.waveSurfer.load(this.urlValue);
+        // Create audio element with metadata preload for streaming
+        const audio = document.createElement('audio');
+        audio.preload = 'metadata';  // Only load metadata initially
+        audio.crossOrigin = 'anonymous';
+        audio.src = this.urlValue;
+        
+        // Set up audio element for streaming
+        audio.addEventListener('loadedmetadata', () => {
+          // Metadata loaded, can start playing (streaming will happen on play)
+          if (this.hasPlayButtonTarget) {
+            this.playButtonTarget.disabled = false;
+          }
+        });
+
+        audio.addEventListener('error', (e) => {
+          console.error('Audio loading error:', e);
+          if (this.hasPlayButtonTarget) {
+            this.playButtonTarget.disabled = true;
+          }
+        });
+
+        // Load the audio element (not URL) for streaming support
+        await this.waveSurfer.load(audio);
       }
 
       // Fetch and add regions
@@ -134,7 +178,6 @@ export default class extends Controller {
     } catch (error) {
       console.error('Error initializing waveform:', error);
       if (this.hasPlayButtonTarget) {
-        this.playButtonTarget.textContent = "Error";
         this.playButtonTarget.disabled = true;
       }
       throw error;
@@ -142,24 +185,18 @@ export default class extends Controller {
   }
 
   setupWaveformEventListeners() {
-    this.waveSurfer.on('loading', (progress) => {
-      if (this.hasPlayButtonTarget) {
-        if (progress < 99) {
-          this.playButtonTarget.textContent = `Loading ${progress}%`;
-        } else {
-          this.playButtonTarget.textContent = "Play";
-        }
-      }
-    });
-
     this.waveSurfer.on('ready', () => {
       if (this.hasPlayButtonTarget) {
-        this.playButtonTarget.textContent = "Play";
         this.playButtonTarget.disabled = false;
       }
       
       // Set up pitch preservation on the underlying media element
       this.setupPitchPreservation();
+      
+      // Remove placeholder after a brief delay to ensure waveform is visible
+      setTimeout(() => {
+        this.removePlaceholder();
+      }, 100);
       
       // Auto-play if requested
       if (this.shouldAutoPlay) {
@@ -169,15 +206,11 @@ export default class extends Controller {
     });
 
     this.waveSurfer.on('play', () => {
-      if (this.hasPlayButtonTarget) {
-        this.playButtonTarget.textContent = "Pause";
-      }
+      this.updatePlayButtonState(true);
     });
 
     this.waveSurfer.on('pause', () => {
-      if (this.hasPlayButtonTarget) {
-        this.playButtonTarget.textContent = "Play";
-      }
+      this.updatePlayButtonState(false);
     });
 
     this.waveSurfer.on('audioprocess', () => {
@@ -191,9 +224,7 @@ export default class extends Controller {
     });
 
     this.waveSurfer.on('finish', () => {
-      if (this.hasPlayButtonTarget) {
-        this.playButtonTarget.textContent = "Play";
-      }
+      this.updatePlayButtonState(false);
     });
 
     // Update subtitle highlighting when seeking
@@ -415,5 +446,39 @@ export default class extends Controller {
       behavior: 'smooth',
       block: 'start'
     });
+  }
+
+  updatePlayButtonState(isPlaying) {
+    if (!this.hasPlayButtonTarget) return;
+
+    const button = this.playButtonTarget;
+    const svg = button.querySelector('svg');
+    const span = button.querySelector('span');
+
+    if (isPlaying) {
+      // Update to pause icon
+      if (svg) {
+        svg.innerHTML = '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />';
+      }
+      if (span) {
+        span.textContent = 'Pause';
+      } else if (!svg) {
+        // Fallback if no SVG or span, just update text
+        button.textContent = 'Pause';
+      }
+      button.setAttribute('aria-label', 'Pause');
+    } else {
+      // Update to play icon
+      if (svg) {
+        svg.innerHTML = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />';
+      }
+      if (span) {
+        span.textContent = 'Play';
+      } else if (!svg) {
+        // Fallback if no SVG or span, just update text
+        button.textContent = 'Play';
+      }
+      button.setAttribute('aria-label', 'Play');
+    }
   }
 }
