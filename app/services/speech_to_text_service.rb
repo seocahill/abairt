@@ -60,7 +60,7 @@ class SpeechToTextService
     )
 
     response = client.chat(parameters: {
-      model: 'gpt-4o',
+      model: 'gpt-4.1',
       messages: [
         { role: "system", content: "You are a language detector and translator. If the text is in Irish (Gaeilge), respond with a JSON object with keys 'language' set to 'ga', and 'translation' containing the English translation. If the text is in English, respond with a JSON object with keys 'language' set to 'en', and 'translation' set to null." },
         { role: "user", content: "Analyze this text and determine language: #{text}" }

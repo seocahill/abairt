@@ -53,7 +53,7 @@ class SyntheticDataService
 
     client.chat(
       parameters: {
-        model: "gpt-4o",
+        model: "gpt-4.1",
         response_format: { type: "json_object" },
         messages: [
           {
