@@ -54,15 +54,11 @@ export default class extends Controller {
 
     this.waveSurfer.on('loading', function (progress) {
       playButton.classList.remove("cursor-not-allowed");
-      if (progress < 99) {
-        playButton.innerHTML = `loading ${progress}%`;
-      } else {
-        playButton.innerHTML = "Play";
-      }
+      // Don't show loading text, just keep placeholder
     })
 
     this.waveSurfer.on('ready', async function() {
-      playButton.innerHTML = "Play";
+      that.toggleButton();
 
       // Fetch and add regions from the URL
       if (that.hasRegionsUrlValue) {
@@ -86,6 +82,18 @@ export default class extends Controller {
           console.error('Error fetching regions:', error);
         }
       }
+    })
+
+    this.waveSurfer.on('play', function() {
+      that.toggleButton();
+    })
+
+    this.waveSurfer.on('pause', function() {
+      that.toggleButton();
+    })
+
+    this.waveSurfer.on('finish', function() {
+      that.toggleButton();
     })
 
     this.waveSurfer.on('audioprocess', function () {
@@ -358,10 +366,34 @@ export default class extends Controller {
 
   toggleButton() {
     const button = this.element.querySelector('#play-pause-button')
-    if (this.waveSurfer.isPlaying()) {
-      button.innerHTML = "Pause"
+    if (!button) return;
+
+    const isPlaying = this.waveSurfer.isPlaying();
+    const svg = button.querySelector('svg');
+    const span = button.querySelector('span');
+
+    if (isPlaying) {
+      // Update to pause icon
+      if (svg) {
+        svg.innerHTML = '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />';
+      }
+      if (span) {
+        span.textContent = 'Pause';
+      } else if (!svg) {
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg><span>Pause</span>';
+      }
+      button.setAttribute('aria-label', 'Pause');
     } else {
-      button.innerHTML = "Play"
+      // Update to play icon
+      if (svg) {
+        svg.innerHTML = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />';
+      }
+      if (span) {
+        span.textContent = 'Play';
+      } else if (!svg) {
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg><span>Play</span>';
+      }
+      button.setAttribute('aria-label', 'Play');
     }
   }
 
