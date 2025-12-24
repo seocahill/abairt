@@ -222,6 +222,9 @@ GEM
     loofah (2.25.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    madmin (1.2.8)
+      pagy (>= 3.5)
+      rails (>= 6.0.3)
     mail (2.9.0)
       logger
       mini_mime (>= 0.1.1)
@@ -297,6 +300,8 @@ GEM
     pry-byebug (3.10.1)
       byebug (~> 11.0)
       pry (>= 0.13, < 0.15)
+    pry-rails (0.3.9)
+      pry (>= 0.10.4)
     psych (5.3.1)
       date
       stringio

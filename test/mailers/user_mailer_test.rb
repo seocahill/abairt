@@ -4,9 +4,9 @@ require 'test_helper'
 class UserMailerTest < ActionMailer::TestCase
   test 'login_email' do
     user = users(:john)
-    user.regenerate_login_token
+    user.generate_password_reset_token
     user.save!
-    email = UserMailer.login_email(user).deliver_now
+    email = UserMailer.password_reset_email(user).deliver_now
 
     assert_not ActionMailer::Base.deliveries.empty?
 
@@ -17,6 +17,5 @@ class UserMailerTest < ActionMailer::TestCase
     email_body = email.body.to_s
     assert email_body.include?("Login Instructions"), "Email should contain login instructions"
     assert email_body.include?("login_with_token") || email_body.include?("token"), "Email should contain login link or token"
-    assert email_body.include?("passwordless"), "Email should mention passwordless login"
   end
 end

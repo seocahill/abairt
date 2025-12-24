@@ -105,6 +105,26 @@ class User < ApplicationRecord
     end
   end
 
+  def generate_password_reset_token
+    # Store raw token directly to avoid Rails 8 automatic signing
+    token = SecureRandom.urlsafe_base64(32)
+    self.password_reset_sent_at = Time.current
+    write_attribute(:password_reset_token, token)
+  end
+  
+  # Override accessor to return raw token for compatibility
+  def password_reset_token
+    read_attribute(:password_reset_token)
+  end
+
+  def clear_password_reset_token
+    update_columns(password_reset_token: nil, password_reset_sent_at: nil)
+  end
+
+  def password_reset_token_expired?
+    return true if password_reset_sent_at.blank?
+    password_reset_sent_at < 5.minutes.ago
+  end
 
   def edit?
     !student? && confirmed

@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:6443760dd5121dd2b9e54f87b436db2c232a575d
+    image: registry.gitlab.com/abairt/web-application:5bcf8c2c0b5a9c408a4ff70d017079d742d471d7
     deploy:
       mode: replicated
       replicas: 1
@@ -40,13 +40,30 @@ services:
         bin/rails db:create db:migrate
         bin/rails s -p 3000 -b 0.0.0.0
 
+  # litestream:
+  #   image: litestream/litestream
+  #   deploy:
+  #     replicas: 1
+  #   secrets:
+  #     - source: litestream_v5
+  #       target: /etc/litestream.yml
+  #   volumes:
+  #     - db:/data
+  #   user: "1000:1000"
+  #   entrypoint:
+  #     - /bin/sh
+  #     - -c
+  #     - |
+  #       litestream restore -if-db-not-exists /data/production.sqlite3
+  #       litestream replicate
+
   backup:
     image: amazon/aws-cli:latest
     volumes:
       - db:/data:ro
     environment:
-      AWS_ACCESS_KEY_ID: AKIAQLYSUE62IMPOF7U4
-      AWS_SECRET_ACCESS_KEY: 3eteFkRvz2ve5begvHB1CJRvbQGRBMiIz+uzKLwl
+      AWS_ACCESS_KEY_ID: REDACTED_AWS_KEY
+      AWS_SECRET_ACCESS_KEY: REDACTED_AWS_SECRET
       AWS_DEFAULT_REGION: eu-west-1
     entrypoint:
       - /bin/sh
@@ -81,10 +98,10 @@ services:
           echo "$$(date): Backup completed - abairt-db-backup-$$BACKUP_DATE.tar.gz"
         }
 
-        # Run backup every 24 hours
+        # Run backup every 6 hours
         while true; do
           backup
-          sleep 86400  # 24 hours
+          sleep 21600  # 6 hours
         done
 
   redis:

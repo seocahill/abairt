@@ -64,11 +64,6 @@ class DictionaryEntry < ApplicationRecord
     excellent
   ]
 
-  enum :accuracy_status, {
-    unconfirmed: 0,
-    confirmed: 1
-  }
-
   enum :status, {
     pending: 0,
     transcribed: 10,
