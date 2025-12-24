@@ -33,14 +33,14 @@ class DictionaryEntry < ApplicationRecord
   validate :dictionary_entries_cannot_exceed_segments_count
 
   # Based on CEFR scale i.e. low: < B2, fair: B2, good: C, excellent: native
-  enum quality: %i[
+  enum :quality, %i[
     low
     fair
     good
     excellent
   ]
 
-  enum status: {
+  enum :status, {
     pending: 0,
     transcribed: 10,
     translated: 20,

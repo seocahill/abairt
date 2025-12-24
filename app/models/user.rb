@@ -14,7 +14,7 @@ class User < ApplicationRecord
 
   has_many :word_lists
 
-  enum role: [
+  enum :role, [
     :student,
     :speaker,
     :teacher,
@@ -23,10 +23,10 @@ class User < ApplicationRecord
     :place,
     :temporary
   ]
-  enum voice: [:male, :female]
-  enum dialect: [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
+  enum :voice, [:male, :female]
+  enum :dialect, [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
   # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
-  enum ability: %i[
+  enum :ability, %i[
     A1
     A2
     B1
@@ -86,14 +86,19 @@ class User < ApplicationRecord
   end
 
   def generate_password_reset_token
-    self.password_reset_token = SecureRandom.urlsafe_base64(32)
+    # Store raw token directly to avoid Rails 8 automatic signing
+    token = SecureRandom.urlsafe_base64(32)
     self.password_reset_sent_at = Time.current
+    write_attribute(:password_reset_token, token)
+  end
+  
+  # Override accessor to return raw token for compatibility
+  def password_reset_token
+    read_attribute(:password_reset_token)
   end
 
   def clear_password_reset_token
-    self.password_reset_token = nil
-    self.password_reset_sent_at = nil
-    save
+    update_columns(password_reset_token: nil, password_reset_sent_at: nil)
   end
 
   def password_reset_token_expired?

@@ -7,7 +7,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '~> 3.4'
 gem 'bcrypt', '~> 3.1.7'
 gem 'puma', '~> 6.0'
-gem 'rails', '~> 7.1.0'
+gem 'rails', '~> 8.1.0'
+gem 'minitest', '~> 5.25'
 gem 'redis', '~> 4.0'
 gem 'sassc-rails'
 gem 'bootsnap', '>= 1.4.4', require: false
@@ -34,7 +35,7 @@ gem 'mailjet', '~> 1.7'
 gem 'mini_portile2', '~> 2.8.5'
 gem 'multi_json', '~> 1.15'
 gem 'pagy', '~> 5.2.1'
-gem 'paper_trail', '~> 15.0'
+gem 'paper_trail', '~> 17.0'
 gem 'pdf-reader', '~> 2.12'
 # gem 'pg', '~> 1.5'
 # gem 'pgvector', '~> 0.2'
@@ -46,7 +47,7 @@ gem 'sentry-rails'
 gem 'sentry-ruby'
 gem 'sequel', '~> 5.76'
 gem 'sprockets-rails'
-gem 'sqlite3', '~> 1.6'
+gem 'sqlite3', '~> 2.1'
 gem 'tailwindcss-rails'
 gem 'tiktoken_ruby', '~> 0.0.6'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
@@ -74,5 +75,3 @@ group :development, :test do
   gem "standard", ">= 1.35.1"
   gem 'standard-rails'
 end
-
-gem "activerecord-enhancedsqlite3-adapter", "~> 0.8.0"

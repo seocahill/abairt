@@ -1,7 +1,7 @@
 require "test_helper"
 
 class FotheidilFixerJobTest < ActiveJob::TestCase
-  setup do
+  def setup
     @owner = users(:one)
     # Clear any existing voice recordings from fixtures to avoid test pollution
     VoiceRecording.destroy_all

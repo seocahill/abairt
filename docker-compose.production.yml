@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:342a03dcc964215288e9c8ab76024acea8425dee
+    image: registry.gitlab.com/abairt/web-application:5bcf8c2c0b5a9c408a4ff70d017079d742d471d7
     deploy:
       mode: replicated
       replicas: 1
@@ -40,34 +40,75 @@ services:
         bin/rails db:create db:migrate
         bin/rails s -p 3000 -b 0.0.0.0
 
-  litestream:
-    image: litestream/litestream
-    deploy:
-      replicas: 1
-    secrets:
-      - source: litestream_v5
-        target: /etc/litestream.yml
+  # litestream:
+  #   image: litestream/litestream
+  #   deploy:
+  #     replicas: 1
+  #   secrets:
+  #     - source: litestream_v5
+  #       target: /etc/litestream.yml
+  #   volumes:
+  #     - db:/data
+  #   user: "1000:1000"
+  #   entrypoint:
+  #     - /bin/sh
+  #     - -c
+  #     - |
+  #       litestream restore -if-db-not-exists /data/production.sqlite3
+  #       litestream replicate
+
+  backup:
+    image: amazon/aws-cli:latest
     volumes:
-      - db:/data
+      - db:/data:ro
+    environment:
+      AWS_ACCESS_KEY_ID: REDACTED_AWS_KEY
+      AWS_SECRET_ACCESS_KEY: REDACTED_AWS_SECRET
+      AWS_DEFAULT_REGION: eu-west-1
     entrypoint:
       - /bin/sh
       - -c
       - |
-        litestream restore -if-replica-exists -v /data/production.sqlite3
-        # Fix permissions - ensure Rails user can access
-        chown -R 1000:1000 /data
-        chmod -R 755 /data
+        # Install dependencies
+        yum install -y tar gzip findutils
 
-        # Wait a moment to ensure file operations complete
-        sleep 2
-        # start replication
-        litestream replicate
+        # Backup function
+        backup() {
+          BACKUP_DATE=$$(date +%Y%m%d-%H%M)
+          BACKUP_DIR="/tmp/db-backup"
+          S3_BUCKET="s3://abairt-db/backups"
+
+          mkdir -p $$BACKUP_DIR
+
+          # Copy database files
+          cp /data/production.sqlite3 $$BACKUP_DIR/ 2>/dev/null || true
+          cp /data/production.sqlite3-wal $$BACKUP_DIR/ 2>/dev/null || true
+          cp /data/production.sqlite3-shm $$BACKUP_DIR/ 2>/dev/null || true
+
+          # Create tarball
+          cd $$BACKUP_DIR
+          tar czf /tmp/abairt-db-backup-$$BACKUP_DATE.tar.gz production.sqlite3*
+
+          # Upload to S3
+          aws s3 cp /tmp/abairt-db-backup-$$BACKUP_DATE.tar.gz $$S3_BUCKET/abairt-db-backup-$$BACKUP_DATE.tar.gz
+
+          # Cleanup
+          rm -rf $$BACKUP_DIR /tmp/abairt-db-backup-$$BACKUP_DATE.tar.gz
+
+          echo "$$(date): Backup completed - abairt-db-backup-$$BACKUP_DATE.tar.gz"
+        }
+
+        # Run backup every 6 hours
+        while true; do
+          backup
+          sleep 21600  # 6 hours
+        done
 
   redis:
     image: redis:alpine
 
   chrome:
-    image: selenium/standalone-chrome:latest
+    image: selenium/standalone-chrome:4.17.0
     deploy:
       mode: replicated
       replicas: 1
