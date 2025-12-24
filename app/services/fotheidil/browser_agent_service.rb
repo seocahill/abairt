@@ -19,7 +19,7 @@ module Fotheidil
       page_context = extract_page_context
 
       response = @client.chat(parameters: {
-        model: "gpt-4o",
+        model: "gpt-4.1",
         messages: [
           {role: "system", content: system_prompt},
           {role: "user", content: user_prompt(instruction, page_context)}

@@ -16,7 +16,7 @@ class AutoTagService
     prompt = "Please analyze the following phrase and generate tags for it. Return a JSON object with a 'tags' array. Phrase: #{@dictionary_entry.translation}"
 
     response = client.chat(parameters: {
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       messages: [
         { role: "system", content: context },
         { role: "user", content: prompt }

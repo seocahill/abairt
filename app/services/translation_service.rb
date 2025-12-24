@@ -12,7 +12,7 @@ class TranslationService
     )
 
     response = client.chat(parameters: {
-      model: 'gpt-4o',
+      model: 'gpt-4.1',
       messages: [
         { role: "system", content: "You are an Irish (Gaeilge) to English translator. Provide only the direct translation, no additional commentary." },
         { role: "user", content: "Translate this Irish text to English: #{@entry.word_or_phrase}. If you are finding the dialect difficult to understand (North Connacht Irish), there is sometimes a standard Irish version available here also: #{@entry.standard_irish}." }

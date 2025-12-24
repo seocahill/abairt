@@ -21,7 +21,7 @@ class FineTuningService
 
   def estimate_cost
     require "tiktoken_ruby"
-    tokenizer = Tiktoken.encoding_for_model("gpt-4o")
+    tokenizer = Tiktoken.encoding_for_model("gpt-4.1")
 
     missing_count = entries.where(standard_irish: [nil, ""]).count
     sample_entries = entries.where(standard_irish: [nil, ""]).limit(10)
