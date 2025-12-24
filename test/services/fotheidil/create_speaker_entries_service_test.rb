@@ -4,7 +4,7 @@ require "test_helper"
 
 module Fotheidil
   class CreateSpeakerEntriesServiceTest < ActiveJob::TestCase
-    setup do
+    def setup
       @owner = users(:one)
       @voice_recording = VoiceRecording.create!(
         owner: @owner,

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "minitest/mock"
 
 module Fotheidil
   class ParserServiceTest < ActiveSupport::TestCase
@@ -73,32 +72,29 @@ module Fotheidil
     end
 
     test "parses segments from script tag using fixture" do
-      # Create parser with mocked browser service
-      browser_service = Minitest::Mock.new
-      browser_service.expect(:cleanup, nil)
       parser = ParserService.new
 
-      # Stub get_page_source to return our fixture
-      parser.stub :get_page_source, @fixture_html do
-        segments = parser.parse_segments(1141)
+      # Stub get_page_source to return our fixture using mocha
+      parser.stubs(:get_page_source).with(1141).returns(@fixture_html)
 
-        # Fixture contains all 395 segments from video 1141
-        assert_equal 395, segments.length
+      segments = parser.parse_segments(1141)
 
-        # Verify first segment structure (JSON returns string keys)
-        first = segments.first
-        assert_equal "SPEAKER_00", first["speaker"]
-        assert_equal 0.03, first["startTimeSeconds"]
-        assert_equal 14.16, first["endTimeSeconds"]
-        assert first["text"].include?("Anois bhí an lá")
+      # Fixture contains all 395 segments from video 1141
+      assert_equal 395, segments.length
 
-        # Verify all segments have required fields
-        segments.each do |segment|
-          assert segment["speaker"].present?
-          assert segment["startTimeSeconds"].present?
-          assert segment["endTimeSeconds"].present?
-          assert segment["text"].present?
-        end
+      # Verify first segment structure (JSON returns string keys)
+      first = segments.first
+      assert_equal "SPEAKER_00", first["speaker"]
+      assert_equal 0.03, first["startTimeSeconds"]
+      assert_equal 14.16, first["endTimeSeconds"]
+      assert first["text"].include?("Anois bhí an lá")
+
+      # Verify all segments have required fields
+      segments.each do |segment|
+        assert segment["speaker"].present?
+        assert segment["startTimeSeconds"].present?
+        assert segment["endTimeSeconds"].present?
+        assert segment["text"].present?
       end
     end
   end

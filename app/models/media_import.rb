@@ -1,5 +1,5 @@
 class MediaImport < ApplicationRecord
-  enum status: { pending: 0, imported: 1, skipped: 2, failed: 100}
+  enum :status, { pending: 0, imported: 1, skipped: 2, failed: 100}
 
   validates :url, presence: true, uniqueness: true
   validates :title, presence: true

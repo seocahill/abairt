@@ -9,7 +9,7 @@ Bundler.require(*Rails.groups)
 module Abairt
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 8.1
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -43,6 +43,8 @@ module Abairt
 
     # to_s
     # config.active_support.disable_to_s_conversion = true
+    # 
+    config.active_storage.variant_processor = :disabled
 
     # config.to_prepare do
     #   ActionText::ContentHelper.allowed_tags << "iframe"
