@@ -49,7 +49,7 @@ class DictionaryEntry < ApplicationRecord
   def cannot_edit_when_confirmed
     return unless confirmed?
     return if accuracy_status_changed? # Allow deconfirmation
-    return if translation.blank? # Allow if there is no translation
+    return if translation_was.blank? && !word_or_phrase_changed? # Allow if there was no translation before and no word or phrase change
 
     if word_or_phrase_changed? || translation_changed?
       errors.add(:base, "Cannot edit confirmed entries. Please deconfirm first.")
