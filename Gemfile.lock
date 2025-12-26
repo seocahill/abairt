@@ -297,8 +297,6 @@ GEM
     pry-byebug (3.10.1)
       byebug (~> 11.0)
       pry (>= 0.13, < 0.15)
-    pry-rails (0.3.9)
-      pry (>= 0.10.4)
     psych (5.3.1)
       date
       stringio
@@ -552,7 +550,6 @@ DEPENDENCIES
   paper_trail (~> 17.0)
   pdf-reader (~> 2.12)
   pry-byebug (~> 3.8)
-  pry-rails (~> 0.3.9)
   puma (~> 6.0)
   pundit (~> 2.3)
   rack-cors (~> 1.1)

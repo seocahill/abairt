@@ -80,7 +80,8 @@ class AdminEmailsController < ApplicationController
   end
 
   def ensure_admin
-    unless current_user&.admin?
+    user = User.find_by(id: session[:user_id])
+    unless user&.admin?
       redirect_to root_path, alert: 'Ní féidir leat an leathanach sin a rochtain.'
     end
   end
