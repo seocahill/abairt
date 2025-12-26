@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :admin_user?
   before_action :set_paper_trail_whodunnit
-  after_action :verify_authorized, except: [:index, :show]
+  after_action :verify_authorized, except: [:index, :show], unless: :rails_engine_controller?
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
@@ -38,5 +38,13 @@ class ApplicationController < ActionController::Base
     else
       redirect_to home_path
     end
+  end
+
+  private
+
+  def rails_engine_controller?
+    # Skip Pundit verification for Rails engine controllers
+    # Mission Control and other engines have their own authorization
+    self.class.name.start_with?("MissionControl::")
   end
 end
