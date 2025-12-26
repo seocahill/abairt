@@ -6,15 +6,16 @@ module Admin
 
     before_action :ensure_admin
     before_action :set_user, only: [:show, :edit, :update, :approve, :reject, :destroy, :generate_api_token, :regenerate_api_token, :revoke_api_token]
+    skip_after_action :verify_authorized, only: [:index, :show]
 
     has_scope :pending, type: :boolean
     has_scope :by_role, as: :role
     has_scope :search
 
     def index
+      # Authorization handled by ensure_admin
       @users = apply_scopes(User.order(created_at: :desc))
       @pagy, @users = pagy(@users, items: params[:per_page] || 50)
-      # Authorization handled by ensure_admin
     end
 
     def show
@@ -94,7 +95,16 @@ module Admin
     end
 
     def ensure_admin
-      redirect_to root_path unless current_user&.admin?
+      user = User.find_by(id: session[:user_id])
+      if user.nil?
+        redirect_to root_path, alert: "Not logged in. Please log in first."
+        return
+      end
+      
+      unless user.admin?
+        redirect_to root_path, alert: "Access denied. Admin privileges required."
+        return
+      end
     end
 
     def user_params

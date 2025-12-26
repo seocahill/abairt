@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   PAGE_SIZE = 15
 
-  helper_method :current_user
+  helper_method :current_user, :admin_user?
   before_action :set_paper_trail_whodunnit
   after_action :verify_authorized, except: [:index, :show]
 
@@ -24,6 +24,11 @@ class ApplicationController < ActionController::Base
 
   def current_user
     User.where(confirmed: true).find_by(id: session[:user_id])
+  end
+
+  def admin_user?
+    user = User.find_by(id: session[:user_id])
+    user&.admin?
   end
 
   def root_redirect
