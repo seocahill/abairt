@@ -43,12 +43,13 @@ class DictionaryEntry < ApplicationRecord
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }
 
-  validate :dictionary_entries_cannot_exceed_segments_count
+  validate :dictionary_entries_cannot_exceed_segments_count, on: :create
   validate :cannot_edit_when_confirmed, on: :update
 
   def cannot_edit_when_confirmed
     return unless confirmed?
     return if accuracy_status_changed? # Allow deconfirmation
+    return if translation.blank? # Allow if there is no translation
 
     if word_or_phrase_changed? || translation_changed?
       errors.add(:base, "Cannot edit confirmed entries. Please deconfirm first.")
