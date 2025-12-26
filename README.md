@@ -29,7 +29,7 @@ Abairt is an open-source platform for Irish language learning, featuring voice r
 - **User Authentication** - Secure user accounts and permissions
 - **Practice Mode** - Interactive pronunciation practice
 - **Translator Leaderboard** - Gamified contribution tracking
-- **Admin Panel** - Comprehensive administrative interface via Madmin
+- **Admin Panel** - Comprehensive administrative interface
 
 ### 🔧 Technical Features
 - **AI Integration** - OpenAI GPT for vocabulary extraction and translation
