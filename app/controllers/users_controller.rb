@@ -3,7 +3,7 @@
 Pub = Struct.new(:name, :lat_lang, :url)
 
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[show edit update destroy]
+  before_action :set_user, only: %i[show edit update destroy generate_api_token regenerate_api_token revoke_api_token]
 
   # GET /users or /users.json
   def index
@@ -79,7 +79,7 @@ class UsersController < ApplicationController
 
   # POST /users or /users.json
   def create
-    @user = User.new(user_params.merge(password: SecureRandom.uuid))
+    @user = User.new(user_params)
     authorize @user
 
     respond_to do |format|
@@ -136,6 +136,26 @@ class UsersController < ApplicationController
       format.html { redirect_to users_url, notice: 'User was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def generate_api_token
+    authorize @user, :generate_api_token?
+    @user.regenerate_api_token
+    @user.save!
+    redirect_to user_path(@user), notice: 'API token generated successfully.'
+  end
+
+  def regenerate_api_token
+    authorize @user, :regenerate_api_token?
+    @user.regenerate_api_token
+    @user.save!
+    redirect_to user_path(@user), notice: 'API token regenerated successfully.'
+  end
+
+  def revoke_api_token
+    authorize @user, :revoke_api_token?
+    @user.update_column(:api_token, nil)
+    redirect_to user_path(@user), notice: 'API token revoked successfully.'
   end
 
   private

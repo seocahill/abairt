@@ -45,7 +45,6 @@ class ProcessDiarizationSegmentJob < ApplicationJob
     name = "#{speaker_id}_#{voice_recording.id}"
     temp_user = User.find_or_create_by(email: "#{name.downcase}@temporary.abairt") do |user|
       user.name = name
-      user.password = SecureRandom.hex(16)
       user.role = :temporary
     end
 

@@ -158,9 +158,9 @@
 
           <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-700" title="These segments have been validated by a speaker with B2 level Irish or higher">Validated</h3>
+              <h3 class="text-sm font-semibold text-gray-700" title="These segments have been confirmed as accurate">Confirmed</h3>
               <span class="text-xl font-bold text-green-600">
-                <%= @recording.dictionary_entries.where(quality: ['good', 'excellent']).count %>
+                <%= @recording.dictionary_entries.confirmed_accuracy.count %>
               </span>
             </div>
           </div>
@@ -171,7 +171,7 @@
               <span class="text-xl font-bold text-purple-600">
                 <%= number_to_percentage(
                   @recording.dictionary_entries.count > 0 ?
-                  (@recording.dictionary_entries.where(quality: ['good', 'excellent']).count.to_f / @recording.dictionary_entries.count * 100) : 0,
+                  (@recording.dictionary_entries.confirmed_accuracy.count.to_f / @recording.dictionary_entries.count * 100) : 0,
                   precision: 1
                 ) %>
               </span>

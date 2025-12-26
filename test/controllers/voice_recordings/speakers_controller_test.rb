@@ -40,7 +40,6 @@ class VoiceRecordings::SpeakersControllerTest < ActionDispatch::IntegrationTest
     temp_speaker1 = User.create!(
       name: "SPEAKER_01",
       email: "speaker_01@temporary.abairt",
-      password: SecureRandom.hex,
       role: :temporary
     )
 
@@ -48,7 +47,6 @@ class VoiceRecordings::SpeakersControllerTest < ActionDispatch::IntegrationTest
     temp_speaker2 = User.create!(
       name: "SPEAKER_02",
       email: "speaker_02@temporary.abairt",
-      password: SecureRandom.hex,
       role: :temporary
     )
 
@@ -73,7 +71,6 @@ class VoiceRecordings::SpeakersControllerTest < ActionDispatch::IntegrationTest
     temp_user = User.create!(
       name: "TEMP_USER",
       email: "temp@temporary.abairt",
-      password: SecureRandom.hex,
       role: :temporary
     )
 

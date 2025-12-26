@@ -108,7 +108,6 @@ class ProcessDiarizationSegmentJobTest < ActiveJob::TestCase
     temp_user = User.create!(
       name: "temp_user",
       email: "temp@temporary.abairt",
-      password: "password",
       role: :temporary
     )
     

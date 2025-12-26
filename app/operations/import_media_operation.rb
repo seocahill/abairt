@@ -88,7 +88,7 @@ class ImportMediaOperation < Trailblazer::Operation
   def find_or_create_owner(ctx, skip_creation: false, **)
     return true if skip_creation
 
-    owner = User.first || User.create!(email: "test@example.com", password: "password")
+    owner = User.first || User.create!(email: "test@example.com", name: "Test User")
     ctx[:owner] = owner
     true
   rescue => e

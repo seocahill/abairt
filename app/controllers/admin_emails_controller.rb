@@ -53,7 +53,13 @@ class AdminEmailsController < ApplicationController
     @email.update!(sent_at: Time.current)
     BroadcastEmailJob.perform_later(@email.id)
 
-    redirect_to admin_email_path(@email), notice: "Ríomhphost á sheoladh chuig #{User.active.count} úsáideoirí sa chúlra."
+    eligible_count = User.active
+                          .where(confirmed: true)
+                          .where.not(role: [:speaker, :ai, :place, :temporary])
+                          .where.not("email LIKE ?", "%@abairt.com")
+                          .count
+
+    redirect_to admin_email_path(@email), notice: "Ríomhphost á sheoladh chuig #{eligible_count} úsáideoirí sa chúlra."
   end
 
   def send_to_self
