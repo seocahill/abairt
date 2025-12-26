@@ -5,7 +5,19 @@ class DictionaryEntryPolicy < ApplicationPolicy
   end
 
   def update?
-    true if user && !user.student?
+    return false unless user && !user.student?
+    # Cannot update confirmed entries unless deconfirming
+    return true if record.unconfirmed?
+    return true if record.confirmed? && record.accuracy_status_changed?
+    false
+  end
+
+  def confirm?
+    user && !user.student?
+  end
+
+  def deconfirm?
+    user && (user.admin? || user == record.owner)
   end
 
   def add_region?

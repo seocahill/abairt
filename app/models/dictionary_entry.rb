@@ -6,7 +6,7 @@ class DictionaryEntry < ApplicationRecord
   include CsvExportable
 
   # only save new version if different user
-  has_paper_trail only: [:word_or_phrase, :translation], limit: 10, on: %i[update destroy]
+  has_paper_trail only: [:word_or_phrase, :translation, :accuracy_status], limit: 10, on: %i[update destroy]
 
   has_one_attached :media
 
@@ -23,14 +23,37 @@ class DictionaryEntry < ApplicationRecord
   scope :has_recording, -> { joins(:media_attachment) }
 
   # Scopes are for filtering visability and training data
-  scope :pending, -> { where(quality: %i[low fair]) }
-  scope :validated, -> { where(quality: %i[good excellent]) }
+  # Note: 'pending' conflicts with status enum, so using 'unconfirmed_accuracy' and 'confirmed_accuracy'
+  scope :unconfirmed_accuracy, -> { where(accuracy_status: 0) }
+  scope :confirmed_accuracy, -> { where(accuracy_status: 1) }
+  
+  # Legacy aliases - these may conflict with status enum, use unconfirmed_accuracy/confirmed_accuracy instead
+  def self.pending
+    unconfirmed_accuracy
+  end
+  
+  def self.validated
+    confirmed_accuracy
+  end
+  
+  def self.confirmed
+    confirmed_accuracy
+  end
+  scope :updated_since, ->(timestamp) { where("updated_at > ?", timestamp) }
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }
 
-  # validates :quality, inclusion: { in: %w[low fair], message: "can only be set to low or fair unless speaker is B2 level or higher" }, unless: -> { Current.user&.ability&.in?(%w[B2 C1 C2 native]) }
-
   validate :dictionary_entries_cannot_exceed_segments_count
+  validate :cannot_edit_when_confirmed, on: :update
+
+  def cannot_edit_when_confirmed
+    return unless confirmed?
+    return if accuracy_status_changed? # Allow deconfirmation
+
+    if word_or_phrase_changed? || translation_changed?
+      errors.add(:base, "Cannot edit confirmed entries. Please deconfirm first.")
+    end
+  end
 
   # Based on CEFR scale i.e. low: < B2, fair: B2, good: C, excellent: native
   enum :quality, %i[
@@ -39,6 +62,11 @@ class DictionaryEntry < ApplicationRecord
     good
     excellent
   ]
+
+  enum :accuracy_status, {
+    unconfirmed: 0,
+    confirmed: 1
+  }
 
   enum :status, {
     pending: 0,

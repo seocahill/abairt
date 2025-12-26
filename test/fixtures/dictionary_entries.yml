@@ -7,6 +7,7 @@ one:
   owner: one
   translator: one
   quality: fair
+  accuracy_status: unconfirmed
 
 two:
   word_or_phrase: "Cén chaoi gur éirigh leat"
@@ -15,6 +16,7 @@ two:
   owner: one
   translator: one
   quality: good
+  accuracy_status: confirmed
 
 
 three:
@@ -24,6 +26,7 @@ three:
   owner: one
   translator: one
   quality: excellent
+  accuracy_status: confirmed
 
 four:
   word_or_phrase: "Airím uaim thú"
@@ -32,6 +35,7 @@ four:
   owner: one
   translator: one
   quality: good
+  accuracy_status: confirmed
 
 
 five:
@@ -40,12 +44,14 @@ five:
   speaker: one
   owner: one
   translator: one
+  accuracy_status: unconfirmed
 
 six:
   word_or_phrase: "Test nil translator"
   translation: "Test translation"
   speaker: one
   owner: one
+  accuracy_status: unconfirmed
 
 with_temp_speaker:
   word_or_phrase: "A chladhaire"
@@ -54,3 +60,4 @@ with_temp_speaker:
   owner: one
   translator: one
   voice_recording: one
+  accuracy_status: unconfirmed

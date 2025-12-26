@@ -59,7 +59,7 @@ class DictionaryEntriesController < ApplicationController
 
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(user_id: current_user.id, quality: current_user.quality))
+    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(user_id: current_user.id))
     @dictionary_entry.speaker = entry_speaker if entry_speaker
     authorize @dictionary_entry
 
@@ -138,7 +138,7 @@ class DictionaryEntriesController < ApplicationController
       user.email = "#{SecureRandom.alphanumeric}@abairt.com"
       user.role = :speaker
       user.ability = :native
-      user.password = SecureRandom.alphanumeric
+      # Passwordless auth - no password needed
     end
   end
 

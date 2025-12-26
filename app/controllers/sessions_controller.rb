@@ -10,12 +10,13 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @user = User.find_by(password_reset_token: params[:token])
-    if @user.nil? || @user.password_reset_token_expired?
-      flash[:alert] = 'Invalid password reset link.'
+    @user = User.find_by(login_token: params[:token])
+    if @user.nil?
+      flash[:alert] = 'Invalid login link.'
       redirect_to login_path
     else
-      @user.clear_password_reset_token
+      @user.regenerate_login_token # Regenerate token after use (one-time use)
+      @user.save!
       session[:user_id] = @user.id
       flash[:notice] = 'Login successful.'
       redirect_to user_path(@user)
@@ -23,12 +24,13 @@ class SessionsController < ApplicationController
   end
 
   def login_with_token
-    @user = User.find_by(password_reset_token: params[:token])
-    if @user.nil? || @user.password_reset_token_expired?
-      flash[:alert] = 'Invalid password reset link.'
+    @user = User.find_by(login_token: params[:token])
+    if @user.nil?
+      flash[:alert] = 'Invalid login link.'
       redirect_to login_path
     else
-      @user.clear_password_reset_token
+      @user.regenerate_login_token # Regenerate token after use (one-time use)
+      @user.save!
       session[:user_id] = @user.id
       flash[:notice] = 'Login successful.'
       redirect_to user_path(@user)

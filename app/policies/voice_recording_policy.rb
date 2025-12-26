@@ -6,7 +6,7 @@ class VoiceRecordingPolicy < ApplicationPolicy
   def create?
     return unless user
 
-    user&.teacher? || user&.admin?
+    user&.teacher? || user&.api_user? || user&.admin?
   end
 
   def new?
@@ -20,7 +20,7 @@ class VoiceRecordingPolicy < ApplicationPolicy
   end
 
   def speakers?
-    user&.admin? || user&.teacher?
+    user&.admin? || user&.teacher? || user&.api_user?
   end
 
   def destroy?

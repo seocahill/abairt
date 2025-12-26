@@ -53,7 +53,6 @@ class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
     temporary_user = User.create!(
       email: "temp@example.com",
       name: "Temporary User",
-      password: "password",
       role: :temporary
     )
     
@@ -76,7 +75,6 @@ class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
     user_no_translations = User.create!(
       email: "notranslations@example.com",
       name: "No Translations User", 
-      password: "password",
       role: :student
     )
 

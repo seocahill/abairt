@@ -1,7 +1,7 @@
 class VoiceRecordings::DictionaryEntriesController < ApplicationController
   # POST /dictionary_entries or /dictionary_entries.json
   def create
-    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(user_id: current_user.id, quality: current_user.quality))
+    @dictionary_entry = DictionaryEntry.new(dictionary_entry_params.merge(user_id: current_user.id))
     authorize @dictionary_entry
     
     # just assign the first user as the speaker initially
@@ -48,6 +48,21 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     @dictionary_entry = DictionaryEntry.find(params[:id])
     authorize @dictionary_entry
 
+    # Prevent updates when confirmed unless explicitly deconfirming
+    if @dictionary_entry.confirmed? && !params[:dictionary_entry][:accuracy_status].in?(['unconfirmed', 0, '0'])
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "dictionary_entry_#{@dictionary_entry.id}",
+            partial: "voice_recordings/dictionary_entries/entry",
+            locals: { entry: @dictionary_entry }
+          ), status: :unprocessable_entity
+        end
+        format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), alert: 'Cannot edit confirmed entries. Please deconfirm first.' }
+      end
+      return
+    end
+
     if @dictionary_entry.update dictionary_entry_params.merge(translator_id: current_user.id)
       respond_to do |format|
         format.turbo_stream do
@@ -64,11 +79,57 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     end
   end
 
+  def confirm
+    @dictionary_entry = DictionaryEntry.find(params[:id])
+    authorize @dictionary_entry, :confirm?
+
+    if @dictionary_entry.update(accuracy_status: :confirmed)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "dictionary_entry_#{@dictionary_entry.id}",
+            partial: "voice_recordings/dictionary_entries/entry",
+            locals: { entry: @dictionary_entry }
+          )
+        end
+        format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry confirmed.' }
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream { head :unprocessable_entity }
+        format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), alert: 'Failed to confirm entry.' }
+      end
+    end
+  end
+
+  def deconfirm
+    @dictionary_entry = DictionaryEntry.find(params[:id])
+    authorize @dictionary_entry, :deconfirm?
+
+    if @dictionary_entry.update(accuracy_status: :unconfirmed)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "dictionary_entry_#{@dictionary_entry.id}",
+            partial: "voice_recordings/dictionary_entries/entry",
+            locals: { entry: @dictionary_entry }
+          )
+        end
+        format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry deconfirmed.' }
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream { head :unprocessable_entity }
+        format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), alert: 'Failed to deconfirm entry.' }
+      end
+    end
+  end
+
   private
 
 
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
-    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, :quality, :translator_id, rang_ids: [])
+    params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, :quality, :translator_id, :accuracy_status, rang_ids: [])
   end
 end

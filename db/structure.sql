@@ -1,14 +1,15 @@
 CREATE TABLE `ar_internal_metadata` (`key` varchar(255) NOT NULL, `value` varchar(255), `created_at` timestamp NOT NULL, `updated_at` timestamp NOT NULL, PRIMARY KEY (`key`));
 CREATE TABLE `schema_migrations` (`version` varchar(255) NOT NULL, PRIMARY KEY (`version`));
-CREATE TABLE `users` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `email` varchar(255), `name` varchar(255), `password_digest` varchar(255), `created_at` timestamp NOT NULL, `updated_at` timestamp NOT NULL, `confirmed` boolean DEFAULT (0) NOT NULL, `token` varchar(255), `master_id` bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "password_reset_token" varchar, "password_reset_sent_at" datetime, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL);
 CREATE TABLE `active_storage_attachments`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `name` varchar(255) DEFAULT (NULL) NOT NULL, `record_type` varchar(255) DEFAULT (NULL) NOT NULL, `record_id` bigint DEFAULT (NULL) NOT NULL, `blob_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_c3b3935057` FOREIGN KEY (`blob_id`) REFERENCES `active_storage_blobs`(`id`));
 CREATE TABLE `active_storage_variant_records`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `blob_id` bigint DEFAULT (NULL) NOT NULL, `variation_digest` varchar(255) DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_993965df05` FOREIGN KEY (`blob_id`) REFERENCES `active_storage_blobs`(`id`));
 CREATE TABLE `rang_entries`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `rang_id` bigint DEFAULT (NULL) NOT NULL, `dictionary_entry_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, `updated_at` timestamp DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_6e0c965f93` FOREIGN KEY (`dictionary_entry_id`) REFERENCES `dictionary_entries`(`id`), CONSTRAINT `fk_rails_3dfa1b15d2` FOREIGN KEY (`rang_id`) REFERENCES `rangs`(`id`));
 CREATE TABLE `rangs`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `name` varchar(255) DEFAULT (NULL) NULL, `user_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, `updated_at` timestamp DEFAULT (NULL) NOT NULL, `url` varchar(255) DEFAULT (NULL) NULL, `meeting_id` varchar(255) DEFAULT (NULL) NULL, `time` timestamp DEFAULT (NULL) NULL, "grupa_id" varchar, "start_time" datetime, "end_time" datetime, "context" integer, CONSTRAINT `fk_rails_0f519c8255` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`));
 CREATE VIRTUAL TABLE fts_dictionary_entries USING fts5(translation, word_or_phrase, content='dictionary_entries', content_rowid='id', tokenize='porter unicode61')
 /* fts_dictionary_entries(translation,word_or_phrase) */;
-CREATE INDEX `index_users_on_master_id` ON `users` (`master_id`);
-CREATE INDEX `index_users_on_token` ON `users` (`token`);
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE UNIQUE INDEX `index_active_storage_attachments_uniqueness` ON `active_storage_attachments` (`record_type`, `record_id`, `name`, `blob_id`);
 CREATE INDEX `index_active_storage_attachments_on_blob_id` ON `active_storage_attachments` (`blob_id`);
 CREATE UNIQUE INDEX `index_active_storage_variant_records_uniqueness` ON `active_storage_variant_records` (`blob_id`, `variation_digest`);
@@ -20,7 +21,6 @@ CREATE TABLE _litestream_lock (id INTEGER);
 CREATE TABLE IF NOT EXISTS "grupas" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "ainm" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "muinteoir_id" bigint, "lat_lang" varchar);
 CREATE INDEX "index_rangs_on_grupa_id" ON "rangs" ("grupa_id");
 CREATE INDEX "index_grupas_on_muinteoir_id" ON "grupas" ("muinteoir_id");
-CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
 CREATE TABLE IF NOT EXISTS "tags" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "created_at" datetime, "updated_at" datetime, "taggings_count" integer DEFAULT 0);
 CREATE TABLE IF NOT EXISTS "taggings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "tag_id" integer, "taggable_type" varchar, "taggable_id" integer, "tagger_type" varchar, "tagger_id" integer, "context" varchar(128), "created_at" datetime, "tenant" varchar(128), CONSTRAINT "fk_rails_9fcd2e236b"
 FOREIGN KEY ("tag_id")
@@ -39,6 +39,10 @@ CREATE INDEX "taggings_idy" ON "taggings" ("taggable_id", "taggable_type", "tagg
 CREATE INDEX "index_taggings_on_tenant" ON "taggings" ("tenant");
 CREATE VIRTUAL TABLE fts_tags USING fts5(name, content='tags', content_rowid='id', tokenize='porter unicode61')
 /* fts_tags(name) */;
+CREATE TABLE IF NOT EXISTS 'fts_tags_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_tags_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'fts_tags_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_tags_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS "conversations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "voice_recording_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_7c15d62a0a"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -82,6 +86,10 @@ CREATE INDEX "index_user_lists_on_user_id" ON "user_lists" ("user_id");
 CREATE INDEX "index_user_lists_on_word_list_id" ON "user_lists" ("word_list_id");
 CREATE VIRTUAL TABLE fts_users USING fts5(name, content='users', content_rowid='id', tokenize='porter unicode61')
 /* fts_users(name) */;
+CREATE TABLE IF NOT EXISTS 'fts_users_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_users_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'fts_users_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_users_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TRIGGER insert_tags_search AFTER INSERT ON tags BEGIN
         INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
       END;
@@ -91,16 +99,6 @@ CREATE TRIGGER delete_tags_search AFTER DELETE ON tags BEGIN
 CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
         INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
         INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
-      END;
-CREATE TRIGGER insert_users_search AFTER INSERT ON users BEGIN
-        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
-      END;
-CREATE TRIGGER delete_users_search AFTER DELETE ON users BEGIN
-        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
-      END;
-CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
-        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
-        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
       END;
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
@@ -145,7 +143,7 @@ CREATE INDEX "index_articles_on_user_id" ON "articles" ("user_id");
 CREATE TABLE IF NOT EXISTS "action_text_rich_texts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "body" text, "record_type" varchar NOT NULL, "record_id" bigint NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_action_text_rich_texts_uniqueness" ON "action_text_rich_texts" ("record_type", "record_id", "name");
 CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
-CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "standard_irish" varchar DEFAULT NULL, "notes" text DEFAULT NULL, "translator_id" integer DEFAULT NULL, "status" integer DEFAULT 0 NOT NULL, CONSTRAINT "fk_rails_43cc55d212"
+CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "standard_irish" varchar DEFAULT NULL, "notes" text DEFAULT NULL, "translator_id" integer DEFAULT NULL, "status" integer DEFAULT 0 NOT NULL, "accuracy_status" integer DEFAULT 0 NOT NULL, CONSTRAINT "fk_rails_43cc55d212"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 , CONSTRAINT "fk_rails_c0a955f533"
@@ -170,7 +168,15 @@ CREATE INDEX "index_media_imports_on_status" ON "media_imports" ("status");
 CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
 CREATE TABLE IF NOT EXISTS "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_settings_on_key" ON "settings" ("key");
+CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar);
+CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
+CREATE INDEX "index_users_on_token" ON "users" ("token");
+CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
+CREATE UNIQUE INDEX "index_users_on_api_token" ON "users" ("api_token");
 INSERT INTO "schema_migrations" (version) VALUES
+('20251226142218'),
+('20251226142210'),
+('20251226142159'),
 ('20251111235455'),
 ('20251004091850'),
 ('20250926144748'),

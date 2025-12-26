@@ -1,0 +1,108 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <%= link_to "← Back to Users", admin_users_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <!-- User Header -->
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900"><%= @user.name %></h1>
+          <div class="mt-2 flex gap-2">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"><%= @user.role.humanize %></span>
+            <% if @user.confirmed? %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
+            <% else %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+            <% end %>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <%= link_to "Edit", edit_admin_user_path(@user), class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" %>
+          <% unless @user.confirmed? %>
+            <%= button_to "Approve", approve_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" %>
+            <%= button_to "Reject", reject_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure? This will delete the user." } %>
+          <% end %>
+          <%= button_to "Delete", admin_user_path(@user), method: :delete, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure?" } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Details -->
+    <div class="px-6 py-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Column -->
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Email</h3>
+            <p class="text-base text-gray-900"><%= @user.email %></p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">About</h3>
+            <p class="text-base text-gray-900"><%= @user.about.present? ? @user.about : "Not specified" %></p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Voice</h3>
+            <p class="text-base text-gray-900"><%= @user.voice&.humanize || "Not specified" %></p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Language Ability</h3>
+            <p class="text-base text-gray-900"><%= @user.ability&.humanize || "Not specified" %></p>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Dialect</h3>
+            <p class="text-base text-gray-900"><%= @user.dialect&.humanize || "Not specified" %></p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Location</h3>
+            <p class="text-base text-gray-900"><%= @user.address || "Not specified" %></p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Created</h3>
+            <p class="text-base text-gray-900"><%= @user.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 mb-1">Last Updated</h3>
+            <p class="text-base text-gray-900"><%= @user.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Token Section -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium text-gray-900">API Token</h3>
+          <div class="flex gap-2">
+            <% if @user.api_token.present? %>
+              <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm" %>
+              <%= button_to "Revoke Token", revoke_api_token_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure?" } %>
+            <% else %>
+              <%= button_to "Generate Token", generate_api_token_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" %>
+            <% end %>
+          </div>
+        </div>
+        <% if @user.api_token.present? %>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-sm text-gray-600 mb-2">Token (first 8 characters):</p>
+            <code class="bg-white px-3 py-2 rounded border border-gray-300 text-sm font-mono"><%= @user.api_token.first(8) %>...</code>
+            <p class="text-xs text-gray-500 mt-2">Full token is stored securely and only shown partially for security.</p>
+          </div>
+        <% else %>
+          <p class="text-sm text-gray-500">No API token has been generated for this user.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+

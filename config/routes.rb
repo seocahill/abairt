@@ -9,8 +9,6 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-  draw :madmin
-
   # Mission Control for job monitoring - admin only
   constraints(AdminConstraint.new) do
     mount MissionControl::Jobs::Engine, at: "/jobs"
@@ -26,12 +24,23 @@ Rails.application.routes.draw do
 
     # Text to Speech API endpoint
     resources :text_to_speech, only: [:create]
+
+    # Public API for confirmed transcriptions
+    resources :transcriptions, only: [:index, :show]
+    
+    # OpenAPI schema
+    get 'openapi', to: 'openapi#show', defaults: { format: 'json' }
   end
 
   resources :word_lists
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
-    resources :dictionary_entries, module: :voice_recordings, only: [:index, :create, :update]
+    resources :dictionary_entries, module: :voice_recordings, only: [:index, :create, :update] do
+      member do
+        post :confirm
+        post :deconfirm
+      end
+    end
     resources :speakers, module: :voice_recordings, only: [:index, :update]
     member do
       get :preview
@@ -47,7 +56,29 @@ Rails.application.routes.draw do
 
   resources :tags
 
-  resources :users
+  resources :users do
+    member do
+      post :generate_api_token
+      post :regenerate_api_token
+      delete :revoke_api_token
+    end
+  end
+
+  namespace :admin do
+    resources :users, only: [:index, :show, :edit, :update, :destroy] do
+      member do
+        post :approve
+        post :reject
+        post :generate_api_token
+        post :regenerate_api_token
+        post :revoke_api_token
+      end
+      collection do
+        post :bulk_approve
+        post :bulk_reject
+      end
+    end
+  end
   
   resources :admin_emails do
     member do
@@ -72,8 +103,7 @@ Rails.application.routes.draw do
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
 
-  get 'password_resets/new'
-  post 'password_resets', to: 'password_resets#create'
+  resources :login_requests, only: [:new, :create]
 
   get 'home', to: 'home#index'
   

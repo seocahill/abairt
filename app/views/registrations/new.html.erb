@@ -7,14 +7,20 @@
       Cláraigh / Sign up
     </h2>
 
+    <% session[:form_start_time] = Time.current %>
     <%= form_with(model: @user, url: registrations_path, id: "claraigh") do |form| %>
       <div class="g-recaptcha" data-sitekey="<%= Rails.application.credentials.dig(:recaptcha_key) %>"></div>
       <br/>
       <p class="hidden">
         <label>
-          Don’t fill this out if you’re human: <input name="bot-field" autocomplete="off" aria-hidden="true">
+          Don't fill this out if you're human: <input name="bot-field" autocomplete="off" aria-hidden="true">
         </label>
       </p>
+      <div style="position: absolute; left: -9999px;">
+        <label>Website (optional): <input name="website" autocomplete="off" tabindex="-1"></label>
+        <label>Phone (optional): <input name="phone" autocomplete="off" tabindex="-1"></label>
+        <label>Company (optional): <input name="company" autocomplete="off" tabindex="-1"></label>
+      </div>
       <div class="rounded-md shadow-sm -space-y-px mb-4">
         <%= form.label "Ainm / Name" %>
         <%= form.text_field :name, required: true, class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" %>

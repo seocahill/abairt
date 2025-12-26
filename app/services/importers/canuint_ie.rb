@@ -95,7 +95,6 @@ module Importers
         # Create temporary user for the speaker
         temp_user = User.find_or_create_by(email: "#{speaker_name.parameterize}@temporary.abairt") do |user|
           user.name = speaker_name
-          user.password = SecureRandom.hex(10)
           user.role = :temporary
           user.address = data[:hometown]
         end

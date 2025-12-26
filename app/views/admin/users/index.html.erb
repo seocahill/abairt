@@ -1,0 +1,148 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">User Management</h1>
+    <div class="flex gap-2">
+      <%= link_to "All Users", admin_users_path, class: "px-4 py-2 #{params[:pending] != 'true' && params[:role].blank? && params[:search].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+      <%= link_to "Pending Signups", admin_users_path(pending: true), class: "px-4 py-2 #{params[:pending] == 'true' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-4">
+    <%= form_with url: admin_users_path, method: :get, local: true, class: "flex gap-2" do |form| %>
+      <%= form.hidden_field :pending, value: params[:pending] if params[:pending].present? %>
+      <%= form.hidden_field :role, value: params[:role] if params[:role].present? %>
+      <%= form.text_field :search, value: params[:search], placeholder: "Search by name or email...", class: "flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+      <%= form.submit "Search", class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+      <% if params[:search].present? %>
+        <%= link_to "Clear", admin_users_path(pending: params[:pending], role: params[:role]), class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Role Filter -->
+  <div class="mb-4 flex gap-2 flex-wrap">
+    <span class="text-sm text-gray-700 font-medium py-2">Filter by role:</span>
+    <%= link_to "All", admin_users_path(pending: params[:pending], search: params[:search]), class: "px-3 py-1 text-sm #{params[:role].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+    <% User.roles.keys.each do |role| %>
+      <%= link_to role.humanize, admin_users_path(role: role, pending: params[:pending], search: params[:search]), class: "px-3 py-1 text-sm #{params[:role] == role ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-x-auto mb-4">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left">
+            <input type="checkbox" id="select-all" class="rounded">
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Token</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @users.each do |user| %>
+          <tr>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <input type="checkbox" name="user_ids[]" value="<%= user.id %>" class="user-checkbox rounded">
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"><%= user.email %></td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"><%= user.role.humanize %></span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <% if user.confirmed? %>
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
+              <% else %>
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+              <% if user.api_token.present? %>
+                <code class="bg-gray-100 px-2 py-1 rounded text-xs"><%= user.api_token.first(8) %>...</code>
+              <% else %>
+                <span class="text-gray-400 text-xs">No token</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"><%= user.created_at.strftime("%Y-%m-%d") %></td>
+            <td class="px-4 py-4 text-sm font-medium">
+              <div class="flex flex-col gap-1">
+                <% unless user.confirmed? %>
+                  <%= button_to "Approve", approve_admin_user_path(user), method: :post, class: "text-green-600 hover:text-green-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
+                  <%= button_to "Reject", reject_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", data: { confirm: "Are you sure? This will delete the user." } %>
+                <% end %>
+                <% if user.api_token.present? %>
+                  <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(user), method: :post, class: "text-indigo-600 hover:text-indigo-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
+                  <%= button_to "Revoke Token", revoke_api_token_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", data: { confirm: "Are you sure?" } %>
+                <% else %>
+                  <%= button_to "Generate Token", generate_api_token_admin_user_path(user), method: :post, class: "text-green-600 hover:text-green-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
+                <% end %>
+                <%= button_to "Delete", admin_user_path(user), method: :delete, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", data: { confirm: "Are you sure?" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mb-4 flex gap-2">
+    <%= form_with url: bulk_approve_admin_users_path, method: :post, id: "bulk-actions-form", onsubmit: "return collectCheckboxes(this)" do |form| %>
+      <%= form.submit "Bulk Approve Selected", class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" %>
+    <% end %>
+    <%= form_with url: bulk_reject_admin_users_path, method: :post, id: "bulk-reject-form", onsubmit: "return collectCheckboxes(this)" do |form| %>
+      <%= form.submit "Bulk Reject Selected", class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700", data: { confirm: "Are you sure? This will delete selected users." } %>
+    <% end %>
+  </div>
+
+  <!-- Pagination -->
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6 border-t border-gray-200 pt-6 flex items-center justify-between">
+      <div class="text-sm text-gray-700">
+        Showing <span class="font-medium"><%= @pagy.from %></span> to
+        <span class="font-medium"><%= @pagy.to %></span> of
+        <span class="font-medium"><%= @pagy.count %></span> users
+      </div>
+      <div class="flex space-x-2">
+        <% if @pagy.prev %>
+          <%= link_to "Previous", admin_users_path(page: @pagy.prev, pending: params[:pending], role: params[:role], search: params[:search], per_page: params[:per_page]),
+              class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <% end %>
+        <% if @pagy.next %>
+          <%= link_to "Next", admin_users_path(page: @pagy.next, pending: params[:pending], role: params[:role], search: params[:search], per_page: params[:per_page]),
+              class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  document.getElementById('select-all')?.addEventListener('change', function(e) {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+      checkbox.checked = e.target.checked;
+    });
+  });
+
+  function collectCheckboxes(form) {
+    const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+    const values = Array.from(checkboxes).map(cb => cb.value);
+    values.forEach(value => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'user_ids[]';
+      input.value = value;
+      form.appendChild(input);
+    });
+    return true;
+  }
+</script>
+

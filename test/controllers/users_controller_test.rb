@@ -21,7 +21,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     @user.update_columns(role:  User.roles[:admin])
     random_str = SecureRandom.alphanumeric
     assert_difference('User.count', 1) do
-      post users_url, params: { user: { email: "#{random_str}@abairt.com", name: random_str, password_digest: random_str, role: "speaker" } }
+      post users_url, params: { user: { email: "#{random_str}@abairt.com", name: random_str, role: "speaker" } }
     end
     assert_redirected_to user_url(User.find_by(name: random_str))
   end
@@ -29,7 +29,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   test "should not directly create teacher or admin" do
     random_str = SecureRandom.alphanumeric
     assert_no_difference('User.count', 1) do
-      post users_url, params: { user: { email: "#{random_str}@abairt.com", name: random_str, password_digest: random_str, role: "admin" } }
+      post users_url, params: { user: { email: "#{random_str}@abairt.com", name: random_str, role: "admin" } }
     end
   end
 
@@ -44,7 +44,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update user" do
-    patch user_url(@user), params: { user: { email: @user.email, name: @user.name, password_digest: @user.password_digest } }
+    patch user_url(@user), params: { user: { email: @user.email, name: @user.name } }
     assert_redirected_to user_url(@user)
   end
 
@@ -86,7 +86,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     temp_user = User.create!(
       name: "TEMP_USER",
       email: "temp@temporary.abairt",
-      password: SecureRandom.hex,
       role: :temporary
     )
 

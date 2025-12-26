@@ -9,10 +9,19 @@ class BroadcastEmailJob < ApplicationJob
       user = User.find(user_id)
       UserMailer.broadcast_email(user, email.subject, email.rich_content).deliver_now
     else
-      # Send to all active users
-      User.active.find_each do |user|
+      # Send to confirmed, non-speaker, non-AI users without @abairt.com emails
+      eligible_users.find_each do |user|
         UserMailer.broadcast_email(user, email.subject, email.rich_content).deliver_now
       end
     end
+  end
+
+  private
+
+  def eligible_users
+    User.active
+        .where(confirmed: true)
+        .where.not(role: [:speaker, :ai, :place, :temporary])
+        .where.not("email LIKE ?", "%@abairt.com")
   end
 end
