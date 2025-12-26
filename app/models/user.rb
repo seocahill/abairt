@@ -19,11 +19,11 @@ class User < ApplicationRecord
     :student,
     :speaker,
     :teacher,
-    :api_user,
     :admin,
     :ai,
     :place,
-    :temporary
+    :temporary,
+    :api_user
   ]
   enum :voice, [:male, :female]
   enum :dialect, [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
