@@ -25,5 +25,32 @@
         </button>
       </div>
     <% end %>
+
+    <div class="mt-6">
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500">Or</span>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <%= form_tag(login_path, method: :post) do %>
+          <div class="rounded-md shadow-sm">
+            <div>
+              <label for="token" class="sr-only">Login token</label>
+              <input id="token" name="token" type="text" required class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Paste your login token">
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Sign in with token
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>
