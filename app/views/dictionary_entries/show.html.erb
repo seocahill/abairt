@@ -119,14 +119,16 @@
                 <tr>
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"><%= version.index %></td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= time_ago_in_words version.created_at %> ago</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= User.find(version.whodunnit).name %></td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= User.find_by(id: version.whodunnit)&.name || "system" %></td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= version.object.dig("word_or_phrase") %></td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= version.object.dig("translation") %></td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><%= version.object.dig("translation") || "not translated" %></td>
                   <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <%= button_to "Restore", reify_path(version_id: version.id), 
-                        method: :post, 
-                        class: "text-orange-600 hover:text-orange-900",
-                        form: { data: { turbo_confirm: "Are you sure you want to restore this version?" } } %>
+                    <% if policy(:reifies).create? %>
+                      <%= button_to "Restore", reify_path(version_id: version.id), 
+                          method: :post, 
+                          class: "text-orange-600 hover:text-orange-900",
+                          form: { data: { turbo_confirm: "Are you sure you want to restore this version?" } } %>
+                    <% end %>
                   </td>
                 </tr>
               <% end %>
