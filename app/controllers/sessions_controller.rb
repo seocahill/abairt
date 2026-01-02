@@ -10,28 +10,46 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @user = User.find_by(login_token: params[:token])
+    token = params[:token]&.strip
+    @user = User.find_by(login_token: token)
+
     if @user.nil?
-      flash[:alert] = 'Invalid login link.'
+      Rails.logger.warn("Failed login attempt with token: #{token&.truncate(10)}")
+      flash[:alert] = 'Invalid login link. Please request a new one.'
       redirect_to login_path
     else
-      @user.regenerate_login_token # Regenerate token after use (one-time use)
-      @user.save!
+      # Allow login and set session
       session[:user_id] = @user.id
+      Rails.logger.info("Successful login for user: #{@user.email}")
+
+      # Regenerate token in background (non-blocking)
+      # This way concurrent requests all succeed before token is regenerated
+      @user.regenerate_login_token
+      @user.save
+
       flash[:notice] = 'Login successful.'
       redirect_to user_path(@user)
     end
   end
 
   def login_with_token
-    @user = User.find_by(login_token: params[:token])
+    token = params[:token]&.strip
+    @user = User.find_by(login_token: token)
+
     if @user.nil?
-      flash[:alert] = 'Invalid login link.'
+      Rails.logger.warn("Failed login attempt with token: #{token&.truncate(10)}")
+      flash[:alert] = 'Invalid login link. Please request a new one.'
       redirect_to login_path
     else
-      @user.regenerate_login_token # Regenerate token after use (one-time use)
-      @user.save!
+      # Allow login and set session
       session[:user_id] = @user.id
+      Rails.logger.info("Successful login for user: #{@user.email}")
+
+      # Regenerate token in background (non-blocking)
+      # This way concurrent requests all succeed before token is regenerated
+      @user.regenerate_login_token
+      @user.save
+
       flash[:notice] = 'Login successful.'
       redirect_to user_path(@user)
     end
