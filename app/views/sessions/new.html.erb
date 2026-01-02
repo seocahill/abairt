@@ -5,6 +5,11 @@
       <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
         Sign in to your account
       </h2>
+      <% if params[:error] == 'invalid_token' %>
+        <p class="mt-2 text-center text-sm text-red-600">
+          Invalid or expired login link. Please request a new one.
+        </p>
+      <% end %>
     </div>
     <%= form_tag(login_requests_path) do %>
       <div class="rounded-md shadow-sm -space-y-px">
