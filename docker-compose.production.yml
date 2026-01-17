@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:5bcf8c2c0b5a9c408a4ff70d017079d742d471d7
+    image: registry.gitlab.com/abairt/web-application:6443760dd5121dd2b9e54f87b436db2c232a575d
     deploy:
       mode: replicated
       replicas: 1
@@ -39,23 +39,6 @@ services:
       - |
         bin/rails db:create db:migrate
         bin/rails s -p 3000 -b 0.0.0.0
-
-  # litestream:
-  #   image: litestream/litestream
-  #   deploy:
-  #     replicas: 1
-  #   secrets:
-  #     - source: litestream_v5
-  #       target: /etc/litestream.yml
-  #   volumes:
-  #     - db:/data
-  #   user: "1000:1000"
-  #   entrypoint:
-  #     - /bin/sh
-  #     - -c
-  #     - |
-  #       litestream restore -if-db-not-exists /data/production.sqlite3
-  #       litestream replicate
 
   backup:
     image: amazon/aws-cli:latest
@@ -98,10 +81,10 @@ services:
           echo "$$(date): Backup completed - abairt-db-backup-$$BACKUP_DATE.tar.gz"
         }
 
-        # Run backup every 6 hours
+        # Run backup every 24 hours
         while true; do
           backup
-          sleep 21600  # 6 hours
+          sleep 86400  # 24 hours
         done
 
   redis:
@@ -143,7 +126,5 @@ configs:
     file: ./Caddyfile
 
 secrets:
-  litestream_v5:
-    file: ./litestream.yml
   master_key:
     file: ./config/master.key

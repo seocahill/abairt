@@ -6,6 +6,8 @@ class VoiceRecordingPolicy < ApplicationPolicy
   def create?
     return unless user
 
+    # Only teachers, api_users, and admins can create new recordings
+    # Students can edit existing transcriptions but not create new recordings
     user&.teacher? || user&.api_user? || user&.admin?
   end
 
