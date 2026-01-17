@@ -5,7 +5,8 @@ class DictionaryEntryPolicy < ApplicationPolicy
   end
 
   def update?
-    return false unless user && !user.student?
+    return false unless user
+    # Students can update unconfirmed entries to contribute translations
     # Cannot update confirmed entries unless deconfirming
     return true if record.unconfirmed?
     return true if record.confirmed? && record.accuracy_status_changed?
