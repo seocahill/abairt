@@ -12,7 +12,7 @@ Sentry.init do |config|
   config.traces_sampler = lambda do |_context|
     true
   end
-  # config.enabled_environments = %w[production]
+  config.enabled_environments = %w[production]
   config.excluded_exceptions += ["Pagy::VariableError"]
   config.enable_logs = true
   config.rails.structured_logging.subscribers = {
