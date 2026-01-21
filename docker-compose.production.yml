@@ -44,10 +44,8 @@ services:
     image: amazon/aws-cli:latest
     volumes:
       - db:/data:ro
-    environment:
-      AWS_ACCESS_KEY_ID: REDACTED_AWS_KEY
-      AWS_SECRET_ACCESS_KEY: REDACTED_AWS_SECRET
-      AWS_DEFAULT_REGION: eu-west-1
+    env_file:
+      - .env
     entrypoint:
       - /bin/sh
       - -c
