@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Abairt - Voice Assistant</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="turbo-native" content="true">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div class="min-h-screen flex flex-col">
+      <!-- Mobile Header -->
+      <header class="bg-gray-800 px-4 py-3 flex items-center justify-between">
+        <h1 class="text-xl font-bold text-green-400">Abairt</h1>
+        <% if current_session&.voice_recording %>
+          <button data-action="click->voice#reset" class="text-gray-400 text-sm">
+            Reset
+          </button>
+        <% end %>
+      </header>
+
+      <!-- Flash Messages -->
+      <% if flash[:alert] %>
+        <div class="bg-red-600 px-4 py-2 text-center">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col">
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

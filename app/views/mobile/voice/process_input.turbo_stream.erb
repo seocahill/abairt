@@ -1,0 +1,65 @@
+<%# Append assistant response to conversation %>
+<%= turbo_stream.append "conversation" do %>
+  <div class="text-left">
+    <div class="inline-block max-w-[80%] px-4 py-2 rounded-lg bg-gray-700">
+      <%= @response.text %>
+    </div>
+  </div>
+<% end %>
+
+<%# Update status area if we have a recording %>
+<% if @session.voice_recording %>
+  <%= turbo_stream.update "status-area" do %>
+    <p class="text-sm text-gray-400">Working on:</p>
+    <p class="text-lg font-medium"><%= @session.voice_recording.title %></p>
+    <% if @session.current_entry %>
+      <p class="text-sm text-green-400">
+        Segment <%= entry_position(@session) %> of <%= @session.voice_recording.dictionary_entries.count %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%# Update segment display if we have a current entry %>
+<% if @session.current_entry %>
+  <%= turbo_stream.update "segment-display" do %>
+    <div class="mb-3">
+      <p class="text-xs text-gray-500 uppercase tracking-wide">Irish</p>
+      <p class="text-xl text-green-400" data-voice-target="transcription">
+        <%= @session.current_entry.word_or_phrase %>
+      </p>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 uppercase tracking-wide">English</p>
+      <p class="text-lg text-gray-300" data-voice-target="translation">
+        <%= @session.current_entry.translation %>
+      </p>
+    </div>
+
+    <div class="flex gap-3 mt-4">
+      <button data-action="click->voice#playOriginal"
+              data-entry-id="<%= @session.current_entry.id %>"
+              class="flex-1 bg-gray-700 py-3 rounded-lg text-center">
+        Play Original
+      </button>
+      <button data-action="click->voice#speakIrish"
+              class="flex-1 bg-green-700 py-3 rounded-lg text-center">
+        Speak Irish
+      </button>
+    </div>
+  <% end %>
+<% end %>
+
+<%# Trigger action handling in Stimulus %>
+<%= turbo_stream.append "conversation" do %>
+  <script>
+    window.dispatchEvent(new CustomEvent('voice:response', {
+      detail: {
+        action: '<%= @response.action %>',
+        data: <%= raw @response.data.to_json %>,
+        sessionState: '<%= @session.state %>',
+        currentEntryId: <%= @session.current_entry&.id || 'null' %>
+      }
+    }));
+  </script>
+<% end %>

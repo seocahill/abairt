@@ -105,6 +105,18 @@ Rails.application.routes.draw do
 
   resources :login_requests, only: [:new, :create]
 
+  # Mobile voice interface for Turbo Native apps
+  namespace :mobile do
+    resource :voice, only: [:show], controller: "voice" do
+      post :process_input
+      post :start_recording
+      post :random_recording
+      get "play_segment/:entry_id", action: :play_segment, as: :play_segment
+      post "confirm_entry/:entry_id", action: :confirm_entry, as: :confirm_entry
+      post :reset
+    end
+  end
+
   get 'home', to: 'home#index'
   
   get 'translator_leaderboard', to: 'translator_leaderboard#index'
