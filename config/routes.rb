@@ -107,7 +107,7 @@ Rails.application.routes.draw do
 
   # Mobile voice interface for Turbo Native apps
   namespace :mobile do
-    resource :voice, only: [:index], controller: "voice" do
+    resource :voice, only: [:show], controller: "voice" do
       post :process_input
       post :start_recording
       post :random_recording

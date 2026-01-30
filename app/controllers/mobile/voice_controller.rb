@@ -7,7 +7,7 @@ module Mobile
 
     # GET /mobile/voice
     # Main voice interface screen
-    def index
+    def show
       @session = current_session
       @recent_recordings = VoiceRecording
         .where.not(metadata_extracted_at: nil)
