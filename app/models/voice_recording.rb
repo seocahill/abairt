@@ -13,6 +13,10 @@ class VoiceRecording < ApplicationRecord
   # Provide direct access to diarization_data JSON fields
   store_accessor :diarization_data, :segments, :source, :fotheidil_video_id, :diarization
 
+  # Provide direct access to metadata JSON fields
+  store_accessor :metadata, :themes, :locations, :speakers_mentioned, :time_period,
+    :keywords, :summary, :dialect_indicators
+
   alias_attribute :name, :title
 
   def next
@@ -106,5 +110,20 @@ class VoiceRecording < ApplicationRecord
 
   def fully_translated?
     dictionary_entries.where.not(translation: [nil, ""]).count.fdiv(dictionary_entries.count).*(100).round >= 75
+  end
+
+  def extract_metadata!
+    ExtractVoiceRecordingMetadataJob.perform_later(id)
+  end
+
+  def metadata_available?
+    metadata_extracted_at.present? && metadata.present?
+  end
+
+  # Search voice recordings by metadata content
+  def self.search_by_metadata(query)
+    query_lower = query.downcase
+    where("metadata->>'keywords' LIKE :q OR metadata->>'summary' LIKE :q OR metadata->>'themes' LIKE :q OR metadata->>'locations' LIKE :q",
+      q: "%#{query_lower}%")
   end
 end

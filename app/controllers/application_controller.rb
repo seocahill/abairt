@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   PAGE_SIZE = 15
 
-  helper_method :current_user, :admin_user?
+  helper_method :current_user, :admin_user?, :turbo_native_app?
   before_action :set_paper_trail_whodunnit
   after_action :verify_authorized, except: [:index, :show], unless: :rails_engine_controller?
 
@@ -41,6 +41,11 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  # Detect if request is from Turbo Native iOS/Android app
+  def turbo_native_app?
+    request.user_agent.to_s.include?("Turbo Native")
+  end
 
   def rails_engine_controller?
     # Skip Pundit verification for Rails engine controllers
