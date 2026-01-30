@@ -53,6 +53,7 @@
       <!-- Audio Controls -->
       <div class="flex gap-3 mt-4">
         <button data-action="click->voice#playOriginal"
+                data-entry-id="<%= @session.current_entry.id %>"
                 class="flex-1 bg-gray-700 py-3 rounded-lg text-center">
           Play Original
         </button>

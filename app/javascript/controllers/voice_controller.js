@@ -214,10 +214,11 @@ export default class extends Controller {
     this.updateStatus('Tap to speak')
   }
 
-  playOriginal() {
-    if (this.hasOriginalAudioTarget) {
+  playOriginal(event) {
+    const entryId = event.currentTarget.dataset.entryId
+    if (this.hasOriginalAudioTarget && entryId) {
       // Get audio URL from current entry
-      fetch(`/mobile/voice/play_segment/${this.currentEntryIdValue}`, {
+      fetch(`/mobile/voice/play_segment/${entryId}`, {
         headers: { 'Accept': 'application/json' }
       })
       .then(response => response.json())
