@@ -1,4 +1,4 @@
-<div class="flex-1 flex flex-col" data-controller="voice" data-voice-session-state-value="<%= @session.state %>">
+<div class="flex-1 flex flex-col" data-controller="voice" data-voice-session-state-value="<%= @session.state %>" data-voice-current-entry-id-value="<%= @session.current_entry&.id %>">
   <!-- Status Area -->
   <div id="status-area" class="bg-gray-800 px-4 py-3">
     <% if @session.voice_recording %>

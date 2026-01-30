@@ -245,9 +245,9 @@ export default class extends Controller {
       })
 
       const data = await response.json()
-      if (data.audio_content) {
+      if (data.audioContent) {
         // Play base64 audio
-        const audio = new Audio(`data:audio/wav;base64,${data.audio_content}`)
+        const audio = new Audio(`data:audio/wav;base64,${data.audioContent}`)
         audio.play()
       }
     } catch (error) {
