@@ -191,9 +191,12 @@ export default class extends Controller {
   }
 
   handleResponse(event) {
-    const { action, data, sessionState } = event.detail
+    const { action, data, sessionState, currentEntryId } = event.detail
 
     this.sessionStateValue = sessionState
+    if (currentEntryId) {
+      this.currentEntryIdValue = currentEntryId
+    }
 
     switch (action) {
       case 'speak':

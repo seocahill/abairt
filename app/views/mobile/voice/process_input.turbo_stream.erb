@@ -56,7 +56,8 @@
       detail: {
         action: '<%= @response.action %>',
         data: <%= raw @response.data.to_json %>,
-        sessionState: '<%= @session.state %>'
+        sessionState: '<%= @session.state %>',
+        currentEntryId: <%= @session.current_entry&.id || 'null' %>
       }
     }));
   </script>
