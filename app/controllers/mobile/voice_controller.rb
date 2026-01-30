@@ -119,9 +119,9 @@ module Mobile
     def response_json
       {
         text: @response.text,
-        audio_url: @response.audio_url,
         action: @response.action,
         data: @response.data,
+        speak_english: @response.speak_english,
         session_state: @session.state,
         current_entry_id: @session.current_entry&.id
       }

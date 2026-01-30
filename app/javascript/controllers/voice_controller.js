@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Voice controller for mobile transcription correction interface
-// Handles speech recognition, audio playback, and native bridge communication
+// Handles speech recognition, audio playback, and TTS for both English and Irish
 export default class extends Controller {
   static targets = [
     "recordButton",
@@ -22,11 +22,10 @@ export default class extends Controller {
     this.isRecording = false
     this.mediaRecorder = null
     this.audioChunks = []
+    this.audioQueue = []
+    this.isPlayingAudio = false
 
-    // Set up speech recognition if available
     this.setupSpeechRecognition()
-
-    // Listen for response events from Turbo Stream
     window.addEventListener('voice:response', this.handleResponse.bind(this))
 
     // Check for native bridge (Turbo Native)
@@ -39,10 +38,10 @@ export default class extends Controller {
     if (this.mediaRecorder) {
       this.mediaRecorder.stop()
     }
+    speechSynthesis.cancel()
   }
 
   setupSpeechRecognition() {
-    // Use Web Speech API for English voice commands
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
     if (SpeechRecognition) {
@@ -71,7 +70,6 @@ export default class extends Controller {
         }
       }
     } else {
-      // Fall back to MediaRecorder for audio capture
       this.useMediaRecorder = true
     }
   }
@@ -85,18 +83,19 @@ export default class extends Controller {
   }
 
   startRecording() {
+    // Stop any playing audio first
+    speechSynthesis.cancel()
+    this.stopAllAudio()
+
     this.isRecording = true
     this.updateRecordButton()
     this.updateStatus('Listening...')
 
     if (this.hasNativeBridge) {
-      // Use native speech recognition
       this.sendToNative('startSpeechRecognition', {})
     } else if (this.recognition) {
-      // Use Web Speech API
       this.recognition.start()
     } else if (this.useMediaRecorder) {
-      // Fall back to audio recording
       this.startAudioRecording()
     }
   }
@@ -140,10 +139,8 @@ export default class extends Controller {
   }
 
   sendTextInput(text) {
-    // Append user message to conversation immediately
     this.appendMessage('user', text)
 
-    // Send to server
     const formData = new FormData()
     formData.append('text', text)
 
@@ -151,17 +148,15 @@ export default class extends Controller {
       method: 'POST',
       headers: {
         'X-CSRF-Token': this.csrfToken(),
-        'Accept': 'text/vnd.turbo-stream.html'
+        'Accept': 'application/json'
       },
       body: formData
     })
-    .then(response => response.text())
-    .then(html => {
-      Turbo.renderStreamMessage(html)
-    })
+    .then(response => response.json())
+    .then(data => this.processResponse(data))
     .catch(error => {
       console.error('Failed to send input:', error)
-      this.appendMessage('assistant', 'Sorry, something went wrong. Please try again.')
+      this.speakEnglish('Sorry, something went wrong. Please try again.')
     })
   }
 
@@ -175,22 +170,70 @@ export default class extends Controller {
       method: 'POST',
       headers: {
         'X-CSRF-Token': this.csrfToken(),
-        'Accept': 'text/vnd.turbo-stream.html'
+        'Accept': 'application/json'
       },
       body: formData
     })
-    .then(response => response.text())
-    .then(html => {
-      Turbo.renderStreamMessage(html)
-      this.updateStatus('Tap to speak')
-    })
+    .then(response => response.json())
+    .then(data => this.processResponse(data))
     .catch(error => {
       console.error('Failed to send audio:', error)
       this.updateStatus('Error - tap to try again')
+      this.speakEnglish('Sorry, I had trouble processing that.')
     })
   }
 
+  processResponse(data) {
+    const { text, action, data: actionData, speak_english, currentEntryId } = data
+
+    // Update current entry ID if provided
+    if (currentEntryId) {
+      this.currentEntryIdValue = currentEntryId
+    }
+
+    // Show assistant message
+    this.appendMessage('assistant', text)
+    this.updateStatus('Tap to speak')
+
+    // Queue up audio to play
+    this.audioQueue = []
+
+    // First: speak the English response
+    if (speak_english) {
+      this.audioQueue.push({ type: 'english', text: speak_english })
+    }
+
+    // Then: handle action-specific audio
+    switch (action) {
+      case 'play_original':
+        this.audioQueue.push({ type: 'original', entryId: actionData.entry_id })
+        break
+
+      case 'play_transcription':
+        if (actionData.irish_text) {
+          this.audioQueue.push({ type: 'irish', text: actionData.irish_text })
+        }
+        break
+
+      case 'play_translation':
+        if (actionData.english_text) {
+          this.audioQueue.push({ type: 'english', text: actionData.english_text })
+        }
+        break
+
+      case 'play_context':
+        if (actionData.context_irish_text) {
+          this.audioQueue.push({ type: 'irish', text: actionData.context_irish_text })
+        }
+        break
+    }
+
+    // Start playing the queue
+    this.playNextInQueue()
+  }
+
   handleResponse(event) {
+    // Handler for Turbo Stream responses
     const { action, data, sessionState, currentEntryId } = event.detail
 
     this.sessionStateValue = sessionState
@@ -198,46 +241,103 @@ export default class extends Controller {
       this.currentEntryIdValue = currentEntryId
     }
 
+    // Process action-specific audio
+    this.audioQueue = []
+
     switch (action) {
-      case 'speak':
-        // Speak Irish text using TTS
+      case 'play_original':
+        this.audioQueue.push({ type: 'original', entryId: data.entry_id })
+        break
+
+      case 'play_transcription':
         if (data.irish_text) {
-          this.speakIrishText(data.irish_text)
+          this.audioQueue.push({ type: 'irish', text: data.irish_text })
         }
         break
-      case 'play_segment':
-        // Play audio segment
-        this.playSegment(data.entry_id)
+
+      case 'play_translation':
+        if (data.english_text) {
+          this.audioQueue.push({ type: 'english', text: data.english_text })
+        }
         break
+
+      case 'play_context':
+        if (data.context_irish_text) {
+          this.audioQueue.push({ type: 'irish', text: data.context_irish_text })
+        }
+        break
+    }
+
+    if (this.audioQueue.length > 0) {
+      this.playNextInQueue()
     }
 
     this.updateStatus('Tap to speak')
   }
 
-  playOriginal(event) {
-    const entryId = event.currentTarget.dataset.entryId
-    if (this.hasOriginalAudioTarget && entryId) {
-      // Get audio URL from current entry
-      fetch(`/mobile/voice/play_segment/${entryId}`, {
-        headers: { 'Accept': 'application/json' }
-      })
-      .then(response => response.json())
-      .then(data => {
-        this.originalAudioTarget.src = data.audio_url
-        this.originalAudioTarget.play()
-      })
+  // Audio queue management
+  playNextInQueue() {
+    if (this.audioQueue.length === 0) {
+      this.isPlayingAudio = false
+      return
+    }
+
+    this.isPlayingAudio = true
+    const item = this.audioQueue.shift()
+
+    switch (item.type) {
+      case 'english':
+        this.speakEnglish(item.text, () => this.playNextInQueue())
+        break
+      case 'irish':
+        this.speakIrishText(item.text, () => this.playNextInQueue())
+        break
+      case 'original':
+        this.playOriginalAudio(item.entryId, () => this.playNextInQueue())
+        break
     }
   }
 
-  speakIrish() {
-    const text = this.transcriptionTarget?.textContent?.trim()
-    if (text) {
-      this.speakIrishText(text)
+  stopAllAudio() {
+    this.audioQueue = []
+    this.isPlayingAudio = false
+    if (this.hasOriginalAudioTarget) {
+      this.originalAudioTarget.pause()
+    }
+    if (this.hasTtsAudioTarget) {
+      this.ttsAudioTarget.pause()
     }
   }
 
-  async speakIrishText(text) {
-    // Fetch TTS audio from server
+  // English TTS using browser speech synthesis
+  speakEnglish(text, onComplete = null) {
+    if (!text || !('speechSynthesis' in window)) {
+      if (onComplete) onComplete()
+      return
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'en-US'
+    utterance.rate = 0.9
+
+    utterance.onend = () => {
+      if (onComplete) onComplete()
+    }
+
+    utterance.onerror = () => {
+      if (onComplete) onComplete()
+    }
+
+    speechSynthesis.speak(utterance)
+  }
+
+  // Irish TTS using Abair.ie via server
+  async speakIrishText(text, onComplete = null) {
+    if (!text) {
+      if (onComplete) onComplete()
+      return
+    }
+
     try {
       const response = await fetch('/api/text_to_speech', {
         method: 'POST',
@@ -250,21 +350,63 @@ export default class extends Controller {
 
       const data = await response.json()
       if (data.audioContent) {
-        // Play base64 audio
         const audio = new Audio(`data:audio/wav;base64,${data.audioContent}`)
+        audio.onended = () => {
+          if (onComplete) onComplete()
+        }
+        audio.onerror = () => {
+          if (onComplete) onComplete()
+        }
         audio.play()
+      } else {
+        if (onComplete) onComplete()
       }
     } catch (error) {
       console.error('Failed to speak Irish text:', error)
+      if (onComplete) onComplete()
     }
   }
 
-  speakEnglish(text) {
-    // Use browser speech synthesis for English
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'en-US'
-      speechSynthesis.speak(utterance)
+  // Play original audio segment
+  async playOriginalAudio(entryId, onComplete = null) {
+    try {
+      const response = await fetch(`/mobile/voice/play_segment/${entryId}`, {
+        headers: { 'Accept': 'application/json' }
+      })
+      const data = await response.json()
+
+      if (data.audio_url && this.hasOriginalAudioTarget) {
+        this.originalAudioTarget.src = data.audio_url
+        this.originalAudioTarget.onended = () => {
+          if (onComplete) onComplete()
+        }
+        this.originalAudioTarget.onerror = () => {
+          if (onComplete) onComplete()
+        }
+        this.originalAudioTarget.play()
+      } else {
+        if (onComplete) onComplete()
+      }
+    } catch (error) {
+      console.error('Failed to play original audio:', error)
+      if (onComplete) onComplete()
+    }
+  }
+
+  // Button handler for manual playback - uses data attribute from button
+  playOriginal(event) {
+    const entryId = event.currentTarget.dataset.entryId
+    if (entryId) {
+      this.stopAllAudio()
+      this.playOriginalAudio(entryId)
+    }
+  }
+
+  speakIrish() {
+    const text = this.transcriptionTarget?.textContent?.trim()
+    if (text) {
+      this.stopAllAudio()
+      this.speakIrishText(text)
     }
   }
 
@@ -281,17 +423,17 @@ export default class extends Controller {
   }
 
   appendMessage(role, content) {
-    if (this.hasConversationTarget) {
-      const div = document.createElement('div')
-      div.className = role === 'user' ? 'text-right' : 'text-left'
-      div.innerHTML = `
-        <div class="inline-block max-w-[80%] px-4 py-2 rounded-lg ${role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}">
-          ${this.escapeHtml(content)}
-        </div>
-      `
-      this.conversationTarget.appendChild(div)
-      this.conversationTarget.scrollTop = this.conversationTarget.scrollHeight
-    }
+    if (!content || !this.hasConversationTarget) return
+
+    const div = document.createElement('div')
+    div.className = role === 'user' ? 'text-right' : 'text-left'
+    div.innerHTML = `
+      <div class="inline-block max-w-[80%] px-4 py-2 rounded-lg ${role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}">
+        ${this.escapeHtml(content)}
+      </div>
+    `
+    this.conversationTarget.appendChild(div)
+    this.conversationTarget.scrollTop = this.conversationTarget.scrollHeight
   }
 
   updateRecordButton() {
