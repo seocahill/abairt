@@ -54,8 +54,10 @@ class TranscriptAnalysisService
 
   def transcript_text
     @transcript_text ||= begin
-      # Combine all dictionary entries for this recording
-      entries = @voice_recording.dictionary_entries.pluck(:word_or_phrase, :translation)
+      # Combine all dictionary entries for this recording, ordered by timestamp
+      entries = @voice_recording.dictionary_entries
+        .order(:region_start)
+        .pluck(:word_or_phrase, :translation)
       entries.map { |irish, english| "#{irish} (#{english})" }.join("\n")
     end
   end
