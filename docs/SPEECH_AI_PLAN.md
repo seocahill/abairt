@@ -2,6 +2,114 @@
 
 A comprehensive plan for building ASR (Automatic Speech Recognition), TTS (Text-to-Speech), and voice cloning capabilities using the abairt transcript dataset.
 
+---
+
+## Executive Summary
+
+### Vision
+
+Create an **open foundation for Mayo Irish language technology** — a suite of speech AI tools that anyone can build upon to develop applications for this dialect. While we will continue to maintain core applications like abairt, the underlying speech models and datasets will be made available to support a broader ecosystem of language tools, educational apps, and accessibility services.
+
+### What We're Building
+
+| Capability | What It Does | Who Benefits |
+|------------|--------------|--------------|
+| **Voice Cloning** | Pronounce any word in an authentic Mayo voice | Learners, dictionary apps, accessibility tools |
+| **Speech Recognition** | Convert Mayo Irish speech to text accurately | Transcription services, voice assistants, archivists |
+| **Text-to-Speech** | Generate natural Mayo Irish speech from text | Screen readers, audiobooks, language apps |
+| **Dialect AI** | Write and translate in authentic Mayo Irish | Educational tools, translation services, content creators |
+
+### Data Requirements at a Glance
+
+| Capability | Minimum Data Needed | Ideal Data | Current Status |
+|------------|---------------------|------------|----------------|
+| **Voice Cloning** | 30 seconds per voice | 2-3 minutes | ✅ Ready now |
+| **Speech Recognition** | 5 hours transcribed | 20+ hours | TBD after audit |
+| **Text-to-Speech** | 5 hours (single speaker) | 15-20 hours | TBD after audit |
+| **Dialect AI** | 1,000 translated phrases | 5,000+ phrases | TBD after audit |
+
+### The Four Phases
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 1: VOICE CLONING                                                     │
+│  ───────────────────────                                                    │
+│  Hear any Irish word spoken in a Mayo accent                                │
+│                                                                             │
+│  • Data: Select best speaker recordings (30 sec - 2 min)                    │
+│  • Effort: 1-2 weeks to deploy                                              │
+│  • Output: Web feature + API for third-party apps                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 2: SPEECH RECOGNITION (ASR)                                          │
+│  ─────────────────────────────────                                          │
+│  Accurately transcribe Mayo Irish speakers                                  │
+│                                                                             │
+│  • Data: 5-20 hours of transcribed audio from native speakers               │
+│  • Effort: 2-4 weeks (data prep + training)                                 │
+│  • Output: Transcription API, improved abairt pipeline, open model          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 3: TEXT-TO-SPEECH (TTS)                                              │
+│  ─────────────────────────────                                              │
+│  Generate natural-sounding Mayo Irish speech                                │
+│                                                                             │
+│  • Data: 5-20 hours from ONE consistent speaker (clean audio)               │
+│  • Effort: 4-8 weeks (significant audio preprocessing)                      │
+│  • Output: TTS API, screen reader voice, open model                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 4: DIALECT AI                                                        │
+│  ───────────────────                                                        │
+│  AI that writes authentic Mayo Irish (not just "standard" Irish)            │
+│                                                                             │
+│  • Data: Translated phrase pairs (Mayo Irish ↔ English)                     │
+│  • Effort: 2-4 weeks                                                        │
+│  • Output: Translation API, writing assistant, dialect checker              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Why This Matters
+
+**For Language Preservation:**
+Mayo Irish has distinct vocabulary, grammar, and idioms that standard Irish language tools don't capture. "Tig leat" (Mayo) vs "is féidir leat" (standard) — these aren't just accent differences, they're different ways of speaking that define the dialect.
+
+**For the Community:**
+- Learners get tools that teach *actual* Mayo Irish, not textbook Irish
+- Native speakers hear their own dialect reflected in technology
+- Researchers and archivists get better transcription of historical recordings
+
+**For the Ecosystem:**
+By releasing open models, we enable others to build:
+- Mobile apps for learners
+- Accessibility tools (screen readers, voice input)
+- Educational games
+- Archival and research tools
+- Voice assistants that understand the dialect
+
+### Data Foundation
+
+All capabilities build on the **abairt transcript database** — recordings of native Mayo Irish speakers, transcribed and translated. The quality and quantity of this data determines what's possible:
+
+| Data Volume | What It Unlocks |
+|-------------|-----------------|
+| **Current baseline** | Voice cloning (immediate) |
+| **5+ hours confirmed** | Speech recognition (good accuracy) |
+| **10+ hours single speaker** | Text-to-speech (natural voice) |
+| **5,000+ translated phrases** | Dialect AI (authentic writing) |
+
+### Next Steps
+
+1. **Audit production data** — Run queries to determine exact hours of confirmed, high-quality transcripts
+2. **Identify best speakers** — Find native speakers with the most clean, transcribed audio
+3. **Phase 1 pilot** — Deploy voice cloning as proof of concept
+4. **Community engagement** — Share vision, gather feedback, identify priority use cases
+
+---
+
 ## Table of Contents
 1. [Dataset Overview](#dataset-overview)
 2. [Phase 1: Voice Cloning for Single Words](#phase-1-voice-cloning-for-single-words-easiest)
