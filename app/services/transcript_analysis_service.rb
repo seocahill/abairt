@@ -118,6 +118,9 @@ class TranscriptAnalysisService
     <<~PROMPT
       Analyze this transcript from a Mayo Irish speaker and extract metadata.
 
+      IMPORTANT: The recording title and description often contain the speaker's name and location.
+      Parse these carefully - they are typically the most reliable source of this information.
+
       #{title_context}#{description_context}
       Transcript (Irish with English translations):
       #{transcript_text.truncate(8000)}
@@ -131,6 +134,7 @@ class TranscriptAnalysisService
             "type": "townland|parish|barony|county|region",
             "dialect_region": "erris|achill|tourmakeady|east_mayo|other",
             "confidence": "high|medium|low",
+            "source": "title|description|transcript",
             "context": "why you identified this location"
           }
         ],
@@ -142,6 +146,7 @@ class TranscriptAnalysisService
             "native_speaker": true|false,
             "dialect_region": "erris|achill|tourmakeady|east_mayo|other",
             "confidence": "high|medium|low",
+            "source": "title|description|transcript",
             "context": "evidence for these assessments"
           }
         ],
@@ -151,7 +156,8 @@ class TranscriptAnalysisService
       }
 
       If you cannot determine something with confidence, use "unknown" or omit the field.
-      Only include locations and speakers you have actual evidence for from the transcript.
+      Only include locations and speakers you have actual evidence for.
+      Info from title/description should have "high" confidence if clearly stated.
     PROMPT
   end
 
