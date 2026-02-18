@@ -112,12 +112,15 @@ All capabilities build on the **abairt transcript database** — recordings of n
 
 ## Table of Contents
 1. [Dataset Overview](#dataset-overview)
-2. [Phase 1: Voice Cloning for Single Words](#phase-1-voice-cloning-for-single-words-easiest)
-3. [Phase 2: ASR Fine-tuning](#phase-2-asr-fine-tuning-medium)
-4. [Phase 3: TTS Training](#phase-3-tts-training-most-complex)
-5. [Infrastructure & Training Platforms](#infrastructure--training-platforms)
-6. [Data Export Scripts](#data-export-scripts)
-7. [Production Data Inventory](#production-data-inventory)
+2. [Phase 0: Digitization Pipeline](#phase-0-digitization-pipeline-prerequisite)
+3. [Phase 1: Voice Cloning for Single Words](#phase-1-voice-cloning-for-single-words-easiest)
+4. [Phase 2: ASR Fine-tuning](#phase-2-asr-fine-tuning-medium)
+5. [Phase 3: TTS Training](#phase-3-tts-training-most-complex)
+6. [Phase 4: Dialect AI](#phase-4-dialect-ai)
+7. [Infrastructure & Training Platforms](#infrastructure--training-platforms)
+8. [Data Export Scripts](#data-export-scripts)
+9. [Production Data Inventory](#production-data-inventory)
+10. [Appendix: Scanning Equipment Guide](#appendix-scanning-equipment-guide)
 
 ---
 
@@ -158,6 +161,183 @@ For training, we should prioritize data by quality:
 | **Gold** | `accuracy_status: confirmed` + `quality: good/excellent` | Primary training data |
 | **Silver** | `accuracy_status: confirmed` OR `quality: fair+` | Extended training |
 | **Bronze** | All other entries with audio | Data augmentation only |
+
+---
+
+## Phase 0: Digitization Pipeline (Prerequisite)
+
+**Goal:** Digitize printed Mayo Irish materials (books, manuscripts, notes) to expand the training corpus for Dialect AI and provide reference materials for all phases.
+
+**Why This Matters:** Many dialectal phrases, idioms, and vocabulary exist only in print — older textbooks, folklore collections, local publications. Digitizing these materials multiplies the available training data for Phase 4 (Dialect AI) and provides reference material for validating ASR/TTS outputs.
+
+### OCR Options for Irish Text
+
+| Service | Best For | Irish/Fada Support | Cost |
+|---------|----------|-------------------|------|
+| **Surya OCR** | Clean modern print | Excellent | Free (local) |
+| **Google Cloud Vision** | Volume processing | Excellent | ~$1.50/1000 pages |
+| **Transkribus** | Historical texts, handwriting | Good (trainable) | Free tier + paid |
+| **Azure Document Intelligence** | Structured documents | Excellent | ~$1.50/1000 pages |
+| **Tesseract** | Basic OCR, offline | Fair (needs config) | Free |
+
+**Recommendation:**
+- **Modern print (post-1950):** Surya OCR locally or Google Cloud Vision
+- **Historical texts / old orthography:** Transkribus with custom model training
+- **Handwritten materials:** Transkribus only
+
+### The Digitization Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  1. CAPTURE                                                                  │
+│  ───────────                                                                 │
+│  Scan or photograph source materials                                         │
+│  • 300 DPI minimum (600 for older/faded text)                               │
+│  • Flat pages, consistent lighting                                          │
+│  • Organize by source (book title, page numbers)                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  2. OCR PROCESSING                                                           │
+│  ─────────────────                                                           │
+│  Extract text from images                                                    │
+│  • Run through chosen OCR service                                           │
+│  • Batch process for efficiency                                             │
+│  • Preserve page/source metadata                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  3. POST-PROCESSING                                                          │
+│  ─────────────────                                                           │
+│  Fix common OCR errors for Irish                                             │
+│  • Verify fadas using abairt vocabulary dictionary                          │
+│  • Correct common character confusions (í/i, á/a, etc.)                     │
+│  • Handle old orthography if preserving (Gaedhilge → Gaeilge optional)      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  4. HUMAN REVIEW                                                             │
+│  ─────────────                                                               │
+│  Quality assurance (essential for training data)                             │
+│  • Sample review: check 5-10% of pages                                      │
+│  • Flag problematic sources for full review                                 │
+│  • Mark confidence levels                                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      ↓
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  5. INTEGRATION                                                              │
+│  ────────────                                                                │
+│  Import into abairt / training pipeline                                      │
+│  • Store as DigitizedText records (new model)                               │
+│  • Link to source metadata                                                  │
+│  • Available for RAG and fine-tuning                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Irish-Specific OCR Challenges
+
+| Challenge | Example | Solution |
+|-----------|---------|----------|
+| **Missing fadas** | "cailin" instead of "cailín" | Post-process with vocabulary lookup |
+| **Wrong fadas** | "cáilín" instead of "cailín" | Vocabulary verification |
+| **Old orthography** | "Gaedhilge", "béul" | Normalize or preserve (configurable) |
+| **Seanchló (old script)** | ꞇ ꞅ ꞃ characters | Transkribus with custom model |
+| **Dialect spellings** | Non-standard but correct | Preserve — this is the valuable data! |
+
+### Post-Processing Service
+
+Build a correction service using the existing abairt vocabulary:
+
+```ruby
+# app/services/irish_ocr_cleanup_service.rb
+class IrishOcrCleanupService
+  def initialize
+    # Build vocabulary from confirmed entries
+    @known_words = DictionaryEntry
+      .where(accuracy_status: :confirmed)
+      .pluck(:word_or_phrase)
+      .flat_map { |phrase| phrase.downcase.split(/\s+/) }
+      .uniq
+      .to_set
+  end
+
+  def cleanup(text)
+    words = text.split(/(\s+)/)  # Preserve whitespace
+
+    words.map do |word|
+      next word if word.match?(/^\s+$/)  # Keep whitespace
+
+      # Check if word (or fada variants) exists in vocabulary
+      corrected = find_correct_spelling(word.downcase)
+      corrected ? match_case(word, corrected) : word
+    end.join
+  end
+
+  private
+
+  def find_correct_spelling(word)
+    return word if @known_words.include?(word)
+
+    # Try adding/correcting fadas
+    FADA_VARIANTS[word] || suggest_fada_correction(word)
+  end
+
+  FADA_VARIANTS = {
+    'cailin' => 'cailín',
+    'failte' => 'fáilte',
+    'slan' => 'slán',
+    'gaeilge' => 'Gaeilge',
+    # Expanded from corpus analysis...
+  }.freeze
+end
+```
+
+### Surya OCR Local Setup
+
+```bash
+# Install Surya OCR
+pip install surya-ocr
+
+# Process a single image
+surya_ocr page_001.png --langs ga --output results/
+
+# Batch process a directory
+for f in scans/*.png; do
+  surya_ocr "$f" --langs ga --output ocr_output/
+done
+```
+
+### Data Model for Digitized Text
+
+```ruby
+# db/migrate/xxx_create_digitized_texts.rb
+class CreateDigitizedTexts < ActiveRecord::Migration[7.1]
+  def change
+    create_table :digitized_texts do |t|
+      t.string :source_title        # Book/document title
+      t.string :source_author
+      t.integer :source_year
+      t.integer :page_number
+      t.text :raw_ocr_text          # Original OCR output
+      t.text :cleaned_text          # Post-processed
+      t.string :ocr_service         # surya, google, transkribus
+      t.float :confidence_score
+      t.string :review_status       # pending, reviewed, verified
+      t.references :reviewer, foreign_key: { to_table: :users }
+      t.timestamps
+    end
+  end
+end
+```
+
+### Effort Estimate
+
+| Task | Effort |
+|------|--------|
+| Set up OCR pipeline (Surya local) | 1-2 days |
+| Build post-processing service | 2-3 days |
+| Process 100 pages | ~1 hour (automated) + 2-4 hours (review) |
+| Process 1000 pages | ~1 day (automated) + 2-3 days (review) |
 
 ---
 
@@ -665,6 +845,256 @@ This allows:
 
 ---
 
+## Phase 4: Dialect AI
+
+**Goal:** Create an AI that writes authentic Mayo Irish — not "textbook" Irish, but the actual dialect with its distinctive vocabulary, grammar, and idioms.
+
+**Approach:** Fine-tune an open-source LLM (Llama 3 8B or 70B) using Unsloth/QLoRA on your translated phrase pairs.
+
+### Why Standard Irish AI Fails for Mayo
+
+| Standard Irish | Mayo Irish | Type |
+|----------------|------------|------|
+| is féidir leat | tig leat | Modal construction |
+| tagann sé | tigeann sé | Verb form |
+| ag dul | ag goil | Verbal noun |
+| anseo | anso | Pronunciation spelling |
+| cad é | caidé | Question word |
+
+These aren't random variations — they're systematic patterns a model can learn.
+
+### Training Data Format
+
+Your existing `DictionaryEntry` records are perfect:
+
+```json
+[
+  {
+    "instruction": "Translate to Mayo Irish (Gaeilge Mhaigh Eo)",
+    "input": "You can do it if you try",
+    "output": "Tig leat é a dhéanamh má dhéanann tú iarracht"
+  },
+  {
+    "instruction": "Translate to Mayo Irish (Gaeilge Mhaigh Eo)",
+    "input": "He comes here every day",
+    "output": "Tigeann sé anso gach lá"
+  }
+]
+```
+
+### Export Service
+
+```ruby
+# app/services/ml_export/dialect_dataset_service.rb
+module MlExport
+  class DialectDatasetService
+    def initialize(output_dir:, dialect: :tuaisceart_mhaigh_eo)
+      @output_dir = Pathname.new(output_dir)
+      @dialect = dialect
+    end
+
+    def call
+      entries = DictionaryEntry
+        .joins(:speaker)
+        .where(users: { dialect: @dialect })
+        .where(accuracy_status: :confirmed)
+        .where.not(translation: [nil, ''])
+        .where.not(word_or_phrase: [nil, ''])
+
+      dataset = entries.map do |entry|
+        {
+          instruction: "Translate to Mayo Irish (Gaeilge Mhaigh Eo)",
+          input: entry.translation.strip,
+          output: entry.word_or_phrase.strip
+        }
+      end
+
+      # Split 90/10 train/validation
+      dataset.shuffle!
+      split_idx = (dataset.size * 0.9).to_i
+
+      File.write(@output_dir.join('train.jsonl'), dataset[0...split_idx].map(&:to_json).join("\n"))
+      File.write(@output_dir.join('val.jsonl'), dataset[split_idx..].map(&:to_json).join("\n"))
+
+      puts "Exported #{dataset.size} entries (#{split_idx} train, #{dataset.size - split_idx} val)"
+    end
+  end
+end
+```
+
+### Fine-tuning with Unsloth
+
+Unsloth makes LoRA fine-tuning fast and memory-efficient:
+
+```python
+# scripts/finetune_dialect.py
+from unsloth import FastLanguageModel
+import torch
+
+# Load model with 4-bit quantization
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name="unsloth/llama-3-8b-bnb-4bit",  # or 70b for better quality
+    max_seq_length=2048,
+    load_in_4bit=True,
+)
+
+# Add LoRA adapters
+model = FastLanguageModel.get_peft_model(
+    model,
+    r=16,  # LoRA rank
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                    "gate_proj", "up_proj", "down_proj"],
+    lora_alpha=16,
+    lora_dropout=0,
+    bias="none",
+    use_gradient_checkpointing="unsloth",
+)
+
+# Format dataset
+def format_prompt(example):
+    return f"""### Instruction:
+{example['instruction']}
+
+### Input:
+{example['input']}
+
+### Response:
+{example['output']}"""
+
+# Load your exported data
+from datasets import load_dataset
+dataset = load_dataset('json', data_files={
+    'train': 'ml_exports/dialect/train.jsonl',
+    'validation': 'ml_exports/dialect/val.jsonl'
+})
+
+# Training
+from trl import SFTTrainer
+from transformers import TrainingArguments
+
+trainer = SFTTrainer(
+    model=model,
+    tokenizer=tokenizer,
+    train_dataset=dataset['train'],
+    eval_dataset=dataset['validation'],
+    formatting_func=format_prompt,
+    max_seq_length=2048,
+    args=TrainingArguments(
+        per_device_train_batch_size=2,
+        gradient_accumulation_steps=4,
+        warmup_steps=100,
+        max_steps=1000,  # Adjust based on dataset size
+        learning_rate=2e-4,
+        fp16=not torch.cuda.is_bf16_supported(),
+        bf16=torch.cuda.is_bf16_supported(),
+        logging_steps=10,
+        output_dir="outputs/mayo-irish-llama",
+        evaluation_strategy="steps",
+        eval_steps=100,
+    ),
+)
+
+trainer.train()
+
+# Save the LoRA adapter
+model.save_pretrained("mayo-irish-llama-lora")
+```
+
+### Hardware Requirements
+
+| Model | Quantization | RAM/VRAM | M4 64GB? | Training Time |
+|-------|-------------|----------|----------|---------------|
+| Llama 3 8B | 4-bit QLoRA | ~6GB | ✅ Yes | 2-6 hours |
+| Llama 3 70B | 4-bit QLoRA | ~40GB | ✅ Yes (tight) | 12-24 hours |
+| Mistral 7B | 4-bit QLoRA | ~5GB | ✅ Yes | 2-4 hours |
+
+**Note:** M4 Mac training uses MPS (Metal Performance Shaders). It's slower than CUDA but works. For the 70B model, cloud GPU recommended.
+
+### Deployment Options
+
+**Option A: Local via Ollama**
+```bash
+# Export to GGUF format
+python -m unsloth.save_to_gguf mayo-irish-llama-lora --quantization q4_k_m
+
+# Import to Ollama
+ollama create mayo-irish -f Modelfile
+
+# Use locally
+ollama run mayo-irish "Translate: How are you today?"
+```
+
+**Option B: API Service**
+```ruby
+# app/services/dialect_translation_service.rb
+class DialectTranslationService
+  OLLAMA_URL = ENV.fetch('OLLAMA_URL', 'http://localhost:11434')
+
+  def translate_to_mayo(english_text)
+    response = HTTParty.post("#{OLLAMA_URL}/api/generate", body: {
+      model: 'mayo-irish',
+      prompt: "### Instruction:\nTranslate to Mayo Irish\n\n### Input:\n#{english_text}\n\n### Response:\n",
+      stream: false
+    }.to_json)
+
+    JSON.parse(response.body)['response'].strip
+  end
+end
+```
+
+### Integration with GPT-4 (Hybrid Approach)
+
+For complex tasks, use GPT-4 for intelligence + Mayo model for dialect accuracy:
+
+```ruby
+class MayoIrishGeneratorService
+  def generate(prompt)
+    # Step 1: GPT-4 generates content (in English or standard Irish)
+    draft = GptService.generate(
+      system: "Generate a response in simple English that can be translated.",
+      user: prompt
+    )
+
+    # Step 2: Fine-tuned model converts to Mayo Irish
+    mayo_irish = DialectTranslationService.new.translate_to_mayo(draft)
+
+    # Step 3: Deterministic post-process for any remaining misses
+    DialectPostProcessor.new.apply_rules(mayo_irish)
+  end
+end
+```
+
+### Evaluation
+
+Test on held-out phrases:
+
+| Metric | What It Measures |
+|--------|------------------|
+| **BLEU score** | N-gram overlap with reference translations |
+| **Dialect accuracy** | % of Mayo-specific constructions correctly used |
+| **Human evaluation** | Native speaker ratings on naturalness |
+
+### Estimated Effort
+
+| Task | Effort |
+|------|--------|
+| Export dataset | 1 day |
+| Fine-tune model | 1-2 days (mostly training time) |
+| Evaluation | 1 day |
+| Integration | 1-2 days |
+| **Total** | 1-2 weeks |
+
+### Data Requirements
+
+| Dataset Size | Expected Quality |
+|--------------|------------------|
+| 500 phrases | Basic dialect patterns |
+| 1,000 phrases | Good coverage of common constructions |
+| 5,000+ phrases | Robust, handles edge cases |
+| 10,000+ phrases | Near-native quality |
+
+---
+
 ## Infrastructure & Training Platforms
 
 ### Local Development (M4 Mac 64GB)
@@ -1072,3 +1502,215 @@ Based on your production data inventory, we can:
    - Consider data augmentation techniques
 
 Fill in the data inventory above and we can refine the plan with specific training parameters and timelines!
+
+---
+
+## Appendix: Scanning Equipment Guide
+
+### Quick Recommendations
+
+| Scenario | Recommended Setup | Budget |
+|----------|-------------------|--------|
+| **Small project (<100 pages)** | Smartphone + good lighting | Free |
+| **Medium project (100-1000 pages)** | Document scanner or book scanner | €200-500 |
+| **Large archive (1000+ pages)** | Overhead book scanner | €500-2000 |
+| **Professional/fragile materials** | Professional digitization service | Variable |
+
+### Smartphone Scanning (Budget Option)
+
+Modern smartphones produce excellent results with proper technique.
+
+**Apps:**
+- **Adobe Scan** (free) — automatic edge detection, perspective correction
+- **Microsoft Lens** (free) — good OCR built-in
+- **vFlat Scan** (free) — specifically designed for books, handles curved pages
+- **Genius Scan** (free/paid) — batch scanning, good organization
+
+**Tips for smartphone scanning:**
+- Use natural daylight or two lights at 45° angles (reduces shadows)
+- Keep phone parallel to page (not angled)
+- Use a tripod or phone mount for consistency
+- Shoot in RAW if possible for better OCR results
+- Disable flash (creates hotspots)
+
+**DIY book scanning rig:**
+```
+        [Phone/Camera mounted above]
+                   │
+                   ▼
+    ┌─────────────────────────────┐
+    │                             │
+    │     ┌───────────────┐      │
+    │     │               │      │
+    │     │     Book      │      │  ← Glass/acrylic to flatten pages
+    │     │               │      │
+    │     └───────────────┘      │
+    │                             │
+    └─────────────────────────────┘
+         ↑                   ↑
+      Light               Light
+     (45° angle)        (45° angle)
+```
+
+### Document Scanners (Flatbed)
+
+Good for loose pages, pamphlets, unbound materials.
+
+| Scanner | Resolution | Speed | Price | Notes |
+|---------|------------|-------|-------|-------|
+| **Epson Perfection V600** | 6400 DPI | ~15 sec/page | ~€250 | Great quality, good software |
+| **Canon CanoScan LiDE 400** | 4800 DPI | ~8 sec/page | ~€80 | Fast, portable, USB-powered |
+| **Fujitsu ScanSnap iX1600** | 600 DPI | 40 pages/min | ~€400 | ADF, batch scanning |
+
+**When to use flatbed:**
+- Loose pages or pamphlets
+- High-quality scans of covers/illustrations
+- Materials that can be unbound
+
+### Overhead Book Scanners
+
+Essential for bound books that can't be pressed flat.
+
+| Scanner | Type | Price | Notes |
+|---------|------|-------|-------|
+| **CZUR ET24 Pro** | Overhead + laser flatten | ~€350 | Auto page-curve correction |
+| **IRIScan Desk 6** | Overhead | ~€250 | Good for books |
+| **Fujitsu ScanSnap SV600** | Overhead | ~€600 | Professional quality |
+| **DIY V-cradle + camera** | Custom | ~€100-200 | Flexible, requires setup |
+
+**CZUR scanners** are particularly good value — they use laser lines to detect page curvature and automatically flatten the image in software.
+
+### V-Cradle Setup (For Fragile Books)
+
+For valuable or fragile materials, a V-cradle keeps the book at a safe angle:
+
+```
+           [Camera above]
+                 │
+                 ▼
+         ┌───────────────┐
+        /                 \
+       /    Book spine     \
+      /      ↓↓↓↓↓          \
+     /   ┌─────────┐         \
+    /    │  Page   │          \
+   ┴─────┴─────────┴───────────┴
+
+   V-cradle at 90-120° angle
+   Glass/acrylic presses page flat
+```
+
+**Benefits:**
+- Spine isn't stressed (book doesn't open flat)
+- Consistent positioning
+- One page at a time (no gutter shadow)
+
+### Lighting
+
+Poor lighting is the #1 cause of bad OCR results.
+
+**Requirements:**
+- Even illumination across the page
+- No shadows (especially from phone/camera)
+- No hotspots or reflections
+- Colour temperature ~5000-6500K (daylight)
+
+**Budget setup:**
+- Two desk lamps at 45° angles
+- Daylight LED bulbs (5000K+)
+- Diffusers (even a white sheet works)
+
+**Better setup:**
+- LED light panels (e.g., Neewer, Viltrox)
+- Positioned 45° from each side
+- ~€50-100 for a pair
+
+### Recommended Settings
+
+| Parameter | Value | Why |
+|-----------|-------|-----|
+| **Resolution** | 300 DPI minimum, 600 for small text | Below 300 DPI, OCR accuracy drops |
+| **Colour mode** | Greyscale for text, Colour for illustrations | Smaller files, faster processing |
+| **Format** | PNG or TIFF (lossless) | JPEG compression hurts OCR |
+| **Bit depth** | 8-bit greyscale / 24-bit colour | Standard for OCR |
+
+### Workflow for Batch Scanning
+
+```
+1. PREPARATION
+   ├── Number pages lightly in pencil (if needed)
+   ├── Remove loose inserts, note their position
+   └── Clean scanner glass / lens
+
+2. SCANNING
+   ├── Scan in batches of 20-50 pages
+   ├── Check first few images for quality
+   ├── Maintain consistent positioning
+   └── Save with sequential naming: book_001.png, book_002.png
+
+3. POST-CAPTURE
+   ├── Review images for problems (blur, shadow, cut-off)
+   ├── Re-scan problem pages immediately
+   ├── Rotate/crop if needed (ScanTailor is excellent for this)
+   └── Convert to final format
+
+4. ORGANIZATION
+   ├── Folder per source: /scans/book_title_year/
+   ├── Metadata file: source.json with title, author, year, etc.
+   └── Backup before processing
+```
+
+### Software for Post-Processing
+
+| Tool | Purpose | Platform | Cost |
+|------|---------|----------|------|
+| **ScanTailor Advanced** | Page cleanup, deskew, crop | Win/Mac/Linux | Free |
+| **Unpaper** | Clean up scanned pages | Linux/Mac | Free |
+| **ImageMagick** | Batch processing | All | Free |
+| **GIMP** | Manual image editing | All | Free |
+| **Adobe Acrobat** | PDF assembly, OCR | All | Paid |
+
+**ScanTailor workflow:**
+1. Load images → auto-detect pages
+2. Deskew (straighten tilted pages)
+3. Split pages (if scanning two-up)
+4. Select content area
+5. Remove margins/noise
+6. Export clean images for OCR
+
+### Professional Digitization Services
+
+For large or valuable collections, professional services may be cost-effective:
+
+| Service | Specialization | Notes |
+|---------|----------------|-------|
+| **Internet Archive** | Free digitization (if donated) | Books become publicly available |
+| **Local libraries** | May offer digitization services | Check university libraries |
+| **National Library of Ireland** | Irish heritage materials | May digitize significant collections |
+| **Commercial services** | Volume digitization | 1DollarScan, ScanCafe, etc. |
+
+### Cost-Benefit Analysis
+
+| Method | Time per 100 pages | Quality | Total Cost |
+|--------|-------------------|---------|------------|
+| **Smartphone + app** | 2-3 hours | Good | Free |
+| **Flatbed scanner** | 3-4 hours | Excellent | €80-250 (one-time) |
+| **Overhead scanner** | 1-2 hours | Very good | €250-600 (one-time) |
+| **Professional service** | 0 (your time) | Excellent | €50-200 |
+
+### Recommendations by Project Scale
+
+**Just getting started (testing the pipeline):**
+- Use smartphone + Adobe Scan or vFlat
+- Scan 20-30 pages as a test
+- Validate OCR quality before investing in equipment
+
+**Regular scanning (ongoing project):**
+- CZUR ET24 Pro (~€350) — best value for books
+- Or Fujitsu ScanSnap iX1600 (~€400) if mostly loose pages
+
+**Serious archival work:**
+- Fujitsu ScanSnap SV600 or professional overhead scanner
+- Proper lighting rig
+- V-cradle for fragile materials
+- Consider partnering with a library or archive
