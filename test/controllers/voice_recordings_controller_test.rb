@@ -17,8 +17,8 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create voice_recording" do
-    assert_difference('VoiceRecording.count') do
-      post voice_recordings_url, params: { voice_recording: { description: @voice_recording.description, title: @voice_recording.title } }
+    assert_difference("VoiceRecording.count") do
+      post voice_recordings_url, params: {voice_recording: {description: @voice_recording.description, title: @voice_recording.title}}
     end
 
     assert_redirected_to voice_recording_url(VoiceRecording.last)
@@ -35,15 +35,53 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update voice_recording" do
-    patch voice_recording_url(@voice_recording), params: { voice_recording: { description: @voice_recording.description, title: @voice_recording.title } }
+    patch voice_recording_url(@voice_recording), params: {voice_recording: {description: @voice_recording.description, title: @voice_recording.title}}
     assert_redirected_to voice_recording_url(@voice_recording)
   end
 
   test "should destroy voice_recording" do
-    assert_difference('VoiceRecording.count', -1) do
+    assert_difference("VoiceRecording.count", -1) do
       delete voice_recording_url(@voice_recording)
     end
 
     assert_redirected_to voice_recordings_url
+  end
+
+  test "retranscribe creates duplicate and enqueues job when admin" do
+    admin = users(:admin)
+    ApplicationController.any_instance.stubs(:current_user).returns(admin)
+
+    @voice_recording.media.attach(
+      io: StringIO.new("fake audio"),
+      filename: "test.mp3",
+      content_type: "audio/mpeg"
+    )
+    @voice_recording.update!(diarization_data: {"fotheidil_video_id" => "123"})
+
+    assert_difference("VoiceRecording.count") do
+      assert_enqueued_with(job: ProcessFotheidilVideoJob) do
+        post retranscribe_voice_recording_url(@voice_recording)
+      end
+    end
+
+    duplicate = VoiceRecording.last
+    assert_includes duplicate.description, "Retranscription of"
+    assert_includes duplicate.description, @voice_recording.id.to_s
+    assert duplicate.media.attached?
+    assert_nil duplicate.diarization_status
+    assert_nil duplicate.import_status
+    assert_equal 0, duplicate.dictionary_entries_count
+    assert_redirected_to voice_recording_url(duplicate)
+  end
+
+  test "retranscribe denied for non-admin user" do
+    non_admin = users(:two)
+    ApplicationController.any_instance.stubs(:current_user).returns(non_admin)
+
+    assert_no_difference("VoiceRecording.count") do
+      post retranscribe_voice_recording_url(@voice_recording)
+    end
+
+    assert_response :redirect
   end
 end

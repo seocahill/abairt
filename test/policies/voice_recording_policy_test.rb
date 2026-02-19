@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class VoiceRecordingPolicyTest < ActiveSupport::TestCase
   def setup
@@ -27,5 +27,29 @@ class VoiceRecordingPolicyTest < ActiveSupport::TestCase
     @voice_recording.owner = other_user
 
     assert_not @policy.destroy?
+  end
+
+  test "retranscribe? allows admin users" do
+    admin = User.new(role: :admin)
+    policy = VoiceRecordingPolicy.new(admin, @voice_recording)
+
+    assert policy.retranscribe?
+  end
+
+  test "retranscribe? denies non-admin users" do
+    assert_not @policy.retranscribe?
+  end
+
+  test "retranscribe? denies teacher users" do
+    teacher = User.new(role: :teacher)
+    policy = VoiceRecordingPolicy.new(teacher, @voice_recording)
+
+    assert_not policy.retranscribe?
+  end
+
+  test "retranscribe? denies nil user" do
+    policy = VoiceRecordingPolicy.new(nil, @voice_recording)
+
+    assert_not policy.retranscribe?
   end
 end

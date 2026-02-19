@@ -49,3 +49,9 @@ temporary:
   role: "temporary"
   email: "temporary@abairt.com"
   confirmed: true
+
+admin:
+  name: "Admin User"
+  role: "admin"
+  email: "admin@abairt.com"
+  confirmed: true
