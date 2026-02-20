@@ -72,10 +72,10 @@
             </td>
             <td class="px-4 py-4 text-sm">
               <div class="flex gap-2">
-                <%= button_to "Regenerate", regenerate_admin_api_path(user_id: user.id),
+                <%= button_to "Regenerate", regenerate_api_token_user_path(user),
                     method: :post,
                     class: "text-indigo-600 hover:text-indigo-900 text-xs" %>
-                <%= button_to "Revoke", revoke_admin_api_path(user_id: user.id),
+                <%= button_to "Revoke", revoke_api_token_user_path(user),
                     method: :delete,
                     class: "text-red-600 hover:text-red-900 text-xs",
                     data: { confirm: "Revoke API token for #{user.name}?" } %>
@@ -111,7 +111,7 @@
   <%# Generate for user %>
   <div class="mt-8 bg-white shadow rounded-lg p-6">
     <h2 class="text-lg font-semibold mb-4">Generate Token for User</h2>
-    <%= form_with url: generate_admin_api_path, method: :post, local: true, class: "flex gap-2 items-end" do |form| %>
+    <%= form_with url: generate_admin_api_index_path, method: :post, local: true, class: "flex gap-2 items-end" do |form| %>
       <div class="flex-1">
         <label class="block text-sm font-medium text-gray-700 mb-1">Select User</label>
         <%= form.collection_select :user_id,
