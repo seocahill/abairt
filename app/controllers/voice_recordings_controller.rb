@@ -1,5 +1,5 @@
 class VoiceRecordingsController < ApplicationController
-  before_action :set_voice_recording, only: %i[show edit update destroy add_region import_status retranscribe]
+  before_action :set_voice_recording, only: %i[show edit update destroy add_region import_status retranscribe autocorrect]
   PAGE_SIZE = 15 # Define the constant at the top of the controller
 
   def index
@@ -191,6 +191,17 @@ class VoiceRecordingsController < ApplicationController
     else
       redirect_to voice_recording_url(@voice_recording), alert: "Failed to create retranscription: #{duplicate.errors.full_messages.join(", ")}"
     end
+  end
+
+  def autocorrect
+    authorize @voice_recording
+
+    unless @voice_recording.transcription.present?
+      return redirect_to voice_recording_url(@voice_recording), alert: "No transcript found. Add a transcript to the recording first."
+    end
+
+    AutocorrectTranscriptionsJob.perform_later(@voice_recording.id)
+    redirect_to voice_recording_url(@voice_recording), notice: "Autocorrect started. Entries will be updated shortly."
   end
 
   def add_region
