@@ -7,11 +7,25 @@ class VoiceRecording < ApplicationRecord
   has_many :users, -> { distinct }, through: :dictionary_entries, source: :speaker, class_name: "User"
 
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
+  belongs_to :location, optional: true
 
   acts_as_taggable_on :tags
 
   # Provide direct access to diarization_data JSON fields
   store_accessor :diarization_data, :segments, :source, :fotheidil_video_id, :diarization
+
+  # Analyze transcript for location/speaker metadata
+  def analyze_transcript
+    AnalyzeVoiceRecordingJob.perform_later(self)
+  end
+
+  def analyzed?
+    metadata_analysis.present?
+  end
+
+  def dialect_region
+    metadata_analysis&.dig("dialect_region")
+  end
 
   alias_attribute :name, :title
 
