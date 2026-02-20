@@ -131,11 +131,12 @@ class ImportMediaOperation < Trailblazer::Operation
     content_type = temp_file.content_type || "audio/mpeg"
     filename = extract_filename(media_import.url)
 
-    rewindable_io = StringIO.new(temp_file.read)
-    rewindable_io.rewind
+    # Stream to disk to avoid loading large files into memory
+    temp_path = "/tmp/#{SecureRandom.hex(8)}_#{filename}"
+    IO.copy_stream(temp_file, temp_path)
 
     voice_recording.media.attach(
-      io: rewindable_io,
+      io: File.open(temp_path, "rb"),
       filename: filename,
       content_type: content_type
     )
@@ -151,7 +152,7 @@ class ImportMediaOperation < Trailblazer::Operation
       ctx[:error] = "Failed to attach media to voice recording"
       return false
     end
-    calculate_duration(voice_recording, rewindable_io, content_type, filename)
+    calculate_duration(voice_recording, temp_path)
 
     Rails.logger.info "Media attached successfully"
     true
@@ -159,6 +160,8 @@ class ImportMediaOperation < Trailblazer::Operation
     ctx[:error] = "Failed to download media: #{e.message}"
     Rails.logger.error "Download error: #{e.message}"
     false
+  ensure
+    File.delete(temp_path) if temp_path && File.exist?(temp_path)
   end
 
   # Validate that media is attached before processing
@@ -216,17 +219,10 @@ class ImportMediaOperation < Trailblazer::Operation
     (filename.present? && filename != "/") ? filename : "archive_#{SecureRandom.hex(16)}.mp3"
   end
 
-  def calculate_duration(voice_recording, rewindable_io, content_type, filename)
-    return unless content_type.start_with?("audio/", "video/")
-
-    temp_path = "/tmp/#{SecureRandom.hex(8)}#{File.extname(filename)}"
-
-    rewindable_io.rewind
-    File.binwrite(temp_path, rewindable_io.read)
+  def calculate_duration(voice_recording, temp_path)
+    return unless File.exist?(temp_path)
 
     duration = voice_recording.calculate_duration(temp_path)
     voice_recording.update(duration_seconds: duration) if duration&.positive?
-  ensure
-    File.delete(temp_path) if temp_path && File.exist?(temp_path)
   end
 end
