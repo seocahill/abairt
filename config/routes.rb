@@ -66,6 +66,26 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
+
+    resources :api, only: [:index] do
+      collection do
+        post :generate
+        post :regenerate
+        delete :revoke
+      end
+    end
+
+    resources :media_imports do
+      member do
+        post :process_now
+        post :retry
+      end
+      collection do
+        post :process_all_pending
+      end
+    end
+
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
       member do
         post :approve
@@ -107,6 +127,9 @@ Rails.application.routes.draw do
   resources :login_requests, only: [:new, :create]
 
   get 'home', to: 'home#index'
+
+  # API Documentation
+  get 'api/docs', to: 'api_docs#show', as: :api_docs
   
   get 'translator_leaderboard', to: 'translator_leaderboard#index'
 

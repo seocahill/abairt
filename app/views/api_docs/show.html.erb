@@ -1,0 +1,314 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container mx-auto px-4 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Abairt API Documentation</h1>
+          <p class="text-gray-600 mt-1">Access confirmed Mayo Irish transcription data programmatically</p>
+        </div>
+        <div class="flex gap-3">
+          <% if current_user %>
+            <%= link_to "Back to Profile", user_path(current_user), class: "px-4 py-2 text-gray-600 hover:text-gray-900" %>
+          <% else %>
+            <%= link_to "Login", login_path, class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar: Quick Start -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Start</h2>
+
+          <div class="space-y-4 text-sm">
+            <div>
+              <h3 class="font-medium text-gray-700">1. Get an API Token</h3>
+              <p class="text-gray-500 mt-1">
+                <% if current_user && (current_user.admin? || current_user.api_user?) %>
+                  <%= link_to "Manage your token", user_path(current_user), class: "text-blue-600 hover:underline" %> from your profile.
+                <% else %>
+                  Contact an admin to get API access.
+                <% end %>
+              </p>
+            </div>
+
+            <div>
+              <h3 class="font-medium text-gray-700">2. Authenticate</h3>
+              <p class="text-gray-500 mt-1">Include your token in the Authorization header:</p>
+              <code class="block mt-2 bg-gray-100 px-2 py-1 rounded text-xs">Authorization: Bearer YOUR_TOKEN</code>
+            </div>
+
+            <div>
+              <h3 class="font-medium text-gray-700">3. Make Requests</h3>
+              <p class="text-gray-500 mt-1">All endpoints return JSON. Rate limit: 100 requests/hour.</p>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <h3 class="font-medium text-gray-700 mb-2">Base URL</h3>
+          <code class="block bg-gray-100 px-2 py-1 rounded text-xs break-all"><%= request.protocol %><%= request.host_with_port %>/api</code>
+
+          <h3 class="font-medium text-gray-700 mt-4 mb-2">OpenAPI Schema</h3>
+          <%= link_to api_openapi_path(format: :json), class: "text-blue-600 hover:underline text-sm", target: "_blank" do %>
+            Download JSON Schema
+            <svg class="inline w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Main Content: API Endpoints -->
+      <div class="lg:col-span-3 space-y-6">
+
+        <!-- Endpoints -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Endpoints</h2>
+          </div>
+
+          <!-- GET /api/transcriptions -->
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded">GET</span>
+              <code class="text-sm font-mono">/api/transcriptions</code>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">Returns a paginated list of confirmed transcriptions with audio URLs.</p>
+
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Query Parameters</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Parameter</th>
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Type</th>
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Default</th>
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Description</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr>
+                    <td class="px-3 py-2"><code>page</code></td>
+                    <td class="px-3 py-2 text-gray-500">integer</td>
+                    <td class="px-3 py-2 text-gray-500">1</td>
+                    <td class="px-3 py-2 text-gray-600">Page number</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-2"><code>per_page</code></td>
+                    <td class="px-3 py-2 text-gray-500">integer</td>
+                    <td class="px-3 py-2 text-gray-500">50</td>
+                    <td class="px-3 py-2 text-gray-600">Items per page (max 100)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-2"><code>updated_since</code></td>
+                    <td class="px-3 py-2 text-gray-500">ISO 8601</td>
+                    <td class="px-3 py-2 text-gray-500">-</td>
+                    <td class="px-3 py-2 text-gray-600">Filter by last update timestamp</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4 class="text-sm font-medium text-gray-700 mt-4 mb-2">Example Request</h4>
+            <div class="bg-gray-800 rounded-md p-4 overflow-x-auto">
+              <pre class="text-gray-100 text-xs font-mono">curl -X GET "<%= request.protocol %><%= request.host_with_port %>/api/transcriptions?page=1&per_page=10" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Accept: application/json"</pre>
+            </div>
+
+            <h4 class="text-sm font-medium text-gray-700 mt-4 mb-2">Example Response</h4>
+            <div class="bg-gray-800 rounded-md p-4 overflow-x-auto">
+              <pre class="text-gray-100 text-xs font-mono">{
+  "entries": [
+    {
+      "id": 1234,
+      "word_or_phrase": "Dia dhuit",
+      "translation": "Hello",
+      "region_id": 1,
+      "region_start": 0.5,
+      "region_end": 1.2,
+      "updated_at": "2024-01-15T10:30:00Z",
+      "audio_url": "https://...",
+      "speaker": {
+        "id": 42,
+        "name": "Seán Ó Maoilchiaráin",
+        "dialect": "erris"
+      },
+      "voice_recording": {
+        "id": 10,
+        "title": "Traditional Stories",
+        "external_id": "abc123"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 10,
+    "total": 5432
+  }
+}</pre>
+            </div>
+          </div>
+
+          <!-- GET /api/transcriptions/:id -->
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded">GET</span>
+              <code class="text-sm font-mono">/api/transcriptions/:id</code>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">Returns a single transcription by ID.</p>
+
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Path Parameters</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Parameter</th>
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Type</th>
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-3 py-2"><code>id</code></td>
+                    <td class="px-3 py-2 text-gray-500">integer</td>
+                    <td class="px-3 py-2 text-gray-600">The transcription ID</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4 class="text-sm font-medium text-gray-700 mt-4 mb-2">Example Request</h4>
+            <div class="bg-gray-800 rounded-md p-4 overflow-x-auto">
+              <pre class="text-gray-100 text-xs font-mono">curl -X GET "<%= request.protocol %><%= request.host_with_port %>/api/transcriptions/1234" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Accept: application/json"</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Response Codes -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Response Codes</h2>
+          </div>
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Code</th>
+                    <th class="px-3 py-2 text-left font-medium text-gray-500">Description</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr>
+                    <td class="px-3 py-2"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded">200</span></td>
+                    <td class="px-3 py-2 text-gray-600">Success - Returns requested data</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-2"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-bold rounded">401</span></td>
+                    <td class="px-3 py-2 text-gray-600">Unauthorized - Invalid or missing API token</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-2"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-bold rounded">404</span></td>
+                    <td class="px-3 py-2 text-gray-600">Not Found - Resource doesn't exist</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-2"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded">429</span></td>
+                    <td class="px-3 py-2 text-gray-600">Rate Limit Exceeded - 100 requests per hour limit</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Schema -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Data Schema</h2>
+          </div>
+          <div class="p-6 space-y-6">
+            <!-- Transcription -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">Transcription</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Field</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Type</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <tr><td class="px-3 py-2"><code>id</code></td><td class="px-3 py-2 text-gray-500">integer</td><td class="px-3 py-2 text-gray-600">Unique identifier</td></tr>
+                    <tr><td class="px-3 py-2"><code>word_or_phrase</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">The Irish word or phrase</td></tr>
+                    <tr><td class="px-3 py-2"><code>translation</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">English translation</td></tr>
+                    <tr><td class="px-3 py-2"><code>region_id</code></td><td class="px-3 py-2 text-gray-500">integer</td><td class="px-3 py-2 text-gray-600">Region ID within the voice recording</td></tr>
+                    <tr><td class="px-3 py-2"><code>region_start</code></td><td class="px-3 py-2 text-gray-500">float</td><td class="px-3 py-2 text-gray-600">Audio start time in seconds</td></tr>
+                    <tr><td class="px-3 py-2"><code>region_end</code></td><td class="px-3 py-2 text-gray-500">float</td><td class="px-3 py-2 text-gray-600">Audio end time in seconds</td></tr>
+                    <tr><td class="px-3 py-2"><code>updated_at</code></td><td class="px-3 py-2 text-gray-500">datetime</td><td class="px-3 py-2 text-gray-600">Last update timestamp (ISO 8601)</td></tr>
+                    <tr><td class="px-3 py-2"><code>audio_url</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">URL to the audio snippet</td></tr>
+                    <tr><td class="px-3 py-2"><code>speaker</code></td><td class="px-3 py-2 text-gray-500">object</td><td class="px-3 py-2 text-gray-600">Speaker information</td></tr>
+                    <tr><td class="px-3 py-2"><code>voice_recording</code></td><td class="px-3 py-2 text-gray-500">object</td><td class="px-3 py-2 text-gray-600">Source recording information</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Speaker -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">Speaker</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Field</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Type</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <tr><td class="px-3 py-2"><code>id</code></td><td class="px-3 py-2 text-gray-500">integer</td><td class="px-3 py-2 text-gray-600">Unique identifier</td></tr>
+                    <tr><td class="px-3 py-2"><code>name</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">Speaker's name</td></tr>
+                    <tr><td class="px-3 py-2"><code>dialect</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">Mayo dialect region (erris, achill, tourmakeady, east_mayo, other)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- VoiceRecording -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-2">VoiceRecording</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Field</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Type</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <tr><td class="px-3 py-2"><code>id</code></td><td class="px-3 py-2 text-gray-500">integer</td><td class="px-3 py-2 text-gray-600">Unique identifier</td></tr>
+                    <tr><td class="px-3 py-2"><code>title</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">Recording title</td></tr>
+                    <tr><td class="px-3 py-2"><code>external_id</code></td><td class="px-3 py-2 text-gray-500">string</td><td class="px-3 py-2 text-gray-600">Fotheidil video ID</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

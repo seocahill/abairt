@@ -40,6 +40,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def ensure_admin
+    user = User.find_by(id: session[:user_id])
+    unless user&.admin?
+      redirect_to root_path, alert: 'Ní féidir leat an leathanach sin a rochtain.'
+    end
+  end
+
   private
 
   def rails_engine_controller?

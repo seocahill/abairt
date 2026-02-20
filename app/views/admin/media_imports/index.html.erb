@@ -1,0 +1,119 @@
+<div class="container mx-auto px-4 py-8">
+
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Media Imports</h1>
+      <p class="text-sm text-gray-500 mt-1">Manage import queue for voice recordings</p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "New Import", new_admin_media_import_path, class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" %>
+      <% if @stats[:pending] > 0 %>
+        <%= button_to "Process All Pending (#{@stats[:pending]})", process_all_pending_admin_media_imports_path,
+            method: :post,
+            class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm",
+            data: { confirm: "Queue all #{@stats[:pending]} pending imports?" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Stats %>
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <%= render "stat_badge", label: "Total", value: @stats[:total], active: params[:status].blank? %>
+    <%= render "stat_badge", label: "Pending", value: @stats[:pending], status: "pending", color: "yellow" %>
+    <%= render "stat_badge", label: "Imported", value: @stats[:imported], status: "imported", color: "green" %>
+    <%= render "stat_badge", label: "Skipped", value: @stats[:skipped], status: "skipped", color: "gray" %>
+    <%= render "stat_badge", label: "Failed", value: @stats[:failed], status: "failed", color: "red" %>
+  </div>
+
+  <%# Search %>
+  <div class="mb-4">
+    <%= form_with url: admin_media_imports_path, method: :get, local: true, class: "flex gap-2" do |form| %>
+      <%= form.hidden_field :status, value: params[:status] if params[:status].present? %>
+      <%= form.text_field :search, value: params[:search], placeholder: "Search by title or URL...",
+          class: "flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+      <%= form.submit "Search", class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+      <% if params[:search].present? || params[:status].present? %>
+        <%= link_to "Clear", admin_media_imports_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Table %>
+  <div class="bg-white shadow rounded-lg overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">URL</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @media_imports.each do |mi| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-4 text-sm font-medium text-gray-900">
+              <%= link_to mi.title.truncate(50), admin_media_import_path(mi), class: "text-blue-600 hover:underline" %>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-500">
+              <%= link_to mi.url.truncate(40), mi.url, target: "_blank", class: "text-gray-500 hover:text-gray-700" %>
+            </td>
+            <td class="px-4 py-4 text-sm">
+              <% status_colors = { "pending" => "bg-yellow-100 text-yellow-800", "imported" => "bg-green-100 text-green-800", "skipped" => "bg-gray-100 text-gray-800", "failed" => "bg-red-100 text-red-800" } %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full <%= status_colors[mi.status] %>">
+                <%= mi.status.humanize %>
+              </span>
+              <% if mi.error_message.present? %>
+                <span class="ml-1 text-xs text-red-500" title="<%= mi.error_message %>">⚠</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-500">
+              <%= mi.created_at.strftime("%Y-%m-%d") %>
+            </td>
+            <td class="px-4 py-4 text-sm">
+              <div class="flex gap-2">
+                <% if mi.pending? %>
+                  <%= button_to "Process", process_now_admin_media_import_path(mi),
+                      method: :post,
+                      class: "text-green-600 hover:text-green-900 text-xs" %>
+                <% elsif mi.failed? %>
+                  <%= button_to "Retry", retry_admin_media_import_path(mi),
+                      method: :post,
+                      class: "text-amber-600 hover:text-amber-900 text-xs" %>
+                <% end %>
+                <%= link_to "Edit", edit_admin_media_import_path(mi), class: "text-indigo-600 hover:text-indigo-900 text-xs" %>
+                <%= button_to "Delete", admin_media_import_path(mi),
+                    method: :delete,
+                    class: "text-red-600 hover:text-red-900 text-xs",
+                    data: { confirm: "Delete this import?" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# Pagination %>
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6 border-t border-gray-200 pt-6 flex items-center justify-between">
+      <div class="text-sm text-gray-700">
+        Showing <span class="font-medium"><%= @pagy.from %></span> to
+        <span class="font-medium"><%= @pagy.to %></span> of
+        <span class="font-medium"><%= @pagy.count %></span> imports
+      </div>
+      <div class="flex space-x-2">
+        <% if @pagy.prev %>
+          <%= link_to "Previous", admin_media_imports_path(page: @pagy.prev, status: params[:status], search: params[:search]),
+              class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <% end %>
+        <% if @pagy.next %>
+          <%= link_to "Next", admin_media_imports_path(page: @pagy.next, status: params[:status], search: params[:search]),
+              class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+</div>

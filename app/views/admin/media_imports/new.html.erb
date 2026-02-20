@@ -1,0 +1,12 @@
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+
+  <div class="mb-6">
+    <%= link_to "← Back to Media Imports", admin_media_imports_path, class: "text-gray-600 hover:text-gray-900 text-sm" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">New Media Import</h1>
+    <%= render "form", media_import: @media_import %>
+  </div>
+
+</div>

@@ -11,12 +11,6 @@
           <h1 class="text-2xl font-bold text-gray-900"><%= @user.name %></h1>
           <span class="bg-green-200 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded"><%= @user.role.humanize %></span>
         </div>
-    <% if admin_user? %>
-          <div class="flex gap-3">
-            <%= link_to "Users", admin_users_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
-            <%= link_to "Ríomhphoist", admin_emails_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
-          </div>
-        <% end %>
       </div>
       <div class="mt-2">
         <%= render "users/inline_edit", model: @user, method: :about, current_user: current_user do %>
@@ -89,37 +83,6 @@
         </div>
       </div>
 
-      <!-- API Token Section (Admin/API User only, own profile) -->
-      <% if (current_user&.admin? || current_user&.api_user?) && current_user == @user %>
-        <div class="mt-8 pt-6 border-t border-gray-200" data-controller="swagger-ui" data-swagger-ui-openapi-url-value="<%= api_openapi_path(format: :json) %>" data-swagger-ui-api-token-value="<%= @user.api_token if @user.api_token.present? %>">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">API Access</h3>
-          <div class="bg-gray-50 rounded-lg p-4 mb-4">
-            <% if @user.api_token.present? %>
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Your API Token</label>
-                <div class="flex items-center gap-2">
-                  <code class="flex-1 bg-white px-3 py-2 rounded border border-gray-300 text-sm font-mono break-all" id="api-token"><%= @user.api_token %></code>
-                  <button data-action="click->swagger-ui#copyToken" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Copy</button>
-                </div>
-                <p class="text-xs text-gray-500 mt-2">Keep this token secure. It provides full API access.</p>
-              </div>
-              <div class="flex gap-2">
-                <%= button_to "Regenerate Token", regenerate_api_token_user_path(@user), method: :post, class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm", data: { confirm: "Are you sure? This will invalidate your current token." } %>
-                <%= button_to "Revoke Token", revoke_api_token_user_path(@user), method: :delete, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure?" } %>
-              </div>
-            <% else %>
-              <p class="text-sm text-gray-600 mb-4">No API token has been generated. Generate one to access the API.</p>
-              <%= button_to "Generate API Token", generate_api_token_user_path(@user), method: :post, class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" %>
-            <% end %>
-          </div>
-
-          <!-- Swagger UI -->
-          <div class="mt-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">API Documentation</h3>
-            <div id="swagger-ui" class="border border-gray-200 rounded-lg overflow-hidden"></div>
-          </div>
-        </div>
-      <% end %>
     </div>
 
     <!-- Map Modal -->
@@ -146,12 +109,70 @@
       <%= form.hidden_field :lat_lang, id: "user-lat-lang", value: @user.lat_lang %>
     <% end %>
   </div>
-</div>
 
-<% if (current_user&.admin? || current_user&.api_user?) && current_user == @user %>
-  <% content_for :head do %>
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
-    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
-    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+  <% if current_user == @user && (current_user.admin? || current_user.api_user?) %>
+    <!-- API Access Section -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mt-6">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">API Access</h2>
+            <p class="text-sm text-gray-500 mt-1">Manage your API token for programmatic access</p>
+          </div>
+          <%= link_to "View API Documentation", api_docs_path, class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <% if @user.api_token.present? %>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Your API Token</label>
+            <div class="flex items-center gap-2">
+              <code class="flex-1 bg-gray-100 px-4 py-3 rounded-md text-sm font-mono select-all border border-gray-200 overflow-x-auto">
+                <%= @user.api_token %>
+              </code>
+              <button type="button" onclick="navigator.clipboard.writeText('<%= @user.api_token %>')" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" title="Copy to clipboard">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Keep this token secure. Do not share it publicly.</p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Usage Example</h4>
+            <code class="block bg-gray-800 text-gray-100 px-4 py-3 rounded-md text-xs font-mono overflow-x-auto">
+              curl -H "Authorization: Bearer <%= @user.api_token %>" \<br>
+              &nbsp;&nbsp;<%= request.protocol %><%= request.host_with_port %>/api/transcriptions
+            </code>
+          </div>
+
+          <div class="flex gap-2">
+            <%= button_to "Regenerate Token", regenerate_api_token_user_path(@user),
+                method: :post,
+                class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm",
+                data: { confirm: "This will invalidate your current token. Continue?" } %>
+            <%= button_to "Revoke Token", revoke_api_token_user_path(@user),
+                method: :delete,
+                class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm",
+                data: { confirm: "This will remove your API access. Continue?" } %>
+          </div>
+        <% else %>
+          <div class="text-center py-6">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No API token</h3>
+            <p class="mt-1 text-sm text-gray-500">Generate a token to access the API programmatically.</p>
+            <div class="mt-4">
+              <%= button_to "Generate API Token", generate_api_token_user_path(@user),
+                  method: :post,
+                  class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
   <% end %>
-<% end %>
+</div>

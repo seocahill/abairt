@@ -4,6 +4,8 @@ class User < ApplicationRecord
   has_secure_token :api_token
   has_secure_token :login_token
 
+  belongs_to :location, optional: true
+
   has_many :dictionary_entries #, foreign_key: :speaker_id
   has_many :spoken_dictionary_entries, foreign_key: :speaker_id, class_name: "DictionaryEntry"
   has_many :voice_recordings, -> { distinct }, through: :dictionary_entries

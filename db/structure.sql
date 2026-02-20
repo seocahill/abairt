@@ -102,7 +102,7 @@ CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
       END;
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, "import_status" varchar, CONSTRAINT "fk_rails_91ca04707d"
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, "import_status" varchar, "metadata" jsonb DEFAULT '{}', "metadata_extracted_at" datetime(6), "location_id" integer, "metadata_analysis" json, CONSTRAINT "fk_rails_91ca04707d"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
 );
@@ -168,12 +168,59 @@ CREATE INDEX "index_media_imports_on_status" ON "media_imports" ("status");
 CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
 CREATE TABLE IF NOT EXISTS "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_settings_on_key" ON "settings" ("key");
-CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar);
+CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar, "location_id" integer);
 CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
 CREATE INDEX "index_users_on_token" ON "users" ("token");
 CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
 CREATE UNIQUE INDEX "index_users_on_api_token" ON "users" ("api_token");
+CREATE TABLE IF NOT EXISTS "voice_recording_locations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "voice_recording_id" integer NOT NULL, "location_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_5ad0e601a6"
+FOREIGN KEY ("voice_recording_id")
+  REFERENCES "voice_recordings" ("id")
+, CONSTRAINT "fk_rails_9d6f9aa564"
+FOREIGN KEY ("location_id")
+  REFERENCES "locations" ("id")
+);
+CREATE INDEX "index_voice_recording_locations_on_voice_recording_id" ON "voice_recording_locations" ("voice_recording_id");
+CREATE INDEX "index_voice_recording_locations_on_location_id" ON "voice_recording_locations" ("location_id");
+CREATE UNIQUE INDEX "index_vr_locations_on_vr_and_location" ON "voice_recording_locations" ("voice_recording_id", "location_id");
+CREATE TABLE IF NOT EXISTS "user_locations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "location_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_3aef0f4606"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_374794d0e3"
+FOREIGN KEY ("location_id")
+  REFERENCES "locations" ("id")
+);
+CREATE INDEX "index_user_locations_on_user_id" ON "user_locations" ("user_id");
+CREATE INDEX "index_user_locations_on_location_id" ON "user_locations" ("location_id");
+CREATE UNIQUE INDEX "index_user_locations_on_user_and_location" ON "user_locations" ("user_id", "location_id");
+CREATE TABLE IF NOT EXISTS "conversation_sessions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "voice_recording_id" integer, "current_entry_id" integer, "state" varchar DEFAULT 'idle' NOT NULL, "conversation_history" json DEFAULT '[]', "context" json DEFAULT '{}', "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_dfc3c81586"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_07645777cf"
+FOREIGN KEY ("voice_recording_id")
+  REFERENCES "voice_recordings" ("id")
+, CONSTRAINT "fk_rails_c66b5d033e"
+FOREIGN KEY ("current_entry_id")
+  REFERENCES "dictionary_entries" ("id")
+);
+CREATE INDEX "index_conversation_sessions_on_user_id" ON "conversation_sessions" ("user_id");
+CREATE INDEX "index_conversation_sessions_on_voice_recording_id" ON "conversation_sessions" ("voice_recording_id");
+CREATE INDEX "index_conversation_sessions_on_current_entry_id" ON "conversation_sessions" ("current_entry_id");
+CREATE INDEX "index_conversation_sessions_on_state" ON "conversation_sessions" ("state");
+CREATE TABLE IF NOT EXISTS "locations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "irish_name" varchar, "location_type" integer DEFAULT 0 NOT NULL, "dialect_region" integer DEFAULT 0 NOT NULL, "latitude" decimal(10,7), "longitude" decimal(10,7), "parent_id" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE INDEX "index_locations_on_parent_id" ON "locations" ("parent_id");
+CREATE INDEX "index_locations_on_name" ON "locations" ("name");
+CREATE INDEX "index_locations_on_dialect_region" ON "locations" ("dialect_region");
+CREATE INDEX "index_users_on_location_id" ON "users" ("location_id");
+CREATE INDEX "index_voice_recordings_on_location_id" ON "voice_recordings" ("location_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20260218000002'),
+('20260218000001'),
+('20260130000002'),
+('20260130000001'),
+('20251227213420'),
+('20251227213418'),
+('20251227213413'),
 ('20251226142218'),
 ('20251226142210'),
 ('20251226142159'),
