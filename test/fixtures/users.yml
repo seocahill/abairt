@@ -3,7 +3,6 @@
 one:
   email: seosamh@seocahill.com
   name: Seosamh Ó Cathail
-  password_digest: <%= BCrypt::Password.create('password') %>
   confirmed: true
   ability: B2
   role: teacher
@@ -13,21 +12,18 @@ one:
 two:
   email: dazpatreg@yahoo.ie
   name: Darren Ó Riagáin
-  password_digest: <%= BCrypt::Password.create('password') %>
   ability: C1
   confirmed: true
 
 three:
   email: seanoraghaille@abairt.com
   name: Seán Ó Raghallaigh
-  password_digest: <%= BCrypt::Password.create('password') %>
   ability: native
   confirmed: true
 
 four:
-  email: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair@abairt.com
-  name: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair
-  password_digest: <%= BCrypt::Password.create('password') %>
+  email: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair@abairt.com
+  name: Maidhcí Mhaidhcil Sheáin Ó Gallchobhair
   role: speaker
   ability: native
   confirmed: true
@@ -35,12 +31,12 @@ four:
 five:
   email: Padraic Ó Murachú@abairt.com
   name: Padraic Ó Murachú
-  password_digest: <%= BCrypt::Password.create('password') %>
+  confirmed: false
 
 john:
   email: john@abairt.com
   name: John McShean
-  password_digest: <%= BCrypt::Password.create('password') %>
+  confirmed: true
 
 caotharnach:
   name: "An Caotharnach"

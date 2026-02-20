@@ -46,15 +46,15 @@ class VoiceRecordingsController < ApplicationController
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 
-    # Add map pins data
-    @pins = VoiceRecording.all.map do |vr|
-      next unless speaker = vr.dictionary_entries.joins(:speaker).where.not(users: {lat_lang: nil}).first&.speaker
-
-      speaker.slice(:id, :name, :lat_lang).tap do |c|
-        c[:recording_id] = vr.id
-        c[:recording_title] = vr.title
+    # Add map pins data - single query instead of N+1
+    @pins = DictionaryEntry
+      .joins(:speaker, :voice_recording)
+      .where.not(users: {lat_lang: nil})
+      .group("voice_recordings.id")
+      .pluck("users.id", "users.name", "users.lat_lang", "voice_recordings.id", "voice_recordings.title")
+      .map do |user_id, name, lat_lang, recording_id, recording_title|
+        {id: user_id, name: name, lat_lang: lat_lang, recording_id: recording_id, recording_title: recording_title}
       end
-    end.compact
 
     respond_to do |format|
       format.html
@@ -181,9 +181,7 @@ class VoiceRecordingsController < ApplicationController
       diarization_status: nil,
       import_status: nil,
       diarization_data: nil,
-      dictionary_entries_count: 0,
-      metadata: {},
-      metadata_extracted_at: nil
+      dictionary_entries_count: 0
     )
     duplicate.media.attach(@voice_recording.media.blob)
 
