@@ -46,7 +46,7 @@
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">URL</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Updated</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
         </tr>
       </thead>
@@ -64,12 +64,14 @@
               <span class="px-2 py-1 text-xs font-semibold rounded-full <%= status_colors[mi.status] %>">
                 <%= mi.status.humanize %>
               </span>
-              <% if mi.error_message.present? %>
-                <span class="ml-1 text-xs text-red-500" title="<%= mi.error_message %>">⚠</span>
+              <% if mi.failed? && mi.error_message.present? %>
+                <div class="mt-1 text-xs text-red-500 max-w-xs truncate" title="<%= mi.error_message %>">
+                  <%= mi.error_message.truncate(80) %>
+                </div>
               <% end %>
             </td>
             <td class="px-4 py-4 text-sm text-gray-500">
-              <%= mi.created_at.strftime("%Y-%m-%d") %>
+              <%= mi.updated_at.strftime("%Y-%m-%d %H:%M") %>
             </td>
             <td class="px-4 py-4 text-sm">
               <div class="flex gap-2">

@@ -9,7 +9,7 @@ module Admin
     skip_after_action :verify_authorized
 
     def index
-      scope = MediaImport.order(created_at: :desc)
+      scope = MediaImport.order(updated_at: :desc)
       scope = scope.where(status: params[:status]) if params[:status].present?
       scope = scope.where("title ILIKE ? OR url ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
 
