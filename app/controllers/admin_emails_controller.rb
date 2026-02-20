@@ -78,11 +78,4 @@ class AdminEmailsController < ApplicationController
   def email_params
     params.require(:email).permit(:subject, :rich_content)
   end
-
-  def ensure_admin
-    user = User.find_by(id: session[:user_id])
-    unless user&.admin?
-      redirect_to root_path, alert: 'Ní féidir leat an leathanach sin a rochtain.'
-    end
-  end
 end

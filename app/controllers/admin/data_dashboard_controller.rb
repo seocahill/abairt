@@ -122,7 +122,7 @@ module Admin
 
       rows.map do |r|
         {
-          dialect: r.dialect.humanize,
+          dialect: r.dialect,
           entries: r.entry_count,
           hours: (r.seconds.to_f / 3600).round(2),
           pct: pct(r.seconds.to_f, total_seconds)
@@ -148,7 +148,7 @@ module Admin
             id: r.id,
             name: r.name.presence || "Speaker ##{r.id}",
             voice: r.voice,
-            dialect: r.dialect&.humanize,
+            dialect: r.dialect,
             ability: r.ability,
             entries: r.entry_count,
             hours: (r.seconds.to_f / 3600).round(2),
@@ -193,13 +193,16 @@ module Admin
         .limit(8)
         .map do |vr|
           analysis = vr.metadata_analysis
-          {
+          locations = analysis["locations"].map { |l| l["name"] }.first(2).join(", ")
+          topics = analysis["topics"].first(3).join(", ")
+          analyzed_at = Time.parse(analysis["analyzed_at"]).strftime("%d %b %Y") rescue "—"
+          { 
             id: vr.id,
-            title: vr.title.presence || "Recording ##{vr.id}",
+            title: vr.title,
             dialect: analysis["dialect_region"],
-            locations: Array(analysis["locations"]).map { |l| l["name"] }.first(2).join(", "),
-            topics: Array(analysis["topics"]).first(3).join(", "),
-            analyzed_at: Time.parse(analysis["analyzed_at"]).strftime("%d %b %Y") rescue "—"
+            locations: locations,
+            topics: topics,
+            analyzed_at: analyzed_at
           }
         end
     end

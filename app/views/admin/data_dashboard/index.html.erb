@@ -262,10 +262,10 @@
                 <% end %>
               </td>
               <td class="px-4 py-3 text-sm text-gray-500"><%= s[:dialect] || "—" %></td>
-              <td class="px-4 py-3 text-sm text-gray-500"><%= s[:voice]&.humanize || "—" %></td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= s[:voice] || "—" %></td>
               <td class="px-4 py-3 text-sm text-gray-500">
                 <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
-                  <%= s[:ability]&.upcase || "—" %>
+                  <%= s[:ability] || "—" %>
                 </span>
               </td>
               <td class="px-4 py-3 text-sm text-gray-500"><%= number_with_delimiter(s[:entries]) %></td>
@@ -302,7 +302,7 @@
             <% @recent.each do |r| %>
               <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 text-sm font-medium">
-                  <%= link_to r[:title].truncate(45), voice_recording_path(r[:id]), class: "text-blue-600 hover:underline" %>
+                  <%= link_to r[:title]&.truncate(45), voice_recording_path(r[:id]), class: "text-blue-600 hover:underline" %>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500">
                   <% if r[:dialect].present? %>
