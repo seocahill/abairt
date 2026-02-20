@@ -1,0 +1,74 @@
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+
+  <div class="mb-6">
+    <%= link_to "← Back to Media Imports", admin_media_imports_path, class: "text-gray-600 hover:text-gray-900 text-sm" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h1 class="text-2xl font-bold"><%= @media_import.title %></h1>
+      <% status_colors = { "pending" => "bg-yellow-100 text-yellow-800", "imported" => "bg-green-100 text-green-800", "skipped" => "bg-gray-100 text-gray-800", "failed" => "bg-red-100 text-red-800" } %>
+      <span class="px-3 py-1 text-sm font-semibold rounded-full <%= status_colors[@media_import.status] %>">
+        <%= @media_import.status.humanize %>
+      </span>
+    </div>
+
+    <dl class="space-y-4">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">URL</dt>
+        <dd class="mt-1">
+          <%= link_to @media_import.url, @media_import.url, target: "_blank", class: "text-blue-600 hover:underline break-all" %>
+        </dd>
+      </div>
+
+      <% if @media_import.headline.present? %>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Headline</dt>
+          <dd class="mt-1 text-gray-900"><%= @media_import.headline %></dd>
+        </div>
+      <% end %>
+
+      <% if @media_import.description.present? %>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Description</dt>
+          <dd class="mt-1 text-gray-900"><%= @media_import.description %></dd>
+        </div>
+      <% end %>
+
+      <% if @media_import.error_message.present? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <dt class="text-sm font-medium text-red-800">Error Message</dt>
+          <dd class="mt-1 text-sm text-red-700"><%= @media_import.error_message %></dd>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Created</dt>
+          <dd class="mt-1 text-gray-900"><%= @media_import.created_at.strftime("%Y-%m-%d %H:%M") %></dd>
+        </div>
+        <% if @media_import.imported_at.present? %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Imported</dt>
+            <dd class="mt-1 text-gray-900"><%= @media_import.imported_at.strftime("%Y-%m-%d %H:%M") %></dd>
+          </div>
+        <% end %>
+      </div>
+    </dl>
+
+    <div class="mt-6 pt-6 border-t border-gray-100 flex gap-3">
+      <% if @media_import.pending? %>
+        <%= button_to "Process Now", process_now_admin_media_import_path(@media_import),
+            method: :post, class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" %>
+      <% elsif @media_import.failed? %>
+        <%= button_to "Retry", retry_admin_media_import_path(@media_import),
+            method: :post, class: "px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700" %>
+      <% end %>
+      <%= link_to "Edit", edit_admin_media_import_path(@media_import), class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+      <%= button_to "Delete", admin_media_import_path(@media_import),
+          method: :delete, class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700",
+          data: { confirm: "Delete this import?" } %>
+    </div>
+  </div>
+
+</div>

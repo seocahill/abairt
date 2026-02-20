@@ -1,0 +1,51 @@
+<%= form_with model: [:admin, media_import], local: true, class: "space-y-6" do |form| %>
+
+  <% if media_import.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+      <h3 class="text-sm font-medium text-red-800">
+        <%= pluralize(media_import.errors.count, "error") %> prevented this import from being saved:
+      </h3>
+      <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+        <% media_import.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :url, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.url_field :url, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+        placeholder: "https://..." %>
+    <p class="mt-1 text-xs text-gray-500">Supported: rte.ie, canuint.ie, youtube.com</p>
+  </div>
+
+  <div>
+    <%= form.label :title, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_field :title, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <div>
+    <%= form.label :headline, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_field :headline, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_area :description, rows: 3, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <% if media_import.persisted? %>
+    <div>
+      <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.select :status, MediaImport.statuses.keys.map { |s| [s.humanize, s] },
+          {}, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-3">
+    <%= form.submit class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer" %>
+    <%= link_to "Cancel", admin_media_imports_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+  </div>
+
+<% end %>

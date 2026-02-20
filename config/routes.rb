@@ -68,6 +68,24 @@ Rails.application.routes.draw do
   namespace :admin do
     get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
 
+    resources :api, only: [:index] do
+      collection do
+        post :generate
+        post :regenerate
+        delete :revoke
+      end
+    end
+
+    resources :media_imports do
+      member do
+        post :process_now
+        post :retry
+      end
+      collection do
+        post :process_all_pending
+      end
+    end
+
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
       member do
         post :approve

@@ -1,0 +1,127 @@
+<div class="container mx-auto px-4 py-8">
+
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">API Token Management</h1>
+      <p class="text-sm text-gray-500 mt-1">Manage API access tokens for users</p>
+    </div>
+  </div>
+
+  <%# Stats %>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white shadow rounded-lg px-5 py-4">
+      <p class="text-xs font-medium text-gray-500 uppercase">Total Tokens</p>
+      <p class="mt-1 text-2xl font-bold text-gray-900"><%= @stats[:total_tokens] %></p>
+    </div>
+    <div class="bg-white shadow rounded-lg px-5 py-4">
+      <p class="text-xs font-medium text-gray-500 uppercase">Active Today</p>
+      <p class="mt-1 text-2xl font-bold text-gray-900"><%= @stats[:active_today] %></p>
+    </div>
+    <% @stats[:by_role].each do |role, count| %>
+      <div class="bg-white shadow rounded-lg px-5 py-4">
+        <p class="text-xs font-medium text-gray-500 uppercase"><%= role.humanize %></p>
+        <p class="mt-1 text-2xl font-bold text-gray-900"><%= count %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Search %>
+  <div class="mb-4">
+    <%= form_with url: admin_api_index_path, method: :get, local: true, class: "flex gap-2" do |form| %>
+      <%= form.text_field :search, value: params[:search], placeholder: "Search by name or email...",
+          class: "flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+      <%= form.submit "Search", class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+      <% if params[:search].present? %>
+        <%= link_to "Clear", admin_api_index_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Users with tokens %>
+  <div class="bg-white shadow rounded-lg overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">API Token</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Updated</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @api_users.each do |user| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-4 text-sm font-medium text-gray-900">
+              <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:underline" %>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-500"><%= user.email %></td>
+            <td class="px-4 py-4 text-sm">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                <%= user.role.humanize %>
+              </span>
+            </td>
+            <td class="px-4 py-4 text-sm">
+              <code class="bg-gray-100 px-2 py-1 rounded text-xs font-mono select-all">
+                <%= user.api_token %>
+              </code>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-500">
+              <%= user.updated_at.strftime("%Y-%m-%d %H:%M") %>
+            </td>
+            <td class="px-4 py-4 text-sm">
+              <div class="flex gap-2">
+                <%= button_to "Regenerate", regenerate_admin_api_path(user_id: user.id),
+                    method: :post,
+                    class: "text-indigo-600 hover:text-indigo-900 text-xs" %>
+                <%= button_to "Revoke", revoke_admin_api_path(user_id: user.id),
+                    method: :delete,
+                    class: "text-red-600 hover:text-red-900 text-xs",
+                    data: { confirm: "Revoke API token for #{user.name}?" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# Pagination %>
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6 border-t border-gray-200 pt-6 flex items-center justify-between">
+      <div class="text-sm text-gray-700">
+        Showing <span class="font-medium"><%= @pagy.from %></span> to
+        <span class="font-medium"><%= @pagy.to %></span> of
+        <span class="font-medium"><%= @pagy.count %></span> users
+      </div>
+      <div class="flex space-x-2">
+        <% if @pagy.prev %>
+          <%= link_to "Previous", admin_api_index_path(page: @pagy.prev, search: params[:search]),
+              class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <% end %>
+        <% if @pagy.next %>
+          <%= link_to "Next", admin_api_index_path(page: @pagy.next, search: params[:search]),
+              class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Generate for user %>
+  <div class="mt-8 bg-white shadow rounded-lg p-6">
+    <h2 class="text-lg font-semibold mb-4">Generate Token for User</h2>
+    <%= form_with url: generate_admin_api_path, method: :post, local: true, class: "flex gap-2 items-end" do |form| %>
+      <div class="flex-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Select User</label>
+        <%= form.collection_select :user_id,
+            User.where(api_token: nil).where.not(role: [:temporary, :ai]).order(:name),
+            :id, :name,
+            { prompt: "Choose a user..." },
+            { class: "w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" } %>
+      </div>
+      <%= form.submit "Generate Token", class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" %>
+    <% end %>
+  </div>
+
+</div>
