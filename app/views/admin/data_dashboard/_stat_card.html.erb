@@ -1,0 +1,7 @@
+<div class="bg-white shadow rounded-lg px-5 py-4 <%= highlight ? 'ring-2 ring-amber-400' : '' %>">
+  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide"><%= label %></p>
+  <p class="mt-1 text-2xl font-bold text-gray-900"><%= value %></p>
+  <% if defined?(sub) && sub.present? %>
+    <p class="text-xs text-gray-400 mt-0.5"><%= sub %></p>
+  <% end %>
+</div>

@@ -66,6 +66,8 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
+
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
       member do
         post :approve

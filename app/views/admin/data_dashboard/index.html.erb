@@ -1,0 +1,327 @@
+<div class="container mx-auto px-4 py-8">
+
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Training Data Dashboard</h1>
+      <p class="mt-1 text-sm text-gray-500">Mayo Irish speech AI — corpus overview and readiness</p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "Analyze Unprocessed", "#", class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm",
+          data: { confirm: "This will queue analysis jobs for all unanalyzed recordings. Continue?" } %>
+      <%= link_to "Users", admin_users_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm" %>
+    </div>
+  </div>
+
+  <%# ─── CORPUS OVERVIEW ─────────────────────────────────────────── %>
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Corpus Overview</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <%= render "admin/data_dashboard/stat_card", label: "Recordings", value: @corpus[:total_recordings] %>
+      <%= render "admin/data_dashboard/stat_card", label: "Total Hours", value: @corpus[:total_hours], unit: "hrs" %>
+      <%= render "admin/data_dashboard/stat_card", label: "Entries", value: @corpus[:total_entries] %>
+      <%= render "admin/data_dashboard/stat_card", label: "With Audio", value: "#{@corpus[:audio_pct]}%", sub: "#{@corpus[:entries_with_audio]} entries" %>
+      <%= render "admin/data_dashboard/stat_card", label: "Confirmed", value: "#{@corpus[:confirmed_pct]}%", sub: "#{@corpus[:confirmed_entries]} entries" %>
+      <%= render "admin/data_dashboard/stat_card", label: "Speakers", value: @corpus[:total_speakers] %>
+      <%= render "admin/data_dashboard/stat_card", label: "Locations", value: @corpus[:total_locations] %>
+      <%= render "admin/data_dashboard/stat_card",
+            label: "Analyzed",
+            value: "#{@corpus[:analyzed_pct]}%",
+            sub: "#{@corpus[:analyzed_recordings]}/#{@corpus[:total_recordings]} recordings",
+            highlight: @corpus[:analyzed_pct] < 50 %>
+    </div>
+  </section>
+
+  <%# ─── TRAINING READINESS ──────────────────────────────────────── %>
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Training Readiness</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% @training.each do |phase, data| %>
+        <div class="bg-white shadow rounded-lg p-5">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="font-semibold text-gray-900"><%= data[:label] %></h3>
+              <p class="text-xs text-gray-500 mt-0.5"><%= data[:description] %></p>
+            </div>
+            <% if data[:ready] %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 whitespace-nowrap">Ready</span>
+            <% else %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 whitespace-nowrap">More data needed</span>
+            <% end %>
+          </div>
+
+          <% if data[:hours] %>
+            <% current = [data[:hours], data[:ideal]].min %>
+            <% bar_pct = [(current.to_f / data[:ideal] * 100), 100].min.round %>
+            <div class="mt-3">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span><%= data[:hours] %> hrs available</span>
+                <span>Ideal: <%= data[:ideal] %> hrs</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="h-2.5 rounded-full <%= data[:ready] ? 'bg-green-500' : 'bg-amber-400' %>"
+                     style="width: <%= bar_pct %>%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-400 mt-1">
+                <span>Min: <%= data[:minimum] %> hrs</span>
+                <span><%= bar_pct %>% of ideal</span>
+              </div>
+            </div>
+          <% elsif data[:count] %>
+            <% bar_pct = [(data[:count].to_f / data[:ideal] * 100), 100].min.round %>
+            <div class="mt-3">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span><%= number_with_delimiter(data[:count]) %> phrase pairs</span>
+                <span>Ideal: <%= number_with_delimiter(data[:ideal]) %></span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="h-2.5 rounded-full <%= data[:ready] ? 'bg-green-500' : 'bg-amber-400' %>"
+                     style="width: <%= bar_pct %>%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-400 mt-1">
+                <span>Min: <%= number_with_delimiter(data[:minimum]) %></span>
+                <span><%= bar_pct %>% of ideal</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+    <%# ─── DATA QUALITY ──────────────────────────────────────────── %>
+    <section>
+      <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Data Quality Breakdown</h2>
+      <div class="bg-white shadow rounded-lg p-5">
+        <% quality_colours = { "excellent" => "bg-green-500", "good" => "bg-blue-500", "fair" => "bg-amber-400", "low" => "bg-red-400" } %>
+        <% quality_labels  = { "excellent" => "Excellent (Gold)", "good" => "Good (Silver)", "fair" => "Fair (Bronze)", "low" => "Low" } %>
+        <% @quality.each do |quality, data| %>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-medium text-gray-700"><%= quality_labels[quality] || quality.humanize %></span>
+              <span class="text-gray-500"><%= data[:count] %> entries &middot; <%= data[:hours] %> hrs</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="h-3 rounded-full <%= quality_colours[quality] || 'bg-gray-400' %>"
+                   style="width: <%= data[:pct] %>%"></div>
+            </div>
+            <div class="text-right text-xs text-gray-400 mt-0.5"><%= data[:pct] %>%</div>
+          </div>
+        <% end %>
+        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
+          Gold + Silver tier used for ASR/TTS training. Bronze for augmentation only.
+        </div>
+      </div>
+    </section>
+
+    <%# ─── DIALECT DISTRIBUTION ─────────────────────────────────── %>
+    <section>
+      <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Dialect Distribution</h2>
+      <div class="bg-white shadow rounded-lg p-5">
+        <% dialect_colours = %w[bg-indigo-500 bg-blue-500 bg-violet-500 bg-cyan-500 bg-gray-400] %>
+        <% @dialects.each_with_index do |d, i| %>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-medium text-gray-700"><%= d[:dialect] %></span>
+              <span class="text-gray-500"><%= d[:entries] %> entries &middot; <%= d[:hours] %> hrs</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="h-3 rounded-full <%= dialect_colours[i % dialect_colours.size] %>"
+                   style="width: <%= d[:pct] %>%"></div>
+            </div>
+            <div class="text-right text-xs text-gray-400 mt-0.5"><%= d[:pct] %>%</div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+
+    <%# ─── GENDER DISTRIBUTION ──────────────────────────────────── %>
+    <section>
+      <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Speaker Gender</h2>
+      <div class="bg-white shadow rounded-lg p-5">
+        <% gender_colours = { "Male" => "bg-blue-500", "Female" => "bg-pink-500", "Unknown" => "bg-gray-400" } %>
+        <% @gender.each do |g| %>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-medium text-gray-700"><%= g[:gender] %></span>
+              <span class="text-gray-500"><%= g[:speakers] %> speakers &middot; <%= g[:hours] %> hrs</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="h-3 rounded-full <%= gender_colours[g[:gender]] || 'bg-gray-400' %>"
+                   style="width: <%= g[:pct] %>%"></div>
+            </div>
+            <div class="text-right text-xs text-gray-400 mt-0.5"><%= g[:pct] %>%</div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <%# ─── LOCATION COVERAGE ─────────────────────────────────────── %>
+    <section>
+      <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Location Coverage</h2>
+      <div class="bg-white shadow rounded-lg p-5">
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Total locations</span>
+            <span class="font-semibold"><%= @locations[:total] %></span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">With coordinates</span>
+            <span class="font-semibold"><%= @locations[:with_coordinates] %></span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Recordings mapped</span>
+            <span class="font-semibold text-green-700"><%= @locations[:recordings_with_location] %></span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Recordings unmapped</span>
+            <span class="font-semibold <%= @locations[:recordings_without_location] > 0 ? 'text-amber-600' : 'text-gray-700' %>">
+              <%= @locations[:recordings_without_location] %>
+            </span>
+          </div>
+          <% if @locations[:by_region].any? %>
+            <div class="pt-3 border-t border-gray-100">
+              <p class="text-xs text-gray-500 font-medium mb-2">By dialect region</p>
+              <% @locations[:by_region].each do |region, count| %>
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <span><%= region.humanize %></span>
+                  <span class="font-medium"><%= count %></span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <%# ─── ANALYSIS STATUS ───────────────────────────────────────── %>
+    <section>
+      <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Analysis Status</h2>
+      <div class="bg-white shadow rounded-lg p-5">
+        <% bar_pct = @corpus[:analyzed_pct] %>
+        <div class="flex items-center justify-center mb-4">
+          <div class="relative w-28 h-28">
+            <svg class="w-28 h-28 -rotate-90" viewBox="0 0 36 36">
+              <path class="text-gray-200" stroke="currentColor" stroke-width="3.8" fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path class="<%= bar_pct >= 80 ? 'text-green-500' : bar_pct >= 40 ? 'text-amber-400' : 'text-red-400' %>"
+                    stroke="currentColor" stroke-width="3.8" fill="none"
+                    stroke-dasharray="<%= bar_pct %>, 100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            </svg>
+            <span class="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-800">
+              <%= bar_pct %>%
+            </span>
+          </div>
+        </div>
+        <p class="text-center text-sm text-gray-600">
+          <%= @corpus[:analyzed_recordings] %> of <%= @corpus[:total_recordings] %> recordings analyzed
+        </p>
+        <% if @corpus[:analyzed_pct] < 100 %>
+          <p class="text-center text-xs text-amber-600 mt-2">
+            <%= @corpus[:total_recordings] - @corpus[:analyzed_recordings] %> recordings pending analysis
+          </p>
+        <% end %>
+      </div>
+    </section>
+
+  </div>
+
+  <%# ─── TOP SPEAKERS ───────────────────────────────────────────── %>
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">
+      Top Speakers by Duration
+      <span class="ml-2 text-green-600 font-normal normal-case text-xs">★ = TTS candidate (5+ hrs)</span>
+    </h2>
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Speaker</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dialect</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ability</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entries</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Audio</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% max_hours = @speakers.first&.dig(:hours).to_f.nonzero? || 1 %>
+          <% @speakers.each do |s| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                <%= link_to s[:name], admin_user_path(s[:id]), class: "text-blue-600 hover:underline" %>
+                <% if s[:tts_candidate] %>
+                  <span class="ml-1 text-green-500 text-xs" title="TTS candidate">★</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= s[:dialect] || "—" %></td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= s[:voice]&.humanize || "—" %></td>
+              <td class="px-4 py-3 text-sm text-gray-500">
+                <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                  <%= s[:ability]&.upcase || "—" %>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= number_with_delimiter(s[:entries]) %></td>
+              <td class="px-4 py-3 text-sm font-semibold text-gray-800"><%= s[:hours] %></td>
+              <td class="px-4 py-3 w-32">
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="h-2 rounded-full <%= s[:tts_candidate] ? 'bg-green-500' : 'bg-blue-400' %>"
+                       style="width: <%= [(s[:hours] / max_hours * 100), 100].min.round %>%"></div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%# ─── RECENT ANALYSES ────────────────────────────────────────── %>
+  <% if @recent.any? %>
+    <section class="mb-8">
+      <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Recently Analyzed</h2>
+      <div class="bg-white shadow rounded-lg overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recording</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dialect</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Locations</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Topics</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Analyzed</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @recent.each do |r| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm font-medium">
+                  <%= link_to r[:title].truncate(45), voice_recording_path(r[:id]), class: "text-blue-600 hover:underline" %>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">
+                  <% if r[:dialect].present? %>
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">
+                      <%= r[:dialect].humanize %>
+                    </span>
+                  <% else %>
+                    <span class="text-gray-400">—</span>
+                  <% end %>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500"><%= r[:locations].presence || "—" %></td>
+                <td class="px-4 py-3 text-sm text-gray-500"><%= r[:topics].presence || "—" %></td>
+                <td class="px-4 py-3 text-sm text-gray-400"><%= r[:analyzed_at] %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+</div>
