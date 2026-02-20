@@ -49,6 +49,7 @@ Rails.application.routes.draw do
       get :import_status
       get 'subtitles(/:lang)', to: 'voice_recordings#subtitles', defaults: { format: 'vtt' }, as: :subtitles
       post :retranscribe
+      post :autocorrect
     end
     resource :diarization, only: [:create]
   end

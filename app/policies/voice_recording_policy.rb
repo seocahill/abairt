@@ -35,6 +35,10 @@ class VoiceRecordingPolicy < ApplicationPolicy
     user&.admin?
   end
 
+  def autocorrect?
+    user&.admin?
+  end
+
   def import_status?
     # Same permission as show - anyone can check import status
     true
