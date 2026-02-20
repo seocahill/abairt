@@ -9,7 +9,7 @@ class CreateLocations < ActiveRecord::Migration[7.1]
       t.integer :dialect_region, default: 0, null: false # erris, achill, tourmakeady, other
       t.decimal :latitude, precision: 10, scale: 7
       t.decimal :longitude, precision: 10, scale: 7
-      t.references :parent, foreign_key: { to_table: :locations }
+      t.references :parent
       t.timestamps
     end
 
