@@ -87,7 +87,7 @@ class VoiceRecordingsController < ApplicationController
     # Improve pagination query to be more efficient
     @pagy, @entries = pagy(
       @recording.dictionary_entries
-        .includes(:speaker) # Add eager loading
+        .includes(:speaker, :versions, media_attachment: :blob)
         .where.not(id: nil)
         .reorder(:region_start),
       items: PAGE_SIZE

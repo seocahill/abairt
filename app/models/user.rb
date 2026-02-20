@@ -72,17 +72,32 @@ class User < ApplicationRecord
 
   class << self
     def pins
-      all.map do |user|
-        next unless user.lat_lang.present?
+      users = where.not(lat_lang: nil)
+      return [] if users.empty?
 
-        user.slice(:id, :name, :lat_lang, :role).tap do |c|
-          if user.all_recordings.any?
-            if sample = user.voice_recordings.with_attached_media.order("RANDOM()").limit(1).first
-              c[:media_url] = sample.media.url
-            end
-          end
+      user_ids = users.pluck(:id)
+
+      # Get one voice recording per user in a single query
+      recording_ids = DictionaryEntry
+        .where(user_id: user_ids)
+        .where.not(voice_recording_id: nil)
+        .group(:user_id)
+        .pluck(:user_id, Arel.sql("voice_recording_id"))
+        .to_h
+
+      recordings_with_media = VoiceRecording
+        .where(id: recording_ids.values.uniq)
+        .joins(:media_attachment)
+        .includes(media_attachment: :blob)
+        .index_by(&:id)
+
+      users.select(:id, :name, :lat_lang, :role).map do |user|
+        pin = user.slice(:id, :name, :lat_lang, :role)
+        if (vr_id = recording_ids[user.id]) && (vr = recordings_with_media[vr_id])
+          pin[:media_url] = vr.media.url
         end
-      end.compact
+        pin
+      end
     end
   end
 
