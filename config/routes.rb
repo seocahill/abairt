@@ -127,6 +127,9 @@ Rails.application.routes.draw do
   resources :login_requests, only: [:new, :create]
 
   get 'home', to: 'home#index'
+
+  # API Documentation
+  get 'api/docs', to: 'api_docs#show', as: :api_docs
   
   get 'translator_leaderboard', to: 'translator_leaderboard#index'
 

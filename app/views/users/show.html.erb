@@ -109,4 +109,70 @@
       <%= form.hidden_field :lat_lang, id: "user-lat-lang", value: @user.lat_lang %>
     <% end %>
   </div>
+
+  <% if current_user == @user && (current_user.admin? || current_user.api_user?) %>
+    <!-- API Access Section -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mt-6">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">API Access</h2>
+            <p class="text-sm text-gray-500 mt-1">Manage your API token for programmatic access</p>
+          </div>
+          <%= link_to "View API Documentation", api_docs_path, class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <% if @user.api_token.present? %>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Your API Token</label>
+            <div class="flex items-center gap-2">
+              <code class="flex-1 bg-gray-100 px-4 py-3 rounded-md text-sm font-mono select-all border border-gray-200 overflow-x-auto">
+                <%= @user.api_token %>
+              </code>
+              <button type="button" onclick="navigator.clipboard.writeText('<%= @user.api_token %>')" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" title="Copy to clipboard">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Keep this token secure. Do not share it publicly.</p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Usage Example</h4>
+            <code class="block bg-gray-800 text-gray-100 px-4 py-3 rounded-md text-xs font-mono overflow-x-auto">
+              curl -H "Authorization: Bearer <%= @user.api_token %>" \<br>
+              &nbsp;&nbsp;<%= request.protocol %><%= request.host_with_port %>/api/transcriptions
+            </code>
+          </div>
+
+          <div class="flex gap-2">
+            <%= button_to "Regenerate Token", regenerate_api_token_user_path(@user),
+                method: :post,
+                class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm",
+                data: { confirm: "This will invalidate your current token. Continue?" } %>
+            <%= button_to "Revoke Token", revoke_api_token_user_path(@user),
+                method: :delete,
+                class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm",
+                data: { confirm: "This will remove your API access. Continue?" } %>
+          </div>
+        <% else %>
+          <div class="text-center py-6">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No API token</h3>
+            <p class="mt-1 text-sm text-gray-500">Generate a token to access the API programmatically.</p>
+            <div class="mt-4">
+              <%= button_to "Generate API Token", generate_api_token_user_path(@user),
+                  method: :post,
+                  class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>
