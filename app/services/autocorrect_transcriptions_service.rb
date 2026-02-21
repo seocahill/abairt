@@ -46,7 +46,7 @@ class AutocorrectTranscriptionsService
 
   def fetch_corrected_segments(entries)
     existing = entries.map.with_index(1) do |entry, i|
-      "#{i}. #{entry.word_or_phrase.presence || "[blank]"}"
+      "#{i}. #{entry.word_or_phrase.presence || "[blank]"} (#{entry.region_start} - #{entry.region_end})"
     end.join("\n")
 
     prompt = <<~PROMPT
@@ -57,7 +57,7 @@ class AutocorrectTranscriptionsService
       #{@voice_recording.transcription}
       </transcript>
 
-      The recording has been segmented into #{entries.size} sequential segments. Each segment's current (possibly inaccurate) ASR transcription is listed below in chronological order:
+      The recording has been segmented into #{entries.size} sequential segments. Each segment's current (possibly inaccurate) ASR transcription is listed below in chronological order with the duration in brackets:
       #{existing}
 
       Using the full accurate transcript as the source of truth, provide the corrected Irish text for each segment in order. The segments together should cover the full transcript.
@@ -77,6 +77,7 @@ class AutocorrectTranscriptionsService
 
     response = client.chat(parameters: {
       model: "gpt-4.1",
+      response_format: { type: "json_object" },
       messages: [
         { role: "system", content: "You are an Irish language expert. Return only valid JSON arrays." },
         { role: "user", content: prompt }
@@ -87,8 +88,6 @@ class AutocorrectTranscriptionsService
     content = response.dig("choices", 0, "message", "content")
     return unless content.present?
 
-    # Strip any accidental markdown fences
-    content = content.gsub(/\A```(?:json)?\n?/, "").gsub(/\n?```\z/, "").strip
     JSON.parse(content)
   rescue JSON::ParserError => e
     Rails.logger.error("AutocorrectTranscriptionsService JSON parse error: #{e.message}")
