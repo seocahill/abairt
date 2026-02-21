@@ -91,7 +91,7 @@ class TranscriptAnalysisService
       You analyze transcripts of native Irish speakers to extract metadata.
 
       Mayo Irish dialect regions:
-      - erris (Iorras): Northwest Mayo - Belmullet, Glenamoy, Carrowteige, Barnatra, Geesala
+      - erris (Iorras): Northwest Mayo - Belmullet, Glenamoy, Carrowteige, Barnatra, Geesala, Stonefield, Portacloy, Belderrig, Kilgalligan, Rossport, Pullathomas
       - achill (Acaill): Achill Island and surroundings - Dooagh, Dooniver, Corrán, Kildavnet
       - tourmakeady (Tuar Mhic Éadaigh): South Mayo near Lough Mask - Finny, Partry, Glencastle
       - east_mayo: Eastern Mayo towards Sligo/Roscommon border - Castlebar, Ballyhaunis, Ballinrobe
