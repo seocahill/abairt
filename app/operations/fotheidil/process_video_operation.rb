@@ -106,7 +106,7 @@ module Fotheidil
       # Use Active Storage's filename methods
       blob = voice_recording.media.blob
       extension = blob.filename.extension.presence
-      
+
       # If no extension, infer from content type
       unless extension
         extension = case blob.content_type
@@ -129,8 +129,9 @@ module Fotheidil
         .gsub(/[^\w\s\-_\.]/, "")  # Remove other special chars
         .strip
         .truncate(200)  # Limit length
-      
+
       temp_path = "/tmp/#{safe_base}.#{extension}"
+      audio_path = nil
       Rails.logger.info "Creating temp file: #{temp_path}"
 
       File.open(temp_path, "wb") do |file|
@@ -139,9 +140,28 @@ module Fotheidil
         end
       end
 
+      # Always upload audio to Fotheidil - extract from video if needed.
+      # Video upload via browser automation is unreliable; audio timestamps
+      # are preserved 1:1 so video playback alignment is unaffected.
+      upload_path = if blob.content_type.start_with?("video/")
+        audio_path = "/tmp/#{safe_base}.mp3"
+        Rails.logger.info "Extracting audio track from video for Fotheidil upload: #{audio_path}"
+        system("ffmpeg", "-i", temp_path, "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-y", audio_path)
+
+        if File.exist?(audio_path) && File.size(audio_path) > 0
+          Rails.logger.info "Audio extraction successful, uploading audio instead of video"
+          audio_path
+        else
+          Rails.logger.warn "Audio extraction failed, falling back to original file"
+          temp_path
+        end
+      else
+        temp_path
+      end
+
       # Upload to Fotheidil
       upload_service = Fotheidil::UploadService.new(browser_service)
-      video_url = upload_service.upload_file(temp_path)
+      video_url = upload_service.upload_file(upload_path)
 
       if video_url.blank?
         ctx[:error] = "Upload failed - no video URL returned"
@@ -165,6 +185,7 @@ module Fotheidil
       false
     ensure
       File.delete(temp_path) if temp_path && File.exist?(temp_path)
+      File.delete(audio_path) if audio_path && File.exist?(audio_path)
     end
 
     # Wait for Fotheidil to generate transcription (can take several minutes)
