@@ -37,7 +37,7 @@ production:
   analyze_voice_recording:
     class: TranscriptAnalysisJob
     queue: default
-    schedule: every hour at minute 42
+    schedule: every 15 minutes
 
 development:
   # nightly_transcribe:
