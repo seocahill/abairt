@@ -67,24 +67,21 @@ class VoiceRecording < ApplicationRecord
     return media unless media.content_type.start_with?("video/")
     return audio_track if audio_track.attached?
 
-    Tempfile.create(["audio", ".wav"], binmode: true) do |temp_audio|
+    Tempfile.create(["audio", ".mp3"], binmode: true) do |temp_audio|
       media.open do |file|
-        # Use ffmpeg to extract audio track to WAV format
         system(
           "ffmpeg", "-i", file.path,
-          "-vn",        # Disable video processing
-          "-acodec", "pcm_s16le",  # PCM 16-bit little-endian
-          "-ar", "44100",          # Sample rate
-          "-ac", "2",              # Stereo audio
+          "-vn",                   # Disable video processing
+          "-acodec", "libmp3lame", # MP3
+          "-q:a", "2",             # VBR ~190kbps
           "-y",                    # Overwrite output file
           temp_audio.path
         )
 
-        # Attach the audio file
         audio_track.attach(
           io: File.open(temp_audio.path),
-          filename: "#{media.filename.base}.wav",
-          content_type: "audio/wav"
+          filename: "#{media.filename.base}.mp3",
+          content_type: "audio/mpeg"
         )
       end
     end
