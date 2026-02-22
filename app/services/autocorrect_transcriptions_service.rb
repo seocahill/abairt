@@ -19,15 +19,10 @@ class AutocorrectTranscriptionsService
     corrected_texts = fetch_corrected_segments(entries)
     return unless corrected_texts.present?
 
-    unless corrected_texts.size == entries.size
-      Rails.logger.error(
-        "AutocorrectTranscriptionsService: expected #{entries.size} segments, got #{corrected_texts.size}"
-      )
-      return
-    end
+    aligned = align_corrected_texts(entries, corrected_texts)
 
     updated_count = 0
-    entries.zip(corrected_texts).each do |entry, corrected_text|
+    entries.zip(aligned).each do |entry, corrected_text|
       next if entry.confirmed?
       next if corrected_text.blank?
       next if corrected_text.strip == entry.word_or_phrase&.strip
@@ -108,5 +103,29 @@ class AutocorrectTranscriptionsService
   rescue JSON::ParserError => e
     Rails.logger.error("AutocorrectTranscriptionsService JSON parse error: #{e.message}")
     nil
+  end
+
+  def align_corrected_texts(entries, corrected_texts)
+    return corrected_texts if corrected_texts.size == entries.size
+
+    Rails.logger.warn(
+      "AutocorrectTranscriptionsService: expected #{entries.size} segments, got #{corrected_texts.size} — aligning by timestamp"
+    )
+    align_by_timestamp(entries, corrected_texts)
+  end
+
+  # When the API returns a different number of segments than entries, distribute
+  # corrected texts proportionally using each entry's midpoint timestamp.
+  def align_by_timestamp(entries, corrected_texts)
+    total_start = entries.first.region_start.to_f
+    total_end = entries.last.region_end.to_f
+    total_duration = total_end - total_start
+    n = corrected_texts.size
+
+    entries.map do |entry|
+      midpoint = ((entry.region_start.to_f + entry.region_end.to_f) / 2.0 - total_start) / total_duration
+      idx = (midpoint * n).floor.clamp(0, n - 1)
+      corrected_texts[idx]
+    end
   end
 end
