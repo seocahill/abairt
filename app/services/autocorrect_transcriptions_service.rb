@@ -111,21 +111,35 @@ class AutocorrectTranscriptionsService
     Rails.logger.warn(
       "AutocorrectTranscriptionsService: expected #{entries.size} segments, got #{corrected_texts.size} — aligning by timestamp"
     )
-    align_by_timestamp(entries, corrected_texts)
+    align_by_word_rate(entries, corrected_texts)
   end
 
-  # When the API returns a different number of segments than entries, distribute
-  # corrected texts proportionally using each entry's midpoint timestamp.
-  def align_by_timestamp(entries, corrected_texts)
-    total_start = entries.first.region_start.to_f
-    total_end = entries.last.region_end.to_f
-    total_duration = total_end - total_start
-    n = corrected_texts.size
+  # When the API returns a different number of segments than entries, join all
+  # corrected texts into a single word stream and redistribute words to each
+  # entry proportionally by its speaking duration. This avoids repeating or
+  # dropping corrected text that the timestamp-index approach would cause.
+  def align_by_word_rate(entries, corrected_texts)
+    words = corrected_texts.join(" ").split
+    total_words = words.size
+    total_duration = entries.sum { |e| e.region_end.to_f - e.region_start.to_f }
 
-    entries.map do |entry|
-      midpoint = ((entry.region_start.to_f + entry.region_end.to_f) / 2.0 - total_start) / total_duration
-      idx = (midpoint * n).floor.clamp(0, n - 1)
-      corrected_texts[idx]
+    result = []
+    word_cursor = 0
+
+    entries.each_with_index do |entry, idx|
+      if idx == entries.size - 1
+        result << words[word_cursor..].join(" ")
+      else
+        duration = entry.region_end.to_f - entry.region_start.to_f
+        count = [(duration / total_duration * total_words).round, 1].max
+        # Never consume so many words that remaining entries would get nothing
+        remaining_entries = entries.size - idx - 1
+        count = [count, total_words - word_cursor - remaining_entries].min
+        result << words[word_cursor, count].join(" ")
+        word_cursor += count
+      end
     end
+
+    result
   end
 end
