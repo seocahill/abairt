@@ -82,13 +82,17 @@ class AutocorrectTranscriptionsServiceTest < ActiveSupport::TestCase
     assert_equal "Dia doit", @entry1.reload.word_or_phrase
   end
 
-  test "returns nil when API returns wrong number of segments" do
-    mock_openai(["Dia duit"])  # only 1, expected 2
+  test "aligns by timestamp when API returns fewer segments than entries" do
+    # 1 corrected text for 2 entries: both entries map to index 0 of corrected_texts
+    # entry1 midpoint = 1.0s, entry2 midpoint = 3.0s, total range 0–4s
+    # proportional positions: 0.25 and 0.75 → both floor to idx 0 of a 1-element array
+    mock_openai(["Dia duit"])
 
     result = @service.process
 
-    assert_nil result
-    assert_equal "Dia doit", @entry1.reload.word_or_phrase  # unchanged
+    assert_equal 2, result
+    assert_equal "Dia duit", @entry1.reload.word_or_phrase
+    assert_equal "Dia duit", @entry2.reload.word_or_phrase
   end
 
   test "returns nil when API response is empty" do
