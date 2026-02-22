@@ -63,11 +63,10 @@ class AutocorrectTranscriptionsService
       Using the full accurate transcript as the source of truth, provide the corrected Irish text for each segment in order. The segments together should cover the full transcript.
 
       Rules:
-      - Return ONLY a valid JSON array of strings, one element per segment, in the same order.
-      - Do not merge or split segments - there must be exactly #{entries.size} elements.
-      - Each element should contain only the Irish text for that segment.
+      - Return exactly #{entries.size} strings in the segments array, one per segment, in the same order.
+      - Do not merge or split segments.
+      - Each string should contain only the Irish text for that segment.
       - If a segment cannot be matched, return its original ASR text unchanged.
-      - No explanations, no markdown, just the raw JSON array.
     PROMPT
 
     client = OpenAI::Client.new(
@@ -77,9 +76,26 @@ class AutocorrectTranscriptionsService
 
     response = client.chat(parameters: {
       model: "gpt-4.1",
-      response_format: { type: "json_object" },
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "corrected_segments",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              segments: {
+                type: "array",
+                items: { type: "string" }
+              }
+            },
+            required: ["segments"],
+            additionalProperties: false
+          }
+        }
+      },
       messages: [
-        { role: "system", content: "You are an Irish language expert. Return only valid JSON arrays." },
+        { role: "system", content: "You are an Irish language expert." },
         { role: "user", content: prompt }
       ],
       temperature: 0.1
@@ -88,7 +104,7 @@ class AutocorrectTranscriptionsService
     content = response.dig("choices", 0, "message", "content")
     return unless content.present?
 
-    JSON.parse(content)
+    JSON.parse(content)["segments"]
   rescue JSON::ParserError => e
     Rails.logger.error("AutocorrectTranscriptionsService JSON parse error: #{e.message}")
     nil
