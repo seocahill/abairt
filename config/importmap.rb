@@ -10,6 +10,7 @@ pin "process", to: "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/pro
 pin "util", to: "https://ga.jspm.io/npm:@jspm/core@2.0.0-beta.12/nodelibs/browser/util.js"
 pin "wavesurferjs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/wavesurfer.js"
 pin "wavesurferregionsjs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/plugin/wavesurfer.regions.min.js"
+pin "wavesurfertimelinejs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/plugin/wavesurfer.timeline.min.js"
 pin "@rails/activestorage", to: "https://ga.jspm.io/npm:@rails/activestorage@6.1.4-1/app/assets/javascripts/activestorage.js"
 pin "@rails/actioncable", to: "https://ga.jspm.io/npm:@rails/actioncable@6.1.4-1/app/assets/javascripts/action_cable.js"
 pin "jitsi" # @2.1.5
