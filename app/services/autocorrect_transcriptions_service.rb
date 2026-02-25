@@ -20,6 +20,7 @@ class AutocorrectTranscriptionsService
     return unless corrected_texts.present?
 
     aligned = align_corrected_texts(entries, corrected_texts)
+    aligned = snap_to_sentence_boundaries(aligned)
 
     updated_count = 0
     entries.zip(aligned).each do |entry, corrected_text|
@@ -62,6 +63,8 @@ class AutocorrectTranscriptionsService
       - Do not merge or split segments.
       - Each string should contain only the Irish text for that segment.
       - If a segment cannot be matched, return its original ASR text unchanged.
+      - Prefer to start and end each segment at a sentence or clause boundary (full stop, question mark, exclamation mark, or a natural comma pause) where possible.
+      - If a segment's assigned text would span two complete sentences, treat that as a signal the word boundary is slightly off — try to move words so the segment ends at the full stop.
     PROMPT
 
     client = OpenAI::Client.new(
@@ -112,6 +115,41 @@ class AutocorrectTranscriptionsService
       "AutocorrectTranscriptionsService: expected #{entries.size} segments, got #{corrected_texts.size} — aligning by timestamp"
     )
     align_by_word_rate(entries, corrected_texts)
+  end
+
+  # After text alignment, look at each consecutive pair of segments and snap
+  # the boundary to a sentence-ending punctuation mark. If segment N ends
+  # without terminal punctuation but contains a full-stop, question mark, or
+  # exclamation mark in its latter half, move the words after that mark to the
+  # front of segment N+1. This keeps each segment to at most one complete
+  # sentence without touching the timestamp data.
+  def snap_to_sentence_boundaries(texts)
+    result = texts.map(&:dup)
+
+    result.each_cons(2).with_index do |(current, _nxt), idx|
+      words = current.split
+      next if words.empty?
+      next if words.last.match?(/[.?!]\z/)
+
+      # Search backwards from the last word for a terminal-punctuation word
+      # Only look in the latter 60% of the segment to avoid over-snapping
+      search_from = (words.size * 0.4).floor
+      pivot = nil
+      words[search_from..].each_with_index do |word, i|
+        pivot = search_from + i if word.match?(/[.?!]\z/)
+      end
+
+      next unless pivot
+
+      # Move words after the pivot into the next segment
+      tail = words[(pivot + 1)..] || []
+      next if tail.empty?
+
+      result[idx] = words[0..pivot].join(" ")
+      result[idx + 1] = (tail + result[idx + 1].split).join(" ")
+    end
+
+    result
   end
 
   # When the API returns a different number of segments than entries, join all
