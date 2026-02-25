@@ -335,9 +335,15 @@ export default class extends Controller {
       }
     }
 
-    // Give the browser one frame to reflow, then redraw the waveform at new width
+    // Give the browser one frame to reflow, then redraw at new width.
+    // When entering edit mode snap zoom to 50% of slider range for useful granularity.
     requestAnimationFrame(() => {
-      if (this.isReady && this.waveSurfer) {
+      if (!this.isReady || !this.waveSurfer) return;
+      if (this.editModeValue) {
+        const mid = Math.round((parseFloat(this.zoomTarget?.min || 1) + parseFloat(this.zoomTarget?.max || 500)) / 2);
+        if (this.hasZoomTarget) this.zoomTarget.value = mid;
+        this.waveSurfer.zoom(mid);
+      } else {
         this.waveSurfer.zoom(this._currentZoom());
       }
     });
