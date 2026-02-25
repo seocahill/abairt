@@ -136,4 +136,46 @@ class AutocorrectTranscriptionsServiceTest < ActiveSupport::TestCase
     assert_equal "Dia duit", @entry1.reload.word_or_phrase
     assert_equal "Conas atá tú?", @entry2.reload.word_or_phrase
   end
+
+  # Layer 2: sentence boundary snapping
+  test "snaps overflow words after a full stop to the next segment" do
+    # 4 words → search_from = floor(4 * 0.4) = 1
+    # "duit." is at index 1, within the search range → snap
+    mock_openai(["Dia duit. Chuaigh sé", "abhaile."])
+
+    @service.process
+
+    assert_equal "Dia duit.", @entry1.reload.word_or_phrase
+    assert_equal "Chuaigh sé abhaile.", @entry2.reload.word_or_phrase
+  end
+
+  test "does not snap when segment already ends with terminal punctuation" do
+    mock_openai(["Dia duit.", "Conas atá tú?"])
+
+    @service.process
+
+    assert_equal "Dia duit.", @entry1.reload.word_or_phrase
+    assert_equal "Conas atá tú?", @entry2.reload.word_or_phrase
+  end
+
+  test "does not snap when terminal punctuation is only in the first word" do
+    # 3 words → search_from = floor(3 * 0.4) = 1
+    # "Dia." is at index 0, before search_from → not found → no snap
+    mock_openai(["Dia. duit labhair", "sé."])
+
+    @service.process
+
+    assert_equal "Dia. duit labhair", @entry1.reload.word_or_phrase
+    assert_equal "sé.", @entry2.reload.word_or_phrase
+  end
+
+  test "snaps with question mark boundary" do
+    # 4 words → search_from = 1; "tú?" is at index 2 → snap
+    mock_openai(["Conas atá tú? Bhí", "sé go maith."])
+
+    @service.process
+
+    assert_equal "Conas atá tú?", @entry1.reload.word_or_phrase
+    assert_equal "Bhí sé go maith.", @entry2.reload.word_or_phrase
+  end
 end

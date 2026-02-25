@@ -3,11 +3,13 @@ import WaveSurfer from "wavesurferjs"
 import RegionsPlugin from 'wavesurferregionsjs';
 
 export default class extends Controller {
-  static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation", "gaeSubs", "engSubs", "speed", "video"]
+  static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation", "gaeSubs", "engSubs", "speed", "video", "editButton"]
   static values = {
     url: String,
     regionsUrl: String,
-    lazy: Boolean
+    lazy: Boolean,
+    editMode: Boolean,
+    entryUpdateUrlTemplate: String
   }
 
   connect() {
@@ -264,25 +266,98 @@ export default class extends Controller {
       if (!response.ok) throw new Error('Failed to fetch regions');
 
       const regions = await response.json();
+      this._regionsData = regions;
 
-      regions.forEach(region => {
-        if (region.region_start != null && region.region_end != null) {
-          this.waveSurfer.addRegion({
-            start: parseFloat(region.region_start),
-            end: parseFloat(region.region_end),
-            drag: false,
-            resize: false,
-            color: 'rgba(79, 70, 229, 0.1)',
-            data: {
-              id: region.id,
-              transcription: region.word_or_phrase,
-              translation: region.translation
-            }
-          });
-        }
-      });
+      this._renderRegions();
     } catch (error) {
       console.error('Error fetching regions:', error);
+    }
+  }
+
+  _renderRegions() {
+    if (!this.waveSurfer || !this._regionsData) return;
+
+    // Clear existing regions
+    this.waveSurfer.clearRegions();
+
+    const editable = this.editModeValue;
+
+    this._regionsData.forEach(region => {
+      if (region.region_start != null && region.region_end != null) {
+        this.waveSurfer.addRegion({
+          start: parseFloat(region.region_start),
+          end: parseFloat(region.region_end),
+          drag: editable,
+          resize: editable,
+          color: editable ? 'rgba(234, 179, 8, 0.2)' : 'rgba(79, 70, 229, 0.1)',
+          data: {
+            id: region.id,
+            transcription: region.word_or_phrase,
+            translation: region.translation
+          }
+        });
+      }
+    });
+
+    if (editable) {
+      this._setupRegionUpdateListener();
+    }
+  }
+
+  _setupRegionUpdateListener() {
+    // Remove any previous listener to avoid duplicates
+    if (this._regionUpdateHandler) {
+      this.waveSurfer.un('region-update-end', this._regionUpdateHandler);
+    }
+
+    this._regionUpdateHandler = async (region) => {
+      const entryId = region.data?.id;
+      if (!entryId || !this.hasEntryUpdateUrlTemplateValue) return;
+
+      const url = this.entryUpdateUrlTemplateValue.replace('ENTRY_ID', entryId);
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+      try {
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            dictionary_entry: {
+              region_start: region.start.toFixed(3),
+              region_end: region.end.toFixed(3)
+            }
+          })
+        });
+
+        if (!response.ok) {
+          console.error('Failed to update segment boundary:', await response.text());
+        }
+      } catch (error) {
+        console.error('Error patching segment boundary:', error);
+      }
+    };
+
+    this.waveSurfer.on('region-update-end', this._regionUpdateHandler);
+  }
+
+  toggleEditMode() {
+    this.editModeValue = !this.editModeValue;
+    this._renderRegions();
+
+    if (this.hasEditButtonTarget) {
+      if (this.editModeValue) {
+        this.editButtonTarget.classList.remove('text-gray-400', 'hover:text-gray-600');
+        this.editButtonTarget.classList.add('text-yellow-500', 'hover:text-yellow-600');
+        this.editButtonTarget.title = 'Exit segment edit mode';
+      } else {
+        this.editButtonTarget.classList.remove('text-yellow-500', 'hover:text-yellow-600');
+        this.editButtonTarget.classList.add('text-gray-400', 'hover:text-gray-600');
+        this.editButtonTarget.title = 'Edit segment boundaries';
+      }
     }
   }
 

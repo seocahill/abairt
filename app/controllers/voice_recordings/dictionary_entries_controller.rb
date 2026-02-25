@@ -73,9 +73,14 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
           )
         end
         format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry was successfully updated.' }
+        format.json { head :ok }
       end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: { errors: @dictionary_entry.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
 
