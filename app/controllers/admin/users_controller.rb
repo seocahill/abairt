@@ -38,6 +38,7 @@ module Admin
     def approve
       authorize @user, :approve?
       @user.update(confirmed: true)
+      UserMailer.account_approved_email(@user).deliver_later
       redirect_to admin_user_path(@user), notice: 'User approved successfully.'
     end
 
@@ -50,7 +51,9 @@ module Admin
     def bulk_approve
       authorize User, :bulk_approve?
       user_ids = params[:user_ids] || []
-      User.where(id: user_ids).update_all(confirmed: true)
+      users = User.where(id: user_ids)
+      users.update_all(confirmed: true)
+      users.each { |user| UserMailer.account_approved_email(user).deliver_later }
       redirect_to admin_users_path(pending: true), notice: "#{user_ids.count} users approved."
     end
 

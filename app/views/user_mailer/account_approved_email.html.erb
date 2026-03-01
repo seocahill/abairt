@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  </head>
+  <body>
+    <h1>Account Approved</h1>
+    <p>Hello <%= @user.email %>,</p>
+    <p>Your Abairt account has been approved. You can now log in and start using the platform.</p>
+    <p><%= link_to "Log in to Abairt", login_url %></p>
+    <p>Thank you!</p>
+  </body>
+</html>

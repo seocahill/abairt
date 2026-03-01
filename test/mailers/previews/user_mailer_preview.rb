@@ -13,6 +13,18 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.new_user_email(user)
   end
 
+  # Preview this email at http://localhost:3000/rails/mailers/user_mailer/signup_pending_email
+  def signup_pending_email
+    user = User.order(updated_at: :desc).first
+    UserMailer.signup_pending_email(user)
+  end
+
+  # Preview this email at http://localhost:3000/rails/mailers/user_mailer/account_approved_email
+  def account_approved_email
+    user = User.order(updated_at: :desc).first
+    UserMailer.account_approved_email(user)
+  end
+
   # Preview this email at http://localhost:3000/rails/mailers/user_mailer/broadcast_email
   def broadcast_email
     user = User.order(updated_at: :desc).first

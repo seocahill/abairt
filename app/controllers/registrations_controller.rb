@@ -16,7 +16,8 @@ class RegistrationsController < ApplicationController
     @user = User.new(user_params)
     authorize @user, policy_class: RegistrationPolicy
     if @user.save
-      UserMailer.new_user_email(@user).deliver
+      UserMailer.new_user_email(@user).deliver_later
+      UserMailer.signup_pending_email(@user).deliver_later
       redirect_to root_path, notice: 'Thanks for signing up.'
     else
       render :new
