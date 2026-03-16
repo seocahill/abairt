@@ -21,6 +21,7 @@ module Fotheidil
 
       navigate_and_select_file(file_path)
       click_upload_button
+      accept_acknowledgment_modal
       wait_for_redirect
     rescue => e
       Rails.logger.error "Upload error: #{e.message}"
@@ -154,6 +155,26 @@ module Fotheidil
     def log_page_debug_info
       page_source = driver.page_source
       Rails.logger.info { "Page source snippet: #{page_source[0..500]}" }
+    end
+
+    def accept_acknowledgment_modal
+      wait = Selenium::WebDriver::Wait.new(timeout: 10, interval: 0.5)
+
+      begin
+        agree_button = wait.until do
+          buttons = driver.find_elements(:tag_name, "button")
+          buttons.find do |btn|
+            btn.displayed? && btn.text.strip.downcase.include?("aontaím")
+          rescue
+            false
+          end
+        end
+
+        agree_button.click
+        Rails.logger.info "Accepted acknowledgment modal"
+      rescue Selenium::WebDriver::Error::TimeoutError
+        Rails.logger.info "No acknowledgment modal appeared, continuing"
+      end
     end
 
     def wait_for_redirect

@@ -182,7 +182,19 @@ To visually debug browser automation (e.g., Fotheidil uploads) in production:
 4. **Run your operation:**
    When you run Fotheidil operations, you'll see the browser automation happening in real-time in the VNC viewer.
 
-**Note:** The VNC service is exposed on port 7900 on the server. The SSH tunnel forwards your local port 17900 to the server's port 7900.
+**Note:** The VNC service is exposed on port 7900 on the server. The SSH tunnel forwards your local port 17900 to the server's port 7900. Use `127.0.0.1` (not `localhost`) in the tunnel command to ensure IPv4 is used — Docker doesn't listen on IPv6.
+
+**Troubleshooting: "Failed to connect to server"**
+
+If noVNC loads but shows "Failed to connect to server", the VNC server inside the Chrome container has likely crashed. Restart it:
+
+```bash
+ssh -i ~/.ssh/old/id_rsa root@<your-server-ip>
+export DOCKER_API_VERSION=1.44
+docker service update --force abairt_chrome
+```
+
+Then restart your SSH tunnel and reconnect.
 
 ## 📦 Deployment
 
