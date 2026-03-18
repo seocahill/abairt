@@ -2,7 +2,7 @@ require "test_helper"
 
 class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
   test "should get index without authentication" do
-    get translator_leaderboard_url
+    get translator_leaderboard_index_url
     assert_response :success
   end
 
@@ -33,7 +33,7 @@ class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
       translator_id: translator1.id
     )
 
-    get translator_leaderboard_url
+    get translator_leaderboard_index_url
     assert_response :success
     
     # Check that translators are present
@@ -63,11 +63,34 @@ class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
       translator_id: temporary_user.id
     )
 
-    get translator_leaderboard_url
+    get translator_leaderboard_index_url
     assert_response :success
     
     # Should not include temporary users
     assert_select "div", text: /#{temporary_user.name}/, count: 0
+  end
+
+  test "should show translator contributions on show page" do
+    translator = users(:one)
+
+    3.times do |i|
+      DictionaryEntry.create!(
+        word_or_phrase: "word_#{i}",
+        translation: "translation_#{i}",
+        owner: translator,
+        translator: translator
+      )
+    end
+
+    get translator_leaderboard_url(translator)
+    assert_response :success
+    assert_select "h1", text: translator.name
+  end
+
+  test "show page should be accessible without authentication" do
+    translator = users(:one)
+    get translator_leaderboard_url(translator)
+    assert_response :success
   end
 
   test "should only show users with translations" do
@@ -78,7 +101,7 @@ class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
       role: :student
     )
 
-    get translator_leaderboard_url
+    get translator_leaderboard_index_url
     assert_response :success
     
     # Should not show users without translations

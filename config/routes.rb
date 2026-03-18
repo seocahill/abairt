@@ -132,7 +132,7 @@ Rails.application.routes.draw do
   # API Documentation
   get 'api/docs', to: 'api_docs#show', as: :api_docs
   
-  get 'translator_leaderboard', to: 'translator_leaderboard#index'
+  resources :translator_leaderboard, only: [:index, :show], controller: 'translator_leaderboard'
 
   resources :practice_recordings, only: [:create]
 

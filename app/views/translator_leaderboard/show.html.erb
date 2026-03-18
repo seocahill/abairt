@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b">
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-semibold text-gray-900"><%= @translator.name %></h1>
+          <p class="text-sm text-gray-500 mt-1">
+            <%= @pagy.count %> <%= "translation".pluralize(@pagy.count) %>
+            <% if @translator.ability.present? %>
+              &middot; <%= @translator.ability.upcase %> level
+            <% end %>
+          </p>
+        </div>
+        <%= link_to translator_leaderboard_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Leaderboard
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entries -->
+  <div class="p-6">
+    <div class="space-y-4">
+      <% @entries.each do |entry| %>
+        <div class="bg-white border rounded-lg px-6 py-4">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-lg font-medium text-gray-900"><%= entry.word_or_phrase.presence || "—" %></p>
+              <p class="text-gray-600 italic"><%= entry.translation.presence || "—" %></p>
+
+              <div class="mt-2 text-xs text-gray-500 flex flex-wrap items-center gap-x-4 gap-y-1">
+                <% if entry.voice_recording %>
+                  <%= link_to voice_recording_path(entry.voice_recording), class: "text-blue-600 hover:text-blue-800 flex items-center" do %>
+                    <svg class="w-3.5 h-3.5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" />
+                      <path d="M5.5 9.643a.75.75 0 00-1.5 0V10c0 3.06 2.29 5.585 5.25 5.954V17.5h-1.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-1.5v-1.546A6.001 6.001 0 0016 10v-.357a.75.75 0 00-1.5 0V10a4.5 4.5 0 01-9 0v-.357z" />
+                    </svg>
+                    Source
+                  <% end %>
+                <% end %>
+                <% if entry.speaker %>
+                  <span><span class="font-medium">Speaker:</span> <%= entry.speaker.name %></span>
+                <% end %>
+                <span class="<%= entry.confirmed? ? 'text-green-600' : 'text-gray-400' %>">
+                  <%= entry.confirmed? ? "Confirmed" : "Unconfirmed" %>
+                </span>
+                <span><%= entry.created_at.strftime("%d %b %Y") %></span>
+              </div>
+            </div>
+
+            <% if entry.media.attached? %>
+              <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
+                      data-controller="audio-player"
+                      data-action="audio-player#play"
+                      data-audio-player-url-value="<%= url_for(entry.media) %>"
+                      data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
+                      data-audio-player-translation-value="<%= entry.translation %>">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <% if @pagy.pages > 1 %>
+      <div class="mt-6 border-t border-gray-200 pt-6 flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Showing <span class="font-medium"><%= @pagy.from %></span> to
+          <span class="font-medium"><%= @pagy.to %></span> of
+          <span class="font-medium"><%= @pagy.count %></span> translations
+        </div>
+        <div class="flex space-x-2">
+          <% if @pagy.prev %>
+            <%= link_to "Previous", translator_leaderboard_path(@translator, page: @pagy.prev),
+                class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+          <% end %>
+          <% if @pagy.next %>
+            <%= link_to "Next", translator_leaderboard_path(@translator, page: @pagy.next),
+                class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

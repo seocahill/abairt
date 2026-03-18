@@ -22,7 +22,7 @@
     <div class="bg-white border rounded-lg overflow-hidden">
       <div class="space-y-0 divide-y divide-gray-200">
         <% @translators.each_with_index do |translator, index| %>
-          <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+          <%= link_to translator_leaderboard_path(translator), class: "px-6 py-4 flex items-center justify-between hover:bg-gray-50 block" do %>
             <div class="flex items-center">
               <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
                 <%= index + 1 %>
@@ -46,7 +46,7 @@
                 <%= pluralize(translator.translation_count, 'translation') %>
               </div>
             </div>
-          </div>
+          <% end %>
         <% end %>
       </div>
     </div>
