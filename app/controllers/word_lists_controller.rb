@@ -14,17 +14,6 @@ class WordListsController < ApplicationController
 
   # GET /word_lists/1
   def show
-    if (params[:phrase].present? || params[:idiom].present?)
-      @vector_search = EntryEmbedding.new
-    end
-
-    if params[:phrase].present?
-      @results = @vector_search.list_grammatic_forms(params[:phrase]).split("\n")
-    end
-
-    if params[:idiom].present?
-      @idioms = @vector_search.list_idioms(params[:idiom]).split("\n")
-    end
     @pagy, @entries = pagy(@word_list.dictionary_entries, items: PAGE_SIZE)
     respond_to do |format|
       format.html
