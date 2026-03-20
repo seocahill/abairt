@@ -20,7 +20,10 @@ class DictionaryEntry < ApplicationRecord
 
   acts_as_taggable_on :tags
 
+  MAYO_DIALECTS = %w[tuaisceart_mhaigh_eo connacht_ó_thuaidh acaill lár_chonnachta].freeze
+
   scope :has_recording, -> { joins(:media_attachment) }
+  scope :mayo_dialect, -> { joins(:speaker).where(users: { dialect: MAYO_DIALECTS }) }
 
   # Scopes are for filtering visability and training data
   # Note: 'pending' conflicts with status enum, so using 'unconfirmed_accuracy' and 'confirmed_accuracy'
