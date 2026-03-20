@@ -1,8 +1,15 @@
 # frozen_string_literal: true
 
 # Given an English island description from the Caotharnach app, finds relevant
-# confirmed Mayo dialect dictionary entries (with audio) using LLM keyword
-# extraction + FTS5 search on the translation field.
+# confirmed Mayo dialect dictionary entries (with audio) using a hybrid search:
+#   1. LLM keyword extraction → FTS5 search on the translation field
+#   2. Vector similarity search (sqlite-vec) on the full island description
+#
+# Results are merged: FTS matches first (keyword precision), then any additional
+# entries surfaced by vector search that weren't caught by keywords.
+#
+# Usage:
+#   IslandContextService.new("ordering coffee in a café...").call
 class IslandContextService
   DEFAULT_LIMIT = 20
   MAX_LIMIT = 50
@@ -14,13 +21,15 @@ class IslandContextService
   end
 
   def call
-    keywords = extract_keywords
-    return [] if keywords.empty?
+    fts_results = fts_search(extract_keywords)
+    vector_results = vector_search
 
-    search_with_keywords(keywords)
+    merge(fts_results, vector_results)
   end
 
   private
+
+  # ── FTS ──────────────────────────────────────────────────────────────────
 
   def extract_keywords
     client = OpenAI::Client.new(
@@ -38,7 +47,7 @@ class IslandContextService
             Return 8-12 short, distinct English words or short phrases (1-3 words each) that would
             commonly appear in English translations of Irish phrases relevant to this scenario.
             Focus on vocabulary, actions, and common expressions for the described context.
-            Return ONLY valid JSON in this exact format: {"keywords": ["word1", "phrase2", ...]}
+            Return ONLY valid JSON: {"keywords": ["word1", "phrase2", ...]}
           PROMPT
         },
         { role: "user", content: @description }
@@ -47,8 +56,7 @@ class IslandContextService
       response_format: { type: "json_object" }
     })
 
-    content = response.dig("choices", 0, "message", "content")
-    parsed = JSON.parse(content)
+    parsed = JSON.parse(response.dig("choices", 0, "message", "content"))
     keywords = parsed["keywords"] || parsed.values.first
     Array(keywords).map(&:to_s).reject(&:blank?).first(MAX_KEYWORDS)
   rescue => e
@@ -56,8 +64,9 @@ class IslandContextService
     []
   end
 
-  def search_with_keywords(keywords)
-    # Build FTS5 OR query - wrap multi-word phrases in quotes for phrase matching
+  def fts_search(keywords)
+    return [] if keywords.empty?
+
     fts_query = keywords.map { |k| "\"#{k.gsub('"', '')}\"" }.join(" OR ")
 
     DictionaryEntry
@@ -71,8 +80,44 @@ class IslandContextService
       .distinct
       .order("rank")
       .limit(@limit)
+      .to_a
   rescue => e
-    Rails.logger.error("IslandContextService search failed: #{e.message}")
+    Rails.logger.error("IslandContextService FTS search failed: #{e.message}")
     []
+  end
+
+  # ── Vector ───────────────────────────────────────────────────────────────
+
+  def vector_search
+    EmbeddingService.new
+      .search(@description, limit: @limit)
+      .then { |entries| filter_to_mayo_with_audio(entries) }
+  rescue => e
+    Rails.logger.error("IslandContextService vector search failed: #{e.message}")
+    []
+  end
+
+  def filter_to_mayo_with_audio(entries)
+    return [] if entries.empty?
+
+    mayo_ids = DictionaryEntry
+      .confirmed_accuracy
+      .mayo_dialect
+      .has_recording
+      .where(id: entries.map(&:id))
+      .pluck(:id)
+      .to_set
+
+    entries.select { |e| mayo_ids.include?(e.id) }
+  end
+
+  # ── Merge ─────────────────────────────────────────────────────────────────
+
+  # FTS results first (explicit keyword matches), then vector-only results,
+  # capped at @limit total.
+  def merge(fts_results, vector_results)
+    fts_ids = fts_results.map(&:id).to_set
+    extra = vector_results.reject { |e| fts_ids.include?(e.id) }
+    (fts_results + extra).first(@limit)
   end
 end

@@ -89,6 +89,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     authorize @dictionary_entry, :confirm?
 
     if @dictionary_entry.update(accuracy_status: :confirmed)
+      EmbedDictionaryEntryJob.perform_later(@dictionary_entry.id)
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
