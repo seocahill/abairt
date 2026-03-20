@@ -39,7 +39,6 @@ class WordListsController < ApplicationController
     authorize @word_list
 
     if @word_list.save
-      GenerateWordListJob.perform_later(@word_list) if @word_list.description.present?
       redirect_to @word_list, notice: 'Word list was successfully created.'
     else
       render :new
@@ -49,8 +48,6 @@ class WordListsController < ApplicationController
   # PATCH/PUT /word_lists/1
   def update
     authorize @word_list
-
-    GenerateScriptJob.perform_later(@word_list, params[:generate_script]) if params[:generate_script]
 
     if params[:phrase]
       @word_list.dictionary_entries.build(word_or_phrase: params[:result], translation: params[:phrase], owner: User.ai.first)

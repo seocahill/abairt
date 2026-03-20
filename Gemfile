@@ -27,7 +27,6 @@ gem 'selenium-webdriver' # Browser automation for Fotheidil
 gem 'importmap-rails', '~> 0.8.2'
 gem 'trailblazer-operation', '~> 0.10.0'
 gem 'trailblazer-developer', group: :development
-gem 'langchainrb', '~> 0.8.2'
 gem 'solid_queue', '~> 1.0'
 gem 'mission_control-jobs', '~> 0.1'
 gem 'mailjet', '~> 1.7'
