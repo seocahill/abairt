@@ -1,0 +1,82 @@
+<div class="container mx-auto px-4 py-8 max-w-5xl">
+
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Island Context Playground</h1>
+    <p class="mt-1 text-sm text-gray-500">Simulate an API request — paste a scenario description and inspect which dictionary entries are returned.</p>
+  </div>
+
+  <%= form_with url: admin_island_context_playground_search_path, method: :post, local: true, class: "mb-8" do |f| %>
+    <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="mb-4">
+        <%= f.label :description, "Island description (English)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_area :description, rows: 5,
+              placeholder: "e.g. Ordering food and drinks in a pub, asking for recommendations, discussing the menu…",
+              value: @description,
+              class: "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <%= f.label :limit, "Limit", class: "text-sm text-gray-600" %>
+          <%= f.select :limit, [5, 10, 20, 30, 50], { selected: params[:limit]&.to_i || 20 },
+                class: "rounded border border-gray-300 px-2 py-1 text-sm" %>
+        </div>
+        <%= f.submit "Search", class: "px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium cursor-pointer" %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @results %>
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+        Results
+        <% if @results.any? %>
+          <span class="ml-2 text-gray-400 font-normal normal-case"><%= @results.size %> entries</span>
+        <% end %>
+      </h2>
+    </div>
+
+    <% if @results.empty? %>
+      <div class="bg-yellow-50 border border-yellow-200 rounded p-4 text-sm text-yellow-800">
+        No matching entries found. Try broadening the description or check that embeddings have been generated (<code>BackfillEntryEmbeddingsJob.perform_later</code>).
+      </div>
+    <% else %>
+      <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wide text-xs w-6">#</th>
+              <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wide text-xs">Irish</th>
+              <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wide text-xs">Translation</th>
+              <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wide text-xs">Speaker</th>
+              <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wide text-xs">Audio</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-100">
+            <% @results.each_with_index do |entry, i| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-gray-400"><%= i + 1 %></td>
+                <td class="px-4 py-3 font-medium text-gray-900">
+                  <%= link_to entry.word_or_phrase,
+                        voice_recording_dictionary_entry_path(entry.voice_recording, entry),
+                        class: "hover:underline text-blue-700", target: "_blank" %>
+                </td>
+                <td class="px-4 py-3 text-gray-700"><%= entry.translation.presence || "—" %></td>
+                <td class="px-4 py-3 text-gray-500"><%= entry.speaker&.name.presence || "—" %></td>
+                <td class="px-4 py-3">
+                  <% if entry.media.attached? %>
+                    <audio controls preload="none" class="h-7" style="min-width:160px">
+                      <source src="<%= rails_blob_url(entry.media) %>" type="audio/mpeg">
+                    </audio>
+                  <% else %>
+                    <span class="text-gray-400 text-xs">no audio</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  <% end %>
+
+</div>

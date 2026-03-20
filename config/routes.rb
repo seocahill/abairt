@@ -72,6 +72,9 @@ Rails.application.routes.draw do
   namespace :admin do
     get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
 
+    get  "island_context_playground",        to: "island_context_playground#index",  as: :island_context_playground
+    post "island_context_playground/search", to: "island_context_playground#search", as: :island_context_playground_search
+
     resources :api, only: [:index] do
       collection do
         post :generate
