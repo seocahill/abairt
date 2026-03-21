@@ -26,15 +26,11 @@ class EmbeddingService
   def generate(text)
     response = @client.embeddings(parameters: { model: EMBEDDING_MODEL, input: text.truncate(8000) })
     response.dig("data", 0, "embedding")
-  rescue => e
-    Rails.logger.error("EmbeddingService#generate failed: #{e.message}")
-    nil
   end
 
   def store(entry)
     text = [entry.word_or_phrase, entry.translation].compact.join(" — ")
     vector = generate(text)
-    return false unless vector
 
     conn = ActiveRecord::Base.connection
     conn.execute("DELETE FROM #{TABLE} WHERE dictionary_entry_id = ?", [entry.id])
@@ -43,9 +39,6 @@ class EmbeddingService
       [entry.id, vector.pack("f*")]
     )
     true
-  rescue => e
-    Rails.logger.error("EmbeddingService#store failed for entry #{entry.id}: #{e.message}")
-    false
   end
 
   # Returns DictionaryEntry records ordered by vector similarity to query_text.
