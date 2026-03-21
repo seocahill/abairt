@@ -28,9 +28,8 @@ class BackfillEntryEmbeddingsJob < ApplicationJob
       .map { |r| r["dictionary_entry_id"] || r[0] }
 
     DictionaryEntry
-      .confirmed_accuracy
-      .mayo_dialect
       .has_recording
+      .has_translation
       .where.not(id: already_embedded_ids)
   end
 end

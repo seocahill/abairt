@@ -24,6 +24,7 @@ class DictionaryEntry < ApplicationRecord
 
   scope :has_recording, -> { joins(:media_attachment) }
   scope :mayo_dialect, -> { joins(:speaker).where(users: { dialect: MAYO_DIALECTS }) }
+  scope :has_translation, -> { where.not(translation: [nil, ""]) }
 
   # Scopes are for filtering visability and training data
   # Note: 'pending' conflicts with status enum, so using 'unconfirmed_accuracy' and 'confirmed_accuracy'
@@ -124,6 +125,10 @@ class DictionaryEntry < ApplicationRecord
 
   def post_process
     PostProcessEntryJob.perform_later(self)
+  end
+
+  def create_embedding
+    EmbedDictionaryEntryJob.perform_later(self.id)
   end
 
   private

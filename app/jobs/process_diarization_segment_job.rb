@@ -67,6 +67,9 @@ class ProcessDiarizationSegmentJob < ApplicationJob
     entry.translate if entry.word_or_phrase.present?
     entry.auto_tag if entry.translation.present?
 
+    # create embedding if translation is present
+    entry.create_embedding if entry.translation.present?
+
     Rails.logger.info("Created and processed dictionary entry #{entry.id} for segment #{segment_data['start']}-#{segment_data['end']}")
   end
 end
