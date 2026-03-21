@@ -96,6 +96,86 @@ module Api
               }
             }
           },
+          "/api/island_context": {
+            post: {
+              summary: "Find island context entries",
+              description: "Given an English description of a Caotharnach island scenario, returns relevant confirmed Mayo dialect dictionary entries with audio. Uses hybrid search (FTS keyword matching + vector similarity) to find the best matches.",
+              operationId: "createIslandContext",
+              tags: ["Island Context"],
+              requestBody: {
+                required: true,
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        description: {
+                          type: "string",
+                          description: "English description of the island scenario (e.g. 'Ordering food and drinks in a pub, asking for recommendations')"
+                        },
+                        limit: {
+                          type: "integer",
+                          description: "Maximum number of entries to return",
+                          default: 20,
+                          minimum: 1,
+                          maximum: 50
+                        }
+                      },
+                      required: ["description"]
+                    }
+                  }
+                }
+              },
+              responses: {
+                "200": {
+                  description: "Successful response",
+                  content: {
+                    "application/json": {
+                      schema: {
+                        type: "object",
+                        properties: {
+                          entries: {
+                            type: "array",
+                            items: { "$ref": "#/components/schemas/Transcription" }
+                          },
+                          meta: {
+                            type: "object",
+                            properties: {
+                              count: {
+                                type: "integer",
+                                description: "Number of entries returned"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "401": {
+                  "$ref": "#/components/responses/Unauthorized"
+                },
+                "422": {
+                  description: "Description parameter is missing or blank",
+                  content: {
+                    "application/json": {
+                      schema: {
+                        type: "object",
+                        properties: {
+                          error: {
+                            type: "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "429": {
+                  "$ref": "#/components/responses/RateLimitExceeded"
+                }
+              }
+            }
+          },
           "/api/transcriptions/{id}": {
             get: {
               summary: "Get transcription",

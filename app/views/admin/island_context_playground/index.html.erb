@@ -5,7 +5,7 @@
     <p class="mt-1 text-sm text-gray-500">Simulate an API request — paste a scenario description and inspect which dictionary entries are returned.</p>
   </div>
 
-  <%= form_with url: admin_island_context_playground_search_path, method: :post, local: true, class: "mb-8" do |f| %>
+  <%= form_with url: admin_island_context_playground_path, method: :get, class: "mb-8" do |f| %>
     <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
       <div class="mb-4">
         <%= f.label :description, "Island description (English)", class: "block text-sm font-medium text-gray-700 mb-1" %>
@@ -56,9 +56,13 @@
               <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 text-gray-400"><%= i + 1 %></td>
                 <td class="px-4 py-3 font-medium text-gray-900">
-                  <%= link_to entry.word_or_phrase,
-                        voice_recording_dictionary_entry_path(entry.voice_recording, entry),
-                        class: "hover:underline text-blue-700", target: "_blank" %>
+                  <% if entry.voice_recording %>
+                    <%= link_to entry.word_or_phrase,
+                          voice_recording_dictionary_entry_path(entry.voice_recording, entry),
+                          class: "hover:underline text-blue-700", target: "_blank" %>
+                  <% else %>
+                    <%= entry.word_or_phrase %>
+                  <% end %>
                 </td>
                 <td class="px-4 py-3 text-gray-700"><%= entry.translation.presence || "—" %></td>
                 <td class="px-4 py-3 text-gray-500"><%= entry.speaker&.name.presence || "—" %></td>

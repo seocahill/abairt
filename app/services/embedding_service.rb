@@ -32,9 +32,9 @@ class EmbeddingService
     text = [entry.word_or_phrase, entry.translation].compact.join(" — ")
     vector = generate(text)
 
-    conn = ActiveRecord::Base.connection
-    conn.execute("DELETE FROM #{TABLE} WHERE dictionary_entry_id = ?", [entry.id])
-    conn.execute(
+    db = ActiveRecord::Base.connection.raw_connection
+    db.execute("DELETE FROM #{TABLE} WHERE dictionary_entry_id = ?", [entry.id])
+    db.execute(
       "INSERT INTO #{TABLE}(dictionary_entry_id, embedding) VALUES (?, ?)",
       [entry.id, vector.pack("f*")]
     )
@@ -47,7 +47,8 @@ class EmbeddingService
     vector = generate(query_text)
     return DictionaryEntry.none unless vector
 
-    rows = ActiveRecord::Base.connection.execute(<<~SQL, [vector.pack("f*"), limit])
+    db = ActiveRecord::Base.connection.raw_connection
+    rows = db.execute(<<~SQL, [vector.pack("f*"), limit])
       SELECT dictionary_entry_id, distance
       FROM #{TABLE}
       WHERE embedding MATCH ?
