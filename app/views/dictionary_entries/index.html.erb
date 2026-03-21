@@ -78,7 +78,7 @@
 
       <div class="mt-4">
         <%= form_tag dictionary_entries_path, method: :get,
-            data: { controller: "form" } do %>
+            data: { controller: "form", turbo_frame: "entries" } do %>
           <div class="relative">
             <%= text_field_tag :search, params[:search],
                 placeholder: "Search dictionary entries...",

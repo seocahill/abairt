@@ -23,8 +23,9 @@ class IslandContextService
   def call
     fts_results = fts_search(extract_keywords)
     vector_results = vector_search
+    candidates = merge(fts_results, vector_results)
 
-    merge(fts_results, vector_results)
+    refine(candidates)
   end
 
   private
@@ -67,7 +68,8 @@ class IslandContextService
   def fts_search(keywords)
     return [] if keywords.empty?
 
-    fts_query = keywords.map { |k| "\"#{k.gsub('"', '')}\"" }.join(" OR ")
+    terms = keywords.map { |k| "\"#{k.gsub('"', '')}\"" }.join(" OR ")
+    fts_query = "translation:(#{terms})"
 
     DictionaryEntry
       .has_recording
@@ -109,11 +111,65 @@ class IslandContextService
 
   # ── Merge ─────────────────────────────────────────────────────────────────
 
-  # FTS results first (explicit keyword matches), then vector-only results,
-  # capped at @limit total.
+  # FTS results first (explicit keyword matches), then vector-only results.
+  # Over-fetches to give the refinement step enough candidates.
   def merge(fts_results, vector_results)
     fts_ids = fts_results.map(&:id).to_set
     extra = vector_results.reject { |e| fts_ids.include?(e.id) }
-    (fts_results + extra).first(@limit)
+    (fts_results + extra).first(@limit * 2)
+  end
+
+  # ── Refine ────────────────────────────────────────────────────────────────
+
+  # LLM pass to score relevance, remove near-duplicates, and filter noise.
+  # Returns up to @limit entries, ordered by relevance.
+  def refine(candidates)
+    return candidates if candidates.size <= 3
+
+    client = OpenAI::Client.new(
+      access_token: Rails.application.credentials.dig(:openai, :openai_key),
+      organization_id: Rails.application.credentials.dig(:openai, :openai_org)
+    )
+
+    entries_json = candidates.map { |e|
+      { id: e.id, irish: e.word_or_phrase, english: e.translation }
+    }.to_json
+
+    response = client.chat(parameters: {
+      model: "gpt-4.1-mini",
+      messages: [
+        {
+          role: "system",
+          content: <<~PROMPT
+            You are filtering dictionary entries for an Irish language learning app.
+            Given a scenario description and candidate entries, return ONLY the IDs of entries
+            that are genuinely relevant to the scenario.
+
+            Rules:
+            - Judge relevance based on the ENGLISH translation, not the Irish text
+            - Remove entries where the English translation is not meaningfully related to the scenario
+            - Remove near-duplicates (same meaning, keep the better/more complete one)
+            - Return at most #{@limit} entries
+            - Order by relevance (most relevant first)
+            - Return ONLY valid JSON: {"ids": [1, 2, 3]}
+          PROMPT
+        },
+        {
+          role: "user",
+          content: "Scenario: #{@description}\n\nCandidate entries:\n#{entries_json}"
+        }
+      ],
+      temperature: 0,
+      response_format: { type: "json_object" }
+    })
+
+    kept_ids = JSON.parse(response.dig("choices", 0, "message", "content"))["ids"]
+    kept_ids = Array(kept_ids).map(&:to_i).first(@limit)
+
+    entries_by_id = candidates.index_by(&:id)
+    kept_ids.filter_map { |id| entries_by_id[id] }
+  rescue => e
+    Rails.logger.error("IslandContextService refinement failed: #{e.message}")
+    candidates.first(@limit)
   end
 end
