@@ -27,6 +27,9 @@ Rails.application.routes.draw do
 
     # Public API for confirmed transcriptions
     resources :transcriptions, only: [:index, :show]
+
+    # Island context: find Mayo dialect entries relevant to a Caotharnach island description
+    resources :island_context, only: [:create]
     
     # OpenAPI schema
     get 'openapi', to: 'openapi#show', defaults: { format: 'json' }
@@ -68,6 +71,8 @@ Rails.application.routes.draw do
 
   namespace :admin do
     get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
+
+    get "island_context_playground", to: "island_context_playground#index", as: :island_context_playground
 
     resources :api, only: [:index] do
       collection do
