@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Given an English island description from the Caotharnach app, finds relevant
-# confirmed Mayo dialect dictionary entries (with audio) using a hybrid search:
+# dictionary entries (with audio) using a hybrid search:
 #   1. LLM keyword extraction → FTS5 search on the translation field
 #   2. Vector similarity search (sqlite-vec) on the full island description
 #
@@ -70,8 +70,6 @@ class IslandContextService
     fts_query = keywords.map { |k| "\"#{k.gsub('"', '')}\"" }.join(" OR ")
 
     DictionaryEntry
-      .confirmed_accuracy
-      .mayo_dialect
       .has_recording
       .joins(:fts_dictionary_entries)
       .where("fts_dictionary_entries MATCH ?", fts_query)
@@ -91,24 +89,22 @@ class IslandContextService
   def vector_search
     EmbeddingService.new
       .search(@description, limit: @limit)
-      .then { |entries| filter_to_mayo_with_audio(entries) }
+      .then { |entries| filter_to_with_audio(entries) }
   rescue => e
     Rails.logger.error("IslandContextService vector search failed: #{e.message}")
     []
   end
 
-  def filter_to_mayo_with_audio(entries)
+  def filter_to_with_audio(entries)
     return [] if entries.empty?
 
-    mayo_ids = DictionaryEntry
-      .confirmed_accuracy
-      .mayo_dialect
+    with_audio_ids = DictionaryEntry
       .has_recording
       .where(id: entries.map(&:id))
       .pluck(:id)
       .to_set
 
-    entries.select { |e| mayo_ids.include?(e.id) }
+    entries.select { |e| with_audio_ids.include?(e.id) }
   end
 
   # ── Merge ─────────────────────────────────────────────────────────────────

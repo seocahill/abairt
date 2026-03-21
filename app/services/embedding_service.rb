@@ -29,7 +29,7 @@ class EmbeddingService
   end
 
   def store(entry)
-    text = [entry.word_or_phrase, entry.translation].compact.join(" — ")
+    text = entry.translation
     vector = generate(text)
 
     db = ActiveRecord::Base.connection.raw_connection
