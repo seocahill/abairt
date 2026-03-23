@@ -46,20 +46,27 @@ class VoiceRecordingsController < ApplicationController
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 
-    # Map pins from Location coordinates
-    @pins = VoiceRecording
+    # Map pins: Location coordinates first, then fall back to speaker coordinates
+    location_pins = VoiceRecording
       .joins(:location)
       .where.not(locations: {latitude: nil, longitude: nil})
-      .pluck(
-        "voice_recordings.id",
-        "voice_recordings.title",
-        "locations.name",
-        "locations.latitude",
-        "locations.longitude"
-      )
-      .map do |recording_id, title, location_name, lat, lng|
-        {recording_id: recording_id, recording_title: title, location_name: location_name, lat: lat.to_f, lng: lng.to_f}
-      end
+      .pluck("voice_recordings.id", "voice_recordings.title", "locations.name", "locations.latitude", "locations.longitude")
+      .map { |id, title, name, lat, lng| {recording_id: id, recording_title: title, location_name: name, lat: lat.to_f, lng: lng.to_f} }
+
+    location_recording_ids = location_pins.pluck(:recording_id)
+
+    speaker_pins = VoiceRecording
+      .joins(:users)
+      .where.not(users: {lat_lang: [nil, ""]})
+      .where.not(id: location_recording_ids)
+      .distinct
+      .pluck("voice_recordings.id", "voice_recordings.title", "users.name", "users.lat_lang")
+      .map { |id, title, speaker, lat_lang|
+        lat, lng = lat_lang.split(",").map(&:to_f)
+        {recording_id: id, recording_title: title, location_name: speaker, lat: lat, lng: lng}
+      }
+
+    @pins = location_pins + speaker_pins
 
     respond_to do |format|
       format.html
