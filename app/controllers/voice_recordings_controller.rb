@@ -42,18 +42,23 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @total_count = records.distinct.count
-    @pagy, @recordings = pagy(records.distinct, items: PAGE_SIZE)
+    @pagy, @recordings = pagy(records.distinct.includes(:tags), items: PAGE_SIZE)
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 
-    # Add map pins data - single query instead of N+1
-    @pins = DictionaryEntry
-      .joins(:speaker, :voice_recording)
-      .where.not(users: {lat_lang: nil})
-      .group("voice_recordings.id")
-      .pluck("users.id", "users.name", "users.lat_lang", "voice_recordings.id", "voice_recordings.title")
-      .map do |user_id, name, lat_lang, recording_id, recording_title|
-        {id: user_id, name: name, lat_lang: lat_lang, recording_id: recording_id, recording_title: recording_title}
+    # Map pins from Location coordinates
+    @pins = VoiceRecording
+      .joins(:location)
+      .where.not(locations: {latitude: nil, longitude: nil})
+      .pluck(
+        "voice_recordings.id",
+        "voice_recordings.title",
+        "locations.name",
+        "locations.latitude",
+        "locations.longitude"
+      )
+      .map do |recording_id, title, location_name, lat, lng|
+        {recording_id: recording_id, recording_title: title, location_name: location_name, lat: lat.to_f, lng: lng.to_f}
       end
 
     respond_to do |format|
@@ -76,7 +81,7 @@ class VoiceRecordingsController < ApplicationController
   end
 
   def show
-    @recording = VoiceRecording.find(params[:id])
+    @recording = VoiceRecording.includes(voice_recording_locations: :location).find(params[:id])
     @regions = set_regions
     if current_user
       @last_speaker_name = @recording.dictionary_entries.last&.speaker&.name

@@ -9,6 +9,9 @@ class VoiceRecording < ApplicationRecord
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
   belongs_to :location, optional: true
 
+  has_many :voice_recording_locations, dependent: :destroy
+  has_many :locations, through: :voice_recording_locations
+
   acts_as_taggable_on :tags
 
   # Provide direct access to diarization_data JSON fields
@@ -25,6 +28,18 @@ class VoiceRecording < ApplicationRecord
 
   def dialect_region
     metadata_analysis&.dig("dialect_region")
+  end
+
+  def analysis_topics
+    metadata_analysis&.dig("topics") || []
+  end
+
+  def analysis_speakers
+    metadata_analysis&.dig("speakers") || []
+  end
+
+  def dialect_evidence
+    metadata_analysis&.dig("dialect_evidence") || []
   end
 
   alias_attribute :name, :title
@@ -111,7 +126,7 @@ class VoiceRecording < ApplicationRecord
   def fully_transcribed?
     # segments refers to newer fotheidil format, diarization refers to older pyannote format
     return false if segments.blank? && diarization.blank?
-    
+
     dictionary_entries_count >= (segments || diarization).count
   end
 

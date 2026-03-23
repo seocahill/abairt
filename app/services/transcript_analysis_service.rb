@@ -178,6 +178,7 @@ class TranscriptAnalysisService
       {
         location: location,
         confidence: loc["confidence"],
+        source: loc["source"],
         context: loc["context"]
       }
     end
@@ -211,10 +212,35 @@ class TranscriptAnalysisService
 
     @voice_recording.update(metadata_analysis: metadata)
 
+    persist_location_associations(result[:locations])
+    auto_tag_from_topics(result.dig(:raw_analysis, "topics"))
+
     # Set primary location if we found one with high confidence
     primary_location = result[:locations].find { |l| l[:confidence] == "high" }
     if primary_location && @voice_recording.location_id.nil?
       @voice_recording.update(location_id: primary_location[:location].id)
     end
+  end
+
+  def persist_location_associations(locations)
+    @voice_recording.voice_recording_locations.destroy_all
+
+    locations.each do |loc_data|
+      @voice_recording.voice_recording_locations.create!(
+        location: loc_data[:location],
+        confidence: loc_data[:confidence] || "medium",
+        source: loc_data[:source],
+        context: loc_data[:context]
+      )
+    end
+  end
+
+  def auto_tag_from_topics(topics)
+    return if topics.blank?
+
+    topic_tags = topics.map { |t| t.strip.downcase.truncate(50) }
+    existing_tags = @voice_recording.tag_list
+    @voice_recording.tag_list = (existing_tags + topic_tags).uniq
+    @voice_recording.save!
   end
 end

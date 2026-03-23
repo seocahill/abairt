@@ -189,7 +189,18 @@ CREATE TABLE IF NOT EXISTS "vec_dictionary_entry_embeddings_chunks"(chunk_id INT
 CREATE TABLE IF NOT EXISTS "vec_dictionary_entry_embeddings_rowids"(rowid INTEGER PRIMARY KEY AUTOINCREMENT,id,chunk_id INTEGER,chunk_offset INTEGER);
 CREATE TABLE IF NOT EXISTS "vec_dictionary_entry_embeddings_vector_chunks00"(rowid PRIMARY KEY,vectors BLOB NOT NULL);
 CREATE TABLE IF NOT EXISTS "vec_dictionary_entry_embeddings_metadatachunks00"(rowid PRIMARY KEY, data BLOB NOT NULL);
+CREATE TABLE IF NOT EXISTS "voice_recording_locations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "voice_recording_id" integer NOT NULL, "location_id" integer NOT NULL, "confidence" varchar DEFAULT 'medium', "source" varchar, "context" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_5ad0e601a6"
+FOREIGN KEY ("voice_recording_id")
+  REFERENCES "voice_recordings" ("id")
+, CONSTRAINT "fk_rails_9d6f9aa564"
+FOREIGN KEY ("location_id")
+  REFERENCES "locations" ("id")
+);
+CREATE INDEX "index_voice_recording_locations_on_voice_recording_id" ON "voice_recording_locations" ("voice_recording_id");
+CREATE INDEX "index_voice_recording_locations_on_location_id" ON "voice_recording_locations" ("location_id");
+CREATE UNIQUE INDEX "idx_vr_locations_unique" ON "voice_recording_locations" ("voice_recording_id", "location_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20260322233134'),
 ('20260320000000'),
 ('20260218000002'),
 ('20260218000001'),

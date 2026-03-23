@@ -143,6 +143,103 @@ namespace :analysis do
     puts "Exported to #{path}"
   end
 
+  desc "Backfill location associations and tags from existing metadata_analysis"
+  task backfill: :environment do
+    recordings = VoiceRecording.where.not(metadata_analysis: nil)
+    total = recordings.count
+    puts "Backfilling #{total} recordings with location associations and tags..."
+
+    recordings.find_each.with_index do |vr, index|
+      analysis = vr.metadata_analysis
+
+      # Create location associations from analysis["locations"]
+      if analysis["locations"].present?
+        analysis["locations"].each do |loc_data|
+          next if loc_data["id"].blank?
+          location = Location.find_by(id: loc_data["id"])
+          next unless location
+
+          VoiceRecordingLocation.find_or_create_by!(
+            voice_recording: vr,
+            location: location
+          ) do |vrl|
+            vrl.confidence = loc_data["confidence"] || "medium"
+          end
+        end
+      end
+
+      # Auto-tag from topics
+      if analysis["topics"].present?
+        topic_tags = analysis["topics"].map { |t| t.strip.downcase.truncate(50) }
+        existing_tags = vr.tag_list
+        vr.tag_list = (existing_tags + topic_tags).uniq
+        vr.save!
+      end
+
+      print "\r  #{index + 1}/#{total} processed"
+    rescue => e
+      puts "\n  ERROR on VR##{vr.id}: #{e.message}"
+    end
+
+    puts "\nBackfill complete!"
+    puts "  Location associations: #{VoiceRecordingLocation.count}"
+    puts "  Tagged recordings: #{VoiceRecording.tagged_with([], exclude: true).count}"
+  end
+
+  desc "Geocode locations that only have fallback region-center coordinates"
+  task geocode_locations: :environment do
+    locations = Location.with_coordinates.select { |l| !l.has_precise_coordinates? }
+    total = locations.size
+    puts "Found #{total} locations with imprecise (region-center) coordinates"
+
+    geocoded = 0
+    failed = 0
+
+    locations.each_with_index do |location, index|
+      print "\r  #{index + 1}/#{total}: #{location.name.truncate(40)}..."
+
+      if location.geocode!
+        geocoded += 1
+      else
+        failed += 1
+      end
+
+      sleep 1 # Nominatim rate limit: 1 request/second
+    rescue => e
+      failed += 1
+      puts "\n  ERROR on #{location.name}: #{e.message}"
+    end
+
+    puts "\nGeocode complete! #{geocoded} updated, #{failed} failed"
+  end
+
+  desc "Merge duplicate locations (by name, case-insensitive)"
+  task deduplicate_locations: :environment do
+    groups = Location.group("LOWER(name)").having("COUNT(*) > 1").pluck(Arel.sql("LOWER(name)"))
+    puts "Found #{groups.size} duplicate groups"
+
+    groups.each do |name|
+      locations = Location.where("LOWER(name) = ?", name).order(:id).to_a
+
+      # Pick the best keeper: prefer one with precise coordinates, then irish_name, then lowest id
+      keeper = locations.max_by { |l|
+        [
+          l.has_precise_coordinates? ? 1 : 0,
+          l.irish_name.present? ? 1 : 0,
+          (l.dialect_region != "other") ? 1 : 0,
+          -l.id # older = better as tiebreaker
+        ]
+      }
+
+      dupes = locations - [keeper]
+      puts "  #{name}: keeping ##{keeper.id}, merging #{dupes.map(&:id).join(", ")}"
+
+      dupes.each { |dupe| dupe.merge_into!(keeper) }
+    end
+
+    puts "Done! #{Location.count} locations remaining"
+  end
+
   desc "Seed initial Mayo locations with coordinates"
   task seed_locations: :environment do
     locations_data = [

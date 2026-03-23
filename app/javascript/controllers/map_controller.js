@@ -2,6 +2,22 @@ import { Controller } from "@hotwired/stimulus"
 import L from 'leaflet'
 import feather from "feather-icons"
 
+// Expose L globally so leaflet.markercluster plugin can extend it
+window.L = L
+
+// Load markercluster plugin once, returns a promise
+const markerClusterReady = new Promise((resolve) => {
+  if (typeof L.markerClusterGroup === 'function') {
+    resolve()
+    return
+  }
+  const script = document.createElement('script')
+  script.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
+  script.onload = () => resolve()
+  script.onerror = () => resolve() // graceful fallback without clustering
+  document.head.appendChild(script)
+})
+
 export default class extends Controller {
   static targets = ["desktopContainer", "modalContainer", "modal"]
   static values = {
@@ -14,13 +30,14 @@ export default class extends Controller {
     console.log("Map controller connected");
     this.marker = null;
 
-    // Initialize map in the appropriate container
-    if (this.hasDesktopContainerTarget) {
-      this.initializeMap(this.desktopContainerTarget);
-    } else if (this.element.id === "map") {
-      // Fallback for simple map cases (like in forms)
-      this.initializeMap(this.element);
-    }
+    // Wait for markercluster to load, then initialize map
+    markerClusterReady.then(() => {
+      if (this.hasDesktopContainerTarget) {
+        this.initializeMap(this.desktopContainerTarget);
+      } else if (this.element.id === "map") {
+        this.initializeMap(this.element);
+      }
+    });
 
     this.initializeFeather();
   }
@@ -76,21 +93,48 @@ export default class extends Controller {
       shadowSize: [41, 41]
     });
 
-    this.pinsValue.forEach((user) => {
-      if (user.lat_lang && user.lat_lang.trim() !== '') {
-        let marker = L.marker(user.lat_lang.split(','))
-        let content
-        if (user.media_url) {
-          content = `<a href="/users/${user.id}">${user.name}</a><audio controls src="${user.media_url}"></audio>`;
-        } else if (user.recording_id) {
-          content = `<a data-turbo-frame="wave_display" href="/voice_recordings?search=${user.recording_title}">${user.recording_title}</a>`;
+    // Use marker clustering if available, fall back to direct map addition
+    const clusterGroup = (typeof L.markerClusterGroup === 'function')
+      ? L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false })
+      : null;
+
+    this.pinsValue.forEach((pin) => {
+      let marker;
+      let content;
+
+      if (pin.lat && pin.lng) {
+        marker = L.marker([pin.lat, pin.lng]);
+        content = `
+          <div class="text-center">
+            <strong>${pin.location_name || ''}</strong><br>
+            <a href="/voice_recordings/${pin.recording_id}">${pin.recording_title}</a>
+          </div>
+        `;
+      } else if (pin.lat_lang && pin.lat_lang.trim() !== '') {
+        // Legacy format support (users page)
+        marker = L.marker(pin.lat_lang.split(','));
+        if (pin.media_url) {
+          content = `<a href="/users/${pin.id}">${pin.name}</a><audio controls src="${pin.media_url}"></audio>`;
+        } else if (pin.recording_id) {
+          content = `<a href="/voice_recordings/${pin.recording_id}">${pin.recording_title}</a>`;
         } else {
-          content = `<a href="/users/${user.id}">${user.name}</a>`;
+          content = `<a href="/users/${pin.id}">${pin.name}</a>`;
         }
-        marker.bindPopup(content).openPopup();
-        marker.addTo(this.map);
+      }
+
+      if (marker && content) {
+        marker.bindPopup(content);
+        if (clusterGroup) {
+          clusterGroup.addLayer(marker);
+        } else {
+          marker.addTo(this.map);
+        }
       }
     });
+
+    if (clusterGroup) {
+      this.map.addLayer(clusterGroup);
+    }
 
     if (this.hasPubsValue) {
       this.pubsValue.forEach((pub) => {

@@ -46,6 +46,27 @@
           </div>
         <% end %>
       </div>
+
+      <%# Tag Filter Pills %>
+      <% if @tags.any? %>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <% if params[:tag].present? %>
+            <%= link_to voice_recordings_path(search: params[:search], dialect: params[:dialect], order: params[:order]),
+                class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200",
+                data: { turbo_frame: "recordings" } do %>
+              <%= params[:tag] %> &times;
+            <% end %>
+          <% end %>
+          <% @tags.each do |tag| %>
+            <%= link_to voice_recordings_path(tag: tag.name, search: params[:search], dialect: params[:dialect], order: params[:order]),
+                class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium #{params[:tag] == tag.name ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}",
+                data: { turbo_frame: "recordings" } do %>
+              <%= tag.name %>
+              <span class="ml-1 text-xs opacity-75">(<%= tag.taggings_count %>)</span>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
     <!-- Recording Cards - Scrollable -->

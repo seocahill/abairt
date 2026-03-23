@@ -92,6 +92,12 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :locations, only: [:index, :edit, :update] do
+      member do
+        post :geocode
+      end
+    end
+
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
       member do
         post :approve
