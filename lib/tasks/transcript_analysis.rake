@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 namespace :analysis do
+  desc "Post-deploy: backfill associations/tags, deduplicate locations, geocode"
+  task post_deploy: %i[backfill deduplicate_locations geocode_locations]
+
   desc "Analyze all voice recordings with transcripts to extract location and speaker metadata"
   task all: :environment do
     recordings = VoiceRecording
@@ -186,31 +189,42 @@ namespace :analysis do
     puts "  Tagged recordings: #{VoiceRecording.tagged_with([], exclude: true).count}"
   end
 
-  desc "Geocode locations that only have fallback region-center coordinates"
+  desc "Geocode locations without coordinates (via Logainm then Nominatim)"
   task geocode_locations: :environment do
-    locations = Location.with_coordinates.select { |l| !l.has_precise_coordinates? }
-    total = locations.size
-    puts "Found #{total} locations with imprecise (region-center) coordinates"
+    # Clear any remaining fallback region-center coordinates
+    cleared = 0
+    Location.with_coordinates.find_each do |loc|
+      next if loc.has_precise_coordinates?
+      loc.update_columns(latitude: nil, longitude: nil)
+      cleared += 1
+    end
+    puts "Cleared #{cleared} fallback coordinates" if cleared > 0
+
+    locations = Location.where(latitude: nil)
+    total = locations.count
+    puts "Geocoding #{total} locations (Logainm -> Nominatim)..."
 
     geocoded = 0
     failed = 0
 
-    locations.each_with_index do |location, index|
+    locations.find_each.with_index do |location, index|
       print "\r  #{index + 1}/#{total}: #{location.name.truncate(40)}..."
 
       if location.geocode!
         geocoded += 1
+        puts " -> #{location.latitude}, #{location.longitude}"
       else
         failed += 1
       end
 
-      sleep 1 # Nominatim rate limit: 1 request/second
+      sleep 1 # rate limit
     rescue => e
       failed += 1
       puts "\n  ERROR on #{location.name}: #{e.message}"
     end
 
     puts "\nGeocode complete! #{geocoded} updated, #{failed} failed"
+    puts "Locations with coordinates: #{Location.with_coordinates.count}/#{Location.count}"
   end
 
   desc "Merge duplicate locations (by name, case-insensitive)"
