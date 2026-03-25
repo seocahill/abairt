@@ -97,11 +97,6 @@ class TranscriptAnalysisService
       - east_mayo: Eastern Mayo towards Sligo/Roscommon border - Castlebar, Ballyhaunis, Ballinrobe
       - other: Areas outside traditional Gaeltacht or mixed dialects
 
-      Dialect markers to look for:
-      - Erris: tends to use "tigeann" (comes), "tig leat" (you can), certain vowel shifts
-      - Achill: distinctive pronunciation patterns, some unique vocabulary
-      - Tourmakeady: influenced by south Connacht, some unique local terms
-
       When analyzing, pay attention to:
       - Place names mentioned in the text
       - Personal names (especially older Irish names)
@@ -210,7 +205,7 @@ class TranscriptAnalysisService
       topics: result.dig(:raw_analysis, "topics")
     }
 
-    @voice_recording.update(metadata_analysis: metadata)
+    @voice_recording.update(metadata_analysis: metadata, )
 
     persist_location_associations(result[:locations])
     auto_tag_from_topics(result.dig(:raw_analysis, "topics"))
