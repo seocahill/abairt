@@ -124,6 +124,7 @@ services:
     environment:
       - SE_NODE_MAX_SESSIONS=5
       - SE_NODE_SESSION_TIMEOUT=300
+      - SE_JAVA_OPTS=-Xmx1536m -Xms512m
 
 
 volumes:

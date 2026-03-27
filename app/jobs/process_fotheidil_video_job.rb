@@ -16,7 +16,9 @@ class ProcessFotheidilVideoJob < ApplicationJob
     )
 
     unless result.success?
-      Rails.logger.error "ProcessFotheidilVideoJob failed: #{result[:error]}"
+      error_message = result[:error]
+      Rails.logger.error "ProcessFotheidilVideoJob failed: #{error_message}"
+      NotificationsMailer.transcription_failed(voice_recording, error_message).deliver_later
     end
   end
 end
