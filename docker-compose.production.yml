@@ -119,9 +119,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-    ports:
-      - "127.0.0.1:7900:7900"
-      - "127.0.0.1:5900:5900"
     tmpfs:
       - /dev/shm:rw,noexec,nosuid,size=2g
     environment:
