@@ -25,9 +25,6 @@ module Abairt
     # config.eager_load_paths << Rails.root.join("extras")
     config.action_mailer.default_url_options = { host: "localhost:3000" }
 
-    # override migrations path
-    config.paths['db/migrate'] = ['migrations']
-
     # support fts
     config.active_record.schema_format = :sql
 

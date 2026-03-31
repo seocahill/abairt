@@ -26,16 +26,15 @@ default: &default
 development:
     primary:
         adapter: sqlite3
-        database: db/development.sqlite3
+        database: storage/development.sqlite3
         pool: 5
         timeout: 5000
-        migrations_paths: migrations
     queue:
         adapter: sqlite3
-        database: db/queue_development.sqlite3
+        database: storage/queue_development.sqlite3
         pool: 5
         timeout: 5000
-        migrations_paths: queue_migrate
+        migrations_paths: db/queue_migrate
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -70,16 +69,15 @@ development:
 test:
   primary:
     adapter: sqlite3
-    database: db/test.sqlite3
+    database: storage/test.sqlite3
     pool: 5
     timeout: 5000
-    migrations_paths: migrations
   queue:
     adapter: sqlite3
-    database: db/queue_test.sqlite3
+    database: storage/queue_test.sqlite3
     pool: 5
     timeout: 5000
-    migrations_paths: queue_migrate
+    migrations_paths: db/queue_migrate
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -104,13 +102,12 @@ test:
 production:
   primary:
     adapter: sqlite3
-    database: db/production.sqlite3
+    database: storage/production.sqlite3
     pool: 5
     timeout: 5000
-    migrations_paths: migrations
   queue:
     adapter: sqlite3
-    database: db/queue_production.sqlite3
+    database: storage/queue_production.sqlite3
     pool: 5
     timeout: 5000
-    migrations_paths: queue_migrate
+    migrations_paths: db/queue_migrate

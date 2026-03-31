@@ -31,7 +31,7 @@ services:
       - source: master_key
         target: /rails/config/master.key
     volumes:
-      - db:/rails/db
+      - storage:/rails/storage
       # - assets:/rails/public
     command:
       - /bin/bash
@@ -48,7 +48,7 @@ services:
   #     - source: litestream_v5
   #       target: /etc/litestream.yml
   #   volumes:
-  #     - db:/data
+  #     - storage:/data
   #   user: "1000:1000"
   #   entrypoint:
   #     - /bin/sh
@@ -60,7 +60,7 @@ services:
   backup:
     image: amazon/aws-cli:latest
     volumes:
-      - db:/data:ro
+      - storage:/data:ro
     env_file:
       - .env
     entrypoint:
@@ -128,7 +128,7 @@ services:
 
 
 volumes:
-  db:
+  storage:
   vector_db:
   caddy_data:
   caddy_config:
