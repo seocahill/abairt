@@ -15,7 +15,7 @@ services:
       # - assets:/var/www/site/current/public
 
   rails:
-    image: registry.gitlab.com/abairt/web-application:783614d04a04411e2959cb261d2f101d0f44d8c6
+    image: registry.gitlab.com/abairt/web-application:af3d63ee46ae1f56625af5e465648d0d465d57a7
     deploy:
       mode: replicated
       replicas: 1
@@ -31,7 +31,7 @@ services:
       - source: master_key
         target: /rails/config/master.key
     volumes:
-      - storage:/rails/storage
+      - db:/rails/storage
       # - assets:/rails/public
     command:
       - /bin/bash
@@ -48,7 +48,7 @@ services:
   #     - source: litestream_v5
   #       target: /etc/litestream.yml
   #   volumes:
-  #     - storage:/data
+  #     - db:/data
   #   user: "1000:1000"
   #   entrypoint:
   #     - /bin/sh
@@ -60,7 +60,7 @@ services:
   backup:
     image: amazon/aws-cli:latest
     volumes:
-      - storage:/data:ro
+      - db:/data:ro
     env_file:
       - .env
     entrypoint:
@@ -128,7 +128,9 @@ services:
 
 
 volumes:
-  storage:
+  db:
+    external: true
+    name: abairt_db
   vector_db:
   caddy_data:
   caddy_config:
