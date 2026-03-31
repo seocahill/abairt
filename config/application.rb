@@ -25,7 +25,7 @@ module Abairt
     # config.eager_load_paths << Rails.root.join("extras")
     config.action_mailer.default_url_options = { host: "localhost:3000" }
 
-    # support fts
+    # Use structure.sql (schema.rb has issues with virtual tables in Rails 8.1.1)
     config.active_record.schema_format = :sql
 
     # Configure Active Job to use Solid Queue
