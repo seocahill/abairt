@@ -23,7 +23,7 @@ class BackfillEntryEmbeddingsJob < ApplicationJob
   private
 
   def entries_to_embed
-    already_embedded_ids = ActiveRecord::Base.connection
+    already_embedded_ids = VectorsRecord.connection
       .execute("SELECT dictionary_entry_id FROM vec_dictionary_entry_embeddings")
       .map { |r| r["dictionary_entry_id"] || r[0] }
 

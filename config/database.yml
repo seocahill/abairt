@@ -35,6 +35,12 @@ development:
         pool: 5
         timeout: 5000
         migrations_paths: db/queue_migrate
+    vectors:
+        adapter: sqlite3
+        database: storage/vectors_development.sqlite3
+        pool: 5
+        timeout: 5000
+        migrations_paths: db/vectors_migrate
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -78,6 +84,12 @@ test:
     pool: 5
     timeout: 5000
     migrations_paths: db/queue_migrate
+  vectors:
+    adapter: sqlite3
+    database: storage/vectors_test.sqlite3
+    pool: 5
+    timeout: 5000
+    migrations_paths: db/vectors_migrate
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -111,3 +123,9 @@ production:
     pool: 5
     timeout: 5000
     migrations_paths: db/queue_migrate
+  vectors:
+    adapter: sqlite3
+    database: storage/vectors_production.sqlite3
+    pool: 5
+    timeout: 5000
+    migrations_paths: db/vectors_migrate

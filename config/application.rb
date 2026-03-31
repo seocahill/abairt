@@ -32,6 +32,9 @@ module Abairt
     config.active_job.queue_adapter = :solid_queue
     config.solid_queue.connects_to = { database: { writing: :queue } }
 
+    # Configure vectors database
+    config.vectors_database = { writing: :vectors, reading: :vectors }
+
     # assets issue
     config.assets.css_compressor = nil
 

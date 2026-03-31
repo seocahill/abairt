@@ -32,7 +32,7 @@ class EmbeddingService
     text = entry.translation
     vector = generate(text)
 
-    db = ActiveRecord::Base.connection.raw_connection
+    db = VectorsRecord.connection.raw_connection
     db.execute("DELETE FROM #{TABLE} WHERE dictionary_entry_id = ?", [entry.id])
     db.execute(
       "INSERT INTO #{TABLE}(dictionary_entry_id, embedding) VALUES (?, ?)",
@@ -47,7 +47,7 @@ class EmbeddingService
     vector = generate(query_text)
     return DictionaryEntry.none unless vector
 
-    db = ActiveRecord::Base.connection.raw_connection
+    db = VectorsRecord.connection.raw_connection
     rows = db.execute(<<~SQL, [vector.pack("f*"), limit])
       SELECT dictionary_entry_id, distance
       FROM #{TABLE}
