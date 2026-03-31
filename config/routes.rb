@@ -44,7 +44,11 @@ Rails.application.routes.draw do
         post :deconfirm
       end
     end
-    resources :speakers, module: :voice_recordings, only: [:index, :update]
+    resources :speakers, module: :voice_recordings, only: [:index, :update] do
+      collection do
+        get :search
+      end
+    end
     member do
       get :preview
       get :add_region

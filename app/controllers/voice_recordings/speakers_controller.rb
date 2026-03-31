@@ -5,15 +5,17 @@ module VoiceRecordings
     def index
       authorize @voice_recording, :speakers?
       @temp_speakers = @voice_recording.users.where(role: :temporary)
-      @speakers = User.active
+      @speakers = User.speaker.order(:name)
+      @analyzed_speakers = @voice_recording.analysis_speakers
+      @new_speaker = User.new(role: :speaker, ability: :C2)
+    end
 
-      # Search existing speakers
-      @speakers = User.speaker
-      @speakers = @speakers.where("name ILIKE ?", "%#{params[:name]}%") if params[:name].present?
-      @speakers = @speakers.where(dialect: params[:dialect]) if params[:dialect].present?
-      @speakers = @speakers.where("lat_lang && ?", params[:location]) if params[:location].present?
+    def search
+      authorize @voice_recording, :speakers?
+      query = params[:q].to_s.strip
+      speakers = User.speaker.search(query).order(:name).limit(10)
 
-      @new_speaker = User.new(role: :speaker)
+      render json: speakers.map { |s| {id: s.id, name: s.name, dialect: s.dialect, ability: s.ability} }
     end
 
     def update
