@@ -57,8 +57,10 @@ class VoiceRecording < ApplicationRecord
   end
 
   def segments_count
-    return 0 unless diarization_data.present? && diarization_data["diarization"].present?
-    diarization_data["diarization"].size
+    return 0 unless diarization_data.present?
+
+    # Prefer Fotheidil segments over pyannote diarization
+    (diarization_data["segments"] || diarization_data["diarization"])&.size || 0
   end
 
   def calculate_duration(path)

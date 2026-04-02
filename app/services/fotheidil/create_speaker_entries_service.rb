@@ -11,11 +11,28 @@ module Fotheidil
     def call
       return if @voice_recording.segments.blank?
 
+      remove_pyannote_entries
       speakers = extract_unique_speakers(@voice_recording.segments)
       queue_speaker_segments(speakers, @voice_recording.segments)
     end
 
     private
+
+    # Remove old pyannote auto-generated entries before creating Fotheidil ones.
+    # Pyannote entries are identified by: temporary speaker + NULL region_id
+    # (Fotheidil entries always have a region_id set to the segment ID).
+    def remove_pyannote_entries
+      pyannote_entries = @voice_recording.dictionary_entries
+        .where(region_id: nil)
+        .where(speaker: User.where(role: :temporary))
+
+      count = pyannote_entries.count
+      return if count.zero?
+
+      Rails.logger.info "Removing #{count} old pyannote entries for VoiceRecording #{@voice_recording.id}"
+      pyannote_entries.destroy_all
+      @voice_recording.reload
+    end
 
     def extract_unique_speakers(segments)
       segments.pluck("speaker").uniq
