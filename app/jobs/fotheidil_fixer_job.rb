@@ -16,7 +16,7 @@ class FotheidilFixerJob < ApplicationJob
         next true if vr.fotheidil_video_id.present? && vr.segments.blank?
 
         # Priority 2: Has segments but incomplete entries
-        next true if vr.segments.present? && vr.dictionary_entries_count < vr.segments.count
+        next true if vr.segments.present? && !vr.fully_transcribed?
 
         # Priority 3: Has media but no video ID
         next true if vr.fotheidil_video_id.blank? && vr.dictionary_entries_count.zero?

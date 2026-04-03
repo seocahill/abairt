@@ -126,13 +126,42 @@ class VoiceRecording < ApplicationRecord
   end
 
   def fully_transcribed?
-    # segments refers to newer fotheidil format, diarization refers to older pyannote format
     return false if segments.blank? && diarization.blank?
 
-    dictionary_entries_count >= (segments || diarization).count
+    dictionary_entries_count >= expected_entries_count
+  end
+
+  # Segments count minus those legitimately skipped because a human entry
+  # already covers that time range (Fotheidil overlap guard).
+  def expected_entries_count
+    source = segments || diarization
+    return 0 if source.blank?
+
+    source.count - segments_covered_by_human_entries
   end
 
   def fully_translated?
     dictionary_entries.where.not(translation: [nil, ""]).count.fdiv(dictionary_entries.count).*(100).round >= 75
+  end
+
+  private
+
+  def segments_covered_by_human_entries
+    return 0 unless segments.present?
+
+    human_entries = dictionary_entries
+      .where.not(speaker: User.where(role: :temporary))
+      .where.not(region_start: nil)
+      .where.not(region_end: nil)
+      .to_a
+    return 0 if human_entries.empty?
+
+    segments.count do |seg|
+      seg_start = seg["startTimeSeconds"]
+      seg_end = seg["endTimeSeconds"]
+      next false unless seg_start && seg_end
+
+      human_entries.any? { |e| e.region_start < seg_end && e.region_end > seg_start }
+    end
   end
 end

@@ -58,14 +58,13 @@ module Fotheidil
     def check_not_already_completed(ctx, voice_recording:, **)
       return true if voice_recording.segments.blank?
 
-      completed = voice_recording.dictionary_entries_count >= voice_recording.segments.count
-
-      if completed
+      if voice_recording.fully_transcribed?
         Rails.logger.info "VoiceRecording #{voice_recording.id} already completed"
         ctx[:error] = "Already completed"
+        return false
       end
 
-      !completed
+      true
     end
 
     # Authenticate with Fotheidil
@@ -358,18 +357,17 @@ module Fotheidil
 
     # Wait for entries to be created
     def wait_for_entries(ctx, voice_recording:, timeout: 300, **)
-      segments = ctx[:segments]
       Rails.logger.info "Waiting for dictionary entries to be created (timeout: #{timeout}s)..."
 
-      expected_count = segments.count
       start_time = Time.current
 
       loop do
         voice_recording.reload
+        expected_count = voice_recording.expected_entries_count
         current_count = voice_recording.dictionary_entries_count
 
         if current_count >= expected_count
-          Rails.logger.info "All #{expected_count} dictionary entries created"
+          Rails.logger.info "All entries created (#{current_count}/#{expected_count})"
           return true
         end
 
