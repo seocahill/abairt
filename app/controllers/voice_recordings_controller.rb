@@ -1,10 +1,12 @@
 class VoiceRecordingsController < ApplicationController
   before_action :set_voice_recording, only: %i[show edit update destroy add_region import_status retranscribe autocorrect]
+  skip_after_action :verify_authorized, only: [:tags]
   PAGE_SIZE = 15 # Define the constant at the top of the controller
 
   def index
     @new_voice_recording = VoiceRecording.new
     records = VoiceRecording.all
+    @view_mode = params[:view] == "list" ? "list" : "map" # Default to map view
 
     if params[:preview].present?
       @recording = VoiceRecording.find(params[:preview])
@@ -85,6 +87,33 @@ class VoiceRecordingsController < ApplicationController
         ]
       end
     end
+  end
+
+  def tags
+    # Get all tags with counts using acts-as-taggable-on's built-in method
+    all_tags = VoiceRecording.tag_counts_on(:tags).to_a
+
+    # Apply letter filter (A-Z)
+    if params[:letter].present? && params[:letter].match?(/^[A-Za-z]$/)
+      letter = params[:letter].downcase
+      all_tags = all_tags.select { |tag| tag.name.downcase.start_with?(letter) }
+    end
+
+    # Apply search filter
+    if params[:search].present?
+      search_term = params[:search].downcase
+      all_tags = all_tags.select { |tag| tag.name.downcase.include?(search_term) }
+    end
+
+    # Sort by count (default) or name
+    all_tags = if params[:order] == "name"
+      all_tags.sort_by(&:name)
+    else
+      all_tags.sort_by { |tag| [-tag.taggings_count, tag.name] }
+    end
+
+    # Paginate the array
+    @pagy, @tags = pagy_array(all_tags, items: 50)
   end
 
   def show

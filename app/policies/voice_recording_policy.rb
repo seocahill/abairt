@@ -3,6 +3,10 @@ class VoiceRecordingPolicy < ApplicationPolicy
     true
   end
 
+  def tags
+    true
+  end
+
   def create?
     return unless user
 

@@ -1,28 +1,51 @@
 <!-- Main Container -->
 <div class="flex flex-col md:flex-row min-h-screen" data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
   <!-- Left Side - Map Container (moves between desktop and modal) -->
-  <div class="hidden md:block md:w-1/2" data-map-target="desktopContainer">
-    <div id="map" class="h-screen w-full"></div>
-  </div>
+  <% if @view_mode == "map" %>
+    <div class="hidden md:block md:w-1/2" data-map-target="desktopContainer">
+      <div id="map" class="h-screen w-full"></div>
+    </div>
+  <% end %>
 
   <!-- Right Side - Media Cards -->
-  <div class="w-full md:w-1/2 h-screen flex flex-col">
+  <div class="<%= @view_mode == 'list' ? 'w-full' : 'w-full md:w-1/2' %> h-screen flex flex-col">
     <!-- Search and Filter Controls -->
     <div class="p-6 bg-white border-b">
       <div class="flex flex-col gap-4">
-        <div class="flex gap-2 justify-end">
-          <% if policy(VoiceRecording).create? %>
-            <%= link_to "New", new_voice_recording_path,
-                class: "px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-          <% end %>
-          <% if current_user&.admin? %>
-            <%= link_to "Import", new_import_path,
-                class: "px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
-          <% end %>
+        <div class="flex gap-2 justify-between">
+          <!-- View Toggle -->
+          <div class="flex gap-1 bg-gray-100 rounded-lg p-1">
+            <%= link_to voice_recordings_path(view: "map", search: params[:search], tag: params[:tag], dialect: params[:dialect], order: params[:order]),
+                class: "px-3 py-1.5 rounded-md text-sm font-medium transition-colors #{@view_mode == 'map' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}",
+                title: "Map view" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            <% end %>
+            <%= link_to voice_recordings_path(view: "list", search: params[:search], tag: params[:tag], dialect: params[:dialect], order: params[:order]),
+                class: "px-3 py-1.5 rounded-md text-sm font-medium transition-colors #{@view_mode == 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}",
+                title: "List view" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            <% end %>
+          </div>
+
+          <div class="flex gap-2">
+            <% if policy(VoiceRecording).create? %>
+              <%= link_to "New", new_voice_recording_path,
+                  class: "px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            <% end %>
+            <% if current_user&.admin? %>
+              <%= link_to "Import", new_import_path,
+                  class: "px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+            <% end %>
+          </div>
         </div>
         <%= form_tag voice_recordings_path, method: :get,
             class: "flex flex-col md:flex-row gap-4 w-full",
             data: { controller: "form", turbo_frame: "recordings" } do %>
+          <%= hidden_field_tag :view, @view_mode %>
           <div class="flex-1">
             <%= text_field_tag :search, params[:search],
                 placeholder: "Search #{@total_count} recordings...",
@@ -51,20 +74,22 @@
       <% if @tags.any? %>
         <div class="flex flex-wrap gap-2 mt-3">
           <% if params[:tag].present? %>
-            <%= link_to voice_recordings_path(search: params[:search], dialect: params[:dialect], order: params[:order]),
+            <%= link_to voice_recordings_path(view: @view_mode, search: params[:search], dialect: params[:dialect], order: params[:order]),
                 class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200",
                 data: { turbo_frame: "recordings" } do %>
               <%= params[:tag] %> &times;
             <% end %>
           <% end %>
           <% @tags.each do |tag| %>
-            <%= link_to voice_recordings_path(tag: tag.name, search: params[:search], dialect: params[:dialect], order: params[:order]),
+            <%= link_to voice_recordings_path(view: @view_mode, tag: tag.name, search: params[:search], dialect: params[:dialect], order: params[:order]),
                 class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium #{params[:tag] == tag.name ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}",
                 data: { turbo_frame: "recordings" } do %>
               <%= tag.name %>
               <span class="ml-1 text-xs opacity-75">(<%= tag.taggings_count %>)</span>
             <% end %>
           <% end %>
+          <%= link_to "View all tags", tags_voice_recordings_path,
+              class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" %>
         </div>
       <% end %>
     </div>
@@ -82,13 +107,15 @@
     </div>
   </div>
 
-  <!-- Mobile Map Toggle Button -->
-  <button class="md:hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
-          data-action="click->map#openModal">
-    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-    </svg>
-  </button>
+  <!-- Mobile Map Toggle Button (only in map view) -->
+  <% if @view_mode == "map" %>
+    <button class="md:hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
+            data-action="click->map#openModal">
+      <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  <% end %>
 
   <!-- Mobile Map Modal -->
   <div class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden"
