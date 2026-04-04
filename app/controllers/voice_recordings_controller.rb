@@ -44,7 +44,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @total_count = records.distinct.count
-    @pagy, @recordings = pagy(records.distinct.includes(:tags), items: PAGE_SIZE)
+    @pagy, @recordings = pagy(records.distinct.includes(:tags, :users), items: PAGE_SIZE)
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 

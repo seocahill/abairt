@@ -88,7 +88,15 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
   test "should get index with list view" do
     get voice_recordings_url(view: "list")
     assert_response :success
-    assert_select 'div[class*="w-full"]', minimum: 1
+    # List view uses multi-column grid
+    assert_select 'div[class*="grid-cols-3"]', minimum: 1
+  end
+
+  test "list view uses same card partial as map view" do
+    get voice_recordings_url(view: "list")
+    assert_response :success
+    # Same card partial renders audio elements
+    assert_select 'audio[preload="none"]', minimum: 0
   end
 
   test "should get index with map view" do
