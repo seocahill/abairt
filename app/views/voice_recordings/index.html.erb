@@ -14,7 +14,7 @@
       <div class="flex flex-col gap-4">
         <div class="flex gap-2 justify-between">
           <!-- View Toggle -->
-          <div class="flex gap-1 bg-gray-100 rounded-lg p-1">
+          <div class="hidden sm:flex gap-1 bg-gray-100 rounded-lg p-1">
             <%= link_to voice_recordings_path(view: "map", search: params[:search], tag: params[:tag], dialect: params[:dialect], order: params[:order]),
                 class: "px-3 py-1.5 rounded-md text-sm font-medium transition-colors #{@view_mode == 'map' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}",
                 title: "Map view" do %>
@@ -70,9 +70,25 @@
         <% end %>
       </div>
 
-      <%# Tag Filter Pills %>
+      <%# Tag Filter Pills - hidden on mobile, replaced with link %>
       <% if @tags.any? %>
-        <div class="flex flex-wrap gap-2 mt-3">
+        <%# Mobile: show active tag filter (if any) + link to tags page %>
+        <div class="flex items-center gap-2 mt-3 sm:hidden">
+          <% if params[:tag].present? %>
+            <%= link_to voice_recordings_path(view: @view_mode, search: params[:search], dialect: params[:dialect], order: params[:order]),
+                class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200",
+                data: { turbo_frame: "recordings" } do %>
+              <%= params[:tag] %> &times;
+            <% end %>
+          <% end %>
+          <%= link_to tags_voice_recordings_path,
+              class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" do %>
+            Browse tags (<%= @tags.size %>)
+          <% end %>
+        </div>
+
+        <%# Desktop: full tag pills %>
+        <div class="hidden sm:flex flex-wrap gap-2 mt-3">
           <% if params[:tag].present? %>
             <%= link_to voice_recordings_path(view: @view_mode, search: params[:search], dialect: params[:dialect], order: params[:order]),
                 class: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200",
