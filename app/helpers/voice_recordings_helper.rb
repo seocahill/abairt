@@ -1,17 +1,5 @@
 module VoiceRecordingsHelper
 
-  def speakers_identified_label(recording)
-    total = recording.users.size
-    identified = recording.users.reject(&:temporary?).size
-    "#{identified}/#{total} speakers identified"
-  end
-
-  def transcriptions_confirmed_label(recording)
-    total = recording.dictionary_entries.count
-    confirmed = recording.dictionary_entries.confirmed_accuracy.count
-    "#{confirmed}/#{total} transcriptions confirmed"
-  end
-
   def pill_color(entry)
     case entry.quality
     when "low"
