@@ -411,9 +411,14 @@ export default class extends Controller {
     const regions = this.waveSurfer.regions?.list;
     if (!regions) return;
 
-    const currentRegion = Object.values(regions).find(r =>
+    // When multiple regions overlap at currentTime, prefer the most specific
+    // (latest-starting) one — it's the innermost/narrowest match.
+    const matchingRegions = Object.values(regions).filter(r =>
       currentTime >= r.start && currentTime <= r.end
     );
+    const currentRegion = matchingRegions.length > 0
+      ? matchingRegions.reduce((best, r) => r.start > best.start ? r : best)
+      : null;
 
     if (currentRegion?.data?.id) {
       this.findAndHighlightEntry(currentRegion.data.id);

@@ -283,7 +283,7 @@ class VoiceRecordingsController < ApplicationController
     @recording = VoiceRecording.find(params[:id])
     authorize @recording, :show?
 
-    regions = @recording.dictionary_entries.map { |e|
+    regions = @recording.dictionary_entries.where.not(region_start: nil).order(:region_start).map { |e|
       e.slice(:region_id, :region_start, :region_end, :word_or_phrase, :translation, :id)
     }
 
