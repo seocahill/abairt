@@ -90,7 +90,7 @@ class VoiceRecording < ApplicationRecord
           "ffmpeg", "-i", file.path,
           "-vn",                   # Disable video processing
           "-acodec", "libmp3lame", # MP3
-          "-q:a", "2",             # VBR ~190kbps
+          "-b:a", "128k",          # CBR 128kbps — avoids browser VBR timing drift
           "-y",                    # Overwrite output file
           temp_audio.path
         )

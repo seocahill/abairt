@@ -1,7 +1,7 @@
 <!-- Media Player Container -->
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
      data-controller="waveform"
-     data-waveform-url-value="<%= @recording.media.url if @recording&.media&.attached? %>"
+     data-waveform-url-value="<%= (@recording.audio_track.attached? ? @recording.audio_track : @recording.media).url if @recording&.media&.attached? %>"
      data-waveform-regions-url-value="<%= regions_voice_recording_path(@recording) if @recording %>"
      data-waveform-edit-mode-value="false"
      data-waveform-entry-update-url-template-value="<%= @recording ? voice_recording_dictionary_entry_path(@recording, 'ENTRY_ID') : '' %>">
