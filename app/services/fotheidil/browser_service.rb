@@ -54,9 +54,7 @@ module Fotheidil
 
       Rails.logger.info "Authenticating with browser automation..."
 
-      # Use the auth-v2 login page which has proper redirects
-      # If the main login page is unavailable, this URL will work
-      login_url = "https://auth-v2.abair.ie/?ref=https%3A%2F%2Ffotheidil.abair.ie%2Fauth%2Fcallback"
+      login_url = "https://auth.abair.ie/?ref=https%3A%2F%2Ffotheidil.abair.ie%2Fauth%2Fcallback"
       @driver.navigate.to login_url
 
       wait = Selenium::WebDriver::Wait.new(timeout: 10)
