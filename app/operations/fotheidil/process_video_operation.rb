@@ -26,6 +26,7 @@ module Fotheidil
     # end
     step :validate_voice_recording
     step :check_not_already_completed, Output(:failure) => End(:already_completed)
+    step :prepare_audio_track
     step :authenticate
     step :determine_video_source
     step :wait_for_transcription
@@ -65,6 +66,49 @@ module Fotheidil
       end
 
       true
+    end
+
+    # Downsample MP3 media to 128kbps mono 16kHz and store as audio_track.
+    # Keeps upload sizes well under the 100MB Fotheidil limit (e.g. 320kbps
+    # 47-min file goes from ~113MB to ~27MB). Skipped if already attached.
+    def prepare_audio_track(ctx, voice_recording:, **)
+      return true if voice_recording.audio_track.attached?
+      return true unless voice_recording.media.content_type == "audio/mpeg"
+
+      Rails.logger.info "Preparing audio_track for VoiceRecording##{voice_recording.id}..."
+
+      voice_recording.media.open do |input|
+        Tempfile.create([ "audio_track", ".mp3" ], binmode: true) do |output|
+          success = system(
+            "ffmpeg", "-i", input.path,
+            "-vn",
+            "-acodec", "libmp3lame",
+            "-b:a", "128k",
+            "-ac", "1",
+            "-ar", "16000",
+            "-y",
+            output.path,
+            err: File::NULL
+          )
+
+          unless success
+            ctx[:error] = "Audio downsampling failed for VoiceRecording##{voice_recording.id}"
+            return false
+          end
+
+          voice_recording.audio_track.attach(
+            io: File.open(output.path),
+            filename: "#{voice_recording.media.filename.base}_track.mp3",
+            content_type: "audio/mpeg"
+          )
+        end
+      end
+
+      Rails.logger.info "audio_track prepared for VoiceRecording##{voice_recording.id}"
+      true
+    rescue => e
+      ctx[:error] = "Audio downsampling error: #{e.message}"
+      false
     end
 
     # Authenticate with Fotheidil
@@ -154,6 +198,13 @@ module Fotheidil
           Rails.logger.warn "Audio extraction failed, falling back to original file"
           temp_path
         end
+      elsif voice_recording.audio_track.attached?
+        audio_path = "/tmp/#{safe_base}_track.mp3"
+        File.open(audio_path, "wb") do |f|
+          voice_recording.audio_track.download { |chunk| f.write(chunk) }
+        end
+        Rails.logger.info "Using downsampled audio_track for upload: #{audio_path}"
+        audio_path
       else
         temp_path
       end
