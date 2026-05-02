@@ -7,6 +7,8 @@ class TranscriptAnalysisJob < ApplicationJob
       .where(metadata_analysis: nil)
       .distinct.last
 
+    return unless recording
+
     TranscriptAnalysisService.new(recording).analyze
   end
 end
