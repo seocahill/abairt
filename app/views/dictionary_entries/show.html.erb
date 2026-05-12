@@ -47,10 +47,6 @@
                 </div>
               <% end %>
               <div>
-                <span class="font-medium">Owner:</span> 
-                <%= link_to @dictionary_entry.owner.name, user_path(@dictionary_entry.owner), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>
-              </div>
-              <div>
                 <span class="font-medium">Translator:</span> 
                 <% if @dictionary_entry.translator %>
                   <%= link_to @dictionary_entry.translator.name, user_path(@dictionary_entry.translator), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: "_top" } %>

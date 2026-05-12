@@ -41,6 +41,10 @@
                 rows: 2,
                 class: "w-full text-gray-600 border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[3rem]",
                 placeholder: "Translation" %>
+            <%= form.select :speaker_id,
+                options_from_collection_for_select(entry.voice_recording.users, :id, :name, entry.speaker_id),
+                { include_blank: "— select speaker —" },
+                class: "w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-700" %>
             <div class="flex gap-2 mt-2">
               <%= form.submit "Save", class: "bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors" %>
               <button type="button"
@@ -84,14 +88,21 @@
           </svg>
           <span><%= format_duration(entry.region_start) %> - <%= format_duration(entry.region_end) %></span>
         </div>
-        <% if entry.speaker %>
-          <div class="flex items-center">
-            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-            </svg>
-            <span><%= link_to entry.speaker.name, voice_recording_speakers_path(entry.voice_recording), class: "hover:text-blue-600 hover:underline cursor-pointer" %></span>
-          </div>
-        <% end %>
+        <div class="flex items-center">
+          <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+          </svg>
+          <% if policy(entry).update? && !entry.confirmed? %>
+            <button type="button" data-action="click->inline-edit#edit"
+                    class="hover:text-blue-600 hover:underline cursor-pointer">
+              <%= entry.speaker&.name || "— assign speaker —" %>
+            </button>
+          <% elsif entry.speaker %>
+            <span><%= entry.speaker.name %></span>
+          <% else %>
+            <span class="text-gray-400">No speaker</span>
+          <% end %>
+        </div>
         <% if entry.versions.any? %>
           <%= link_to dictionary_entry_path(entry), class: "flex items-center text-gray-500 hover:text-gray-700", data: { turbo_frame: "_top" } do %>
             <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
