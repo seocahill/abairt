@@ -139,6 +139,7 @@ Rails.application.routes.draw do
   resources :dictionary_entries do
     post :update_region, on: :member
     post :generate_audio, on: :member
+    get :practice, on: :member
   end
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]

@@ -40,6 +40,11 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should get practice" do
+    get practice_dictionary_entry_url(@dictionary_entry)
+    assert_response :success
+  end
+
   test "should get edit" do
     users(:one).update_columns(role: User.roles[:teacher])
     get edit_dictionary_entry_url(@dictionary_entry)
