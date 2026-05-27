@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef
+          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef ffmpeg
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
