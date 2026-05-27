@@ -51,6 +51,7 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries/1/practice
   def practice
+    skip_authorization
   end
 
   # GET /dictionary_entries/new
