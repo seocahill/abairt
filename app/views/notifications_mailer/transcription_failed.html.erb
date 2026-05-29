@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2>Voice Recording Transcription Failed</h2>
+
+    <p><strong>Recording:</strong> <%= @voice_recording.title %></p>
+    <p><strong>ID:</strong> <%= @voice_recording.id %></p>
+    <p><strong>Status:</strong> <%= @voice_recording.diarization_status %></p>
+
+    <h3>Error Details:</h3>
+    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;"><%= @error_message %></pre>
+
+    <p>
+      <a href="<%= @url %>" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        View Recording
+      </a>
+    </p>
+
+    <hr style="margin: 20px 0;">
+    <p style="color: #666; font-size: 12px;">
+      This is an automated notification from Abairt.
+    </p>
+  </body>
+</html>

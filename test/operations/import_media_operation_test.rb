@@ -40,6 +40,7 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
     # Stub the wait and processing steps
+    Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
@@ -104,6 +105,7 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     Fotheidil::ParserService.stubs(:new).returns(parser_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
+    Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
@@ -187,6 +189,7 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     Fotheidil::ParserService.stubs(:new).returns(parser_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
+    Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
@@ -240,6 +243,7 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     Fotheidil::ParserService.stubs(:new).returns(parser_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
+    Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)

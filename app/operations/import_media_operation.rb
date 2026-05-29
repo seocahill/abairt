@@ -64,6 +64,13 @@ class ImportMediaOperation < Trailblazer::Operation
     existing_recording = VoiceRecording.find_by(title: generated_name)
 
     if existing_recording
+      if existing_recording.import_status == "skipped"
+        media_import.mark_as_skipped!("Voice recording marked as skipped")
+        ctx[:voice_recording] = existing_recording
+        ctx[:error] = "Recording is marked as skipped"
+        return false
+      end
+
       if existing_recording.diarization_status == "completed"
         # Only mark as imported if it's truly completed
         media_import.mark_as_imported!
@@ -187,6 +194,7 @@ class ImportMediaOperation < Trailblazer::Operation
   # Mark MediaImport as failed
   def mark_import_as_failed(ctx, media_import: nil, error: nil, **)
     return true unless media_import
+    return true if media_import.skipped?
 
     error_message = error || "Import failed"
     media_import.mark_as_failed!(error_message)

@@ -59,7 +59,59 @@ module Fotheidil
       assert_equal "Already completed", result[:error]
     end
 
+    test "prepare_audio_track creates audio_track for mp3 media" do
+      refute @voice_recording.audio_track.attached?
+
+      # Stop pipeline after prepare_audio_track by failing authenticate
+      ProcessVideoOperation.any_instance.stubs(:authenticate).returns(false)
+
+      ProcessVideoOperation.call(voice_recording: @voice_recording)
+
+      assert @voice_recording.reload.audio_track.attached?
+    end
+
+    test "prepare_audio_track skips if audio_track already attached" do
+      @voice_recording.audio_track.attach(
+        io: File.open(Rails.root.join("test/fixtures/files/deasaigh.mp3")),
+        filename: "deasaigh.mp3",
+        content_type: "audio/mpeg"
+      )
+      original_blob_id = @voice_recording.audio_track.blob.id
+
+      ProcessVideoOperation.any_instance.stubs(:authenticate).returns(false)
+
+      ProcessVideoOperation.call(voice_recording: @voice_recording)
+
+      assert_equal original_blob_id, @voice_recording.reload.audio_track.blob.id
+    end
+
+    test "prepare_audio_track skips for non-mp3 media" do
+      @voice_recording.media.attach(
+        io: StringIO.new("dummy"),
+        filename: "test.wav",
+        content_type: "audio/wav"
+      )
+
+      ProcessVideoOperation.any_instance.stubs(:authenticate).returns(false)
+
+      ProcessVideoOperation.call(voice_recording: @voice_recording)
+
+      refute @voice_recording.reload.audio_track.attached?
+    end
+
+    test "prepare_audio_track fails and marks recording failed if ffmpeg fails" do
+      ProcessVideoOperation.any_instance.stubs(:system).returns(false)
+
+      result = ProcessVideoOperation.call(voice_recording: @voice_recording)
+
+      assert_not result.success?
+      assert_includes result[:error], "downsampling failed"
+      assert_equal "failed", @voice_recording.reload.diarization_status
+    end
+
     test "successfully uploads and processes new video" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
       # Mock browser service
       browser_service = mock("browser_service")
       browser_service.stubs(:setup_browser).returns(true)
@@ -102,6 +154,8 @@ module Fotheidil
     end
 
     test "successfully processes with existing video_id" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
       # Mock all external services
       browser_service = mock("browser_service")
       browser_service.stubs(:setup_browser).returns(true)
@@ -141,6 +195,8 @@ module Fotheidil
     end
 
     test "marks as failed on authentication error" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
       browser_service = mock("browser_service")
       browser_service.stubs(:setup_browser).returns(false)
       browser_service.stubs(:cleanup)
@@ -158,6 +214,8 @@ module Fotheidil
     end
 
     test "marks as failed on parse error" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
       browser_service = mock("browser_service")
       browser_service.stubs(:setup_browser).returns(true)
       browser_service.stubs(:authenticate).returns(true)

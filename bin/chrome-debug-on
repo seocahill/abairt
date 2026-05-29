@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+echo "Opening Chrome debug ports (7900, 5900)..."
+docker service update --publish-add 7900:7900 --publish-add 5900:5900 abairt_chrome
+
+echo "Waiting for service to update..."
+sleep 3
+
+echo "Chrome debug ports are now open."
+echo ""
+echo "To connect via SSH tunnel, run:"
+echo "  ssh -i ~/.ssh/old/id_rsa -L 17900:127.0.0.1:7900 -N root@5.75.153.105"
+echo ""
+echo "Then open http://localhost:17900 in your browser"
+echo ""
+echo "Don't forget to run 'bin/chrome-debug-off' when done!"

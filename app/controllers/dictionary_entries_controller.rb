@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DictionaryEntriesController < ApplicationController
-  before_action :set_dictionary_entry, only: %i[show edit update update_all destroy]
+  before_action :set_dictionary_entry, only: %i[show edit update update_all destroy practice]
 
   # GET /dictionary_entries or /dictionary_entries.json
   def index
@@ -47,6 +47,11 @@ class DictionaryEntriesController < ApplicationController
 
   # GET /dictionary_entries/1 or /dictionary_entries/1.json
   def show
+  end
+
+  # GET /dictionary_entries/1/practice
+  def practice
+    skip_authorization
   end
 
   # GET /dictionary_entries/new

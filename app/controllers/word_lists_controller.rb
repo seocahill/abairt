@@ -3,6 +3,8 @@ class WordListsController < ApplicationController
 
   # GET /word_lists
   def index
+    authorize WordList
+
     records = current_user.word_lists
 
     if params[:search].present?

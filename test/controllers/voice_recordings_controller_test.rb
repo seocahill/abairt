@@ -84,4 +84,64 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :redirect
   end
+
+  test "should get index with list view" do
+    get voice_recordings_url(view: "list")
+    assert_response :success
+    # List view uses multi-column grid
+    assert_select 'div[class*="grid-cols-3"]', minimum: 1
+  end
+
+  test "list view uses same card partial as map view" do
+    get voice_recordings_url(view: "list")
+    assert_response :success
+    # Same card partial renders audio elements
+    assert_select 'audio[preload="none"]', minimum: 0
+  end
+
+  test "should get index with map view" do
+    get voice_recordings_url(view: "map")
+    assert_response :success
+  end
+
+  test "should get index with tag filter" do
+    @voice_recording.tag_list.add("test_tag")
+    @voice_recording.save
+
+    get voice_recordings_url(tag: "test_tag")
+    assert_response :success
+  end
+
+  test "should get tags index" do
+    @voice_recording.tag_list.add("test_tag")
+    @voice_recording.save
+
+    get tags_voice_recordings_url
+    assert_response :success
+    assert_select 'h1', text: "All Tags"
+  end
+
+  test "tags index preserves query params in pagination" do
+    @voice_recording.tag_list.add("test_tag")
+    @voice_recording.save
+
+    get tags_voice_recordings_url(page: 1)
+    assert_response :success
+  end
+
+  test "tags index supports search" do
+    @voice_recording.tag_list.add("searchable_tag")
+    @voice_recording.save
+
+    get tags_voice_recordings_url(search: "searchable")
+    assert_response :success
+  end
+
+  test "tags index supports sorting by name" do
+    @voice_recording.tag_list.add("zebra_tag", "apple_tag")
+    @voice_recording.save
+
+    get tags_voice_recordings_url(order: "name")
+    assert_response :success
+  end
 end

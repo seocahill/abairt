@@ -101,9 +101,10 @@
       </div>
     <% end %>
 
-    <!-- Dictionary Entries Table -->
-    <%= turbo_frame_tag "entries-list", data: { controller: "pagination" } do %>
-      <%= render "voice_recordings/dictionary_entries/entries_list", entries: @entries, current_user: current_user, pagy: @pagy %>
-    <% end %>
+    <!-- Dictionary Entries -->
+    <div id="entries-list" class="space-y-3 mt-8">
+      <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries %>
+    </div>
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
   </div>
 </div>

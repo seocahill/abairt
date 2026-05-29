@@ -17,7 +17,6 @@ jobs:
 
     env:
       RAILS_ENV: test
-      GEMFILE_RUBY_VERSION: 3.0.0
       # Rails verifies the time zone in DB is the same as the time zone of the Rails app
       # TZ: "Europe/Berlin"
 
@@ -25,12 +24,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef
+          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef ffmpeg
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # Not needed with a .ruby-version file
-          ruby-version: 3.0.6
+          # Uses the version from .ruby-version
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
       - name: Update Dependencies

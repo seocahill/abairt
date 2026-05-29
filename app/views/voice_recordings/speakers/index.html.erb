@@ -1,6 +1,48 @@
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold mb-6">Manage Speakers for <%= link_to @voice_recording.title, voice_recording_path(@voice_recording), class: "text-blue-500 hover:text-blue-700" %></h1>
 
+  <!-- Analyzed Speakers Section -->
+  <% if @analyzed_speakers.present? %>
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 mt-0.5">
+          <svg class="w-5 h-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h2 class="text-sm font-semibold text-blue-900 mb-2">Identified speakers (click to auto-fill form):</h2>
+          <div class="flex flex-wrap gap-2">
+            <% primary_location = @voice_recording.locations.first&.name %>
+            <% @analyzed_speakers.each do |speaker_data| %>
+              <button type="button"
+                      class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors group cursor-pointer"
+                      data-controller="speaker-form-filler"
+                      data-action="click->speaker-form-filler#fill"
+                      data-name="<%= speaker_data['name'] %>"
+                      data-dialect="<%= speaker_data['dialect_region'] %>"
+                      data-native-speaker="<%= speaker_data['native_speaker'] %>"
+                      data-location="<%= primary_location %>">
+                <div class="text-left">
+                  <div class="font-medium text-sm text-gray-900"><%= speaker_data["name"] %></div>
+                  <div class="flex items-center gap-1 text-xs text-gray-600">
+                    <span><%= speaker_data["dialect_region"]&.humanize %></span>
+                    <span>•</span>
+                    <span><%= speaker_data["ability"]&.humanize %></span>
+                  </div>
+                </div>
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
     <!-- Temporary Speakers List -->
     <div class="bg-white p-6 rounded-lg shadow">
@@ -27,13 +69,42 @@
             <% end %>
 
             <%= form_tag voice_recording_speaker_path(@voice_recording, speaker), method: :patch, class: "mt-4" do %>
-              <div class="space-y-4">
-                <%= select_tag :speaker_id,
-                    options_from_collection_for_select(@speakers, :id, :name),
-                    prompt: "Select existing speaker",
-                    class: "w-full p-2 border rounded" %>
+              <div class="space-y-4"
+                   data-controller="speaker-autocomplete"
+                   data-speaker-autocomplete-url-value="<%= search_voice_recording_speakers_path(@voice_recording) %>">
 
-                <%= submit_tag "Update Speaker", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
+                <% if @analyzed_speakers.present? %>
+                  <div class="mb-3">
+                    <p class="text-xs text-gray-600 mb-2">Quick search:</p>
+                    <div class="flex flex-wrap gap-1">
+                      <% @analyzed_speakers.each do |speaker_data| %>
+                        <button type="button"
+                                class="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 border border-blue-200"
+                                data-action="click->speaker-autocomplete#quickSearch"
+                                data-query="<%= speaker_data['name'] %>">
+                          <%= speaker_data['name'].split(' ').first(2).join(' ') %>
+                        </button>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+
+                <div class="relative">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Search Existing Speaker</label>
+                  <input type="text"
+                         data-speaker-autocomplete-target="input"
+                         data-action="input->speaker-autocomplete#search blur->speaker-autocomplete#blur"
+                         placeholder="Type to search speakers..."
+                         class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                  <%= hidden_field_tag :speaker_id, nil, data: { speaker_autocomplete_target: "hiddenField" } %>
+
+                  <!-- Results dropdown -->
+                  <div data-speaker-autocomplete-target="results"
+                       class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-64 overflow-y-auto">
+                  </div>
+                </div>
+
+                <%= submit_tag "Update Speaker", class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full" %>
               </div>
             <% end %>
           </div>
@@ -42,22 +113,34 @@
     </div>
 
     <!-- Create New Speaker Form -->
-    <div class="bg-white p-6 rounded-lg shadow temp-speaker-entry" data-controller="map">
+    <div class="bg-white p-6 rounded-lg shadow temp-speaker-entry"
+         data-controller="map speaker-form-filler"
+         id="create-speaker-form">
       <h2 class="text-xl font-semibold mb-4">Create New Speaker</h2>
       <%= form_with(model: @new_speaker, local: true, class: "space-y-4") do |f| %>
         <div>
           <%= f.label :name, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+          <%= f.text_field :name,
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm",
+              data: { speaker_form_filler_target: "name" } %>
         </div>
 
         <div>
           <%= f.label :dialect, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.select :dialect, User.dialects.keys.map { |d| [d.humanize, d] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+          <%= f.select :dialect,
+              User.dialects.keys.map { |d| [d.humanize, d] },
+              {},
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm",
+              data: { speaker_form_filler_target: "dialect" } %>
         </div>
 
         <div>
           <%= f.label :ability, class: "block text-sm font-medium text-gray-700" %>
-          <%= f.select :ability, User.abilities.keys.map { |a| [a.humanize, a] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+          <%= f.select :ability,
+              User.abilities.keys.map { |a| [a.humanize, a] },
+              {},
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm",
+              data: { speaker_form_filler_target: "ability" } %>
         </div>
 
         <div>
@@ -68,7 +151,9 @@
         <div>
           <%= f.label :address, "Location", class: "block text-sm font-medium text-gray-700" %>
           <div class="flex items-center">
-            <%= f.text_field :address, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+            <%= f.text_field :address,
+                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm",
+                data: { speaker_form_filler_target: "address" } %>
             <button type="button" class="ml-2" data-action="click->map#openModal">
               <svg class="w-5 h-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />

@@ -1,0 +1,118 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <!-- Header -->
+    <div class="p-6 border-b border-gray-200 flex items-start justify-between">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-400 mb-1">Shadow practice</p>
+        <p class="text-sm text-gray-500">
+          <% if @dictionary_entry.speaker %>Speaker: <%= @dictionary_entry.speaker.name %><% end %>
+          <% if @dictionary_entry.quality %> · <span class="capitalize"><%= @dictionary_entry.quality %></span><% end %>
+        </p>
+      </div>
+      <%= link_to :back, fallback_location: dictionary_entries_path,
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back
+      <% end %>
+    </div>
+
+    <% if @dictionary_entry.media.attached? %>
+      <div class="p-6"
+           data-controller="shadow"
+           data-shadow-native-url-value="<%= url_for(@dictionary_entry.media) %>"
+           data-shadow-direct-upload-url-value="<%= rails_direct_uploads_path %>"
+           data-shadow-create-url-value="<%= practice_recordings_path %>"
+           data-shadow-entry-id-value="<%= @dictionary_entry.id %>"
+           data-shadow-mode-value="echo">
+
+        <!-- Phrase -->
+        <div class="text-center mb-6">
+          <h1 class="text-2xl font-bold text-gray-900"><%= @dictionary_entry.word_or_phrase %></h1>
+          <p class="text-gray-500 italic mt-1"><%= @dictionary_entry.translation %></p>
+        </div>
+
+        <!-- Native waveform -->
+        <div class="mb-3 bg-gray-50 rounded-lg p-3">
+          <div data-shadow-target="waveform" class="w-full" style="height: 80px;"></div>
+        </div>
+
+        <!-- Waveform controls -->
+        <div class="flex items-center justify-between mb-6">
+          <button type="button" data-action="shadow#listen"
+                  class="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            Listen
+          </button>
+          <label class="flex items-center text-sm text-gray-600 gap-2">
+            Speed
+            <select data-shadow-target="speed" data-action="change->shadow#changeSpeed"
+                    class="text-sm border-gray-300 rounded-md">
+              <option value="0.5">0.5×</option>
+              <option value="0.75">0.75×</option>
+              <option value="1.0" selected>1.0×</option>
+              <option value="1.25">1.25×</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Mode toggle -->
+        <div class="flex justify-center gap-2 mb-2">
+          <% [["echo", "Echo", "Listen first, then repeat in the gap"],
+              ["sync", "Sync", "Speak along with the audio"]].each do |mode, label, hint| %>
+            <button type="button"
+                    data-shadow-target="modeButton"
+                    data-mode="<%= mode %>"
+                    data-action="shadow#selectMode"
+                    title="<%= hint %>"
+                    class="px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <%= label %>
+            </button>
+          <% end %>
+        </div>
+        <p data-shadow-target="headphonesTip" class="hidden text-center text-xs text-gray-500 mb-6">
+          Tip: use headphones for Sync — speaker audio will bleed into the recording otherwise.
+        </p>
+
+        <% if current_user %>
+          <!-- Practice controls -->
+          <div class="flex flex-col items-center gap-4 mt-4">
+            <button type="button" data-shadow-target="startButton" data-action="shadow#start"
+                    class="inline-flex items-center px-6 py-3 border border-transparent rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" /></svg>
+              Start
+            </button>
+
+            <button type="button" data-shadow-target="stopButton" data-action="shadow#stop"
+                    class="hidden inline-flex items-center px-6 py-3 border border-transparent rounded-md text-base font-medium text-white bg-gray-700 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+              Stop
+            </button>
+
+            <p class="text-sm text-gray-500" data-shadow-target="status">Ready</p>
+
+            <audio data-shadow-target="takeAudio" class="hidden"></audio>
+            <button type="button" data-shadow-target="playTakeButton" data-action="shadow#playTake" disabled
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+              </svg>
+              Play your take
+            </button>
+          </div>
+        <% else %>
+          <p class="text-center text-sm text-gray-500">
+            <%= link_to "Log in", login_path, class: "text-blue-600 hover:text-blue-800" %> to record yourself.
+          </p>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-6 text-center text-gray-500">
+        This phrase has no native audio yet, so there's nothing to shadow.
+      </div>
+    <% end %>
+  </div>
+</div>

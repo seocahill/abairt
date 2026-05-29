@@ -13,6 +13,6 @@ mkdir -p "$BACKUP_DIR"
 
 echo "Backing up from container: $CONTAINER_NAME"
 
-docker cp "$CONTAINER_NAME:/rails/db/production.sqlite3" "$BACKUP_DIR/production.sqlite3"
+docker cp "$CONTAINER_NAME:/rails/storage/production.sqlite3" "$BACKUP_DIR/production.sqlite3"
 
 echo "Backup complete: $BACKUP_DIR"

@@ -9,9 +9,9 @@ S3_BUCKET="s3://abairt-db/backups"
 mkdir -p $BACKUP_DIR
 
 # Copy database files
-docker cp $CONTAINER_NAME:/rails/db/production.sqlite3 $BACKUP_DIR/production.sqlite3
-docker cp $CONTAINER_NAME:/rails/db/production.sqlite3-wal $BACKUP_DIR/production.sqlite3-wal 2>/dev/null || true
-docker cp $CONTAINER_NAME:/rails/db/production.sqlite3-shm $BACKUP_DIR/production.sqlite3-shm 2>/dev/null || true
+docker cp $CONTAINER_NAME:/rails/storage/production.sqlite3 $BACKUP_DIR/production.sqlite3
+docker cp $CONTAINER_NAME:/rails/storage/production.sqlite3-wal $BACKUP_DIR/production.sqlite3-wal 2>/dev/null || true
+docker cp $CONTAINER_NAME:/rails/storage/production.sqlite3-shm $BACKUP_DIR/production.sqlite3-shm 2>/dev/null || true
 
 # Create tarball
 cd $BACKUP_DIR

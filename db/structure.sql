@@ -4,12 +4,6 @@ CREATE TABLE `active_storage_attachments`(`id` integer DEFAULT (NULL) NOT NULL P
 CREATE TABLE `active_storage_variant_records`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `blob_id` bigint DEFAULT (NULL) NOT NULL, `variation_digest` varchar(255) DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_993965df05` FOREIGN KEY (`blob_id`) REFERENCES `active_storage_blobs`(`id`));
 CREATE TABLE `rang_entries`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `rang_id` bigint DEFAULT (NULL) NOT NULL, `dictionary_entry_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, `updated_at` timestamp DEFAULT (NULL) NOT NULL, CONSTRAINT `fk_rails_6e0c965f93` FOREIGN KEY (`dictionary_entry_id`) REFERENCES `dictionary_entries`(`id`), CONSTRAINT `fk_rails_3dfa1b15d2` FOREIGN KEY (`rang_id`) REFERENCES `rangs`(`id`));
 CREATE TABLE `rangs`(`id` integer DEFAULT (NULL) NOT NULL PRIMARY KEY AUTOINCREMENT, `name` varchar(255) DEFAULT (NULL) NULL, `user_id` bigint DEFAULT (NULL) NOT NULL, `created_at` timestamp DEFAULT (NULL) NOT NULL, `updated_at` timestamp DEFAULT (NULL) NOT NULL, `url` varchar(255) DEFAULT (NULL) NULL, `meeting_id` varchar(255) DEFAULT (NULL) NULL, `time` timestamp DEFAULT (NULL) NULL, "grupa_id" varchar, "start_time" datetime, "end_time" datetime, "context" integer, CONSTRAINT `fk_rails_0f519c8255` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`));
-CREATE VIRTUAL TABLE fts_dictionary_entries USING fts5(translation, word_or_phrase, content='dictionary_entries', content_rowid='id', tokenize='porter unicode61')
-/* fts_dictionary_entries(translation,word_or_phrase) */;
-CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE UNIQUE INDEX `index_active_storage_attachments_uniqueness` ON `active_storage_attachments` (`record_type`, `record_id`, `name`, `blob_id`);
 CREATE INDEX `index_active_storage_attachments_on_blob_id` ON `active_storage_attachments` (`blob_id`);
 CREATE UNIQUE INDEX `index_active_storage_variant_records_uniqueness` ON `active_storage_variant_records` (`blob_id`, `variation_digest`);
@@ -37,12 +31,6 @@ CREATE INDEX "index_taggings_on_context" ON "taggings" ("context");
 CREATE INDEX "index_taggings_on_tagger_id_and_tagger_type" ON "taggings" ("tagger_id", "tagger_type");
 CREATE INDEX "taggings_idy" ON "taggings" ("taggable_id", "taggable_type", "tagger_id", "context");
 CREATE INDEX "index_taggings_on_tenant" ON "taggings" ("tenant");
-CREATE VIRTUAL TABLE fts_tags USING fts5(name, content='tags', content_rowid='id', tokenize='porter unicode61')
-/* fts_tags(name) */;
-CREATE TABLE IF NOT EXISTS 'fts_tags_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'fts_tags_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'fts_tags_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'fts_tags_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS "conversations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "voice_recording_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_7c15d62a0a"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -84,22 +72,6 @@ FOREIGN KEY ("word_list_id")
 );
 CREATE INDEX "index_user_lists_on_user_id" ON "user_lists" ("user_id");
 CREATE INDEX "index_user_lists_on_word_list_id" ON "user_lists" ("word_list_id");
-CREATE VIRTUAL TABLE fts_users USING fts5(name, content='users', content_rowid='id', tokenize='porter unicode61')
-/* fts_users(name) */;
-CREATE TABLE IF NOT EXISTS 'fts_users_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'fts_users_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'fts_users_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'fts_users_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE TRIGGER insert_tags_search AFTER INSERT ON tags BEGIN
-        INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
-      END;
-CREATE TRIGGER delete_tags_search AFTER DELETE ON tags BEGIN
-        INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
-      END;
-CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
-        INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
-        INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
-      END;
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
 CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, "import_status" varchar, "location_id" integer, "metadata_analysis" json, CONSTRAINT "fk_rails_91ca04707d"
@@ -199,7 +171,60 @@ FOREIGN KEY ("location_id")
 CREATE INDEX "index_voice_recording_locations_on_voice_recording_id" ON "voice_recording_locations" ("voice_recording_id");
 CREATE INDEX "index_voice_recording_locations_on_location_id" ON "voice_recording_locations" ("location_id");
 CREATE UNIQUE INDEX "idx_vr_locations_unique" ON "voice_recording_locations" ("voice_recording_id", "location_id");
+CREATE VIRTUAL TABLE fts_dictionary_entries USING fts5 (translation, word_or_phrase, content='dictionary_entries', content_rowid='id', tokenize='porter unicode61')
+/* fts_dictionary_entries(translation,word_or_phrase) */;
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_dictionary_entries_config'(k PRIMARY KEY, v) WITHOUT ROWID;
+CREATE VIRTUAL TABLE fts_tags USING fts5 (name, content='tags', content_rowid='id', tokenize='porter unicode61')
+/* fts_tags(name) */;
+CREATE TABLE IF NOT EXISTS 'fts_tags_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_tags_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'fts_tags_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_tags_config'(k PRIMARY KEY, v) WITHOUT ROWID;
+CREATE VIRTUAL TABLE fts_users USING fts5 (name, content='users', content_rowid='id', tokenize='porter unicode61')
+/* fts_users(name) */;
+CREATE TABLE IF NOT EXISTS 'fts_users_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_users_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'fts_users_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'fts_users_config'(k PRIMARY KEY, v) WITHOUT ROWID;
+CREATE TRIGGER insert_search AFTER INSERT ON dictionary_entries BEGIN
+        INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase)
+        VALUES (new.id, new.translation, new.word_or_phrase);
+      END;
+CREATE TRIGGER delete_search AFTER DELETE ON dictionary_entries BEGIN
+        INSERT INTO fts_dictionary_entries(fts_dictionary_entries, rowid, translation, word_or_phrase)
+        VALUES('delete', old.id, old.translation, old.word_or_phrase);
+      END;
+CREATE TRIGGER update_search AFTER UPDATE ON dictionary_entries BEGIN
+        INSERT INTO fts_dictionary_entries(fts_dictionary_entries, rowid, translation, word_or_phrase)
+        VALUES('delete', old.id, old.translation, old.word_or_phrase);
+        INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase)
+        VALUES (new.id, new.translation, new.word_or_phrase);
+      END;
+CREATE TRIGGER insert_tags_search AFTER INSERT ON tags BEGIN
+        INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
+      END;
+CREATE TRIGGER delete_tags_search AFTER DELETE ON tags BEGIN
+        INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
+      END;
+CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
+        INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
+        INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
+      END;
+CREATE TRIGGER insert_users_search AFTER INSERT ON users BEGIN
+        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
+      END;
+CREATE TRIGGER delete_users_search AFTER DELETE ON users BEGIN
+        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
+      END;
+CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
+        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
+        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
+      END;
 INSERT INTO "schema_migrations" (version) VALUES
+('20260331213148'),
 ('20260322233134'),
 ('20260320000000'),
 ('20260218000002'),

@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+echo "Closing Chrome debug ports (7900, 5900)..."
+docker service update --publish-rm 7900 --publish-rm 5900 abairt_chrome
+
+echo "Chrome debug ports are now closed."

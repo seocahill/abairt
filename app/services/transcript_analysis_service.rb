@@ -162,7 +162,7 @@ class TranscriptAnalysisService
 
       location = Location.find_or_create_from_analysis(
         name: loc["irish_name"] || loc["name"],
-        dialect_region: loc["dialect_region"] || "other"
+        dialect_region: loc["dialect_region"]
       )
 
       # Update with Irish name if we have both

@@ -10,13 +10,14 @@ class FotheidilFixerJob < ApplicationJob
     voice_recording = VoiceRecording
       .joins(:media_attachment)
       .where(diarization_status: ['processing', 'failed', nil])
+      .where("import_status IS NULL OR import_status != ?", "skipped")
       .order(created_at: :desc)
       .find do |vr|
         # Priority 1: Has video ID but missing segments
         next true if vr.fotheidil_video_id.present? && vr.segments.blank?
 
         # Priority 2: Has segments but incomplete entries
-        next true if vr.segments.present? && vr.dictionary_entries_count < vr.segments.count
+        next true if vr.segments.present? && !vr.fully_transcribed?
 
         # Priority 3: Has media but no video ID
         next true if vr.fotheidil_video_id.blank? && vr.dictionary_entries_count.zero?

@@ -35,7 +35,7 @@ class EmbeddingServiceTest < ActiveSupport::TestCase
       params[:parameters][:input] == @entry.translation
     }.returns({ "data" => [{ "embedding" => @fake_vector }] })
 
-    db = ActiveRecord::Base.connection.raw_connection
+    db = VectorsRecord.connection.raw_connection
     db.stubs(:execute)
 
     EmbeddingService.new.store(@entry)
@@ -44,7 +44,7 @@ class EmbeddingServiceTest < ActiveSupport::TestCase
   test "store deletes existing embedding before inserting" do
     @mock_client.stubs(:embeddings).returns({ "data" => [{ "embedding" => @fake_vector }] })
 
-    db = ActiveRecord::Base.connection.raw_connection
+    db = VectorsRecord.connection.raw_connection
     delete_called = false
     insert_called = false
 
@@ -77,7 +77,7 @@ class EmbeddingServiceTest < ActiveSupport::TestCase
     entry_one = dictionary_entries(:one)
     entry_two = dictionary_entries(:two)
 
-    db = ActiveRecord::Base.connection.raw_connection
+    db = VectorsRecord.connection.raw_connection
     db.stubs(:execute).with { |sql, _| sql.include?("MATCH") }.returns([
       { "dictionary_entry_id" => entry_two.id, "distance" => 0.1 },
       { "dictionary_entry_id" => entry_one.id, "distance" => 0.3 }

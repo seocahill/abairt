@@ -40,6 +40,6 @@ db/queue_test.sqlite3
 db/queue_production.sqlite3
 db/queue_*.sqlite3-*
 training-data/*
-DS_Store
+.DS_Store
 *.sqlite3
 local

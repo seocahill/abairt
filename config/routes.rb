@@ -38,13 +38,20 @@ Rails.application.routes.draw do
   resources :word_lists
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
+    collection do
+      get :tags
+    end
     resources :dictionary_entries, module: :voice_recordings, only: [:index, :create, :update] do
       member do
         post :confirm
         post :deconfirm
       end
     end
-    resources :speakers, module: :voice_recordings, only: [:index, :update]
+    resources :speakers, module: :voice_recordings, only: [:index, :update] do
+      collection do
+        get :search
+      end
+    end
     member do
       get :preview
       get :add_region
@@ -132,6 +139,7 @@ Rails.application.routes.draw do
   resources :dictionary_entries do
     post :update_region, on: :member
     post :generate_audio, on: :member
+    get :practice, on: :member
   end
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]

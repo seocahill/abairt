@@ -123,6 +123,9 @@ class Location < ApplicationRecord
       location = find_by("LOWER(name) = ? OR LOWER(irish_name) = ?", name.downcase, name.downcase)
       return location if location
 
+      # Discard unrecognised values from the LLM (e.g. "unknown") so we fall back to inference
+      dialect_region = nil unless dialect_regions.key?(dialect_region.to_s)
+
       # Infer dialect region from name if not provided
       dialect_region ||= infer_dialect_region(name)
 
