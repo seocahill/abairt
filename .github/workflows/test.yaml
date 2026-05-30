@@ -17,7 +17,6 @@ jobs:
 
     env:
       RAILS_ENV: test
-      GEMFILE_RUBY_VERSION: 3.0.0
       # Rails verifies the time zone in DB is the same as the time zone of the Rails app
       # TZ: "Europe/Berlin"
 
@@ -29,9 +28,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # Not needed with a .ruby-version file
-          ruby-version: 3.0.6
-          # runs 'bundle install' and caches installed gems automatically
+          # Reads .ruby-version
           bundler-cache: true
       - name: Update Dependencies
         run: |
