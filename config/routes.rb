@@ -110,6 +110,7 @@ Rails.application.routes.draw do
         post :bulk_approve
         post :bulk_reject
       end
+      resource :cloned_voice, only: [:create, :destroy], module: :users
     end
   end
   
@@ -132,6 +133,7 @@ Rails.application.routes.draw do
   resources :dictionary_entries do
     post :update_region, on: :member
     post :generate_audio, on: :member
+    resources :cloned_renditions, module: :dictionary_entries, only: [:show], param: :voice_user_id
   end
 
   resources :word_list_dictionary_entries, only: [:create, :destroy, :update]

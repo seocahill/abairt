@@ -102,6 +102,47 @@
           <p class="text-sm text-gray-500">No API token has been generated for this user.</p>
         <% end %>
       </div>
+
+      <!-- Cloned Voice Section -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium text-gray-900">Cloned Voice</h3>
+          <div class="flex gap-2">
+            <% if @user.cloned_voice? %>
+              <%= button_to "Remove Voice", admin_user_cloned_voice_path(@user), method: :delete, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Delete this cloned voice from ElevenLabs?" } %>
+            <% elsif @user.voice_clone_pending? %>
+              <span class="px-4 py-2 text-sm text-gray-600">Cloning in progress…</span>
+            <% else %>
+              <%= button_to "Create Cloned Voice", admin_user_cloned_voice_path(@user), method: :post, class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm" %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+          <div class="flex items-center gap-2 text-sm">
+            <span class="font-medium text-gray-600">Status:</span>
+            <% case @user.voice_clone_status %>
+            <% when "ready" %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Ready</span>
+            <% when "pending" %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+            <% when "failed" %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Failed</span>
+            <% else %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">Not cloned</span>
+            <% end %>
+          </div>
+          <% if @user.cloned_voice_id.present? %>
+            <p class="text-sm text-gray-600"><span class="font-medium">Provider:</span> <%= @user.voice_clone_provider %></p>
+            <p class="text-sm text-gray-600"><span class="font-medium">Voice ID:</span> <code class="font-mono"><%= @user.cloned_voice_id %></code></p>
+            <p class="text-sm text-gray-600"><span class="font-medium">Cloned at:</span> <%= @user.voice_cloned_at&.strftime("%B %d, %Y at %I:%M %p") %></p>
+          <% end %>
+          <% if @user.voice_clone_error.present? %>
+            <p class="text-sm text-red-700"><span class="font-medium">Error:</span> <%= @user.voice_clone_error %></p>
+          <% end %>
+          <p class="text-xs text-gray-500">Samples are drawn from this user's confirmed dictionary entries with attached audio.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
