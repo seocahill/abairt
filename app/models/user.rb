@@ -28,6 +28,7 @@ class User < ApplicationRecord
     :api_user
   ]
   enum :voice, [:male, :female]
+  enum :voice_clone_status, { none: 0, pending: 1, ready: 2, failed: 3 }, prefix: :voice_clone
   enum :dialect, [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
   # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
   enum :ability, %i[
@@ -46,6 +47,7 @@ class User < ApplicationRecord
 
   scope :active, -> { where.not(role: :temporary) }
   scope :with_api_token, -> { where.not(api_token: nil) }
+  scope :with_cloned_voice, -> { where.not(cloned_voice_id: nil) }
   scope :pending, -> { where(confirmed: false) }
   scope :by_role, ->(role) { where(role: role) if role.present? && roles.key?(role) }
   scope :search, ->(query) {
@@ -124,5 +126,9 @@ class User < ApplicationRecord
 
   def edit?
     !student? && confirmed
+  end
+
+  def cloned_voice?
+    cloned_voice_id.present?
   end
 end
