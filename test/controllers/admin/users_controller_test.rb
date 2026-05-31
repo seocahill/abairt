@@ -75,6 +75,7 @@ module Admin
     end
 
     test "should reject user" do
+      get admin_users_path(pending: true)
       assert_difference 'User.count', -1 do
         post reject_admin_user_path(@pending_user)
       end
@@ -82,6 +83,7 @@ module Admin
     end
 
     test "should bulk approve users" do
+      get admin_users_path(pending: true)
       user2 = users(:john)
       user2.update(confirmed: false)
       post bulk_approve_admin_users_path, params: { user_ids: [@pending_user.id, user2.id] }
@@ -91,6 +93,7 @@ module Admin
     end
 
     test "should bulk reject users" do
+      get admin_users_path(pending: true)
       user2 = users(:john)
       user2.update(confirmed: false)
       assert_difference 'User.count', -2 do

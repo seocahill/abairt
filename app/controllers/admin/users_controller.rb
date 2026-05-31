@@ -14,8 +14,10 @@ module Admin
 
     def index
       # Authorization handled by ensure_admin
-      @users = apply_scopes(User.order(created_at: :desc))
+      base = params[:role] == "temporary" ? User.all : User.active
+      @users = apply_scopes(base.order(created_at: :desc))
       @pagy, @users = pagy(@users, items: params[:per_page] || 50)
+      session[:admin_users_filter] = filter_params.to_h
     end
 
     def show
@@ -45,7 +47,7 @@ module Admin
     def reject
       authorize @user, :reject?
       @user.destroy
-      redirect_to admin_users_path(pending: true), notice: 'User rejected and deleted.'
+      redirect_to admin_users_path(saved_filter_params), notice: 'User rejected and deleted.'
     end
 
     def bulk_approve
@@ -54,7 +56,7 @@ module Admin
       users = User.where(id: user_ids)
       users.update_all(confirmed: true)
       users.each { |user| UserMailer.account_approved_email(user).deliver_later }
-      redirect_to admin_users_path(pending: true), notice: "#{user_ids.count} users approved."
+      redirect_to admin_users_path(saved_filter_params), notice: "#{user_ids.count} users approved."
     end
 
     def bulk_reject
@@ -62,13 +64,13 @@ module Admin
       user_ids = params[:user_ids] || []
       count = User.where(id: user_ids).count
       User.where(id: user_ids).destroy_all
-      redirect_to admin_users_path(pending: true), notice: "#{count} users rejected and deleted."
+      redirect_to admin_users_path(saved_filter_params), notice: "#{count} users rejected and deleted."
     end
 
     def destroy
       authorize @user, :destroy?
       @user.destroy
-      redirect_to admin_users_path, notice: 'User deleted successfully.'
+      redirect_to admin_users_path(saved_filter_params), notice: 'User deleted successfully.'
     end
 
     def generate_api_token
@@ -108,6 +110,14 @@ module Admin
         redirect_to root_path, alert: "Access denied. Admin privileges required."
         return
       end
+    end
+
+    def filter_params
+      params.permit(:pending, :role, :search, :per_page)
+    end
+
+    def saved_filter_params
+      session[:admin_users_filter] || {}
     end
 
     def user_params

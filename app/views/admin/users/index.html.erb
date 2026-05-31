@@ -2,8 +2,9 @@
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">User Management</h1>
     <div class="flex gap-2">
-      <%= link_to "All Users", admin_users_path, class: "px-4 py-2 #{params[:pending] != 'true' && params[:role].blank? && params[:search].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+      <%= link_to "All Users", admin_users_path, class: "px-4 py-2 #{params[:pending].blank? && params[:role] != 'temporary' && params[:search].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
       <%= link_to "Pending Signups", admin_users_path(pending: true), class: "px-4 py-2 #{params[:pending] == 'true' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+      <%= link_to "Temporary Speakers", admin_users_path(role: "temporary"), class: "px-4 py-2 #{params[:role] == 'temporary' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
     </div>
   </div>
 
