@@ -84,4 +84,55 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :redirect
   end
+
+  test "radio redirects when feature flag is disabled" do
+    Rails.configuration.x.features.stubs(:radio).returns(false)
+
+    get radio_voice_recordings_url
+
+    assert_redirected_to voice_recordings_url
+  end
+
+  test "radio renders when feature flag is enabled" do
+    Rails.configuration.x.features.stubs(:radio).returns(true)
+
+    get radio_voice_recordings_url
+
+    assert_response :success
+    assert_select "[data-controller='radio']"
+  end
+
+  test "radio renders empty state when no recordings have media" do
+    Rails.configuration.x.features.stubs(:radio).returns(true)
+    VoiceRecording.find_each { |r| r.media.purge if r.media.attached? }
+
+    get radio_voice_recordings_url
+
+    assert_response :success
+    assert_match(/No recordings to play/, response.body)
+  end
+
+  test "radio includes attached recording with entries in playlist" do
+    Rails.configuration.x.features.stubs(:radio).returns(true)
+    @voice_recording.media.attach(
+      io: StringIO.new("fake audio"),
+      filename: "test.mp3",
+      content_type: "audio/mpeg"
+    )
+    DictionaryEntry.create!(
+      voice_recording: @voice_recording,
+      speaker: users(:one),
+      owner: users(:one),
+      word_or_phrase: "Dia dhuit",
+      translation: "Hello",
+      region_start: 0.0,
+      region_end: 1.5
+    )
+
+    get radio_voice_recordings_url
+
+    assert_response :success
+    assert_match(/data-radio-playlist-value/, response.body)
+    assert_match(/Dia dhuit/, response.body)
+  end
 end

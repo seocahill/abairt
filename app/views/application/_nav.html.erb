@@ -14,6 +14,9 @@
         <div class="hidden md:block">
           <div class="ml-10 flex items-baseline space-x-4">
             <%= link_to 'Transcriptions', voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+            <% if Rails.configuration.x.features.radio %>
+              <%= link_to 'Radio', radio_voice_recordings_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+            <% end %>
             <%= link_to 'Dictionary', dictionary_entries_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <%= link_to 'Speakers', users_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
             <%= link_to 'Translators', translator_leaderboard_index_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
@@ -91,6 +94,11 @@
         <li>
           <%= link_to 'Transcriptions', voice_recordings_path, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
         </li>
+        <% if Rails.configuration.x.features.radio %>
+          <li>
+            <%= link_to 'Radio', radio_voice_recordings_path, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
+          </li>
+        <% end %>
         <li>
           <%= link_to 'Dictionary', dictionary_entries_path, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
         </li>

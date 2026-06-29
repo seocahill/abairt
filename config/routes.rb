@@ -38,6 +38,9 @@ Rails.application.routes.draw do
   resources :word_lists
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
+    collection do
+      get :radio
+    end
     resources :dictionary_entries, module: :voice_recordings, only: [:index, :create, :update] do
       member do
         post :confirm
