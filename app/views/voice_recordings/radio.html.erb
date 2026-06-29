@@ -1,0 +1,105 @@
+<div class="min-h-screen flex flex-col"
+     data-controller="radio"
+     data-radio-playlist-value="<%= @playlist.to_json %>">
+  <% if @playlist.empty? %>
+    <div class="flex-1 flex items-center justify-center p-8 text-center">
+      <div>
+        <h1 class="text-2xl font-semibold mb-2">No recordings to play</h1>
+        <p class="text-slate-400 mb-6">There are no voice recordings with audio available yet.</p>
+        <%= link_to "Back to recordings", voice_recordings_path,
+            class: "inline-block px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white" %>
+      </div>
+    </div>
+  <% else %>
+    <header class="flex items-center justify-between p-4 text-sm text-slate-400">
+      <%= link_to voice_recordings_path,
+          class: "hover:text-white inline-flex items-center gap-1" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Back
+      <% end %>
+      <span>
+        <span data-radio-target="position">1</span> / <%= @playlist.size %>
+      </span>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center px-6 pb-6">
+      <a data-radio-target="link" href="#"
+         class="text-xs uppercase tracking-widest text-slate-500 hover:text-slate-300 mb-3">
+        <span data-radio-target="title">&nbsp;</span>
+      </a>
+
+      <div class="w-full max-w-2xl bg-slate-900/60 rounded-2xl p-6 md:p-10 shadow-2xl">
+        <div class="min-h-[8rem] md:min-h-[12rem] flex flex-col items-center justify-center text-center">
+          <p data-radio-target="ga"
+             class="text-2xl md:text-4xl font-medium leading-snug">
+            Brúigh seinm
+          </p>
+          <p data-radio-target="en"
+             class="mt-3 text-base md:text-xl text-slate-400 italic">
+            Press play
+          </p>
+        </div>
+
+        <div class="mt-8">
+          <div class="h-1 w-full rounded-full bg-slate-800 overflow-hidden">
+            <div data-radio-target="progress" class="h-full bg-indigo-500" style="width: 0%"></div>
+          </div>
+          <div class="mt-2 flex justify-between text-xs text-slate-500">
+            <span data-radio-target="currentTime">0:00</span>
+            <span data-radio-target="duration">0:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex items-center gap-6">
+        <button type="button"
+                data-action="click->radio#prev"
+                aria-label="Previous"
+                class="p-3 rounded-full text-slate-300 hover:bg-slate-800 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M15.555 5.168A1 1 0 0014 6v8a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4z" transform="rotate(180 10 10)"/>
+            <path d="M3 5a1 1 0 011-1h1a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V5z"/>
+          </svg>
+        </button>
+
+        <button type="button"
+                data-action="click->radio#playPause"
+                data-radio-target="playButton"
+                aria-label="Play"
+                class="p-5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg">
+          <svg data-radio-target="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          <svg data-radio-target="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 hidden" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </button>
+
+        <button type="button"
+                data-action="click->radio#next"
+                aria-label="Skip"
+                class="p-3 rounded-full text-slate-300 hover:bg-slate-800 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798L4.555 5.168z" />
+          </svg>
+        </button>
+
+        <button type="button"
+                data-action="click->radio#shuffle"
+                aria-label="Shuffle"
+                class="p-3 rounded-full text-slate-300 hover:bg-slate-800 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+          </svg>
+        </button>
+      </div>
+
+      <audio data-radio-target="audio"
+             data-action="ended->radio#next timeupdate->radio#timeupdate loadedmetadata->radio#loadedmetadata play->radio#playing pause->radio#paused"
+             preload="auto"
+             playsinline></audio>
+    </main>
+  <% end %>
+</div>

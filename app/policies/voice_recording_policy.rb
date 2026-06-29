@@ -43,4 +43,8 @@ class VoiceRecordingPolicy < ApplicationPolicy
     # Same permission as show - anyone can check import status
     true
   end
+
+  def radio?
+    true
+  end
 end

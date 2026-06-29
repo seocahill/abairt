@@ -1,6 +1,33 @@
 class VoiceRecordingsController < ApplicationController
   before_action :set_voice_recording, only: %i[show edit update destroy add_region import_status retranscribe autocorrect]
   PAGE_SIZE = 15 # Define the constant at the top of the controller
+  RADIO_PLAYLIST_SIZE = 50
+
+  def radio
+    authorize VoiceRecording
+
+    unless Rails.configuration.x.features.radio
+      return redirect_to(voice_recordings_path, alert: "Radio is not enabled yet.")
+    end
+
+    candidates = VoiceRecording
+      .joins(:dictionary_entries)
+      .joins(ActiveRecord::Base.sanitize_sql_array([
+        "INNER JOIN active_storage_attachments asa ON asa.record_id = voice_recordings.id " \
+        "AND asa.record_type = ? AND asa.name = ?",
+        "VoiceRecording", "media"
+      ]))
+      .distinct
+      .order(Arel.sql("RANDOM()"))
+      .limit(RADIO_PLAYLIST_SIZE)
+      .with_attached_media
+      .with_attached_audio_track
+      .includes(:dictionary_entries)
+
+    @playlist = candidates.filter_map { |recording| radio_playlist_entry(recording) }
+
+    render layout: "radio"
+  end
 
   def index
     @new_voice_recording = VoiceRecording.new
@@ -267,6 +294,28 @@ class VoiceRecordingsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_voice_recording
     @voice_recording = VoiceRecording.find(params[:id])
+  end
+
+  def radio_playlist_entry(recording)
+    blob = recording.audio_track.attached? ? recording.audio_track : recording.media
+    return nil unless blob.attached?
+
+    {
+      id: recording.id,
+      title: recording.title,
+      url: url_for(blob),
+      path: voice_recording_path(recording),
+      entries: recording.dictionary_entries
+        .sort_by { |e| e.region_start.to_f }
+        .map { |e|
+          {
+            start: e.region_start.to_f,
+            end: e.region_end.to_f,
+            ga: e.word_or_phrase,
+            en: e.translation
+          }
+        }
+    }
   end
 
   def set_regions
