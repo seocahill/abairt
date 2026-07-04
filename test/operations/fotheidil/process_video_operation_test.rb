@@ -16,6 +16,10 @@ module Fotheidil
         io: File.open(Rails.root.join("test/fixtures/files/deasaigh.mp3")),
         filename: "deasaigh.mp3"
       )
+
+      # Stub duration calculation - it shells out to ffprobe, which isn't available
+      # in CI (returns nil there and previously crashed the operation).
+      VoiceRecording.any_instance.stubs(:calculate_duration).returns(120.0)
     end
 
     teardown do

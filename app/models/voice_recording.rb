@@ -65,7 +65,10 @@ class VoiceRecording < ApplicationRecord
     result = `ffprobe -i  #{path} -v quiet -print_format json -show_format -show_streams -hide_banner`
     JSON.parse(result).dig("format", "duration").to_f
   rescue => e
+    # Return nil (not the truthy result of Logger#warn) so callers can rely on
+    # `duration&.positive?` instead of crashing on `true.positive?`.
     Rails.logger.warn(["Duration calculation failed", e])
+    nil
   end
 
   def percentage_transcribed
