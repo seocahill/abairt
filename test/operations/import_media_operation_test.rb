@@ -84,6 +84,9 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
       filename: "deasaigh.mp3"
     )
 
+    # Stub duration calculation since fake audio is invalid
+    VoiceRecording.any_instance.stubs(:calculate_duration).returns(120.0)
+
     # Mock Fotheidil services
     browser_service = mock("browser_service")
     browser_service.stubs(:setup_browser).returns(true)

@@ -14,6 +14,30 @@ Rails.application.routes.draw do
     mount MissionControl::Jobs::Engine, at: "/jobs"
   end
 
+  # OAuth 2 provider (Doorkeeper) + Model Context Protocol server for Claude web.
+  #
+  # Discovery/authorization flow used by Claude web:
+  #   1. POST /mcp -> 401 with WWW-Authenticate pointing at the resource metadata
+  #   2. GET  /.well-known/oauth-protected-resource   (RFC 9728)
+  #   3. GET  /.well-known/oauth-authorization-server  (RFC 8414)
+  #   4. POST /oauth/register  (RFC 7591 Dynamic Client Registration)
+  #   5. GET  /oauth/authorize + POST /oauth/token  (PKCE authorization code grant)
+  #   6. POST /mcp with a bearer token
+  use_doorkeeper
+
+  # Dynamic Client Registration (RFC 7591) - Doorkeeper does not ship this endpoint.
+  post "/oauth/register", to: "oauth/registrations#create"
+
+  # OAuth discovery metadata. The path-suffixed variants support clients that append the
+  # protected resource path (e.g. `/.well-known/oauth-protected-resource/mcp`).
+  get "/.well-known/oauth-protected-resource", to: "well_known#oauth_protected_resource"
+  get "/.well-known/oauth-protected-resource/*resource", to: "well_known#oauth_protected_resource"
+  get "/.well-known/oauth-authorization-server", to: "well_known#oauth_authorization_server"
+  get "/.well-known/oauth-authorization-server/*resource", to: "well_known#oauth_authorization_server"
+
+  # MCP Streamable HTTP transport endpoint.
+  match "/mcp", to: "mcp#handle", via: %i[get post delete]
+
   namespace :api do
     resources :voice_recordings, only: [] do
       post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'

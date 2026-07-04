@@ -29,8 +29,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # Not needed with a .ruby-version file
-          ruby-version: 3.0.6
+          # Reads the Ruby version from .ruby-version
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
       - name: Update Dependencies
