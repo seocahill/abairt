@@ -28,7 +28,7 @@ class SessionsController < ApplicationController
       @user.save
 
       flash[:notice] = 'Login successful.'
-      redirect_to user_path(@user)
+      redirect_to(session.delete(:user_return_to) || user_path(@user))
     end
   end
 
@@ -51,7 +51,7 @@ class SessionsController < ApplicationController
       @user.save
 
       flash[:notice] = 'Login successful.'
-      redirect_to user_path(@user)
+      redirect_to(session.delete(:user_return_to) || user_path(@user))
     end
   end
 

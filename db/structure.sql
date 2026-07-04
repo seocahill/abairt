@@ -199,7 +199,25 @@ FOREIGN KEY ("location_id")
 CREATE INDEX "index_voice_recording_locations_on_voice_recording_id" ON "voice_recording_locations" ("voice_recording_id");
 CREATE INDEX "index_voice_recording_locations_on_location_id" ON "voice_recording_locations" ("location_id");
 CREATE UNIQUE INDEX "idx_vr_locations_unique" ON "voice_recording_locations" ("voice_recording_id", "location_id");
+CREATE TABLE IF NOT EXISTS "oauth_applications" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "uid" varchar NOT NULL, "secret" varchar NOT NULL, "redirect_uri" text, "scopes" varchar DEFAULT '' NOT NULL, "confidential" boolean DEFAULT 1 NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_oauth_applications_on_uid" ON "oauth_applications" ("uid");
+CREATE TABLE IF NOT EXISTS "oauth_access_grants" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "resource_owner_id" integer NOT NULL, "application_id" integer NOT NULL, "token" varchar NOT NULL, "expires_in" integer NOT NULL, "redirect_uri" text NOT NULL, "scopes" varchar DEFAULT '' NOT NULL, "created_at" datetime(6) NOT NULL, "revoked_at" datetime(6), CONSTRAINT "fk_rails_b4b53e07b0"
+FOREIGN KEY ("application_id")
+  REFERENCES "oauth_applications" ("id")
+);
+CREATE INDEX "index_oauth_access_grants_on_resource_owner_id" ON "oauth_access_grants" ("resource_owner_id");
+CREATE INDEX "index_oauth_access_grants_on_application_id" ON "oauth_access_grants" ("application_id");
+CREATE UNIQUE INDEX "index_oauth_access_grants_on_token" ON "oauth_access_grants" ("token");
+CREATE TABLE IF NOT EXISTS "oauth_access_tokens" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "resource_owner_id" integer, "application_id" integer NOT NULL, "token" varchar NOT NULL, "refresh_token" varchar, "expires_in" integer, "revoked_at" datetime(6), "created_at" datetime(6) NOT NULL, "scopes" varchar, "previous_refresh_token" varchar DEFAULT '' NOT NULL, CONSTRAINT "fk_rails_ee63f25419"
+FOREIGN KEY ("application_id")
+  REFERENCES "oauth_applications" ("id")
+);
+CREATE INDEX "index_oauth_access_tokens_on_resource_owner_id" ON "oauth_access_tokens" ("resource_owner_id");
+CREATE INDEX "index_oauth_access_tokens_on_application_id" ON "oauth_access_tokens" ("application_id");
+CREATE UNIQUE INDEX "index_oauth_access_tokens_on_token" ON "oauth_access_tokens" ("token");
+CREATE UNIQUE INDEX "index_oauth_access_tokens_on_refresh_token" ON "oauth_access_tokens" ("refresh_token");
 INSERT INTO "schema_migrations" (version) VALUES
+('20260704000001'),
 ('20260322233134'),
 ('20260320000000'),
 ('20260218000002'),
