@@ -15,7 +15,12 @@ class ListVoiceRecordingsTool < ApplicationTool
 
   def self.call(server_context:, query: nil, limit: 20)
     guard do
-      records = VoiceRecording.includes(:users).order(created_at: :desc).limit(limit.to_i.clamp(1, 50))
+      records = VoiceRecording
+        .with_attached_media
+        .with_attached_audio_track
+        .includes(:users)
+        .order(created_at: :desc)
+        .limit(limit.to_i.clamp(1, 50))
       if query.present?
         like = "%#{query}%"
         records = records.where("title LIKE ? OR description LIKE ?", like, like)

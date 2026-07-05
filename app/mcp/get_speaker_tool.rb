@@ -18,7 +18,7 @@ class GetSpeakerTool < ApplicationTool
     guard do
       user = User.find(id)
       recent = user.dictionary_entries
-        .includes(:speaker, :translator, :tags, :voice_recording)
+        .includes(:speaker, :translator, :tags, :voice_recording, media_attachment: :blob)
         .order(updated_at: :desc)
         .limit(entries_limit.to_i.clamp(1, 50))
 

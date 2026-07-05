@@ -18,7 +18,7 @@ class ListRecentTranscriptionsTool < ApplicationTool
   def self.call(server_context:, accuracy_status: nil, dialect: nil, limit: 20)
     guard do
       records = DictionaryEntry
-        .includes(:speaker, :translator, :tags, :voice_recording)
+        .includes(:speaker, :translator, :tags, :voice_recording, media_attachment: :blob)
         .order(updated_at: :desc)
         .limit(limit.to_i.clamp(1, 50))
 

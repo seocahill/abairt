@@ -57,6 +57,34 @@ class McpEndpointTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "get_dictionary_entry exposes the entry audio blob url" do
+    entry = dictionary_entries(:one)
+    entry.media.attach(io: StringIO.new("audio"), filename: "entry.mp3", content_type: "audio/mpeg")
+
+    post "/mcp",
+      params: rpc("tools/call", name: "get_dictionary_entry", arguments: {id: entry.id}),
+      headers: json_headers("Bearer #{@token.token}")
+    assert_response :success
+
+    payload = JSON.parse(mcp_result(response).fetch("content").first.fetch("text"))
+    assert_match %r{/rails/active_storage/blobs/.+/entry\.mp3}, payload["audio_url"]
+  end
+
+  test "get_voice_recording exposes media and audio_track blob urls" do
+    recording = voice_recordings(:one)
+    recording.media.attach(io: StringIO.new("video"), filename: "clip.mp4", content_type: "video/mp4")
+    recording.audio_track.attach(io: StringIO.new("audio"), filename: "clip.mp3", content_type: "audio/mpeg")
+
+    post "/mcp",
+      params: rpc("tools/call", name: "get_voice_recording", arguments: {id: recording.id}),
+      headers: json_headers("Bearer #{@token.token}")
+    assert_response :success
+
+    rec = JSON.parse(mcp_result(response).fetch("content").first.fetch("text")).fetch("recording")
+    assert_match %r{/rails/active_storage/blobs/.+/clip\.mp4}, rec["media_url"]
+    assert_match %r{/rails/active_storage/blobs/.+/clip\.mp3}, rec["audio_track_url"]
+  end
+
   test "reads expose unconfirmed drafts" do
     draft = dictionary_entries(:one) # unconfirmed
 

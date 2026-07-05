@@ -11,7 +11,7 @@ class GetWordListTool < ApplicationTool
 
   def self.call(id:, server_context:)
     guard do
-      list = WordList.includes(dictionary_entries: [:speaker, :translator, :tags, :voice_recording]).find(id)
+      list = WordList.includes(dictionary_entries: [:speaker, :translator, :tags, :voice_recording, {media_attachment: :blob}]).find(id)
       entries = Mcp::EntrySerializer.new(list.dictionary_entries, params: {host: host(server_context)}).serializable_hash
 
       ok(

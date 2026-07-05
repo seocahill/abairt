@@ -14,7 +14,11 @@ class GetDictionaryEntryTool < ApplicationTool
   def self.call(id:, server_context:)
     guard do
       entry = DictionaryEntry
-        .includes(:speaker, :translator, :tags, :voice_recording, :versions)
+        .includes(
+          :speaker, :translator, :tags, :versions,
+          {media_attachment: :blob},
+          {voice_recording: [:users, {media_attachment: :blob}, {audio_track_attachment: :blob}]}
+        )
         .find(id)
 
       ok(Mcp::EntryDetailSerializer.new(entry, params: {host: host(server_context)}).serializable_hash)

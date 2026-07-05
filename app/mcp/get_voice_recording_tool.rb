@@ -13,7 +13,11 @@ class GetVoiceRecordingTool < ApplicationTool
 
   def self.call(id:, server_context:)
     guard do
-      recording = VoiceRecording.includes(:users, dictionary_entries: [:speaker, :translator, :tags]).find(id)
+      recording = VoiceRecording
+        .with_attached_media
+        .with_attached_audio_track
+        .includes(:users, dictionary_entries: [:speaker, :translator, :tags, {media_attachment: :blob}])
+        .find(id)
       params = {host: host(server_context)}
 
       ok(

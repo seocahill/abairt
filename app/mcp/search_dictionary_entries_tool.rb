@@ -26,7 +26,7 @@ class SearchDictionaryEntriesTool < ApplicationTool
       records = DictionaryEntry
         .joins(:fts_dictionary_entries)
         .where("fts_dictionary_entries match ?", query)
-        .includes(:speaker, :translator, :tags, :voice_recording)
+        .includes(:speaker, :translator, :tags, :voice_recording, media_attachment: :blob)
         .distinct
         .order("rank")
         .limit(limit.to_i.clamp(1, 50))

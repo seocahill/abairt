@@ -28,7 +28,7 @@ class Mcp::EntrySerializer
     entry.translator&.name
   end
 
-  attribute :audio_url do |entry, params: {}|
+  attribute :audio_url do |entry|
     next nil unless entry.media.attached?
 
     Rails.application.routes.url_helpers.rails_blob_url(entry.media, host: params[:host])
