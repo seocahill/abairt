@@ -1,8 +1,13 @@
 # MCP integration (Claude web)
 
 Abairt exposes a [Model Context Protocol](https://modelcontextprotocol.io) server so that
-Claude web (and other MCP clients) can search and read the confirmed dictionary/transcription
-corpus. Access is authorised with OAuth 2 provided by [Doorkeeper](https://github.com/doorkeeper-gem/doorkeeper).
+Claude web (and other MCP clients) can act as a **translation assistant** over the whole
+corpus: researching entries (confirmed and draft), recordings, speaker/dialect context and
+translation history, and saving translations, tags and confirmations back. Access is
+authorised with OAuth 2 provided by [Doorkeeper](https://github.com/doorkeeper-gem/doorkeeper)
+and is **restricted to admin users** — the assistant sees and edits the entire corpus, so the
+admin check is the read boundary; per-record writes are additionally governed by Pundit
+policies and every edit is versioned (PaperTrail) and reversible.
 
 ## Endpoints
 
@@ -26,15 +31,38 @@ corpus. Access is authorised with OAuth 2 provided by [Doorkeeper](https://githu
 5. Claude exchanges the code at `/oauth/token` (PKCE, no client secret) and calls `/mcp`
    with the bearer token.
 
-Access tokens carry the `mcp` scope, expire after two hours and are refreshable.
+Access tokens carry the `mcp` scope, expire after two hours and are refreshable. The token's
+resource owner must be an **admin** user or the `/mcp` endpoint returns `401`.
 
 ## Tools
 
-Tools live in `app/mcp/` and read only confirmed (`accuracy_status: confirmed`) data:
+Tools live in `app/mcp/` and are thin adapters over the same models, services and Pundit
+policies the rest of the app uses. Each subclasses `ApplicationTool` (which resolves the acting
+admin, authorizes writes and serialises responses via the `Mcp::*` Alba serializers) and
+registers itself, so `McpController` exposes the full set automatically.
 
-- `search_dictionary_entries` – full-text search over Irish words/phrases and translations.
-- `get_dictionary_entry` – fetch a single entry (translation, dialect, speaker, audio URL).
-- `list_recent_transcriptions` – most recently updated confirmed transcriptions.
+**Read / research**
+
+- `search_dictionary_entries` – full-text search over the whole corpus, with filters (dialect,
+  speaker, tag, accuracy status, has-audio).
+- `get_dictionary_entry` – a single entry in full detail: translation, dialect, speaker, tags,
+  audio, source recording and edit history.
+- `list_recent_transcriptions` – most recently updated entries, filterable.
+- `context_search` – hybrid keyword + vector similarity search from an English description.
+- `get_voice_recording` / `list_voice_recordings` – recordings with segments, dialect region,
+  speakers and their entries.
+- `get_speaker` / `list_speakers` – user/dialect context and a person's recent entries.
+- `list_tags` – the tag vocabulary with usage counts.
+- `get_word_list` / `list_word_lists` – curated collections.
+
+**Write (Pundit-gated, versioned)**
+
+- `save_translation` – set/replace a translation (supplied or model-generated). Confirmed
+  entries are locked; deconfirm first.
+- `create_dictionary_entry` – create a new draft entry.
+- `set_entry_accuracy` – confirm / deconfirm an entry.
+- `tag_entry` – add/remove tags.
+- `create_word_list` / `add_to_word_list` – build and curate collections.
 
 ## Connecting from Claude web
 
