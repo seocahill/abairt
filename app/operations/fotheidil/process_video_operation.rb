@@ -2,12 +2,13 @@
 
 module Fotheidil
   # Trailblazer operation for processing Fotheidil videos
-  # Handles authentication, upload/fetch, parsing, entry creation, and publishing
+  # Handles submission, transcription, entry creation, and publishing via the
+  # Abair API (see Fotheidil::ApiService)
   #
   # Usage:
   #   result = Fotheidil::ProcessVideoOperation.call(
   #     voice_recording: voice_recording,
-  #     fotheidil_video_id: "1141" # Optional: use existing video
+  #     fotheidil_video_id: "1141" # Optional: use an existing transcription job
   #   )
   #
   #   if result.success?
@@ -27,7 +28,6 @@ module Fotheidil
     step :validate_voice_recording
     step :check_not_already_completed, Output(:failure) => End(:already_completed)
     step :prepare_audio_track
-    step :authenticate
     step :determine_video_source
     step :wait_for_transcription
     step :parse_segments
@@ -78,7 +78,7 @@ module Fotheidil
       Rails.logger.info "Preparing audio_track for VoiceRecording##{voice_recording.id}..."
 
       voice_recording.media.open do |input|
-        Tempfile.create([ "audio_track", ".mp3" ], binmode: true) do |output|
+        Tempfile.create(["audio_track", ".mp3"], binmode: true) do |output|
           success = system(
             "ffmpeg", "-i", input.path,
             "-vn",
@@ -111,39 +111,19 @@ module Fotheidil
       false
     end
 
-    # Authenticate with Fotheidil
-    def authenticate(ctx, **)
-      Rails.logger.info "Authenticating with Fotheidil..."
-
-      email = Rails.application.credentials.dig(:fotheidil, :email)
-      password = Rails.application.credentials.dig(:fotheidil, :password)
-
-      browser_service = Fotheidil::BrowserService.new(email, password)
-
-      unless browser_service.setup_browser && browser_service.authenticate
-        ctx[:error] = "Fotheidil authentication failed"
-        return false
-      end
-
-      ctx[:browser_service] = browser_service
-      Rails.logger.info "Fotheidil authentication successful"
-      true
-    end
-
-    # Determine video source: use existing ID or upload new video
-    def determine_video_source(ctx, voice_recording:, browser_service:, fotheidil_video_id: nil, **)
+    # Determine video source: use existing ID or submit new media
+    def determine_video_source(ctx, voice_recording:, fotheidil_video_id: nil, **)
       if fotheidil_video_id.present?
         Rails.logger.info "Using existing Fotheidil video ID: #{fotheidil_video_id}"
         ctx[:fotheidil_video_id] = fotheidil_video_id
         return true
       end
 
-      # Upload new video
-      upload_and_extract_id(ctx, voice_recording, browser_service)
+      submit_media(ctx, voice_recording)
     end
 
-    # Upload video and extract ID
-    def upload_and_extract_id(ctx, voice_recording, browser_service)
+    # Submit media to the Abair API and record the job id
+    def submit_media(ctx, voice_recording)
       Rails.logger.info "Uploading new video to Fotheidil..."
 
       # Use Active Storage's filename methods
@@ -153,15 +133,15 @@ module Fotheidil
       # If no extension, infer from content type
       unless extension
         extension = case blob.content_type
-                    when /audio\/mpeg/, /audio\/mp3/
-                      "mp3"
-                    when /video\/mp4/
-                      "mp4"
-                    when /audio\/wav/
-                      "wav"
-                    else
-                      "mp3" # Default fallback
-                    end
+        when /audio\/mpeg/, /audio\/mp3/
+          "mp3"
+        when /video\/mp4/
+          "mp4"
+        when /audio\/wav/
+          "wav"
+        else
+          "mp3" # Default fallback
+        end
         Rails.logger.info "Inferred extension .#{extension} from content_type #{blob.content_type}"
       end
 
@@ -169,7 +149,7 @@ module Fotheidil
       base_name = blob.filename.base.presence || voice_recording.name.to_s
       safe_base = base_name
         .gsub(/[:\/\\]/, "_")  # Replace invalid filesystem chars
-        .gsub(/[^\w\s\-_\.]/, "")  # Remove other special chars
+        .gsub(/[^\w\s\-_.]/, "")  # Remove other special chars
         .strip
         .truncate(200)  # Limit length
 
@@ -183,9 +163,8 @@ module Fotheidil
         end
       end
 
-      # Always upload audio to Fotheidil - extract from video if needed.
-      # Video upload via browser automation is unreliable; audio timestamps
-      # are preserved 1:1 so video playback alignment is unaffected.
+      # Always submit audio - extract from video if needed. Audio timestamps are
+      # preserved 1:1 so video playback alignment is unaffected.
       upload_path = if blob.content_type.start_with?("video/")
         audio_path = "/tmp/#{safe_base}.mp3"
         Rails.logger.info "Extracting audio track from video for Fotheidil upload: #{audio_path}"
@@ -209,26 +188,14 @@ module Fotheidil
         temp_path
       end
 
-      # Upload to Fotheidil
-      upload_service = Fotheidil::UploadService.new(browser_service)
-      video_url = upload_service.upload_file(upload_path)
+      # The API derives its stored media name from file_name and rejects one it
+      # already holds, so keep the readable base and make it unique per submission.
+      file_name = "#{safe_base}-#{SecureRandom.hex(4)}#{File.extname(upload_path)}"
+      job_id = Fotheidil::ApiService.new.submit(upload_path, file_name: file_name)
 
-      if video_url.blank?
-        ctx[:error] = "Upload failed - no video URL returned"
-        return false
-      end
-
-      # Extract video ID from URL
-      match = video_url.match(%r{/videos/(\d+)})
-
-      if match
-        ctx[:fotheidil_video_id] = match[1]
-        Rails.logger.info "Upload successful - video ID: #{match[1]}"
-        true
-      else
-        ctx[:error] = "Failed to extract video ID from URL: #{video_url}"
-        false
-      end
+      ctx[:fotheidil_video_id] = job_id.to_s
+      Rails.logger.info "Submission successful - job ID: #{job_id}"
+      true
     rescue => e
       ctx[:error] = "Upload error: #{e.message}"
       Rails.logger.error "Upload error: #{e.message}"
@@ -238,8 +205,8 @@ module Fotheidil
       File.delete(audio_path) if audio_path && File.exist?(audio_path)
     end
 
-    # Wait for Fotheidil to generate transcription (can take several minutes)
-    def wait_for_transcription(ctx, browser_service:, timeout: 1800, **)
+    # Wait for the Abair API to finish transcribing (can take several minutes)
+    def wait_for_transcription(ctx, timeout: 1800, interval: 30, **)
       fotheidil_video_id = ctx[:fotheidil_video_id]
 
       unless fotheidil_video_id
@@ -247,42 +214,30 @@ module Fotheidil
         return false
       end
 
-      Rails.logger.info "Waiting for Fotheidil transcription (video #{fotheidil_video_id}, timeout: #{timeout}s)..."
+      Rails.logger.info "Waiting for Fotheidil transcription (job #{fotheidil_video_id}, timeout: #{timeout}s)..."
 
+      service = Fotheidil::ApiService.new
       start_time = Time.current
-      url = "https://fotheidil.abair.ie/videos/#{fotheidil_video_id}"
 
       loop do
-        # Check if we've exceeded timeout
+        transcript = service.transcript(fotheidil_video_id)
+
+        # nil means recognition is still running; an empty array means it
+        # finished with nothing, which parse_segments reports straight away
+        unless transcript.nil?
+          Rails.logger.info "Transcription ready after #{(Time.current - start_time).round}s"
+          ctx[:transcript] = transcript
+          return true
+        end
+
         if Time.current - start_time > timeout
           ctx[:error] = "Timeout waiting for transcription to appear on Fotheidil"
           Rails.logger.error ctx[:error]
           return false
         end
 
-        # Navigate to video page and check for segments
-        browser_service.driver.navigate.to url
-
-        # Wait for page to load
-        wait = Selenium::WebDriver::Wait.new(timeout: 10)
-        begin
-          wait.until { browser_service.driver.find_element(css: "div.py-5.border-b.border-gray-300.bg-white.relative") }
-        rescue Selenium::WebDriver::Error::TimeoutError
-          Rails.logger.debug "Page not loaded yet, retrying..."
-          sleep 30
-          next
-        end
-
-        # Check if segments exist in page source
-        page_source = browser_service.driver.page_source
-
-        if page_source.include?("endTimeSeconds")
-          Rails.logger.info "Transcription appeared after #{(Time.current - start_time).round}s"
-          return true
-        end
-
-        Rails.logger.debug "No segments yet, checking again in 30s..."
-        sleep 30
+        Rails.logger.debug { "Not transcribed yet, checking again in #{interval}s..." }
+        sleep interval
       end
     rescue => e
       ctx[:error] = "Error waiting for transcription: #{e.message}"
@@ -290,20 +245,12 @@ module Fotheidil
       false
     end
 
-    # Parse segments from Fotheidil
-    def parse_segments(ctx, browser_service:, **)
-      fotheidil_video_id = ctx[:fotheidil_video_id]
-
-      unless fotheidil_video_id
-        ctx[:error] = "No fotheidil_video_id available"
-        return false
+    # Keep only well-formed segments - a segment missing its timings cannot be
+    # turned into a dictionary entry downstream
+    def parse_segments(ctx, **)
+      segments = Array(ctx[:transcript]).select do |segment|
+        segment["startTimeSeconds"].present? && segment["endTimeSeconds"].present? && segment["text"].present?
       end
-
-      Rails.logger.info "Parsing segments for video #{fotheidil_video_id}..."
-
-      # Reuse the authenticated browser_service from wait_for_transcription
-      parser_service = Fotheidil::ParserService.new(browser_service)
-      segments = parser_service.parse_segments(fotheidil_video_id)
 
       if segments.blank?
         ctx[:error] = "No segments found"
@@ -313,10 +260,6 @@ module Fotheidil
       ctx[:segments] = segments
       Rails.logger.info "Parsed #{segments.length} segments"
       true
-    rescue => e
-      ctx[:error] = "Failed to parse segments: #{e.message}"
-      Rails.logger.error "Parse error: #{e.message}"
-      false
     end
 
     # Save segments to voice recording
@@ -451,11 +394,6 @@ module Fotheidil
       voice_recording.update!(diarization_status: "failed")
       Rails.logger.error "Fotheidil processing failed for VoiceRecording #{voice_recording.id}: #{error}"
       true
-    end
-
-    # Cleanup browser after operation
-    def cleanup(ctx, browser_service: nil, **)
-      browser_service&.cleanup
     end
   end
 end

@@ -77,9 +77,9 @@ module Fotheidil
     end
 
     test "processes all valid segments from test fixture" do
-      parser = Fotheidil::ParserService.new
-      html = File.read(Rails.root.join("test/fixtures/files/fotheidil_video_1141.html"))
-      segments = parser.parse_html(html)
+      segments = JSON.parse(
+        Rails.root.join("test/fixtures/files/fotheidil_video_1141_segments.json").read
+      )
 
       @voice_recording.update!(segments: segments)
       service = CreateSpeakerEntriesService.new(@voice_recording)

@@ -19,29 +19,20 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     VoiceRecording.any_instance.stubs(:calculate_duration).returns(120.0)
 
     # Mock Fotheidil services used by subprocess
-    browser_service = mock("browser_service")
-    browser_service.stubs(:setup_browser).returns(true)
-    browser_service.stubs(:authenticate).returns(true)
-    browser_service.stubs(:cleanup)
-
-    upload_service = mock("upload_service")
-    upload_service.stubs(:upload_file).returns("https://fotheidil.abair.ie/videos/9999")
-
-    parser_service = mock("parser_service")
     segments = [{"id" => "0001", "text" => "Test", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5}]
-    parser_service.stubs(:parse_segments).returns(segments)
+
+    api_service = mock("api_service")
+    api_service.stubs(:submit).returns(9999)
+    api_service.stubs(:transcript).returns(segments)
 
     create_speaker_entries_service = mock("create_speaker_entries_service")
     create_speaker_entries_service.stubs(:call)
 
-    Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-    Fotheidil::UploadService.stubs(:new).returns(upload_service)
-    Fotheidil::ParserService.stubs(:new).returns(parser_service)
+    Fotheidil::ApiService.stubs(:new).returns(api_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
     # Stub the wait and processing steps
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
-    Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
@@ -88,28 +79,19 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     VoiceRecording.any_instance.stubs(:calculate_duration).returns(120.0)
 
     # Mock Fotheidil services
-    browser_service = mock("browser_service")
-    browser_service.stubs(:setup_browser).returns(true)
-    browser_service.stubs(:authenticate).returns(true)
-    browser_service.stubs(:cleanup)
-
-    upload_service = mock("upload_service")
-    upload_service.stubs(:upload_file).returns("https://fotheidil.abair.ie/videos/9999")
-
-    parser_service = mock("parser_service")
     segments = [{"id" => "0001", "text" => "Test", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5}]
-    parser_service.stubs(:parse_segments).returns(segments)
+
+    api_service = mock("api_service")
+    api_service.stubs(:submit).returns(9999)
+    api_service.stubs(:transcript).returns(segments)
 
     create_speaker_entries_service = mock("create_speaker_entries_service")
     create_speaker_entries_service.stubs(:call)
 
-    Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-    Fotheidil::UploadService.stubs(:new).returns(upload_service)
-    Fotheidil::ParserService.stubs(:new).returns(parser_service)
+    Fotheidil::ApiService.stubs(:new).returns(api_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
-    Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
@@ -146,12 +128,11 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     mock_file.stubs(:read).returns('fake audio content')
     URI.stubs(:open).returns(mock_file)
 
-    # Mock browser service to fail authentication
-    browser_service = mock("browser_service")
-    browser_service.stubs(:setup_browser).returns(false)
-    browser_service.stubs(:cleanup)
+    # Mock the Abair API to reject the submission
+    api_service = mock("api_service")
+    api_service.stubs(:submit).raises(Fotheidil::ApiService::Error, "Abair API 401: Unauthorized")
 
-    Fotheidil::BrowserService.stubs(:new).returns(browser_service)
+    Fotheidil::ApiService.stubs(:new).returns(api_service)
 
     result = ImportMediaOperation.call(media_import_id: @media_import.id)
 
@@ -172,28 +153,19 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     VoiceRecording.any_instance.stubs(:calculate_duration).returns(120.0)
 
     # Mock Fotheidil services
-    browser_service = mock("browser_service")
-    browser_service.stubs(:setup_browser).returns(true)
-    browser_service.stubs(:authenticate).returns(true)
-    browser_service.stubs(:cleanup)
-
-    upload_service = mock("upload_service")
-    upload_service.stubs(:upload_file).returns("https://fotheidil.abair.ie/videos/9999")
-
-    parser_service = mock("parser_service")
     segments = [{"id" => "0001", "text" => "Test", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5}]
-    parser_service.stubs(:parse_segments).returns(segments)
+
+    api_service = mock("api_service")
+    api_service.stubs(:submit).returns(9999)
+    api_service.stubs(:transcript).returns(segments)
 
     create_speaker_entries_service = mock("create_speaker_entries_service")
     create_speaker_entries_service.stubs(:call)
 
-    Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-    Fotheidil::UploadService.stubs(:new).returns(upload_service)
-    Fotheidil::ParserService.stubs(:new).returns(parser_service)
+    Fotheidil::ApiService.stubs(:new).returns(api_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
-    Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
@@ -226,28 +198,19 @@ class ImportMediaOperationTest < ActiveSupport::TestCase
     VoiceRecording.any_instance.stubs(:calculate_duration).returns(120.0)
 
     # Mock Fotheidil services
-    browser_service = mock("browser_service")
-    browser_service.stubs(:setup_browser).returns(true)
-    browser_service.stubs(:authenticate).returns(true)
-    browser_service.stubs(:cleanup)
-
-    upload_service = mock("upload_service")
-    upload_service.stubs(:upload_file).returns("https://fotheidil.abair.ie/videos/9999")
-
-    parser_service = mock("parser_service")
     segments = [{"id" => "0001", "text" => "Test", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5}]
-    parser_service.stubs(:parse_segments).returns(segments)
+
+    api_service = mock("api_service")
+    api_service.stubs(:submit).returns(9999)
+    api_service.stubs(:transcript).returns(segments)
 
     create_speaker_entries_service = mock("create_speaker_entries_service")
     create_speaker_entries_service.stubs(:call)
 
-    Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-    Fotheidil::UploadService.stubs(:new).returns(upload_service)
-    Fotheidil::ParserService.stubs(:new).returns(parser_service)
+    Fotheidil::ApiService.stubs(:new).returns(api_service)
     Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
-    Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
     Fotheidil::ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)

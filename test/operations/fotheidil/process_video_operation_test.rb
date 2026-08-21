@@ -67,7 +67,7 @@ module Fotheidil
       refute @voice_recording.audio_track.attached?
 
       # Stop pipeline after prepare_audio_track by failing authenticate
-      ProcessVideoOperation.any_instance.stubs(:authenticate).returns(false)
+      ProcessVideoOperation.any_instance.stubs(:determine_video_source).returns(false)
 
       ProcessVideoOperation.call(voice_recording: @voice_recording)
 
@@ -82,7 +82,7 @@ module Fotheidil
       )
       original_blob_id = @voice_recording.audio_track.blob.id
 
-      ProcessVideoOperation.any_instance.stubs(:authenticate).returns(false)
+      ProcessVideoOperation.any_instance.stubs(:determine_video_source).returns(false)
 
       ProcessVideoOperation.call(voice_recording: @voice_recording)
 
@@ -96,7 +96,7 @@ module Fotheidil
         content_type: "audio/wav"
       )
 
-      ProcessVideoOperation.any_instance.stubs(:authenticate).returns(false)
+      ProcessVideoOperation.any_instance.stubs(:determine_video_source).returns(false)
 
       ProcessVideoOperation.call(voice_recording: @voice_recording)
 
@@ -113,43 +113,30 @@ module Fotheidil
       assert_equal "failed", @voice_recording.reload.diarization_status
     end
 
-    test "successfully uploads and processes new video" do
+    test "successfully submits and processes new media" do
       ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
 
-      # Mock browser service
-      browser_service = mock("browser_service")
-      browser_service.stubs(:setup_browser).returns(true)
-      browser_service.stubs(:authenticate).returns(true)
-      browser_service.stubs(:cleanup)
-
-      # Mock upload service
-      upload_service = mock("upload_service")
-      upload_service.stubs(:upload_file).returns("https://fotheidil.abair.ie/videos/9999")
-
-      # Mock parser service
-      parser_service = mock("parser_service")
       segments = [
         {"id" => "0001", "text" => "Uploaded test", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5}
       ]
-      parser_service.stubs(:parse_segments).returns(segments)
 
-      # Mock create entries service
+      api_service = mock("api_service")
+      api_service.stubs(:submit).returns(9999)
+      api_service.stubs(:transcript).returns(segments)
+
       create_speaker_entries_service = mock("create_speaker_entries_service")
       create_speaker_entries_service.stubs(:call)
 
-      Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-      Fotheidil::UploadService.stubs(:new).returns(upload_service)
-      Fotheidil::ParserService.stubs(:new).returns(parser_service)
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
       Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
       # Mock wait and post-process steps
-      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
       ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
       ProcessVideoOperation.any_instance.stubs(:publish).returns(true)
 
-      # Call without video_id to trigger upload
+      # Call without video_id to trigger submission
       result = ProcessVideoOperation.call(voice_recording: @voice_recording)
 
       assert result.success?, "Operation should succeed. Error: #{result[:error]}"
@@ -157,31 +144,39 @@ module Fotheidil
       assert_equal 1, @voice_recording.segments.count
     end
 
+    test "submits a unique file name so the api does not reject a duplicate" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
+      api_service = mock("api_service")
+      api_service.expects(:submit).with do |_path, file_name:|
+        file_name.start_with?("deasaigh-") && file_name.end_with?(".mp3")
+      end.returns(9999)
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
+
+      # Halt once the submission has happened
+      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(false)
+
+      ProcessVideoOperation.call(voice_recording: @voice_recording)
+    end
+
     test "successfully processes with existing video_id" do
       ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
 
-      # Mock all external services
-      browser_service = mock("browser_service")
-      browser_service.stubs(:setup_browser).returns(true)
-      browser_service.stubs(:authenticate).returns(true)
-      browser_service.stubs(:cleanup)
-
-      parser_service = mock("parser_service")
       segments = [
         {"id" => "0001", "text" => "Test 1", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5},
         {"id" => "0002", "text" => "Test 2", "speaker" => "SPEAKER_01", "startTimeSeconds" => 3.0, "endTimeSeconds" => 5.0}
       ]
-      parser_service.stubs(:parse_segments).returns(segments)
+
+      api_service = mock("api_service")
+      api_service.stubs(:transcript).returns(segments)
 
       create_speaker_entries_service = mock("create_speaker_entries_service")
       create_speaker_entries_service.stubs(:call)
 
-      Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-      Fotheidil::ParserService.stubs(:new).returns(parser_service)
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
       Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
 
       # Mock the wait and post-process steps
-      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
       ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
       ProcessVideoOperation.any_instance.stubs(:post_process_entries).returns(true)
@@ -198,14 +193,12 @@ module Fotheidil
       assert_equal "processing", @voice_recording.diarization_status
     end
 
-    test "marks as failed on authentication error" do
+    test "marks as failed when the api rejects the key" do
       ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
 
-      browser_service = mock("browser_service")
-      browser_service.stubs(:setup_browser).returns(false)
-      browser_service.stubs(:cleanup)
-
-      Fotheidil::BrowserService.stubs(:new).returns(browser_service)
+      api_service = mock("api_service")
+      api_service.stubs(:transcript).raises(Fotheidil::ApiService::Error, "Abair API 401: Unauthorized")
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
 
       result = ProcessVideoOperation.call(
         voice_recording: @voice_recording,
@@ -213,26 +206,16 @@ module Fotheidil
       )
 
       assert_not result.success?
-      assert_equal "Fotheidil authentication failed", result[:error]
+      assert_includes result[:error], "401"
       assert_equal "failed", @voice_recording.reload.diarization_status
     end
 
-    test "marks as failed on parse error" do
+    test "marks as failed when the transcription comes back empty" do
       ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
 
-      browser_service = mock("browser_service")
-      browser_service.stubs(:setup_browser).returns(true)
-      browser_service.stubs(:authenticate).returns(true)
-      browser_service.stubs(:cleanup)
-
-      parser_service = mock("parser_service")
-      parser_service.stubs(:parse_segments).raises(StandardError, "Parse failed")
-
-      Fotheidil::BrowserService.stubs(:new).returns(browser_service)
-      Fotheidil::ParserService.stubs(:new).returns(parser_service)
-
-      # Mock wait_for_transcription to succeed
-      ProcessVideoOperation.any_instance.stubs(:wait_for_transcription).returns(true)
+      api_service = mock("api_service")
+      api_service.stubs(:transcript).returns([])
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
 
       result = ProcessVideoOperation.call(
         voice_recording: @voice_recording,
@@ -240,8 +223,34 @@ module Fotheidil
       )
 
       assert_not result.success?
-      assert_includes result[:error], "Parse failed"
+      assert_equal "No segments found", result[:error]
       assert_equal "failed", @voice_recording.reload.diarization_status
+    end
+
+    test "drops segments that are missing timings" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
+      api_service = mock("api_service")
+      api_service.stubs(:transcript).returns([
+        {"id" => "0001", "text" => "Good", "speaker" => "SPEAKER_00", "startTimeSeconds" => 0.5, "endTimeSeconds" => 2.5},
+        {"id" => "0002", "text" => "No timings", "speaker" => "SPEAKER_00"}
+      ])
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
+
+      create_speaker_entries_service = mock("create_speaker_entries_service")
+      create_speaker_entries_service.stubs(:call)
+      Fotheidil::CreateSpeakerEntriesService.stubs(:new).returns(create_speaker_entries_service)
+
+      ProcessVideoOperation.any_instance.stubs(:wait_for_segments).returns(true)
+      ProcessVideoOperation.any_instance.stubs(:wait_for_entries).returns(true)
+      ProcessVideoOperation.any_instance.stubs(:publish).returns(true)
+
+      ProcessVideoOperation.call(
+        voice_recording: @voice_recording,
+        fotheidil_video_id: "1141"
+      )
+
+      assert_equal 1, @voice_recording.reload.segments.count
     end
   end
 end
