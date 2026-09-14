@@ -7,8 +7,9 @@ class Whatsapp::DeliverQuestionTest < ActiveSupport::TestCase
     @question = Question.new(asker: users(:two), speaker: @speaker)
     @question.audio.attach(
       io: Rails.root.join("test/fixtures/files/sample.mp3").open,
-      filename: "sample.mp3",
-      content_type: "audio/mpeg"
+      filename: "sample.ogg",
+      content_type: "audio/ogg",
+      identify: false
     )
     @question.save!
     @client = mock("client")
