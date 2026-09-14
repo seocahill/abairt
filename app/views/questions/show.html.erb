@@ -1,0 +1,22 @@
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+  <%= link_to "← Mo cheisteanna", questions_path, class: "text-sm text-blue-600 hover:underline" %>
+
+  <div class="bg-white shadow rounded-lg p-6 mt-4">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">Ceist do <%= @question.speaker.name %></h1>
+      <%= render "questions/status", question: @question %>
+    </div>
+
+    <h2 class="text-sm font-medium text-gray-500 mb-2">Do cheist</h2>
+    <% if @question.audio.attached? %>
+      <audio controls class="w-full mb-6" src="<%= url_for(@question.audio) %>"></audio>
+    <% end %>
+
+    <h2 class="text-sm font-medium text-gray-500 mb-2">An freagra</h2>
+    <% if @question.answer_audio.attached? %>
+      <audio controls class="w-full" src="<%= url_for(@question.answer_audio) %>"></audio>
+    <% else %>
+      <p class="text-gray-500 text-sm">Níl freagra ann go fóill.</p>
+    <% end %>
+  </div>
+</div>

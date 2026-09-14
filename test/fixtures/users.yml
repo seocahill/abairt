@@ -55,3 +55,13 @@ admin:
   role: "admin"
   email: "admin@abairt.com"
   confirmed: true
+
+whatsapp_speaker:
+  name: Máirtín Ó Conghaile
+  role: speaker
+  ability: native
+  confirmed: true
+  phone_number: "353861234567"
+  answers_questions: true
+  whatsapp_opted_in_at: <%= 1.month.ago.to_fs(:db) %>
+  whatsapp_last_inbound_at: <%= 1.hour.ago.to_fs(:db) %>

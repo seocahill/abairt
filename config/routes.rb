@@ -43,6 +43,11 @@ Rails.application.routes.draw do
       post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
     end
 
+    # WhatsApp Cloud API webhooks. GET is Meta's subscription handshake, POST
+    # carries inbound messages from speakers.
+    get "whatsapp/webhook", to: "whatsapp/webhooks#show"
+    post "whatsapp/webhook", to: "whatsapp/webhooks#create"
+
     # Speech to Text API endpoint
     post 'speech_to_text', to: 'speech_to_text#create'
 
@@ -123,6 +128,12 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :questions, only: [:index] do
+      member do
+        post :deliver
+      end
+    end
+
     resources :locations, only: [:index, :edit, :update] do
       member do
         post :geocode
@@ -177,6 +188,8 @@ Rails.application.routes.draw do
   resources :translator_leaderboard, only: [:index, :show], controller: 'translator_leaderboard'
 
   resources :practice_recordings, only: [:create]
+
+  resources :questions, only: [:index, :new, :create, :show]
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # health

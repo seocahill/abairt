@@ -1,0 +1,76 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold">Questions</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      The queue behind the WhatsApp pipe. Speakers hold one question at a time.
+    </p>
+  </div>
+
+  <%# Who is holding what right now %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <% @speakers.each do |speaker| %>
+      <% outstanding = QuestionQueue.new(speaker).outstanding %>
+      <div class="bg-white shadow rounded-lg p-4">
+        <p class="font-medium"><%= speaker.name %></p>
+        <p class="text-sm text-gray-500">
+          <%= speaker.whatsapp_window_open? ? "Window open" : "Window shut — needs a nudge" %>
+        </p>
+        <p class="text-sm mt-2">
+          <% if outstanding %>
+            Holding #<%= outstanding.id %> since <%= time_ago_in_words(outstanding.sent_at || outstanding.created_at) %> ago
+          <% else %>
+            Nothing outstanding
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Status filter %>
+  <div class="flex gap-2 mb-4 text-sm">
+    <%= link_to "All (#{@stats.values.sum})", admin_questions_path,
+                class: "px-3 py-1 rounded #{params[:status].blank? ? "bg-blue-600 text-white" : "bg-gray-200"}" %>
+    <% Question.statuses.each_key do |status| %>
+      <%= link_to "#{status.humanize} (#{@stats[status.to_sym] || 0})",
+                  admin_questions_path(status: status),
+                  class: "px-3 py-1 rounded #{params[:status] == status ? "bg-blue-600 text-white" : "bg-gray-200"}" %>
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asker</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Speaker</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asked</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @questions.each do |question| %>
+          <tr>
+            <td class="px-4 py-3 text-sm"><%= question.id %></td>
+            <td class="px-4 py-3 text-sm"><%= question.asker.name %></td>
+            <td class="px-4 py-3 text-sm"><%= question.speaker.name %></td>
+            <td class="px-4 py-3 text-sm"><%= render "questions/status", question: question %></td>
+            <td class="px-4 py-3 text-sm text-gray-500"><%= time_ago_in_words(question.created_at) %> ago</td>
+            <td class="px-4 py-3 text-sm">
+              <% unless question.answered? %>
+                <%= button_to "Check queue", deliver_admin_question_path(question),
+                              method: :post,
+                              class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4">
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  </div>
+</div>

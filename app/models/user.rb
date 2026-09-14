@@ -17,6 +17,9 @@ class User < ApplicationRecord
 
   has_many :word_lists
 
+  has_many :questions, foreign_key: :asker_id
+  has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
+
   enum :role, [
     :student,
     :speaker,
@@ -27,6 +30,9 @@ class User < ApplicationRecord
     :temporary,
     :api_user
   ]
+  # WhatsApp identifies people by E.164 digits with no leading "+".
+  normalizes :phone_number, with: ->(number) { number.to_s.gsub(/\D/, "").presence }
+
   enum :voice, [:male, :female]
   enum :dialect, [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
   # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
@@ -40,11 +46,16 @@ class User < ApplicationRecord
     native
   ]
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  # Speakers are onboarded by phone and never touch a web form, so they have a
+  # number instead of an email address.
+  validates :email, presence: true, unless: -> { phone_number.present? }
+  validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
+  validates :phone_number, uniqueness: true, allow_nil: true
   validates :name, presence: true
   validates :role, exclusion: { in: %w(teacher api_user admin) }, if: -> { role_changed? && Current.user&.admin? == false }
 
   scope :active, -> { where.not(role: :temporary) }
+  scope :answering, -> { where(answers_questions: true).where.not(phone_number: nil) }
   scope :with_api_token, -> { where.not(api_token: nil) }
   scope :pending, -> { where(confirmed: false) }
   scope :by_role, ->(role) { where(role: role) if role.present? && roles.key?(role) }
@@ -63,6 +74,12 @@ class User < ApplicationRecord
     email_ids = where("LOWER(email) LIKE ?", "%#{query.downcase}%").pluck(:id)
     where(id: (name_ids + email_ids).uniq)
   }
+
+  # WhatsApp only allows free-form messages (audio included) within 24 hours of
+  # the person's last message to us. Outside it, all we may send is a template.
+  def whatsapp_window_open?
+    whatsapp_last_inbound_at.present? && whatsapp_last_inbound_at > 24.hours.ago
+  end
 
   def all_entries
     dictionary_entries.or(spoken_dictionary_entries)
