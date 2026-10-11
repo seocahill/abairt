@@ -25,7 +25,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef ffmpeg
+          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef
+      # Installed directly rather than through the cache action above: that
+      # action restores only the packages it is given, so on a cache hit ffmpeg
+      # comes back without its shared libraries and dies on libblas.so.3.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
