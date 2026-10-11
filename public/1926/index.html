@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Find your town on the 1926 Gaeltacht map and see whether it was counted as Irish-speaking when the first Gaeltacht was drawn.">
+<meta property="og:title" content="An Ghaeltacht, 1926">
+<meta property="og:description" content="Was your area Irish-speaking when the first Gaeltacht was drawn? Find your town on the 1926 map.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abairt.com/1926">
+<link rel="icon" href="/favicon.ico">
+<title>An Ghaeltacht, 1926</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+
+/* Layout: reference-atlas page. Narrow text column, the map breaks out full width with a finder bar above it.
+   Data colours are the 1926 categories and are used nowhere else. */
+:root{
+  --bg:#f4f4f1; --surface:#ffffff; --ink:#1b1f23; --muted:#5a6168; --rule:#d9dbd6;
+  --accent:#1f5d73;               /* ordnance blue */
+  --land:#e9eae5; --land-ni:#f1f1ee; --edge:#a9ada6; --sea:#dfe7ea;
+  --fior:#e61414; --breac:#e89600; --omit:#fae100; --surv:#64a500;
+  --display:"Source Serif 4",Georgia,serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15181b;--surface:#1d2125;--ink:#e7e9ea;--muted:#a1a8ae;--rule:#33393f;--accent:#7fbfd6;
+  --land:#262b30;--land-ni:#202428;--edge:#4b535a;--sea:#14202a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181b;--surface:#1d2125;--ink:#e7e9ea;--muted:#a1a8ae;--rule:#33393f;--accent:#7fbfd6;
+  --land:#262b30;--land-ni:#202428;--edge:#4b535a;--sea:#14202a;color-scheme:dark}
+
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);margin:0;padding-inline:20px}
+img{max-width:100%}
+.col{max-width:42rem;margin-inline:auto}
+.wide{max-width:72rem;margin-inline:auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2.1rem,5vw,3.1rem);font-weight:600}
+h2{font-size:clamp(1.5rem,3.2vw,1.95rem)}
+h3{font-size:1.1rem}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:.18em;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font:500 .72rem/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ga{font-style:italic}
+.stack{display:grid;gap:1rem}
+
+header{padding-block:3rem 2rem;display:grid;gap:1rem}
+header .lede{font-size:1.15rem;color:var(--ink);max-width:38rem}
+
+/* finder */
+.finder{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1rem;align-items:stretch;margin-block:1rem}
+@media (max-width:720px){.finder{grid-template-columns:1fr}}
+.search{display:grid;gap:.4rem;align-content:start}
+.search label{font-weight:600}
+.search input{font:inherit;padding:.65rem .8rem;border:1px solid var(--edge);border-radius:4px;background:var(--surface);color:var(--ink);width:100%}
+.search small{color:var(--muted);font-size:.85rem}
+.result{background:var(--surface);border:1px solid var(--rule);border-left:6px solid var(--edge);padding:.9rem 1rem;display:grid;gap:.25rem;min-width:0}
+.result .where{font:500 .78rem/1.3 var(--mono);color:var(--muted)}
+.result .cat{font-family:var(--display);font-size:1.3rem;font-weight:600;line-height:1.2}
+.result .what{font-size:.92rem;color:var(--muted)}
+
+.mapframe{position:relative;border:1px solid var(--rule);background:var(--sea)}
+#map{height:min(78vh,760px);min-height:420px;width:100%;background:var(--sea);font-family:var(--body)}
+.leaflet-container{background:var(--sea)}
+.leaflet-control-attribution{font-size:10px}
+.mapbar{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;align-items:center;justify-content:space-between;padding:.7rem .9rem;background:var(--surface);border:1px solid var(--rule);border-top:0;font-size:.86rem}
+.key{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin:0;padding:0;list-style:none}
+.key li{display:flex;gap:.45rem;align-items:center}
+.sw{width:.9rem;height:.9rem;border-radius:2px;border:1px solid #0003;flex:none}
+.ctrl{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;color:var(--muted)}
+.ctrl input[type=range]{accent-color:var(--accent);width:7rem;vertical-align:middle}
+.townlbl{background:none;border:0;font:500 11.5px var(--body);color:#1b1f23;white-space:nowrap;
+  text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
+.townlbl b{display:inline-block;width:5px;height:5px;background:#1b1f23;border-radius:50%;margin-right:4px;vertical-align:1px}
+.townlbl.sel{font-weight:600;font-size:13px}
+.townlbl.sel b{width:9px;height:9px;background:var(--accent);border:2px solid #fff;vertical-align:-1px}
+.note{font-size:.84rem;color:var(--muted);margin-top:.6rem}
+
+section{padding-block:3rem;display:grid;gap:1.1rem}
+section + section{border-top:1px solid var(--rule)}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.steps li{display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:1rem;padding:1rem 0;border-bottom:1px solid var(--rule)}
+.steps .yr{font:500 1rem/1.4 var(--mono);color:var(--accent);font-variant-numeric:tabular-nums}
+.steps h3{margin-bottom:.25rem}
+.steps p{font-size:.97rem}
+@media (max-width:480px){.steps li{grid-template-columns:1fr;gap:.2rem}}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.cats div{background:var(--surface);padding:.9rem 1rem;display:grid;gap:.3rem;align-content:start}
+.cats h3{display:flex;gap:.5rem;align-items:center;font-size:1.02rem}
+.cats p{font-size:.92rem;color:var(--muted)}
+.caveats{margin:0;padding-left:1.1rem;display:grid;gap:.6rem}
+
+.video{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:1.4rem;align-items:center;background:var(--surface);border:1px solid var(--rule);padding:1.2rem;text-decoration:none;color:var(--ink)}
+@media (max-width:720px){.video{grid-template-columns:1fr}}
+.video .poster{aspect-ratio:16/9;max-width:100%;background:#1b1f23;display:grid;place-items:center;border-radius:3px;position:relative;overflow:hidden}
+.video .poster span{font:500 .8rem var(--mono);letter-spacing:.1em;color:#e7e9ea;text-transform:uppercase;position:absolute;left:.8rem;bottom:.7rem}
+.video .play{width:4rem;height:4rem;border-radius:50%;background:#e7e9ea;display:grid;place-items:center}
+.video .play::after{content:"";border-left:1.2rem solid #1b1f23;border-top:.75rem solid transparent;border-bottom:.75rem solid transparent;margin-left:.3rem}
+.video p{font-size:.95rem;color:var(--muted)}
+
+.links{display:grid;gap:0;border-top:1px solid var(--rule)}
+.links a{display:grid;gap:.15rem;padding:.8rem 0;border-bottom:1px solid var(--rule);text-decoration:none;color:var(--ink)}
+.links a b{font-weight:600}
+.links a:hover b{color:var(--accent);text-decoration:underline}
+.links a span{font-size:.9rem;color:var(--muted)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);background:var(--surface)}
+table.rec{border-collapse:collapse;width:100%;min-width:36rem;font-size:.92rem}
+.rec th,.rec td{text-align:left;vertical-align:top;padding:.6rem .75rem;border-bottom:1px solid var(--rule)}
+.rec th{font:500 .7rem/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rec tbody tr:last-child td{border-bottom:0}
+.rec td:first-child{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.rec .sw{display:inline-block;vertical-align:-1px;margin-right:.4rem}
+footer{border-top:1px solid var(--rule);padding-block:2rem 3rem;font-size:.82rem;color:var(--muted);display:grid;gap:.6rem}
+footer ol{margin:0;padding-left:1.2rem;display:grid;gap:.3rem}
+</style>
+</head>
+<body>
+
+
+<header class="col">
+  <p class="eyebrow">Léarscáil · 1926</p>
+  <h1>Was your area Irish-speaking when the first Gaeltacht was drawn?</h1>
+  <p class="lede">In 1925 the new Irish state counted Irish speakers in every district along the western seaboard, and in 1926 it published the first official map of the Gaeltacht. Find your town or parish below to see how it was classed.</p>
+</header>
+
+<div class="wide">
+  <div class="finder">
+    <div class="search">
+      <label for="q">Find a place</label>
+      <input id="q" list="placelist" placeholder="e.g. Bonniconlon, Aclare, Foxford" autocomplete="off">
+      <datalist id="placelist"></datalist>
+      <small>Or click anywhere on the map.</small>
+    </div>
+    <div class="result" id="result" aria-live="polite">
+      <p class="where" id="r-where">Ballina area</p>
+      <p class="cat" id="r-cat">Choose a place or click the map</p>
+      <p class="what" id="r-what">The panel shows how the 1925–26 count classed that spot.</p>
+    </div>
+  </div>
+  <div class="mapframe"><div id="map" role="region" aria-label="Map of the 1926 Gaeltacht"></div></div>
+  <div class="mapbar">
+    <ul class="key">
+      <li><span class="sw" style="background:var(--fior)"></span>Fíor-Ghaeltacht, 80%+</li>
+      <li><span class="sw" style="background:var(--breac)"></span>Breac-Ghaeltacht, 25–79%</li>
+      <li><span class="sw" style="background:var(--omit)"></span>Breac-Ghaeltacht left out in 1929</li>
+      <li><span class="sw" style="background:var(--surv)"></span>Added in 1929</li>
+    </ul>
+    <div class="ctrl">
+      <label for="op">Overlay <input id="op" type="range" min="0" max="100" value="60"></label>
+      <label><input type="checkbox" id="tw" checked> Place names</label>
+    </div>
+  </div>
+  <p class="note">Georeferenced from Figure 1 of Ní Bhrádaigh, McCarron, Walsh &amp; Duffy (2007). Colours apply to whole Electoral Divisions, and boundaries are accurate to roughly 0.5–1 km. Place positions are approximate.</p>
+</div>
+
+<div class="col">
+<section aria-labelledby="h-cats">
+  <h2 id="h-cats">What the colours mean</h2>
+  <div class="cats">
+    <div><h3><span class="sw" style="background:var(--fior)"></span>Fíor-Ghaeltacht</h3><p>80% or more of the people in the Electoral Division could speak Irish. The Commission treated these as the Irish-speaking districts proper.</p></div>
+    <div><h3><span class="sw" style="background:var(--breac)"></span>Breac-Ghaeltacht</h3><p>Between 25% and 79% could speak Irish. In most of these districts the speakers were mainly the older generation.</p></div>
+    <div><h3><span class="sw" style="background:var(--omit)"></span>Left out in 1929</h3><p>Counted as Breac-Ghaeltacht in 1925, but not included in the list of districts in the Housing (Gaeltacht) Act 1929.</p></div>
+    <div><h3><span class="sw" style="background:var(--surv)"></span>Added in 1929</h3><p>Not in the 1925 count, but brought into the 1929 Act on the strength of the April 1926 census figures.</p></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-how">
+  <h2 id="h-how">How the boundaries were drawn</h2>
+  <p>The Gaeltacht has never had a single fixed border. It has been defined several times, by different methods, and each definition was built from Electoral Divisions rather than parishes or townlands.</p>
+  <ol class="steps">
+    <li><span class="yr">1925</span><div><h3>Coimisiún na Gaeltachta</h3><p>The government set up a Commission under Risteárd Ó Maolchatha (Richard Mulcahy) to establish where Irish was spoken and what the state should do there. In July and August 1925 the Gardaí, already out collecting agricultural statistics, also recorded how many people in each district could speak Irish.</p></div></li>
+    <li><span class="yr">1926</span><div><h3>The Commission reports</h3><p>The report, published on 17 August 1926, grouped Electoral Divisions by the share of Irish speakers: 80% or more was Fíor-Ghaeltacht, 25–79% was Breac-Ghaeltacht. The Commission used these bands as a guide and did not apply them mechanically, so a few districts were placed above or below their figures. The national census taken in April 1926 asked about Irish too, and its figures were often lower.</p></div></li>
+    <li><span class="yr">1929</span><div><h3>Housing (Gaeltacht) Act</h3><p>The first law to use the word Gaeltacht. It defined the Gaeltacht, for housing grants only, as a schedule of named Electoral Divisions. Some 1925 Breac-Ghaeltacht districts were dropped and some were added on the basis of the 1926 census.</p></div></li>
+    <li><span class="yr">1956</span><div><h3>Gaeltacht Areas Order</h3><p>When the Department of the Gaeltacht was created, the Gaeltacht was redrawn much more tightly, by Electoral Division and in places by townland. Most of the former Breac-Ghaeltacht, including the Moy valley and the Ox Mountains, was left out. In Mayo the official Gaeltacht became the areas still recognised today: Iorras, Acaill and Tuar Mhic Éadaigh.</p></div></li>
+    <li><span class="yr">2012</span><div><h3>Gaeltacht Act</h3><p>The existing boundaries were kept and divided into Gaeltacht Language Planning Areas, each of which prepares its own language plan.</p></div></li>
+  </ol>
+</section>
+
+<section aria-labelledby="h-read">
+  <h2 id="h-read">Reading the map</h2>
+  <ul class="caveats">
+    <li><b>It records ability, not daily use.</b> The 1925 question was whether a person could speak Irish. In many Breac-Ghaeltacht districts the speakers were older people, and English was the main language of the household.</li>
+    <li><b>It was not school Irish.</b> Irish became a compulsory subject in national schools only in March 1922, three years before the count, and many teachers could not yet teach it. Adult Gaelic League classes reached relatively few people, mostly in towns. In the rural districts on this map, almost everyone recorded as able to speak Irish in 1925 had learned it at home or in the community from native speakers. The 1926 census tables by age (Table 19) let you check a district: a count built on school Irish would be weighted towards children, while native speech is weighted towards older people. Town figures, such as Castlebar's, are more likely to include some school and adult learners.</li>
+    <li><b>A colour covers a whole Electoral Division.</b> An orange district means 25–79% of its people across the whole district, not in every townland. Irish was often strongest on the hill farms and weakest near towns and roads.</li>
+    <li><b>Towns were counted separately.</b> Urban Districts such as Ballina and Castlebar had their own figures, which is why some towns appear as islands, or as gaps, in the surrounding pattern.</li>
+    <li><b>Absence from the map is not absence of speakers.</b> A district under 25% could still have had dozens of native speakers. Rinn an Eanaigh near Foxford had a fluent speaker recorded on tape in 1968, and another, who had learned Irish from the old people as a child, recorded in 1982.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="h-rec">
+  <h2 id="h-rec">Recorded where the Gaeltacht is gone</h2>
+  <p>Native speakers from districts that are no longer in the Gaeltacht were recorded from the 1940s into the 1980s. These are some from North Connacht that you can listen to or read today.</p>
+  <div class="tablewrap">
+    <table class="rec">
+      <thead><tr><th>Year</th><th>Speaker</th><th>Place</th><th>In 1926</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>1949</td><td>Joe Neilan</td><td>Magheraboy, Sligo town</td><td><span class="sw" style="background:var(--edge)"></span>Under 25%</td><td><a href="https://www.canuint.ie/en/QQTRIN023702c2" target="_blank" rel="noopener">canuint.ie</a></td></tr>
+        <tr><td>1959</td><td>Laurence Godfrey, aged 76</td><td>Ballindine, east Mayo</td><td><span class="sw" style="background:var(--breac)"></span>Breac-Ghaeltacht</td><td><a href="https://www.duchas.ie/en/cbef/6100072/6250640" target="_blank" rel="noopener">dúchas.ie</a> · <a href="https://abairt.com/voice_recordings/211" target="_blank" rel="noopener">Abairt</a></td></tr>
+        <tr><td>1968</td><td>James Deasy</td><td>Rinn an Eanaigh, below Foxford</td><td><span class="sw" style="background:var(--breac)"></span>Breac-Ghaeltacht</td><td>Tape described in <i>Notes on a Mayo Dialect</i></td></tr>
+        <tr><td>1982</td><td>Maggie McGiff, aged 83</td><td>Rinn an Eanaigh, below Foxford</td><td><span class="sw" style="background:var(--breac)"></span>Breac-Ghaeltacht</td><td><a href="https://www.canuint.ie/en/QQTRIN030387c2" target="_blank" rel="noopener">canuint.ie</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Maggie McGiff told the interviewer that she could speak Irish by the age of ten, having picked it up from the old people around her. For the areas that are still Gaeltacht, such as Iorras, Acaill and Tuar Mhic Éadaigh, the recordings run continuously to the present day.</p>
+</section>
+
+<section aria-labelledby="h-video">
+  <h2 id="h-video">The dialects behind the map</h2>
+  <p>The map shows where Irish was spoken. Darren Ó Riagáin's talk covers what it sounded like: the varieties of Erris, Achill, Tuar Mhic Éadaigh and east Mayo, how they relate to Ulster and Connemara Irish, and the features that set them apart.</p>
+  <div class="video">
+    <div class="poster"><iframe src="https://www.youtube-nocookie.com/embed/VEbYzSjhuZ8" title="The Irish Dialects of Mayo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>
+    <div class="stack" style="gap:.5rem">
+      <h3>The Irish Dialects of Mayo</h3>
+      <p>Darren Ó Riagáin. A walk through the dialect areas of Mayo and their neighbours, with examples of vocabulary, pronunciation and grammar from recordings of native speakers.</p>
+      <p><a href="https://www.youtube.com/watch?v=VEbYzSjhuZ8" target="_blank" rel="noopener">Watch on YouTube</a></p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-more">
+  <h2 id="h-more">Looking further</h2>
+  <div class="links">
+    <a href="https://www.cso.ie/en/census/censusvolumes1926to1991/historicalreports/census1926reports/census1926volume8-irishlanguage" target="_blank" rel="noopener"><b>Census of 1926, Volume 8: Irish Language</b><span>CSO. Table 13 gives Irish speakers for every Electoral Division in the country. Table 19 breaks the Gaeltacht figures down by age.</span></a>
+    <a href="https://www.duchas.ie/en/cbes" target="_blank" rel="noopener"><b>The Schools' Collection, 1937–39</b><span>dúchas.ie. Local schools wrote down lore, placenames and sometimes Irish from older neighbours.</span></a>
+    <a href="https://www.canuint.ie/en/" target="_blank" rel="noopener"><b>Taisce Chanúintí na Gaeilge</b><span>canuint.ie. RTÉ recordings of native speakers with transcripts, including Iorras, Acaill, Ceara and Gaileanga.</span></a>
+    <a href="https://turassiar.ie" target="_blank" rel="noopener"><b>Turas Siar</b><span>Language, culture and genealogy centre in An Cartúr, near Béal an Mhuirthead, with an archive of older Erris recordings and a podcast.</span></a>
+    <a href="https://abairt.com" target="_blank" rel="noopener"><b>Abairt</b><span>Transcribed recordings of Mayo speakers, searchable by word and speaker.</span></a>
+    <a href="https://mural.maynoothuniversity.ie/8874/" target="_blank" rel="noopener"><b>Using GIS to map the evolution of the Gaeltacht</b><span>Ní Bhrádaigh, McCarron, Walsh &amp; Duffy, <i>Irish Geography</i> 40(1), 2007. The source of the map above.</span></a>
+  </div>
+</section>
+</div>
+
+<footer class="col">
+  <p class="eyebrow">Sources</p>
+  <ol>
+    <li>Ní Bhrádaigh, E., McCarron, S., Walsh, J. &amp; Duffy, P. (2007). Using GIS to map the evolution of the Gaeltacht. <i>Irish Geography</i> 40(1), Figure 1. Map base © Ordnance Survey Ireland, permit MP 002907.</li>
+    <li>Coimisiún na Gaeltachta, Report (1926); summary in “Léargas eolach ar Choimisiún na Gaeltachta”, <i>The Irish Times</i>, 17 August 2026.</li>
+    <li>Housing (Gaeltacht) Act, 1929, s. 2 and Schedule. Gaeltacht Areas Order, 1956 (S.I. No. 245 of 1956). Gaeltacht Act 2012.</li>
+    <li>Central Statistics Office, Census of Population 1926, Volume 8.</li>
+    <li>Darren Ó Riagáin, <i>The Irish Dialects of Mayo</i> (YouTube).</li>
+  </ol>
+  <p>County outlines: Highcharts Map Collection. Background map tiles where shown: © OpenStreetMap contributors, © OpenTopoMap (CC-BY-SA).</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+const B=[[51.35,-10.75],[55.48,-5.85]];
+const IMG="/1926/overlay.png";
+const BASE={"type":"FeatureCollection","features":[{"type":"Feature","properties":{"n":"Wicklow","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-6.732,52.919],[-6.736,52.919],[-6.732,52.919],[-6.589,52.899],[-6.584,52.883],[-6.54,52.883],[-6.531,52.891],[-6.526,52.891],[-6.531,52.891],[-6.526,52.891],[-6.508,52.879],[-6.508,52.871],[-6.571,52.801],[-6.642,52.828],[-6.647,52.828],[-6.642,52.828],[-6.647,52.828],[-6.665,52.82],[-6.701,52.793],[-6.71,52.777],[-6.656,52.765],[-6.616,52.714],[-6.62,52.71],[-6.616,52.714],[-6.575,52.702],[-6.531,52.682],[-6.486,52.698],[-6.486,52.702],[-6.486,52.698],[-6.486,52.702],[-6.468,52.714],[-6.396,52.785],[-6.253,52.793],[-6.173,52.753],[-6.173,52.749],[-6.155,52.738],[-6.141,52.801],[-6.02,52.931],[-6.007,52.974],[-6.061,53.013],[-6.034,53.064],[-6.043,53.123],[-6.101,53.21],[-6.123,53.206],[-6.128,53.206],[-6.123,53.206],[-6.128,53.206],[-6.182,53.218],[-6.307,53.218],[-6.329,53.179],[-6.401,53.21],[-6.41,53.218],[-6.472,53.234],[-6.544,53.167],[-6.553,53.155],[-6.571,53.135],[-6.566,53.131],[-6.571,53.127],[-6.593,53.116],[-6.598,53.108],[-6.607,53.104],[-6.611,53.104],[-6.607,53.104],[-6.611,53.104],[-6.732,53.068],[-6.728,53.049],[-6.768,53.009],[-6.79,52.99],[-6.732,52.919]]]]}},{"type":"Feature","properties":{"n":"Dublin","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-6.517,53.265],[-6.517,53.261],[-6.517,53.265],[-6.517,53.261],[-6.513,53.261],[-6.517,53.261],[-6.531,53.253],[-6.531,53.25],[-6.517,53.246],[-6.472,53.234],[-6.41,53.218],[-6.401,53.21],[-6.329,53.179],[-6.307,53.218],[-6.182,53.218],[-6.128,53.206],[-6.123,53.206],[-6.128,53.206],[-6.123,53.206],[-6.101,53.21],[-6.096,53.277],[-6.204,53.316],[-6.217,53.356],[-6.123,53.391],[-6.065,53.387],[-6.114,53.391],[-6.15,53.474],[-6.146,53.474],[-6.079,53.557],[-6.213,53.632],[-6.213,53.635],[-6.213,53.632],[-6.226,53.632],[-6.226,53.628],[-6.226,53.632],[-6.226,53.628],[-6.235,53.632],[-6.24,53.632],[-6.235,53.632],[-6.24,53.632],[-6.249,53.635],[-6.249,53.632],[-6.249,53.635],[-6.249,53.632],[-6.271,53.616],[-6.271,53.612],[-6.338,53.576],[-6.347,53.58],[-6.414,53.572],[-6.419,53.572],[-6.414,53.572],[-6.419,53.572],[-6.428,53.557],[-6.432,53.557],[-6.428,53.557],[-6.432,53.557],[-6.432,53.549],[-6.423,53.541],[-6.419,53.541],[-6.423,53.541],[-6.419,53.541],[-6.369,53.517],[-6.365,53.517],[-6.369,53.517],[-6.365,53.517],[-6.356,53.462],[-6.356,53.458],[-6.352,53.45],[-6.356,53.45],[-6.352,53.45],[-6.356,53.45],[-6.428,53.419],[-6.432,53.411],[-6.441,53.403],[-6.45,53.391],[-6.459,53.387],[-6.49,53.352],[-6.495,53.344],[-6.49,53.336],[-6.495,53.328],[-6.513,53.32],[-6.513,53.324],[-6.513,53.32],[-6.513,53.324],[-6.531,53.313],[-6.517,53.265]]],[[[-6.15,53.474],[-6.146,53.474],[-6.15,53.474]]],[[[-6.011,53.482],[-6.011,53.486],[-6.011,53.482]]],[[[-6.011,53.486],[-6.011,53.482],[-6.011,53.486]]]]}},{"type":"Feature","properties":{"n":"Meath","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.345,53.797],[-7.233,53.73],[-7.211,53.698],[-7.077,53.655],[-7.077,53.651],[-7.077,53.655],[-7.077,53.651],[-7.027,53.663],[-6.974,53.663],[-6.956,53.655],[-6.992,53.576],[-7.068,53.47],[-7.193,53.427],[-7.144,53.395],[-7.081,53.379],[-7.009,53.435],[-6.911,53.45],[-6.862,53.407],[-6.857,53.407],[-6.862,53.407],[-6.857,53.407],[-6.772,53.431],[-6.696,53.419],[-6.692,53.419],[-6.696,53.419],[-6.692,53.419],[-6.692,53.411],[-6.692,53.419],[-6.692,53.411],[-6.651,53.391],[-6.571,53.387],[-6.459,53.387],[-6.45,53.391],[-6.441,53.403],[-6.432,53.411],[-6.428,53.419],[-6.356,53.45],[-6.352,53.45],[-6.356,53.45],[-6.352,53.45],[-6.356,53.458],[-6.356,53.462],[-6.365,53.517],[-6.369,53.517],[-6.365,53.517],[-6.369,53.517],[-6.419,53.541],[-6.423,53.541],[-6.419,53.541],[-6.423,53.541],[-6.432,53.549],[-6.432,53.557],[-6.428,53.557],[-6.432,53.557],[-6.428,53.557],[-6.419,53.572],[-6.414,53.572],[-6.419,53.572],[-6.414,53.572],[-6.347,53.58],[-6.338,53.576],[-6.271,53.612],[-6.271,53.616],[-6.249,53.632],[-6.249,53.635],[-6.249,53.632],[-6.249,53.635],[-6.24,53.632],[-6.235,53.632],[-6.24,53.632],[-6.235,53.632],[-6.226,53.628],[-6.226,53.632],[-6.226,53.628],[-6.226,53.632],[-6.213,53.632],[-6.213,53.635],[-6.244,53.722],[-6.307,53.718],[-6.311,53.718],[-6.307,53.718],[-6.311,53.718],[-6.432,53.718],[-6.468,53.742],[-6.463,53.742],[-6.468,53.742],[-6.463,53.742],[-6.45,53.758],[-6.45,53.761],[-6.45,53.758],[-6.45,53.761],[-6.459,53.765],[-6.459,53.769],[-6.459,53.765],[-6.459,53.769],[-6.517,53.765],[-6.58,53.805],[-6.58,53.809],[-6.58,53.817],[-6.593,53.844],[-6.692,53.899],[-6.759,53.915],[-6.786,53.899],[-6.795,53.887],[-6.799,53.887],[-6.795,53.887],[-6.799,53.887],[-6.826,53.895],[-6.929,53.884],[-6.924,53.876],[-6.974,53.868],[-6.969,53.868],[-6.974,53.868],[-6.969,53.868],[-6.969,53.856],[-6.969,53.852],[-6.969,53.856],[-6.969,53.852],[-6.96,53.844],[-6.951,53.84],[-6.929,53.824],[-6.929,53.801],[-6.938,53.793],[-6.938,53.789],[-7.001,53.765],[-7.157,53.801],[-7.175,53.793],[-7.215,53.781],[-7.22,53.773],[-7.26,53.777],[-7.265,53.777],[-7.26,53.777],[-7.265,53.777],[-7.282,53.785],[-7.345,53.797]]]}},{"type":"Feature","properties":{"n":"Waterford","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-8.016,52.068],[-8.021,52.068],[-8.016,52.068],[-8.021,52.068],[-8.021,52.056],[-7.896,51.977],[-7.887,51.977],[-7.882,51.977],[-7.851,51.977],[-7.829,51.954],[-7.726,51.946],[-7.712,51.974],[-7.591,51.989],[-7.547,52.056],[-7.632,52.06],[-7.448,52.127],[-7.363,52.135],[-7.359,52.139],[-7.359,52.135],[-7.359,52.139],[-7.359,52.135],[-7.359,52.139],[-7.359,52.135],[-7.354,52.135],[-7.332,52.135],[-7.189,52.131],[-7.135,52.17],[-7.086,52.151],[-7.09,52.147],[-6.996,52.147],[-6.987,52.253],[-6.987,52.261],[-6.992,52.273],[-7.001,52.277],[-7.099,52.265],[-7.095,52.265],[-7.099,52.265],[-7.095,52.265],[-7.166,52.277],[-7.224,52.241],[-7.323,52.332],[-7.372,52.344],[-7.376,52.344],[-7.376,52.336],[-7.381,52.34],[-7.381,52.336],[-7.381,52.34],[-7.381,52.336],[-7.376,52.336],[-7.381,52.336],[-7.524,52.363],[-7.676,52.356],[-7.793,52.344],[-7.775,52.269],[-7.748,52.222],[-7.878,52.226],[-7.994,52.237],[-7.994,52.202],[-8.106,52.206],[-8.155,52.159],[-8.07,52.139],[-8.079,52.127],[-8.03,52.1],[-8.021,52.084],[-8.016,52.068]]],[[[-7.359,52.135],[-7.354,52.135],[-7.359,52.135]]],[[[-7.359,52.135],[-7.354,52.135],[-7.359,52.135]]],[[[-7.359,52.135],[-7.354,52.135],[-7.359,52.135]]],[[[-7.359,52.135],[-7.354,52.135],[-7.359,52.135]]],[[[-7.359,52.135],[-7.354,52.135],[-7.359,52.135]]],[[[-7.09,52.147],[-7.086,52.151],[-7.09,52.147]]]]}},{"type":"Feature","properties":{"n":"Monaghan","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.323,54.116],[-7.309,54.108],[-7.265,54.096],[-7.242,54.1],[-7.206,54.096],[-7.206,54.092],[-7.206,54.096],[-7.206,54.092],[-7.202,54.092],[-7.206,54.092],[-7.202,54.092],[-7.023,54.08],[-6.974,54.049],[-6.862,53.974],[-6.857,53.974],[-6.862,53.974],[-6.857,53.974],[-6.853,53.966],[-6.835,53.943],[-6.83,53.935],[-6.759,53.915],[-6.692,53.899],[-6.629,53.923],[-6.651,53.951],[-6.66,53.954],[-6.66,53.958],[-6.66,53.954],[-6.651,53.954],[-6.651,53.951],[-6.651,53.954],[-6.66,53.958],[-6.638,53.97],[-6.589,53.97],[-6.589,53.966],[-6.589,53.97],[-6.589,53.966],[-6.566,54.017],[-6.566,54.021],[-6.566,54.017],[-6.566,54.021],[-6.575,54.033],[-6.584,54.041],[-6.589,54.041],[-6.584,54.041],[-6.589,54.041],[-6.593,54.045],[-6.665,54.065],[-6.629,54.147],[-6.687,54.199],[-6.745,54.183],[-6.866,54.269],[-6.862,54.325],[-6.907,54.372],[-7.032,54.419],[-7.153,54.336],[-7.189,54.34],[-7.153,54.222],[-7.251,54.206],[-7.341,54.143],[-7.323,54.116]]]}},{"type":"Feature","properties":{"n":"Cavan","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.999,54.183],[-7.994,54.183],[-7.999,54.183],[-7.994,54.183],[-7.873,54.124],[-7.855,54.12],[-7.797,54.116],[-7.793,54.116],[-7.797,54.116],[-7.793,54.116],[-7.69,54.065],[-7.685,54.065],[-7.69,54.065],[-7.685,54.065],[-7.6,54.014],[-7.605,53.947],[-7.614,53.935],[-7.609,53.935],[-7.56,53.899],[-7.555,53.899],[-7.56,53.899],[-7.555,53.899],[-7.582,53.848],[-7.529,53.864],[-7.475,53.836],[-7.47,53.836],[-7.475,53.836],[-7.47,53.836],[-7.475,53.813],[-7.412,53.777],[-7.345,53.797],[-7.282,53.785],[-7.265,53.777],[-7.26,53.777],[-7.265,53.777],[-7.26,53.777],[-7.22,53.773],[-7.215,53.781],[-7.175,53.793],[-7.157,53.801],[-7.001,53.765],[-6.938,53.789],[-6.938,53.793],[-6.929,53.801],[-6.929,53.824],[-6.951,53.84],[-6.96,53.844],[-6.969,53.852],[-6.969,53.856],[-6.969,53.852],[-6.969,53.856],[-6.969,53.868],[-6.974,53.868],[-6.969,53.868],[-6.974,53.868],[-6.924,53.876],[-6.929,53.884],[-6.826,53.895],[-6.799,53.887],[-6.795,53.887],[-6.799,53.887],[-6.795,53.887],[-6.786,53.899],[-6.759,53.915],[-6.83,53.935],[-6.835,53.943],[-6.853,53.966],[-6.857,53.974],[-6.862,53.974],[-6.857,53.974],[-6.862,53.974],[-6.974,54.049],[-7.023,54.08],[-7.202,54.092],[-7.206,54.092],[-7.202,54.092],[-7.206,54.092],[-7.206,54.096],[-7.206,54.092],[-7.206,54.096],[-7.242,54.1],[-7.265,54.096],[-7.309,54.108],[-7.323,54.116],[-7.412,54.155],[-7.479,54.124],[-7.609,54.143],[-7.654,54.187],[-7.846,54.21],[-7.887,54.301],[-7.949,54.305],[-8.034,54.218],[-8.048,54.195],[-8.034,54.187],[-7.999,54.187],[-7.999,54.183]]]}},{"type":"Feature","properties":{"n":"Donegal","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-8.303,54.64],[-8.294,54.608],[-8.173,54.648],[-8.119,54.62],[-8.124,54.62],[-8.218,54.573],[-8.254,54.51],[-8.2,54.498],[-8.316,54.474],[-8.321,54.47],[-8.316,54.474],[-8.249,54.462],[-8.209,54.47],[-8.204,54.47],[-8.209,54.47],[-8.204,54.47],[-8.2,54.47],[-8.2,54.466],[-8.2,54.47],[-8.2,54.466],[-8.182,54.466],[-8.182,54.462],[-8.182,54.466],[-8.182,54.462],[-8.178,54.462],[-8.043,54.486],[-7.999,54.545],[-7.842,54.533],[-7.797,54.585],[-7.703,54.608],[-7.896,54.655],[-7.9,54.691],[-7.833,54.738],[-7.743,54.707],[-7.645,54.75],[-7.538,54.746],[-7.547,54.793],[-7.444,54.868],[-7.448,54.935],[-7.408,54.951],[-7.408,55.002],[-7.35,55.049],[-7.282,55.049],[-7.153,55.156],[-6.942,55.219],[-6.951,55.254],[-7.13,55.286],[-7.197,55.341],[-7.368,55.384],[-7.372,55.384],[-7.376,55.384],[-7.394,55.38],[-7.394,55.376],[-7.399,55.376],[-7.394,55.376],[-7.327,55.309],[-7.47,55.282],[-7.547,55.203],[-7.466,55.144],[-7.47,55.041],[-7.52,55.034],[-7.618,54.967],[-7.681,54.955],[-7.564,55.045],[-7.6,55.045],[-7.641,55.049],[-7.533,55.097],[-7.529,55.136],[-7.618,55.191],[-7.614,55.238],[-7.663,55.278],[-7.757,55.25],[-7.757,55.246],[-7.793,55.207],[-7.721,55.187],[-7.703,55.223],[-7.681,55.132],[-7.681,55.128],[-7.685,55.128],[-7.708,55.112],[-7.703,55.12],[-7.699,55.128],[-7.735,55.179],[-7.806,55.179],[-7.815,55.226],[-7.86,55.195],[-7.864,55.14],[-7.905,55.14],[-7.909,55.191],[-7.999,55.223],[-8.025,55.175],[-8.155,55.148],[-8.276,55.156],[-8.316,55.116],[-8.303,55.057],[-8.428,55.006],[-8.451,54.998],[-8.451,54.994],[-8.451,54.998],[-8.451,54.994],[-8.442,54.99],[-8.442,54.986],[-8.37,54.943],[-8.446,54.935],[-8.433,54.9],[-8.361,54.88],[-8.325,54.833],[-8.401,54.844],[-8.518,54.833],[-8.451,54.797],[-8.545,54.785],[-8.442,54.758],[-8.634,54.77],[-8.795,54.699],[-8.773,54.659],[-8.616,54.62],[-8.477,54.636],[-8.46,54.608],[-8.397,54.632],[-8.379,54.612],[-8.303,54.64]]],[[[-8.527,54.97],[-8.495,54.994],[-8.527,54.97]]],[[[-8.451,54.99],[-8.451,54.994],[-8.451,54.99]]],[[[-8.451,54.99],[-8.442,54.986],[-8.442,54.99],[-8.446,54.99],[-8.451,54.99]]],[[[-8.446,54.99],[-8.442,54.99],[-8.446,54.99]]],[[[-8.124,54.62],[-8.119,54.62],[-8.124,54.62]]],[[[-7.757,55.246],[-7.757,55.25],[-7.757,55.246]]],[[[-7.685,55.128],[-7.685,55.132],[-7.685,55.128]]],[[[-7.685,55.132],[-7.681,55.132],[-7.685,55.132]]],[[[-7.399,55.376],[-7.399,55.38],[-7.399,55.376]]],[[[-7.399,55.38],[-7.399,55.376],[-7.394,55.376],[-7.394,55.38],[-7.399,55.38]]],[[[-7.376,55.384],[-7.372,55.384],[-7.368,55.384],[-7.372,55.384],[-7.376,55.384]]]]}},{"type":"Feature","properties":{"n":"Leitrim","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-8.397,54.419],[-8.392,54.419],[-8.397,54.419],[-8.392,54.419],[-8.379,54.423],[-8.348,54.419],[-8.397,54.36],[-8.357,54.313],[-8.343,54.289],[-8.334,54.234],[-8.339,54.234],[-8.334,54.234],[-8.339,54.234],[-8.334,54.214],[-8.334,54.21],[-8.33,54.179],[-8.195,54.132],[-8.191,54.132],[-8.195,54.132],[-8.191,54.132],[-8.178,54.116],[-8.173,54.116],[-8.178,54.116],[-8.173,54.116],[-8.164,54.112],[-8.052,54.108],[-8.088,54.014],[-8.084,54.014],[-8.088,54.014],[-8.084,54.014],[-8.11,53.958],[-8.061,53.907],[-7.994,53.919],[-7.981,53.868],[-7.918,53.821],[-7.878,53.817],[-7.873,53.813],[-7.873,53.809],[-7.855,53.828],[-7.784,53.828],[-7.775,53.848],[-7.775,53.864],[-7.761,53.864],[-7.757,53.872],[-7.757,53.876],[-7.757,53.872],[-7.757,53.876],[-7.73,53.887],[-7.726,53.887],[-7.73,53.887],[-7.726,53.887],[-7.667,53.923],[-7.614,53.935],[-7.609,53.935],[-7.614,53.935],[-7.605,53.947],[-7.6,54.014],[-7.685,54.065],[-7.69,54.065],[-7.685,54.065],[-7.69,54.065],[-7.793,54.116],[-7.797,54.116],[-7.793,54.116],[-7.797,54.116],[-7.855,54.12],[-7.873,54.124],[-7.994,54.183],[-7.999,54.183],[-7.994,54.183],[-7.999,54.183],[-7.999,54.187],[-8.034,54.187],[-8.048,54.195],[-8.034,54.218],[-7.949,54.305],[-8.012,54.36],[-8.057,54.364],[-8.178,54.462],[-8.182,54.462],[-8.182,54.466],[-8.182,54.462],[-8.182,54.466],[-8.2,54.466],[-8.2,54.47],[-8.2,54.466],[-8.2,54.47],[-8.204,54.47],[-8.209,54.47],[-8.204,54.47],[-8.209,54.47],[-8.249,54.462],[-8.316,54.474],[-8.321,54.47],[-8.383,54.462],[-8.375,54.451],[-8.415,54.415],[-8.397,54.419]]]}},{"type":"Feature","properties":{"n":"Kildare","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.108,53.167],[-7.103,53.167],[-7.09,53.171],[-7.063,53.163],[-7.086,53.127],[-7.041,53.076],[-7.054,53.041],[-7.063,53.037],[-7.086,53.013],[-7.086,53.001],[-6.978,52.978],[-6.96,52.954],[-6.938,52.883],[-6.933,52.883],[-6.929,52.883],[-6.933,52.883],[-6.929,52.883],[-6.871,52.871],[-6.866,52.871],[-6.871,52.871],[-6.866,52.871],[-6.839,52.864],[-6.786,52.868],[-6.736,52.919],[-6.732,52.919],[-6.79,52.99],[-6.768,53.009],[-6.728,53.049],[-6.732,53.068],[-6.611,53.104],[-6.607,53.104],[-6.611,53.104],[-6.607,53.104],[-6.598,53.108],[-6.593,53.116],[-6.571,53.127],[-6.566,53.131],[-6.571,53.135],[-6.553,53.155],[-6.544,53.167],[-6.472,53.234],[-6.517,53.246],[-6.531,53.25],[-6.531,53.253],[-6.517,53.261],[-6.513,53.261],[-6.517,53.261],[-6.517,53.265],[-6.517,53.261],[-6.517,53.265],[-6.531,53.313],[-6.513,53.324],[-6.513,53.32],[-6.513,53.324],[-6.513,53.32],[-6.495,53.328],[-6.49,53.336],[-6.495,53.344],[-6.49,53.352],[-6.459,53.387],[-6.571,53.387],[-6.651,53.391],[-6.692,53.411],[-6.692,53.419],[-6.692,53.411],[-6.692,53.419],[-6.696,53.419],[-6.692,53.419],[-6.696,53.419],[-6.772,53.431],[-6.857,53.407],[-6.862,53.407],[-6.857,53.407],[-6.862,53.407],[-6.911,53.45],[-7.009,53.435],[-7.081,53.379],[-6.978,53.309],[-7.054,53.242],[-7.032,53.21],[-7.032,53.206],[-7.032,53.21],[-7.036,53.21],[-7.036,53.206],[-7.036,53.21],[-7.036,53.206],[-7.032,53.206],[-7.09,53.186],[-7.108,53.167]]]}},{"type":"Feature","properties":{"n":"Laois","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.676,52.781],[-7.618,52.801],[-7.538,52.804],[-7.448,52.785],[-7.417,52.801],[-7.417,52.797],[-7.417,52.801],[-7.417,52.797],[-7.417,52.801],[-7.417,52.797],[-7.417,52.801],[-7.417,52.797],[-7.372,52.828],[-7.35,52.812],[-7.345,52.832],[-7.341,52.84],[-7.341,52.844],[-7.341,52.84],[-7.341,52.844],[-7.3,52.864],[-7.184,52.891],[-7.162,52.875],[-7.139,52.868],[-7.144,52.868],[-7.139,52.868],[-7.144,52.868],[-7.13,52.832],[-7.121,52.832],[-7.13,52.832],[-7.121,52.832],[-7.059,52.793],[-7.041,52.804],[-7.036,52.804],[-7.041,52.804],[-7.036,52.804],[-6.956,52.808],[-6.938,52.883],[-6.96,52.954],[-6.978,52.978],[-7.086,53.001],[-7.086,53.013],[-7.063,53.037],[-7.054,53.041],[-7.041,53.076],[-7.086,53.127],[-7.063,53.163],[-7.09,53.171],[-7.103,53.167],[-7.108,53.167],[-7.18,53.167],[-7.22,53.151],[-7.265,53.139],[-7.287,53.135],[-7.363,53.21],[-7.462,53.186],[-7.462,53.19],[-7.462,53.186],[-7.462,53.19],[-7.488,53.194],[-7.632,53.167],[-7.645,53.147],[-7.587,53.104],[-7.694,53.033],[-7.73,52.958],[-7.667,52.927],[-7.735,52.852],[-7.676,52.781]]]}},{"type":"Feature","properties":{"n":"Carlow","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-6.915,52.466],[-6.88,52.466],[-6.88,52.47],[-6.88,52.466],[-6.88,52.47],[-6.781,52.568],[-6.777,52.619],[-6.732,52.639],[-6.732,52.643],[-6.732,52.639],[-6.732,52.643],[-6.62,52.71],[-6.616,52.714],[-6.656,52.765],[-6.71,52.777],[-6.701,52.793],[-6.665,52.82],[-6.647,52.828],[-6.642,52.828],[-6.647,52.828],[-6.642,52.828],[-6.571,52.801],[-6.508,52.871],[-6.508,52.879],[-6.526,52.891],[-6.531,52.891],[-6.526,52.891],[-6.531,52.891],[-6.54,52.883],[-6.584,52.883],[-6.589,52.899],[-6.732,52.919],[-6.736,52.919],[-6.786,52.868],[-6.839,52.864],[-6.866,52.871],[-6.871,52.871],[-6.866,52.871],[-6.871,52.871],[-6.929,52.883],[-6.933,52.883],[-6.929,52.883],[-6.933,52.883],[-6.938,52.883],[-6.956,52.808],[-7.036,52.804],[-7.041,52.804],[-7.036,52.804],[-7.041,52.804],[-7.059,52.793],[-7.068,52.785],[-7.068,52.781],[-7.068,52.785],[-7.068,52.781],[-7.081,52.769],[-7.063,52.71],[-7.001,52.686],[-6.987,52.627],[-6.924,52.588],[-6.956,52.537],[-6.915,52.466]]]}},{"type":"Feature","properties":{"n":"Kilkenny","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.676,52.781],[-7.649,52.73],[-7.56,52.702],[-7.52,52.655],[-7.479,52.615],[-7.475,52.615],[-7.479,52.615],[-7.475,52.615],[-7.475,52.612],[-7.457,52.545],[-7.435,52.497],[-7.466,52.474],[-7.412,52.438],[-7.399,52.43],[-7.399,52.426],[-7.399,52.43],[-7.399,52.426],[-7.39,52.415],[-7.39,52.411],[-7.394,52.379],[-7.381,52.352],[-7.376,52.352],[-7.381,52.352],[-7.376,52.352],[-7.376,52.348],[-7.372,52.344],[-7.376,52.344],[-7.372,52.344],[-7.323,52.332],[-7.224,52.241],[-7.166,52.277],[-7.095,52.265],[-7.099,52.265],[-7.095,52.265],[-7.099,52.265],[-7.001,52.277],[-6.987,52.371],[-6.956,52.391],[-6.915,52.43],[-6.915,52.462],[-6.915,52.466],[-6.956,52.537],[-6.924,52.588],[-6.987,52.627],[-7.001,52.686],[-7.063,52.71],[-7.081,52.769],[-7.068,52.781],[-7.068,52.785],[-7.068,52.781],[-7.068,52.785],[-7.059,52.793],[-7.121,52.832],[-7.13,52.832],[-7.121,52.832],[-7.13,52.832],[-7.144,52.868],[-7.139,52.868],[-7.144,52.868],[-7.139,52.868],[-7.162,52.875],[-7.184,52.891],[-7.3,52.864],[-7.341,52.844],[-7.341,52.84],[-7.341,52.844],[-7.341,52.84],[-7.345,52.832],[-7.35,52.812],[-7.372,52.828],[-7.417,52.797],[-7.417,52.801],[-7.417,52.797],[-7.417,52.801],[-7.417,52.797],[-7.417,52.801],[-7.417,52.797],[-7.417,52.801],[-7.448,52.785],[-7.538,52.804],[-7.618,52.801],[-7.676,52.781]]]}},{"type":"Feature","properties":{"n":"Wexford","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-7.001,52.277],[-6.992,52.273],[-6.898,52.174],[-6.929,52.127],[-6.83,52.174],[-6.839,52.233],[-6.763,52.257],[-6.759,52.257],[-6.804,52.21],[-6.642,52.206],[-6.638,52.206],[-6.598,52.178],[-6.472,52.206],[-6.369,52.178],[-6.316,52.241],[-6.365,52.249],[-6.495,52.359],[-6.378,52.359],[-6.334,52.434],[-6.208,52.545],[-6.226,52.651],[-6.155,52.738],[-6.173,52.749],[-6.173,52.753],[-6.253,52.793],[-6.396,52.785],[-6.468,52.714],[-6.486,52.702],[-6.486,52.698],[-6.486,52.702],[-6.486,52.698],[-6.531,52.682],[-6.575,52.702],[-6.616,52.714],[-6.62,52.71],[-6.732,52.643],[-6.732,52.639],[-6.732,52.643],[-6.732,52.639],[-6.777,52.619],[-6.781,52.568],[-6.88,52.47],[-6.88,52.466],[-6.88,52.47],[-6.88,52.466],[-6.915,52.466],[-6.915,52.462],[-6.915,52.43],[-6.956,52.391],[-6.987,52.371],[-7.001,52.277]]],[[[-6.987,52.253],[-6.987,52.261],[-6.987,52.253]]],[[[-6.759,52.257],[-6.763,52.257],[-6.759,52.257]]],[[[-6.642,52.206],[-6.638,52.206],[-6.642,52.206]]]]}},{"type":"Feature","properties":{"n":"Kerry","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-10.254,51.946],[-10.25,51.946],[-10.187,51.966],[-10.245,51.946],[-10.254,51.907],[-10.38,51.887],[-10.388,51.848],[-10.335,51.844],[-10.339,51.788],[-10.236,51.851],[-10.183,51.832],[-10.201,51.781],[-10.156,51.765],[-10.151,51.765],[-10.147,51.761],[-10.084,51.757],[-9.941,51.808],[-9.86,51.812],[-9.865,51.812],[-9.86,51.812],[-9.865,51.812],[-9.86,51.812],[-9.842,51.816],[-9.842,51.82],[-9.842,51.816],[-9.842,51.82],[-9.838,51.82],[-9.838,51.824],[-9.807,51.832],[-9.798,51.832],[-9.789,51.836],[-9.655,51.871],[-9.583,51.875],[-9.655,51.848],[-9.663,51.848],[-9.744,51.828],[-9.851,51.761],[-9.851,51.757],[-9.856,51.757],[-9.856,51.753],[-9.86,51.753],[-9.856,51.753],[-9.798,51.69],[-9.628,51.788],[-9.516,51.788],[-9.44,51.828],[-9.355,51.836],[-9.296,51.871],[-9.288,51.914],[-9.256,51.97],[-9.144,51.981],[-9.149,52.005],[-9.153,52.005],[-9.153,52.009],[-9.153,52.005],[-9.153,52.009],[-9.216,52.048],[-9.22,52.048],[-9.216,52.048],[-9.22,52.048],[-9.22,52.052],[-9.216,52.056],[-9.216,52.06],[-9.216,52.056],[-9.216,52.06],[-9.207,52.072],[-9.202,52.072],[-9.207,52.072],[-9.202,52.072],[-9.189,52.08],[-9.189,52.084],[-9.189,52.08],[-9.189,52.084],[-9.198,52.088],[-9.202,52.088],[-9.198,52.088],[-9.202,52.088],[-9.207,52.1],[-9.207,52.107],[-9.22,52.115],[-9.22,52.119],[-9.22,52.115],[-9.22,52.119],[-9.229,52.131],[-9.229,52.135],[-9.229,52.131],[-9.229,52.135],[-9.234,52.139],[-9.234,52.143],[-9.234,52.139],[-9.234,52.143],[-9.238,52.147],[-9.238,52.151],[-9.234,52.151],[-9.238,52.151],[-9.234,52.151],[-9.234,52.159],[-9.229,52.167],[-9.234,52.167],[-9.229,52.167],[-9.234,52.167],[-9.234,52.17],[-9.229,52.17],[-9.234,52.17],[-9.229,52.17],[-9.229,52.174],[-9.238,52.178],[-9.243,52.178],[-9.238,52.178],[-9.243,52.178],[-9.247,52.186],[-9.252,52.202],[-9.261,52.214],[-9.27,52.226],[-9.274,52.226],[-9.27,52.226],[-9.274,52.226],[-9.216,52.3],[-9.296,52.336],[-9.301,52.336],[-9.296,52.336],[-9.301,52.336],[-9.323,52.375],[-9.31,52.379],[-9.31,52.395],[-9.337,52.474],[-9.332,52.474],[-9.337,52.474],[-9.332,52.474],[-9.319,52.478],[-9.314,52.478],[-9.319,52.478],[-9.314,52.478],[-9.319,52.478],[-9.314,52.478],[-9.301,52.521],[-9.364,52.576],[-9.493,52.568],[-9.619,52.576],[-9.672,52.552],[-9.677,52.501],[-9.825,52.434],[-9.919,52.426],[-9.936,52.403],[-9.838,52.391],[-9.842,52.273],[-9.74,52.245],[-9.959,52.23],[-10.035,52.277],[-10.071,52.249],[-10.169,52.241],[-10.174,52.285],[-10.375,52.214],[-10.384,52.17],[-10.429,52.194],[-10.478,52.151],[-10.456,52.1],[-10.371,52.131],[-10.272,52.111],[-10.272,52.139],[-10.187,52.107],[-10.03,52.139],[-9.869,52.159],[-9.757,52.151],[-9.775,52.123],[-9.892,52.111],[-9.923,52.068],[-10.026,52.037],[-10.133,52.029],[-10.308,51.962],[-10.254,51.946]]],[[[-10.429,51.887],[-10.303,51.911],[-10.411,51.907],[-10.429,51.887]]],[[[-10.254,51.946],[-10.25,51.946],[-10.245,51.946],[-10.25,51.946],[-10.254,51.946]]],[[[-10.147,51.761],[-10.151,51.765],[-10.156,51.765],[-10.147,51.761]]],[[[-9.865,51.812],[-9.86,51.812],[-9.865,51.812]]],[[[-9.856,51.757],[-9.851,51.757],[-9.851,51.761],[-9.856,51.757]]],[[[-9.842,51.82],[-9.838,51.82],[-9.842,51.82],[-9.842,51.816],[-9.838,51.824],[-9.838,51.82],[-9.842,51.82]]],[[[-9.789,51.836],[-9.798,51.832],[-9.807,51.832],[-9.807,51.828],[-9.789,51.836]]],[[[-9.663,51.848],[-9.655,51.848],[-9.663,51.848]]]]}},{"type":"Feature","properties":{"n":"Cork","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-10.071,51.603],[-10.066,51.603],[-9.941,51.619],[-9.91,51.647],[-9.901,51.651],[-9.753,51.666],[-9.726,51.678],[-9.722,51.678],[-9.628,51.682],[-9.525,51.725],[-9.453,51.702],[-9.462,51.678],[-9.569,51.655],[-9.784,51.58],[-9.784,51.552],[-9.592,51.611],[-9.534,51.611],[-9.65,51.556],[-9.771,51.513],[-9.807,51.493],[-9.82,51.45],[-9.713,51.469],[-9.731,51.469],[-9.735,51.469],[-9.722,51.473],[-9.717,51.477],[-9.713,51.477],[-9.659,51.521],[-9.614,51.493],[-9.543,51.529],[-9.395,51.548],[-9.417,51.513],[-9.404,51.501],[-9.337,51.521],[-9.341,51.521],[-9.346,51.517],[-9.35,51.513],[-9.355,51.513],[-9.35,51.513],[-9.355,51.513],[-9.35,51.513],[-9.35,51.509],[-9.35,51.513],[-9.35,51.509],[-9.35,51.505],[-9.355,51.501],[-9.355,51.497],[-9.346,51.473],[-9.265,51.501],[-9.22,51.485],[-9.189,51.525],[-8.988,51.564],[-8.889,51.556],[-8.867,51.592],[-8.701,51.576],[-8.697,51.576],[-8.688,51.631],[-8.571,51.643],[-8.545,51.615],[-8.513,51.706],[-8.468,51.682],[-8.348,51.721],[-8.298,51.765],[-8.298,51.832],[-8.348,51.832],[-8.352,51.875],[-8.428,51.887],[-8.294,51.903],[-8.182,51.887],[-8.245,51.804],[-8.021,51.824],[-7.999,51.863],[-7.914,51.875],[-7.922,51.914],[-7.869,51.93],[-7.851,51.977],[-7.882,51.977],[-7.887,51.977],[-7.896,51.977],[-8.021,52.056],[-8.021,52.068],[-8.016,52.068],[-8.021,52.068],[-8.016,52.068],[-8.021,52.084],[-8.03,52.1],[-8.079,52.127],[-8.07,52.139],[-8.155,52.159],[-8.106,52.206],[-8.182,52.285],[-8.204,52.296],[-8.209,52.296],[-8.204,52.296],[-8.209,52.296],[-8.285,52.285],[-8.361,52.32],[-8.361,52.316],[-8.361,52.312],[-8.366,52.312],[-8.361,52.312],[-8.366,52.312],[-8.361,52.312],[-8.366,52.312],[-8.442,52.289],[-8.522,52.281],[-8.634,52.348],[-8.656,52.356],[-8.656,52.352],[-8.656,52.356],[-8.656,52.352],[-8.724,52.375],[-8.75,52.379],[-8.782,52.387],[-8.952,52.324],[-8.979,52.3],[-8.979,52.296],[-8.979,52.3],[-8.979,52.296],[-9.028,52.324],[-9.135,52.344],[-9.216,52.3],[-9.274,52.226],[-9.27,52.226],[-9.274,52.226],[-9.27,52.226],[-9.261,52.214],[-9.252,52.202],[-9.247,52.186],[-9.243,52.178],[-9.238,52.178],[-9.243,52.178],[-9.238,52.178],[-9.229,52.174],[-9.229,52.17],[-9.234,52.17],[-9.229,52.17],[-9.234,52.17],[-9.234,52.167],[-9.229,52.167],[-9.234,52.167],[-9.229,52.167],[-9.234,52.159],[-9.234,52.151],[-9.238,52.151],[-9.234,52.151],[-9.238,52.151],[-9.238,52.147],[-9.234,52.143],[-9.234,52.139],[-9.234,52.143],[-9.234,52.139],[-9.229,52.135],[-9.229,52.131],[-9.229,52.135],[-9.229,52.131],[-9.22,52.119],[-9.22,52.115],[-9.22,52.119],[-9.22,52.115],[-9.207,52.107],[-9.207,52.1],[-9.202,52.088],[-9.198,52.088],[-9.202,52.088],[-9.198,52.088],[-9.189,52.084],[-9.189,52.08],[-9.189,52.084],[-9.189,52.08],[-9.202,52.072],[-9.207,52.072],[-9.202,52.072],[-9.207,52.072],[-9.216,52.06],[-9.216,52.056],[-9.216,52.06],[-9.216,52.056],[-9.22,52.052],[-9.22,52.048],[-9.216,52.048],[-9.22,52.048],[-9.216,52.048],[-9.153,52.009],[-9.153,52.005],[-9.153,52.009],[-9.153,52.005],[-9.149,52.005],[-9.144,51.981],[-9.256,51.97],[-9.288,51.914],[-9.296,51.871],[-9.355,51.836],[-9.44,51.828],[-9.516,51.788],[-9.628,51.788],[-9.798,51.69],[-9.856,51.753],[-9.86,51.753],[-9.887,51.745],[-9.892,51.745],[-9.892,51.761],[-9.896,51.761],[-9.923,51.749],[-9.932,51.745],[-9.936,51.741],[-9.954,51.714],[-9.968,51.698],[-9.972,51.694],[-10.071,51.67],[-10.071,51.674],[-10.084,51.658],[-10.066,51.651],[-10.062,51.651],[-10.062,51.647],[-10.071,51.603]]],[[[-10.071,51.674],[-10.071,51.67],[-10.071,51.674]]],[[[-10.071,51.603],[-10.066,51.603],[-10.071,51.603]]],[[[-10.066,51.651],[-10.062,51.647],[-10.062,51.651],[-10.066,51.651]]],[[[-9.936,51.745],[-9.932,51.745],[-9.936,51.745]]],[[[-9.936,51.741],[-9.936,51.745],[-9.936,51.741]]],[[[-9.936,51.745],[-9.932,51.745],[-9.936,51.745]]],[[[-9.905,51.615],[-9.901,51.615],[-9.86,51.619],[-9.905,51.615]]],[[[-9.91,51.647],[-9.901,51.651],[-9.91,51.647]]],[[[-9.905,51.615],[-9.901,51.615],[-9.905,51.615]]],[[[-9.896,51.761],[-9.892,51.761],[-9.896,51.761]]],[[[-9.892,51.745],[-9.887,51.745],[-9.892,51.745]]],[[[-9.735,51.469],[-9.731,51.469],[-9.735,51.469]]],[[[-9.726,51.678],[-9.722,51.678],[-9.726,51.678]]],[[[-9.722,51.473],[-9.713,51.477],[-9.717,51.477],[-9.722,51.473]]],[[[-9.65,51.556],[-9.655,51.556],[-9.65,51.556]]],[[[-9.364,51.497],[-9.364,51.501],[-9.364,51.505],[-9.364,51.501],[-9.364,51.505],[-9.355,51.505],[-9.35,51.505],[-9.35,51.509],[-9.35,51.513],[-9.355,51.513],[-9.364,51.497]]],[[[-9.364,51.497],[-9.355,51.497],[-9.355,51.501],[-9.355,51.497],[-9.355,51.501],[-9.364,51.501],[-9.364,51.497]]],[[[-9.364,51.505],[-9.355,51.505],[-9.355,51.501],[-9.355,51.505],[-9.364,51.505]]],[[[-9.355,51.517],[-9.35,51.517],[-9.355,51.517]]],[[[-9.355,51.513],[-9.35,51.513],[-9.35,51.517],[-9.355,51.517],[-9.355,51.513]]],[[[-9.355,51.505],[-9.35,51.505],[-9.355,51.505]]],[[[-9.35,51.517],[-9.346,51.517],[-9.341,51.521],[-9.337,51.521],[-9.337,51.525],[-9.35,51.517]]],[[[-8.701,51.576],[-8.697,51.576],[-8.701,51.576]]]]}},{"type":"Feature","properties":{"n":"Tipperary","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-8.477,52.757],[-8.473,52.734],[-8.468,52.734],[-8.473,52.734],[-8.468,52.734],[-8.464,52.706],[-8.464,52.702],[-8.464,52.706],[-8.464,52.702],[-8.383,52.682],[-8.383,52.678],[-8.383,52.682],[-8.383,52.678],[-8.285,52.694],[-8.191,52.667],[-8.213,52.623],[-8.231,52.584],[-8.236,52.584],[-8.231,52.584],[-8.236,52.584],[-8.231,52.584],[-8.236,52.584],[-8.227,52.572],[-8.227,52.568],[-8.227,52.564],[-8.227,52.568],[-8.227,52.564],[-8.231,52.564],[-8.227,52.564],[-8.231,52.564],[-8.227,52.525],[-8.316,52.493],[-8.339,52.505],[-8.392,52.478],[-8.392,52.474],[-8.321,52.438],[-8.285,52.403],[-8.231,52.411],[-8.218,52.367],[-8.164,52.367],[-8.182,52.285],[-8.106,52.206],[-7.994,52.202],[-7.994,52.237],[-7.878,52.226],[-7.748,52.222],[-7.775,52.269],[-7.793,52.344],[-7.676,52.356],[-7.524,52.363],[-7.381,52.336],[-7.376,52.336],[-7.381,52.336],[-7.381,52.34],[-7.381,52.336],[-7.381,52.34],[-7.376,52.336],[-7.376,52.344],[-7.372,52.344],[-7.376,52.344],[-7.372,52.344],[-7.376,52.348],[-7.376,52.352],[-7.381,52.352],[-7.376,52.352],[-7.381,52.352],[-7.394,52.379],[-7.39,52.411],[-7.39,52.415],[-7.399,52.426],[-7.399,52.43],[-7.399,52.426],[-7.399,52.43],[-7.412,52.438],[-7.466,52.474],[-7.435,52.497],[-7.457,52.545],[-7.475,52.612],[-7.475,52.615],[-7.479,52.615],[-7.475,52.615],[-7.479,52.615],[-7.52,52.655],[-7.56,52.702],[-7.649,52.73],[-7.676,52.781],[-7.735,52.852],[-7.667,52.927],[-7.73,52.958],[-7.779,52.974],[-7.824,52.974],[-7.837,52.966],[-7.864,52.946],[-7.846,52.934],[-7.963,52.848],[-7.967,52.848],[-7.963,52.848],[-7.967,52.848],[-8.039,52.891],[-8.048,52.942],[-7.981,52.95],[-7.994,52.997],[-7.958,53.033],[-7.94,53.053],[-7.936,53.053],[-7.94,53.053],[-7.936,53.053],[-7.931,53.076],[-7.927,53.076],[-7.931,53.076],[-7.927,53.076],[-7.976,53.131],[-8.07,53.159],[-8.07,53.163],[-8.07,53.159],[-8.07,53.163],[-8.079,53.167],[-8.084,53.167],[-8.128,53.159],[-8.2,53.088],[-8.267,53.057],[-8.316,52.986],[-8.281,52.97],[-8.339,52.915],[-8.406,52.915],[-8.455,52.844],[-8.437,52.789],[-8.477,52.757]]]}},{"type":"Feature","properties":{"n":"Clare","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-8.764,52.671],[-8.54,52.694],[-8.504,52.718],[-8.477,52.757],[-8.437,52.789],[-8.455,52.844],[-8.406,52.915],[-8.339,52.915],[-8.281,52.97],[-8.316,52.986],[-8.352,52.978],[-8.406,52.997],[-8.495,52.986],[-8.5,52.986],[-8.495,52.986],[-8.5,52.986],[-8.518,53.013],[-8.527,53.021],[-8.558,53.041],[-8.665,53.041],[-8.809,52.978],[-8.813,52.978],[-8.809,52.978],[-8.813,52.978],[-8.835,52.99],[-8.844,52.986],[-8.885,53.017],[-8.894,53.064],[-9.001,53.1],[-9.006,53.139],[-9.01,53.143],[-9.028,53.147],[-9.023,53.147],[-9.059,53.159],[-9.064,53.159],[-9.082,53.159],[-9.068,53.135],[-9.158,53.112],[-9.27,53.147],[-9.431,52.974],[-9.435,52.974],[-9.431,52.974],[-9.453,52.934],[-9.355,52.946],[-9.35,52.919],[-9.431,52.879],[-9.435,52.832],[-9.489,52.801],[-9.502,52.745],[-9.596,52.741],[-9.681,52.675],[-9.686,52.675],[-9.69,52.675],[-9.86,52.572],[-9.793,52.568],[-9.695,52.608],[-9.556,52.639],[-9.386,52.612],[-9.279,52.639],[-9.332,52.6],[-9.144,52.623],[-9.055,52.694],[-9.023,52.745],[-8.943,52.773],[-8.947,52.686],[-8.867,52.69],[-8.764,52.671]]],[[[-9.686,52.675],[-9.681,52.675],[-9.686,52.675]]],[[[-9.435,52.974],[-9.431,52.974],[-9.435,52.974]]],[[[-9.082,53.159],[-9.064,53.159],[-9.059,53.159],[-9.082,53.159]]],[[[-9.059,53.159],[-9.064,53.159],[-9.059,53.159]]],[[[-9.028,53.147],[-9.023,53.147],[-9.028,53.147]]]]}},{"type":"Feature","properties":{"n":"Limerick","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-9.314,52.478],[-9.319,52.478],[-9.314,52.478],[-9.319,52.478],[-9.314,52.478],[-9.319,52.478],[-9.332,52.474],[-9.337,52.474],[-9.332,52.474],[-9.337,52.474],[-9.31,52.395],[-9.31,52.379],[-9.323,52.375],[-9.301,52.336],[-9.296,52.336],[-9.301,52.336],[-9.296,52.336],[-9.216,52.3],[-9.135,52.344],[-9.028,52.324],[-8.979,52.296],[-8.979,52.3],[-8.979,52.296],[-8.979,52.3],[-8.952,52.324],[-8.782,52.387],[-8.75,52.379],[-8.724,52.375],[-8.656,52.352],[-8.656,52.356],[-8.656,52.352],[-8.656,52.356],[-8.634,52.348],[-8.522,52.281],[-8.442,52.289],[-8.366,52.312],[-8.361,52.312],[-8.366,52.312],[-8.361,52.312],[-8.366,52.312],[-8.361,52.312],[-8.361,52.316],[-8.361,52.32],[-8.285,52.285],[-8.209,52.296],[-8.204,52.296],[-8.209,52.296],[-8.204,52.296],[-8.182,52.285],[-8.164,52.367],[-8.218,52.367],[-8.231,52.411],[-8.285,52.403],[-8.321,52.438],[-8.392,52.474],[-8.392,52.478],[-8.339,52.505],[-8.316,52.493],[-8.227,52.525],[-8.231,52.564],[-8.227,52.564],[-8.231,52.564],[-8.227,52.564],[-8.227,52.568],[-8.227,52.564],[-8.227,52.568],[-8.227,52.572],[-8.236,52.584],[-8.231,52.584],[-8.236,52.584],[-8.231,52.584],[-8.236,52.584],[-8.231,52.584],[-8.213,52.623],[-8.191,52.667],[-8.285,52.694],[-8.383,52.678],[-8.383,52.682],[-8.383,52.678],[-8.383,52.682],[-8.464,52.702],[-8.464,52.706],[-8.464,52.702],[-8.464,52.706],[-8.468,52.734],[-8.473,52.734],[-8.468,52.734],[-8.473,52.734],[-8.477,52.757],[-8.504,52.718],[-8.54,52.694],[-8.764,52.671],[-8.956,52.651],[-8.988,52.623],[-9.068,52.623],[-9.27,52.576],[-9.364,52.576],[-9.301,52.521],[-9.314,52.478]]]}},{"type":"Feature","properties":{"n":"Sligo","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-9.126,54.183],[-9.131,54.163],[-9.046,54.159],[-8.938,54.143],[-8.943,54.136],[-8.943,54.132],[-8.943,54.136],[-8.943,54.132],[-8.938,54.132],[-8.934,54.128],[-8.938,54.132],[-8.934,54.128],[-9.006,54.057],[-9.01,54.057],[-9.006,54.057],[-9.01,54.057],[-9.006,54.057],[-9.01,54.057],[-9.006,54.057],[-9.01,54.053],[-9.01,54.057],[-9.01,54.053],[-8.97,54.029],[-8.965,54.029],[-8.97,54.029],[-8.965,54.029],[-8.943,54.014],[-8.907,54.017],[-8.885,54.01],[-8.8,53.962],[-8.755,53.974],[-8.737,53.994],[-8.652,54.037],[-8.652,54.041],[-8.652,54.037],[-8.652,54.041],[-8.63,54.029],[-8.63,54.025],[-8.63,54.029],[-8.63,54.025],[-8.607,54.021],[-8.585,54.014],[-8.585,53.951],[-8.522,53.927],[-8.339,53.927],[-8.357,53.951],[-8.388,53.982],[-8.397,54.002],[-8.392,54.002],[-8.397,54.002],[-8.392,54.002],[-8.334,54.002],[-8.307,54.037],[-8.236,54.045],[-8.24,54.057],[-8.218,54.069],[-8.209,54.084],[-8.164,54.1],[-8.164,54.112],[-8.173,54.116],[-8.178,54.116],[-8.173,54.116],[-8.178,54.116],[-8.191,54.132],[-8.195,54.132],[-8.191,54.132],[-8.195,54.132],[-8.33,54.179],[-8.334,54.21],[-8.334,54.214],[-8.339,54.234],[-8.334,54.234],[-8.339,54.234],[-8.334,54.234],[-8.343,54.289],[-8.357,54.313],[-8.397,54.36],[-8.348,54.419],[-8.379,54.423],[-8.392,54.419],[-8.397,54.419],[-8.392,54.419],[-8.397,54.419],[-8.415,54.415],[-8.375,54.451],[-8.383,54.462],[-8.468,54.47],[-8.491,54.419],[-8.495,54.415],[-8.5,54.415],[-8.527,54.403],[-8.531,54.403],[-8.661,54.36],[-8.5,54.325],[-8.468,54.277],[-8.603,54.281],[-8.558,54.23],[-8.554,54.23],[-8.549,54.23],[-8.513,54.218],[-8.513,54.214],[-8.571,54.199],[-8.648,54.266],[-8.764,54.277],[-8.835,54.254],[-8.938,54.289],[-9.05,54.289],[-9.126,54.183]]],[[[-8.558,54.23],[-8.554,54.23],[-8.558,54.23]]],[[[-8.531,54.403],[-8.527,54.403],[-8.531,54.403]]],[[[-8.513,54.214],[-8.513,54.218],[-8.513,54.214]]],[[[-8.5,54.415],[-8.495,54.415],[-8.491,54.419],[-8.5,54.415]]]]}},{"type":"Feature","properties":{"n":"Offaly","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-8.084,53.167],[-8.079,53.167],[-8.07,53.163],[-8.07,53.159],[-8.07,53.163],[-8.07,53.159],[-7.976,53.131],[-7.927,53.076],[-7.931,53.076],[-7.927,53.076],[-7.931,53.076],[-7.936,53.053],[-7.94,53.053],[-7.936,53.053],[-7.94,53.053],[-7.958,53.033],[-7.994,52.997],[-7.981,52.95],[-8.048,52.942],[-8.039,52.891],[-7.967,52.848],[-7.963,52.848],[-7.967,52.848],[-7.963,52.848],[-7.846,52.934],[-7.864,52.946],[-7.837,52.966],[-7.824,52.974],[-7.779,52.974],[-7.73,52.958],[-7.694,53.033],[-7.587,53.104],[-7.645,53.147],[-7.632,53.167],[-7.488,53.194],[-7.462,53.19],[-7.462,53.186],[-7.462,53.19],[-7.462,53.186],[-7.363,53.21],[-7.287,53.135],[-7.265,53.139],[-7.22,53.151],[-7.18,53.167],[-7.108,53.167],[-7.103,53.167],[-7.108,53.167],[-7.09,53.186],[-7.032,53.206],[-7.036,53.206],[-7.036,53.21],[-7.036,53.206],[-7.036,53.21],[-7.032,53.21],[-7.032,53.206],[-7.032,53.21],[-7.054,53.242],[-6.978,53.309],[-7.081,53.379],[-7.144,53.395],[-7.193,53.427],[-7.215,53.419],[-7.22,53.407],[-7.22,53.403],[-7.22,53.407],[-7.22,53.403],[-7.278,53.395],[-7.332,53.364],[-7.336,53.364],[-7.332,53.364],[-7.336,53.364],[-7.448,53.324],[-7.448,53.32],[-7.484,53.328],[-7.488,53.328],[-7.484,53.328],[-7.488,53.328],[-7.538,53.328],[-7.533,53.324],[-7.538,53.328],[-7.56,53.344],[-7.564,53.352],[-7.618,53.419],[-7.645,53.407],[-7.645,53.411],[-7.645,53.407],[-7.645,53.411],[-7.649,53.407],[-7.645,53.407],[-7.649,53.407],[-7.676,53.399],[-7.694,53.387],[-7.708,53.364],[-7.837,53.352],[-7.842,53.348],[-7.86,53.344],[-7.922,53.36],[-7.99,53.328],[-8.025,53.313],[-8.048,53.281],[-8.052,53.273],[-8.057,53.273],[-8.052,53.273],[-7.972,53.234],[-7.99,53.194],[-8.084,53.167]]]}},{"type":"Feature","properties":{"n":"Roscommon","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-8.822,53.667],[-8.818,53.667],[-8.656,53.679],[-8.652,53.679],[-8.656,53.679],[-8.652,53.679],[-8.576,53.718],[-8.446,53.702],[-8.437,53.683],[-8.366,53.643],[-8.375,53.643],[-8.379,53.643],[-8.375,53.643],[-8.379,53.643],[-8.401,53.628],[-8.406,53.628],[-8.401,53.628],[-8.303,53.561],[-8.294,53.545],[-8.294,53.541],[-8.294,53.545],[-8.294,53.541],[-8.285,53.505],[-8.285,53.474],[-8.24,53.446],[-8.245,53.364],[-8.187,53.336],[-8.182,53.289],[-8.057,53.273],[-8.052,53.273],[-8.048,53.281],[-8.025,53.313],[-7.99,53.328],[-7.922,53.36],[-7.945,53.411],[-7.958,53.435],[-7.972,53.525],[-8.034,53.604],[-8.034,53.643],[-7.918,53.734],[-7.882,53.785],[-7.918,53.821],[-7.981,53.868],[-7.994,53.919],[-8.061,53.907],[-8.11,53.958],[-8.084,54.014],[-8.088,54.014],[-8.084,54.014],[-8.088,54.014],[-8.052,54.108],[-8.164,54.112],[-8.164,54.1],[-8.209,54.084],[-8.218,54.069],[-8.24,54.057],[-8.236,54.045],[-8.307,54.037],[-8.334,54.002],[-8.392,54.002],[-8.397,54.002],[-8.392,54.002],[-8.397,54.002],[-8.388,53.982],[-8.357,53.951],[-8.339,53.927],[-8.522,53.927],[-8.585,53.951],[-8.598,53.951],[-8.679,53.966],[-8.683,53.954],[-8.683,53.951],[-8.683,53.954],[-8.683,53.951],[-8.674,53.947],[-8.679,53.947],[-8.683,53.923],[-8.634,53.876],[-8.639,53.876],[-8.634,53.876],[-8.639,53.876],[-8.701,53.872],[-8.692,53.852],[-8.697,53.852],[-8.692,53.852],[-8.697,53.852],[-8.719,53.84],[-8.715,53.84],[-8.719,53.84],[-8.715,53.84],[-8.719,53.84],[-8.715,53.84],[-8.715,53.836],[-8.679,53.758],[-8.688,53.742],[-8.692,53.742],[-8.688,53.742],[-8.692,53.742],[-8.697,53.734],[-8.706,53.722],[-8.715,53.714],[-8.71,53.714],[-8.715,53.714],[-8.71,53.714],[-8.782,53.695],[-8.786,53.695],[-8.782,53.695],[-8.786,53.695],[-8.791,53.695],[-8.795,53.695],[-8.791,53.695],[-8.795,53.695],[-8.818,53.667],[-8.822,53.667]]]}},{"type":"Feature","properties":{"n":"Galway","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-10.071,53.513],[-10.066,53.513],[-10.129,53.509],[-10.013,53.482],[-10.075,53.47],[-10.066,53.442],[-10.156,53.442],[-10.178,53.411],[-10.107,53.407],[-10.039,53.399],[-10.039,53.395],[-9.923,53.387],[-9.865,53.435],[-9.86,53.435],[-9.865,53.419],[-9.793,53.407],[-9.789,53.407],[-9.802,53.395],[-9.905,53.324],[-9.789,53.301],[-9.744,53.313],[-9.655,53.391],[-9.65,53.352],[-9.646,53.348],[-9.578,53.383],[-9.556,53.391],[-9.552,53.391],[-9.556,53.391],[-9.578,53.383],[-9.601,53.364],[-9.565,53.344],[-9.614,53.293],[-9.605,53.285],[-9.605,53.281],[-9.516,53.226],[-9.404,53.246],[-8.947,53.269],[-8.952,53.234],[-8.956,53.234],[-8.934,53.143],[-9.001,53.151],[-9.01,53.143],[-9.006,53.139],[-9.001,53.1],[-8.894,53.064],[-8.885,53.017],[-8.844,52.986],[-8.835,52.99],[-8.813,52.978],[-8.809,52.978],[-8.813,52.978],[-8.809,52.978],[-8.665,53.041],[-8.558,53.041],[-8.527,53.021],[-8.518,53.013],[-8.5,52.986],[-8.495,52.986],[-8.5,52.986],[-8.495,52.986],[-8.406,52.997],[-8.352,52.978],[-8.316,52.986],[-8.267,53.057],[-8.2,53.088],[-8.128,53.159],[-8.084,53.167],[-8.079,53.167],[-8.084,53.167],[-7.99,53.194],[-7.972,53.234],[-8.052,53.273],[-8.057,53.273],[-8.182,53.289],[-8.187,53.336],[-8.245,53.364],[-8.24,53.446],[-8.285,53.474],[-8.285,53.505],[-8.294,53.541],[-8.294,53.545],[-8.294,53.541],[-8.294,53.545],[-8.303,53.561],[-8.401,53.628],[-8.406,53.628],[-8.401,53.628],[-8.379,53.643],[-8.375,53.643],[-8.379,53.643],[-8.375,53.643],[-8.366,53.643],[-8.437,53.683],[-8.446,53.702],[-8.576,53.718],[-8.652,53.679],[-8.656,53.679],[-8.652,53.679],[-8.656,53.679],[-8.818,53.667],[-8.822,53.667],[-8.88,53.655],[-8.894,53.651],[-8.938,53.659],[-8.938,53.663],[-8.938,53.659],[-8.938,53.663],[-8.992,53.6],[-9.041,53.565],[-9.028,53.553],[-9.1,53.494],[-9.126,53.482],[-9.167,53.482],[-9.198,53.474],[-9.288,53.545],[-9.364,53.576],[-9.484,53.565],[-9.511,53.576],[-9.52,53.58],[-9.525,53.58],[-9.52,53.58],[-9.525,53.58],[-9.672,53.612],[-9.677,53.612],[-9.681,53.612],[-9.69,53.608],[-9.695,53.604],[-9.793,53.596],[-9.856,53.62],[-9.91,53.6],[-10.008,53.604],[-9.981,53.572],[-9.977,53.572],[-9.977,53.569],[-9.981,53.569],[-9.977,53.569],[-9.981,53.561],[-9.986,53.557],[-10.111,53.557],[-10.156,53.557],[-10.16,53.557],[-10.071,53.513]]],[[[-10.16,53.557],[-10.156,53.557],[-10.16,53.557]]],[[[-10.111,53.561],[-10.111,53.557],[-10.111,53.561]]],[[[-10.111,53.557],[-10.111,53.561],[-10.111,53.557]]],[[[-10.066,53.513],[-10.071,53.513],[-10.066,53.513]]],[[[-10.039,53.399],[-10.044,53.399],[-10.039,53.399]]],[[[-10.039,53.399],[-10.039,53.395],[-10.039,53.399]]],[[[-9.981,53.572],[-9.981,53.569],[-9.977,53.569],[-9.977,53.572],[-9.981,53.572],[-9.977,53.572],[-9.981,53.572]]],[[[-9.865,53.435],[-9.86,53.435],[-9.865,53.435]]],[[[-9.713,53.108],[-9.686,53.104],[-9.672,53.131],[-9.811,53.139],[-9.713,53.108]]],[[[-9.793,53.407],[-9.789,53.407],[-9.793,53.407]]],[[[-9.695,53.269],[-9.699,53.269],[-9.704,53.269],[-9.695,53.226],[-9.646,53.253],[-9.695,53.269]]],[[[-9.704,53.273],[-9.704,53.277],[-9.704,53.273]]],[[[-9.704,53.269],[-9.704,53.273],[-9.704,53.269]]],[[[-9.704,53.277],[-9.699,53.277],[-9.704,53.277]]],[[[-9.699,53.269],[-9.699,53.273],[-9.699,53.269]]],[[[-9.699,53.273],[-9.695,53.273],[-9.695,53.269],[-9.695,53.273],[-9.699,53.277],[-9.699,53.273]]],[[[-9.605,53.281],[-9.605,53.285],[-9.605,53.281],[-9.605,53.285],[-9.605,53.281]]],[[[-9.556,53.391],[-9.552,53.391],[-9.556,53.391]]],[[[-9.001,53.214],[-8.997,53.218],[-9.006,53.218],[-9.001,53.214]]],[[[-9.001,53.214],[-8.997,53.214],[-9.001,53.214]]],[[[-8.997,53.218],[-8.997,53.214],[-8.997,53.218]]],[[[-8.956,53.234],[-8.952,53.234],[-8.956,53.234]]]]}},{"type":"Feature","properties":{"n":"Longford","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.972,53.525],[-7.922,53.545],[-7.793,53.537],[-7.793,53.541],[-7.793,53.537],[-7.793,53.541],[-7.676,53.533],[-7.587,53.616],[-7.569,53.624],[-7.573,53.659],[-7.484,53.706],[-7.479,53.71],[-7.475,53.71],[-7.479,53.71],[-7.475,53.71],[-7.394,53.734],[-7.385,53.742],[-7.39,53.742],[-7.385,53.742],[-7.39,53.742],[-7.39,53.769],[-7.39,53.773],[-7.39,53.769],[-7.39,53.773],[-7.412,53.777],[-7.475,53.813],[-7.47,53.836],[-7.475,53.836],[-7.47,53.836],[-7.475,53.836],[-7.529,53.864],[-7.582,53.848],[-7.555,53.899],[-7.56,53.899],[-7.555,53.899],[-7.56,53.899],[-7.609,53.935],[-7.614,53.935],[-7.667,53.923],[-7.726,53.887],[-7.73,53.887],[-7.726,53.887],[-7.73,53.887],[-7.757,53.876],[-7.757,53.872],[-7.757,53.876],[-7.757,53.872],[-7.761,53.864],[-7.775,53.864],[-7.775,53.848],[-7.784,53.828],[-7.855,53.828],[-7.873,53.809],[-7.873,53.813],[-7.878,53.817],[-7.918,53.821],[-7.882,53.785],[-7.918,53.734],[-8.034,53.643],[-8.034,53.604],[-7.972,53.525]]]}},{"type":"Feature","properties":{"n":"Westmeath","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-7.922,53.36],[-7.86,53.344],[-7.842,53.348],[-7.837,53.352],[-7.708,53.364],[-7.694,53.387],[-7.676,53.399],[-7.649,53.407],[-7.645,53.407],[-7.649,53.407],[-7.645,53.411],[-7.645,53.407],[-7.645,53.411],[-7.645,53.407],[-7.618,53.419],[-7.564,53.352],[-7.56,53.344],[-7.538,53.328],[-7.533,53.324],[-7.538,53.328],[-7.488,53.328],[-7.484,53.328],[-7.488,53.328],[-7.484,53.328],[-7.448,53.32],[-7.448,53.324],[-7.336,53.364],[-7.332,53.364],[-7.336,53.364],[-7.332,53.364],[-7.278,53.395],[-7.22,53.403],[-7.22,53.407],[-7.22,53.403],[-7.22,53.407],[-7.215,53.419],[-7.193,53.427],[-7.068,53.47],[-6.992,53.576],[-6.956,53.655],[-6.974,53.663],[-7.027,53.663],[-7.077,53.651],[-7.077,53.655],[-7.077,53.651],[-7.077,53.655],[-7.211,53.698],[-7.233,53.73],[-7.345,53.797],[-7.412,53.777],[-7.39,53.773],[-7.39,53.769],[-7.39,53.773],[-7.39,53.769],[-7.39,53.742],[-7.385,53.742],[-7.39,53.742],[-7.385,53.742],[-7.394,53.734],[-7.475,53.71],[-7.479,53.71],[-7.475,53.71],[-7.479,53.71],[-7.484,53.706],[-7.573,53.659],[-7.569,53.624],[-7.587,53.616],[-7.676,53.533],[-7.793,53.541],[-7.793,53.537],[-7.793,53.541],[-7.793,53.537],[-7.922,53.545],[-7.972,53.525],[-7.958,53.435],[-7.945,53.411],[-7.922,53.36]]]}},{"type":"Feature","properties":{"n":"Mayo","ni":false},"geometry":{"type":"MultiPolygon","coordinates":[[[[-10.053,53.951],[-10.053,53.911],[-9.941,53.887],[-9.932,53.958],[-9.959,54.017],[-10.062,54.025],[-10.102,54.002],[-10.178,54.01],[-10.196,53.966],[-10.066,53.97],[-10.053,53.951]]],[[[-9.842,54.073],[-9.905,54.041],[-9.883,54.01],[-9.878,54.01],[-9.851,54.006],[-9.802,53.958],[-9.905,53.951],[-9.932,53.868],[-9.771,53.899],[-9.569,53.887],[-9.565,53.887],[-9.565,53.876],[-9.569,53.864],[-9.565,53.864],[-9.583,53.852],[-9.587,53.852],[-9.592,53.809],[-9.574,53.793],[-9.578,53.793],[-9.601,53.781],[-9.605,53.781],[-9.646,53.789],[-9.646,53.785],[-9.905,53.765],[-9.91,53.651],[-9.784,53.608],[-9.695,53.604],[-9.69,53.608],[-9.681,53.612],[-9.677,53.612],[-9.672,53.612],[-9.525,53.58],[-9.52,53.58],[-9.525,53.58],[-9.52,53.58],[-9.511,53.576],[-9.484,53.565],[-9.364,53.576],[-9.288,53.545],[-9.198,53.474],[-9.167,53.482],[-9.126,53.482],[-9.1,53.494],[-9.028,53.553],[-9.041,53.565],[-8.992,53.6],[-8.938,53.663],[-8.938,53.659],[-8.938,53.663],[-8.938,53.659],[-8.894,53.651],[-8.88,53.655],[-8.822,53.667],[-8.818,53.667],[-8.795,53.695],[-8.791,53.695],[-8.795,53.695],[-8.791,53.695],[-8.786,53.695],[-8.782,53.695],[-8.786,53.695],[-8.782,53.695],[-8.71,53.714],[-8.715,53.714],[-8.71,53.714],[-8.715,53.714],[-8.706,53.722],[-8.697,53.734],[-8.692,53.742],[-8.688,53.742],[-8.692,53.742],[-8.688,53.742],[-8.679,53.758],[-8.715,53.836],[-8.715,53.84],[-8.719,53.84],[-8.715,53.84],[-8.719,53.84],[-8.715,53.84],[-8.719,53.84],[-8.697,53.852],[-8.692,53.852],[-8.697,53.852],[-8.692,53.852],[-8.701,53.872],[-8.639,53.876],[-8.634,53.876],[-8.639,53.876],[-8.634,53.876],[-8.683,53.923],[-8.679,53.947],[-8.674,53.947],[-8.683,53.951],[-8.683,53.954],[-8.683,53.951],[-8.683,53.954],[-8.679,53.966],[-8.598,53.951],[-8.585,53.951],[-8.585,54.014],[-8.607,54.021],[-8.63,54.025],[-8.63,54.029],[-8.63,54.025],[-8.63,54.029],[-8.652,54.041],[-8.652,54.037],[-8.652,54.041],[-8.652,54.037],[-8.737,53.994],[-8.755,53.974],[-8.8,53.962],[-8.885,54.01],[-8.907,54.017],[-8.943,54.014],[-8.965,54.029],[-8.97,54.029],[-8.965,54.029],[-8.97,54.029],[-9.01,54.053],[-9.01,54.057],[-9.01,54.053],[-9.006,54.057],[-9.01,54.057],[-9.006,54.057],[-9.01,54.057],[-9.006,54.057],[-9.01,54.057],[-9.006,54.057],[-8.934,54.128],[-8.938,54.132],[-8.934,54.128],[-8.938,54.132],[-8.943,54.132],[-8.943,54.136],[-8.943,54.132],[-8.943,54.136],[-8.938,54.143],[-9.046,54.159],[-9.131,54.163],[-9.211,54.214],[-9.211,54.218],[-9.229,54.234],[-9.234,54.234],[-9.229,54.234],[-9.234,54.234],[-9.234,54.238],[-9.207,54.277],[-9.319,54.317],[-9.377,54.293],[-9.511,54.309],[-9.713,54.317],[-9.78,54.336],[-9.847,54.325],[-9.807,54.293],[-9.798,54.293],[-9.766,54.285],[-9.78,54.285],[-9.735,54.258],[-9.847,54.277],[-9.91,54.203],[-9.887,54.269],[-9.954,54.269],[-10.008,54.305],[-10.008,54.301],[-10.098,54.238],[-10.057,54.23],[-10.124,54.136],[-10.12,54.096],[-10.066,54.096],[-10.071,54.171],[-9.999,54.226],[-9.905,54.12],[-9.99,54.1],[-9.95,54.069],[-9.842,54.073]]],[[[-10.053,53.801],[-9.95,53.805],[-9.986,53.824],[-10.053,53.801]]],[[[-10.008,54.301],[-10.008,54.305],[-10.008,54.301]]],[[[-9.883,54.01],[-9.878,54.01],[-9.883,54.01]]],[[[-9.807,54.293],[-9.798,54.293],[-9.807,54.293]]],[[[-9.78,54.285],[-9.775,54.285],[-9.78,54.285]]],[[[-9.775,54.285],[-9.766,54.285],[-9.775,54.285]]],[[[-9.646,53.789],[-9.646,53.785],[-9.646,53.789],[-9.646,53.785],[-9.646,53.789]]],[[[-9.605,53.785],[-9.601,53.785],[-9.605,53.785],[-9.601,53.785],[-9.605,53.785]]],[[[-9.605,53.781],[-9.605,53.785],[-9.605,53.781]]],[[[-9.605,53.781],[-9.601,53.781],[-9.601,53.785],[-9.601,53.781],[-9.601,53.785],[-9.605,53.785],[-9.605,53.781]]],[[[-9.587,53.852],[-9.583,53.852],[-9.587,53.852]]],[[[-9.578,53.793],[-9.574,53.793],[-9.578,53.793]]],[[[-9.569,53.887],[-9.565,53.887],[-9.569,53.887]]],[[[-9.569,53.864],[-9.565,53.864],[-9.569,53.864]]],[[[-9.234,54.234],[-9.229,54.234],[-9.234,54.234]]],[[[-9.234,54.238],[-9.234,54.234],[-9.234,54.238]]],[[[-9.211,54.214],[-9.211,54.218],[-9.211,54.214]]]]}},{"type":"Feature","properties":{"n":"Louth","ni":false},"geometry":{"type":"Polygon","coordinates":[[[-6.692,53.899],[-6.593,53.844],[-6.58,53.817],[-6.58,53.809],[-6.58,53.805],[-6.517,53.765],[-6.459,53.769],[-6.459,53.765],[-6.459,53.769],[-6.459,53.765],[-6.45,53.761],[-6.45,53.758],[-6.45,53.761],[-6.45,53.758],[-6.463,53.742],[-6.468,53.742],[-6.463,53.742],[-6.468,53.742],[-6.432,53.718],[-6.311,53.718],[-6.307,53.718],[-6.311,53.718],[-6.307,53.718],[-6.244,53.722],[-6.262,53.809],[-6.244,53.864],[-6.352,53.88],[-6.378,53.954],[-6.32,54.017],[-6.186,53.982],[-6.11,54.002],[-6.244,54.077],[-6.28,54.112],[-6.365,54.116],[-6.361,54.073],[-6.593,54.057],[-6.593,54.045],[-6.589,54.041],[-6.584,54.041],[-6.589,54.041],[-6.584,54.041],[-6.575,54.033],[-6.566,54.021],[-6.566,54.017],[-6.566,54.021],[-6.566,54.017],[-6.589,53.966],[-6.589,53.97],[-6.589,53.966],[-6.589,53.97],[-6.638,53.97],[-6.66,53.958],[-6.651,53.954],[-6.651,53.951],[-6.651,53.954],[-6.66,53.954],[-6.66,53.958],[-6.66,53.954],[-6.651,53.951],[-6.629,53.923],[-6.692,53.899]]]}},{"type":"Feature","properties":{"n":"Moyle","ni":true},"geometry":{"type":"MultiPolygon","coordinates":[[[[406,5230],[381,5222],[333,5227],[366,5241],[406,5230]]],[[[432,4861],[407,4861],[375,4912],[353,4960],[358,5020],[293,5005],[259,5046],[227,5035],[221,5054],[169,5065],[163,5138],[155,5155],[203,5179],[241,5157],[267,5172],[346,5126],[410,5135],[448,5121],[487,5068],[469,4949],[517,4936],[495,4912],[432,4861]]]]}},{"type":"Feature","properties":{"n":"Antrim","ni":true},"geometry":{"type":"Polygon","coordinates":[[[165,4640],[226,4629],[251,4650],[344,4628],[386,4655],[431,4634],[455,4613],[442,4583],[455,4543],[445,4493],[463,4482],[436,4469],[432,4438],[383,4436],[320,4408],[297,4411],[251,4421],[179,4391],[179,4391],[196,4489],[147,4552],[171,4622],[165,4640]]]}},{"type":"Feature","properties":{"n":"Ballymena","ni":true},"geometry":{"type":"Polygon","coordinates":[[[431,4634],[386,4655],[344,4628],[251,4650],[226,4629],[165,4640],[175,4691],[157,4795],[206,4786],[215,4818],[198,4844],[238,4860],[281,4857],[285,4888],[310,4885],[375,4912],[407,4861],[432,4861],[481,4797],[468,4754],[473,4710],[515,4703],[516,4663],[476,4663],[483,4639],[431,4634]]]}},{"type":"Feature","properties":{"n":"Belfast","ni":true},"geometry":{"type":"Polygon","coordinates":[[[535,4460],[537,4412],[563,4431],[563,4431],[604,4419],[597,4394],[544,4384],[502,4355],[452,4388],[432,4438],[436,4469],[463,4482],[501,4462],[535,4460]]]}},{"type":"Feature","properties":{"n":"Derry","ni":true},"geometry":{"type":"Polygon","coordinates":[[[-445,4871],[-433,4939],[-396,4980],[-289,4991],[-260,4978],[-277,4960],[-253,4902],[-223,4900],[-226,4831],[-207,4815],[-204,4730],[-186,4702],[-227,4693],[-253,4705],[-285,4750],[-307,4745],[-313,4790],[-358,4798],[-346,4828],[-420,4838],[-445,4871]]]}},{"type":"Feature","properties":{"n":"Newry and Mourne","ni":true},"geometry":{"type":"Polygon","coordinates":[[[6,3943],[39,3993],[86,4009],[103,3997],[123,4028],[182,4051],[209,4050],[321,4007],[420,4002],[408,3984],[424,3914],[471,3938],[498,3919],[538,3923],[522,3850],[501,3817],[410,3759],[361,3770],[381,3784],[321,3808],[315,3830],[263,3847],[219,3841],[201,3857],[182,3803],[143,3797],[114,3813],[18,3784],[-18,3822],[-10,3876],[14,3915],[6,3943]]]}},{"type":"Feature","properties":{"n":"Armagh","ni":true},"geometry":{"type":"Polygon","coordinates":[[[209,4050],[182,4051],[123,4028],[103,3997],[86,4009],[39,3993],[6,3943],[-31,3975],[-50,3958],[-86,3983],[-115,4052],[-144,4073],[-125,4090],[-132,4129],[-104,4145],[-75,4226],[-23,4212],[-7,4258],[22,4279],[51,4260],[92,4274],[134,4192],[166,4169],[187,4187],[204,4124],[199,4069],[209,4050]]]}},{"type":"Feature","properties":{"n":"Banbridge","ni":true},"geometry":{"type":"Polygon","coordinates":[[[420,4002],[321,4007],[209,4050],[199,4069],[204,4124],[187,4187],[301,4184],[321,4224],[352,4235],[421,4189],[417,4167],[453,4151],[493,4152],[477,4108],[490,4049],[473,4003],[427,4021],[420,4002]]]}},{"type":"Feature","properties":{"n":"Craigavon","ni":true},"geometry":{"type":"Polygon","coordinates":[[[321,4224],[301,4184],[187,4187],[166,4169],[134,4192],[92,4274],[76,4327],[115,4361],[147,4375],[179,4391],[179,4391],[251,4421],[297,4411],[273,4385],[285,4330],[307,4305],[297,4287],[321,4224]]]}},{"type":"Feature","properties":{"n":"Dungannon","ni":true},"geometry":{"type":"Polygon","coordinates":[[[115,4361],[76,4327],[92,4274],[51,4260],[22,4279],[-7,4258],[-23,4212],[-75,4226],[-104,4145],[-132,4129],[-163,4186],[-203,4224],[-246,4237],[-304,4169],[-347,4156],[-391,4150],[-404,4192],[-440,4204],[-436,4241],[-457,4274],[-302,4314],[-231,4342],[-184,4379],[-173,4423],[-130,4406],[-81,4416],[-24,4408],[-3,4378],[43,4396],[115,4361]]]}},{"type":"Feature","properties":{"n":"Cookstown","ni":true},"geometry":{"type":"Polygon","coordinates":[[[179,4391],[147,4375],[115,4361],[43,4396],[-3,4378],[-24,4408],[-81,4416],[-130,4406],[-173,4423],[-163,4457],[-191,4539],[-183,4603],[-165,4614],[-113,4595],[-69,4607],[-26,4598],[23,4548],[108,4579],[147,4552],[196,4489],[179,4391],[179,4391]]]}},{"type":"Feature","properties":{"n":"Lisburn","ni":true},"geometry":{"type":"Polygon","coordinates":[[[297,4411],[320,4408],[383,4436],[432,4438],[452,4388],[502,4355],[522,4336],[555,4264],[521,4232],[493,4152],[453,4151],[417,4167],[421,4189],[352,4235],[321,4224],[297,4287],[307,4305],[285,4330],[273,4385],[297,4411]]]}},{"type":"Feature","properties":{"n":"Magherafelt","ni":true},"geometry":{"type":"Polygon","coordinates":[[[165,4640],[171,4622],[147,4552],[108,4579],[23,4548],[-26,4598],[-69,4607],[-113,4595],[-165,4614],[-142,4625],[-136,4643],[-117,4650],[-124,4698],[-103,4738],[-51,4729],[-26,4748],[-26,4802],[5,4820],[32,4803],[70,4822],[106,4805],[151,4829],[159,4803],[157,4795],[175,4691],[165,4640]]]}},{"type":"Feature","properties":{"n":"Omagh","ni":true},"geometry":{"type":"Polygon","coordinates":[[[-136,4643],[-142,4625],[-165,4614],[-183,4603],[-191,4539],[-163,4457],[-173,4423],[-184,4379],[-231,4342],[-302,4314],[-457,4274],[-494,4284],[-556,4252],[-588,4283],[-594,4372],[-569,4440],[-602,4438],[-649,4462],[-662,4489],[-633,4515],[-516,4535],[-490,4525],[-451,4578],[-409,4595],[-392,4620],[-366,4614],[-322,4639],[-258,4630],[-183,4657],[-136,4643]]]}},{"type":"Feature","properties":{"n":"Larne","ni":true},"geometry":{"type":"Polygon","coordinates":[[[432,4861],[495,4912],[517,4936],[525,4921],[509,4850],[545,4836],[607,4733],[622,4657],[666,4637],[626,4684],[657,4697],[688,4658],[692,4595],[649,4577],[626,4606],[560,4601],[492,4609],[483,4639],[476,4663],[516,4663],[515,4703],[473,4710],[468,4754],[481,4797],[432,4861]]]}},{"type":"Feature","properties":{"n":"Carrickfergus","ni":true},"geometry":{"type":"Polygon","coordinates":[[[692,4595],[664,4548],[603,4529],[562,4500],[545,4535],[560,4601],[626,4606],[649,4577],[692,4595]]]}},{"type":"Feature","properties":{"n":"Newtownabbey","ni":true},"geometry":{"type":"Polygon","coordinates":[[[560,4601],[545,4535],[562,4500],[552,4489],[535,4460],[501,4462],[463,4482],[445,4493],[455,4543],[442,4583],[455,4613],[431,4634],[483,4639],[492,4609],[560,4601]]]}},{"type":"Feature","properties":{"n":"North Down","ni":true},"geometry":{"type":"Polygon","coordinates":[[[604,4419],[563,4431],[563,4431],[586,4461],[649,4493],[684,4477],[765,4486],[771,4477],[762,4456],[711,4418],[658,4432],[639,4418],[616,4424],[604,4419]]]}},{"type":"Feature","properties":{"n":"Down","ni":true},"geometry":{"type":"Polygon","coordinates":[[[493,4152],[521,4232],[555,4264],[578,4278],[589,4277],[607,4246],[656,4222],[709,4239],[716,4212],[689,4142],[655,4111],[744,4144],[763,4121],[757,4044],[683,3968],[669,3988],[601,3992],[544,3976],[538,3923],[498,3919],[471,3938],[424,3914],[408,3984],[420,4002],[427,4021],[473,4003],[490,4049],[477,4108],[493,4152]]]}},{"type":"Feature","properties":{"n":"Coleraine","ni":true},"geometry":{"type":"Polygon","coordinates":[[[151,4829],[106,4805],[70,4822],[32,4803],[5,4820],[-26,4802],[-39,4870],[-30,4987],[-37,5024],[-62,5053],[-43,5110],[13,5109],[91,5139],[137,5139],[155,5155],[163,5138],[169,5065],[130,5047],[124,5009],[99,4986],[117,4943],[113,4890],[151,4829]]]}},{"type":"Feature","properties":{"n":"Ballymoney","ni":true},"geometry":{"type":"Polygon","coordinates":[[[157,4795],[159,4803],[151,4829],[113,4890],[117,4943],[99,4986],[124,5009],[130,5047],[169,5065],[221,5054],[227,5035],[259,5046],[293,5005],[358,5020],[353,4960],[375,4912],[310,4885],[285,4888],[281,4857],[238,4860],[198,4844],[215,4818],[206,4786],[157,4795]]]}},{"type":"Feature","properties":{"n":"Castlereagh","ni":true},"geometry":{"type":"Polygon","coordinates":[[[589,4277],[578,4278],[555,4264],[522,4336],[502,4355],[544,4384],[597,4394],[604,4419],[616,4424],[639,4418],[638,4381],[588,4317],[589,4277]]]}},{"type":"Feature","properties":{"n":"Limavady","ni":true},"geometry":{"type":"Polygon","coordinates":[[[-124,4698],[-140,4713],[-186,4702],[-204,4730],[-207,4815],[-226,4831],[-223,4900],[-253,4902],[-277,4960],[-260,4978],[-204,4969],[-170,4998],[-136,5070],[-123,5138],[-73,5111],[-43,5110],[-62,5053],[-37,5024],[-30,4987],[-39,4870],[-26,4802],[-26,4748],[-51,4729],[-103,4738],[-124,4698]]]}},{"type":"Feature","properties":{"n":"Strabane","ni":true},"geometry":{"type":"Polygon","coordinates":[[[-186,4702],[-140,4713],[-124,4698],[-117,4650],[-136,4643],[-183,4657],[-258,4630],[-322,4639],[-366,4614],[-392,4620],[-409,4595],[-451,4578],[-490,4525],[-516,4535],[-633,4515],[-662,4489],[-672,4493],[-672,4494],[-672,4517],[-702,4508],[-740,4540],[-757,4532],[-800,4570],[-812,4613],[-752,4648],[-704,4614],[-681,4614],[-620,4653],[-549,4643],[-544,4703],[-491,4759],[-470,4803],[-470,4845],[-445,4871],[-420,4838],[-346,4828],[-358,4798],[-313,4790],[-307,4745],[-285,4750],[-253,4705],[-227,4693],[-186,4702]]]}},{"type":"Feature","properties":{"n":"Fermanagh","ni":true},"geometry":{"type":"Polygon","coordinates":[[[-662,4489],[-649,4462],[-602,4438],[-569,4440],[-594,4372],[-588,4283],[-556,4252],[-494,4284],[-457,4274],[-436,4241],[-440,4204],[-404,4192],[-391,4150],[-347,4156],[-364,4108],[-325,4057],[-332,4025],[-385,4010],[-409,3980],[-414,3934],[-438,3919],[-433,3964],[-461,3940],[-448,3906],[-504,3919],[-533,3950],[-577,3928],[-648,3951],[-662,3986],[-708,4026],[-797,4038],[-817,4066],[-815,4117],[-828,4145],[-865,4156],[-894,4225],[-944,4255],[-999,4355],[-916,4390],[-875,4440],[-799,4420],[-773,4428],[-700,4486],[-672,4493],[-672,4494],[-662,4489]]]}},{"type":"Feature","properties":{"n":"Ards","ni":true},"geometry":{"type":"Polygon","coordinates":[[[771,4477],[789,4459],[800,4389],[823,4355],[827,4293],[847,4234],[824,4188],[825,4149],[794,4090],[777,4097],[747,4166],[768,4211],[772,4264],[756,4312],[711,4359],[673,4372],[662,4325],[721,4299],[709,4239],[656,4222],[607,4246],[589,4277],[588,4317],[638,4381],[639,4418],[658,4432],[711,4418],[762,4456],[771,4477]]]}}]};
+const PLACES=[{"en": "Dooagh", "ga": "Dumha Acha", "lon": -10.128, "lat": 53.974}, {"en": "Keel", "ga": "An Caol", "lon": -10.075, "lat": 53.975}, {"en": "Belmullet", "ga": "Béal an Mhuirthead", "lon": -9.991, "lat": 54.225}, {"en": "Bangor Erris", "ga": "Baingear", "lon": -9.742, "lat": 54.144}, {"en": "Geesala", "ga": "Gaoth Sáile", "lon": -9.837, "lat": 54.105}, {"en": "Carrowteige", "ga": "Ceathrú Thaidhg", "lon": -9.807, "lat": 54.303}, {"en": "Rossport", "ga": "Ros Dumhach", "lon": -9.845, "lat": 54.272}, {"en": "Glenamoy", "ga": "Gleann na Muaidhe", "lon": -9.708, "lat": 54.237}, {"en": "Ballycroy", "ga": "Baile Chruaich", "lon": -9.832, "lat": 54.022}, {"en": "Mulranny", "ga": "An Mhala Raithní", "lon": -9.782, "lat": 53.906}, {"en": "Newport", "ga": "Baile Uí Fhiacháin", "lon": -9.546, "lat": 53.885}, {"en": "Westport", "ga": "Cathair na Mart", "lon": -9.518, "lat": 53.8}, {"en": "Louisburgh", "ga": "Cluain Cearbán", "lon": -9.811, "lat": 53.763}, {"en": "Castlebar", "ga": "Caisleán an Bharraigh", "lon": -9.299, "lat": 53.855}, {"en": "Islandeady", "ga": "Oileán Éadaí", "lon": -9.38, "lat": 53.858}, {"en": "Turlough", "ga": "Turlach", "lon": -9.213, "lat": 53.883}, {"en": "Bellavary", "ga": "Béal Átha Fhearaigh", "lon": -9.152, "lat": 53.9}, {"en": "Foxford", "ga": "Béal Easa", "lon": -9.115, "lat": 53.98}, {"en": "Pontoon", "ga": "Pontún", "lon": -9.205, "lat": 53.981}, {"en": "Lahardane", "ga": "Leathardán", "lon": -9.322, "lat": 54.031}, {"en": "Crossmolina", "ga": "Crois Mhaoilíona", "lon": -9.317, "lat": 54.1}, {"en": "Ballina", "ga": "Béal an Átha", "lon": -9.155, "lat": 54.115}, {"en": "Ardnaree", "ga": "Ard na Ria", "lon": -9.142, "lat": 54.108}, {"en": "Killala", "ga": "Cill Ala", "lon": -9.218, "lat": 54.213}, {"en": "Ballycastle", "ga": "Baile an Chaisil", "lon": -9.372, "lat": 54.28}, {"en": "Bonniconlon", "ga": "Muine Chonalláin", "lon": -9.032, "lat": 54.108}, {"en": "Rinnananny", "ga": "Rinn an Eanaigh", "lon": -9.12, "lat": 54.035}, {"en": "Attymass", "ga": "Áth Tí an Mheasaigh", "lon": -9.075, "lat": 54.04}, {"en": "Knockmore", "ga": "An Cnoc Mór", "lon": -9.177, "lat": 54.02}, {"en": "Swinford", "ga": "Béal Átha na Muice", "lon": -8.951, "lat": 53.944}, {"en": "Kiltimagh", "ga": "Coillte Mach", "lon": -8.997, "lat": 53.85}, {"en": "Charlestown", "ga": "Baile Chathail", "lon": -8.793, "lat": 53.964}, {"en": "Kilkelly", "ga": "Cill Cheallaigh", "lon": -8.85, "lat": 53.873}, {"en": "Knock", "ga": "An Cnoc", "lon": -8.918, "lat": 53.793}, {"en": "Ballyhaunis", "ga": "Béal Átha hAmhnais", "lon": -8.764, "lat": 53.763}, {"en": "Claremorris", "ga": "Clár Chlainne Mhuiris", "lon": -8.995, "lat": 53.722}, {"en": "Balla", "ga": "Balla", "lon": -9.13, "lat": 53.805}, {"en": "Ballinrobe", "ga": "Baile an Róba", "lon": -9.225, "lat": 53.633}, {"en": "Partry", "ga": "Partraí", "lon": -9.282, "lat": 53.692}, {"en": "Tourmakeady", "ga": "Tuar Mhic Éadaigh", "lon": -9.397, "lat": 53.637}, {"en": "Cong", "ga": "Conga", "lon": -9.286, "lat": 53.541}, {"en": "Ballindine", "ga": "Baile an Daighin", "lon": -8.958, "lat": 53.668}, {"en": "Enniscrone", "ga": "Inis Crabhann", "lon": -9.095, "lat": 54.215}, {"en": "Easkey", "ga": "Iascaigh", "lon": -8.962, "lat": 54.286}, {"en": "Dromore West", "ga": "An Droim Mór Thiar", "lon": -8.891, "lat": 54.251}, {"en": "Aclare", "ga": "Áth an Chláir", "lon": -8.907, "lat": 54.039}, {"en": "Tubbercurry", "ga": "Tobar an Choire", "lon": -8.729, "lat": 54.056}, {"en": "Ballymote", "ga": "Baile an Mhóta", "lon": -8.517, "lat": 54.09}, {"en": "Gurteen", "ga": "An Goirtín", "lon": -8.442, "lat": 53.985}, {"en": "Collooney", "ga": "Cúil Mhuine", "lon": -8.49, "lat": 54.187}, {"en": "Ballisodare", "ga": "Baile Easa Dara", "lon": -8.51, "lat": 54.21}, {"en": "Skreen", "ga": "An Scrín", "lon": -8.733, "lat": 54.246}, {"en": "Sligo", "ga": "Sligeach", "lon": -8.476, "lat": 54.27}, {"en": "Grange", "ga": "An Ghráinseach", "lon": -8.523, "lat": 54.396}, {"en": "Ballaghaderreen", "ga": "Bealach an Doirín", "lon": -8.58, "lat": 53.901}, {"en": "Boyle", "ga": "Mainistir na Búille", "lon": -8.3, "lat": 53.973}, {"en": "Castlerea", "ga": "An Caisleán Riabhach", "lon": -8.49, "lat": 53.768}, {"en": "Tuam", "ga": "Tuaim", "lon": -8.851, "lat": 53.515}, {"en": "Clonbur", "ga": "An Fhairche", "lon": -9.364, "lat": 53.545}, {"en": "Carrick-on-Shannon", "ga": "Cora Droma Rúisc", "lon": -8.09, "lat": 53.947}];
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const map=L.map('map',{zoomSnap:.25,minZoom:6,maxZoom:15,attributionControl:true}).setView([54.0,-9.05],9);
+map.createPane('base');map.getPane('base').style.zIndex=200;
+map.createPane('ov');map.getPane('ov').style.zIndex=350;map.getPane('ov').style.pointerEvents='none';
+
+// Vector base: always available
+const base=L.geoJSON(BASE,{pane:'base',interactive:false,style:f=>({color:css('--edge'),weight:.8,fillColor:f.properties.ni?css('--land-ni'):css('--land'),fillOpacity:1})}).addTo(map);
+// Topographic tiles: used where the host allows them, dropped silently otherwise
+const topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{pane:'base',maxZoom:15,attribution:'© OpenStreetMap contributors, SRTM | © OpenTopoMap (CC-BY-SA)'});
+let tileFail=0;topo.on('tileerror',()=>{if(++tileFail>3&&map.hasLayer(topo))map.removeLayer(topo)});
+topo.on('tileload',()=>{if(map.hasLayer(base))base.setStyle({fillOpacity:0,opacity:.6})});
+topo.addTo(map);
+
+const ov=L.imageOverlay(IMG,B,{pane:'ov',opacity:.6,interactive:false}).addTo(map);
+map.attributionControl.addAttribution('1926 Gaeltacht: Ní Bhrádaigh et al. 2007');
+L.control.scale({imperial:false}).addTo(map);
+document.getElementById('op').addEventListener('input',e=>ov.setOpacity(e.target.value/100));
+
+// Place labels
+const lbl={};const labels=L.layerGroup(PLACES.map(p=>{
+  const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:'townlbl',html:'<b></b>'+p.en,iconAnchor:[3,8]}),keyboard:false,interactive:false});
+  lbl[p.en]=m;return m})).addTo(map);
+document.getElementById('tw').addEventListener('change',e=>e.target.checked?labels.addTo(map):labels.remove());
+
+// Probe the overlay
+const im=new Image(),cv=document.createElement('canvas');let ctx;
+const my=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));
+const CATS=[
+ {rgb:[230,20,20],c:'--fior',t:'Fíor-Ghaeltacht',d:'In 1925, 80% or more of the people in this district could speak Irish.'},
+ {rgb:[232,150,0],c:'--breac',t:'Breac-Ghaeltacht',d:'In 1925, between 25% and 79% of the people in this district could speak Irish.'},
+ {rgb:[250,225,0],c:'--omit',t:'Breac-Ghaeltacht, left out in 1929',d:'In 1925, between 25% and 79% could speak Irish, but the district was not included in the 1929 Act.'},
+ {rgb:[100,165,0],c:'--surv',t:'Added to the Gaeltacht in 1929',d:'Brought into the 1929 Act on the basis of the April 1926 census figures.'},
+];
+const NONE={c:'--edge',t:'Under 25% in 1925',d:'This district was not part of the 1926 Gaeltacht. That does not mean nobody spoke Irish here; it means fewer than one in four could.'};
+function tally(x,y,r){const n=2*r+1,d=ctx.getImageData(x-r,y-r,n,n).data;const v=new Map();let grey=0,none=0;
+  for(let i=0;i<d.length;i+=4){if(d[i+3]<20){none++;continue}let best=null,bd=6000;
+    for(const c of CATS){const dd=(c.rgb[0]-d[i])**2+(c.rgb[1]-d[i+1])**2+(c.rgb[2]-d[i+2])**2;if(dd<bd){bd=dd;best=c}}
+    if(best)v.set(best,(v.get(best)||0)+1);else grey++}
+  return{v,grey,none,total:n*n}}
+function classify(lat,lng){
+  if(!ctx)return null;
+  const W=cv.width,H=cv.height;
+  const x=Math.floor((lng-B[0][1])/(B[1][1]-B[0][1])*W);
+  const y=Math.floor((my(B[1][0])-my(lat))/(my(B[1][0])-my(B[0][0]))*H);
+  if(x<12||y<12||x>=W-12||y>=H-12)return NONE;
+  let t=tally(x,y,2);
+  let floor=t.none;
+  if(t.grey>t.total*.5){t=tally(x,y,10);floor=Math.max(12,t.none*.25)}  // on a line or town symbol: read the surrounding district, discounting sea
+  let top=NONE,n=floor;for(const[k,c]of t.v)if(c>n){n=c;top=k}
+  return top;
+}
+const pin=L.circleMarker([0,0],{radius:7,color:'#fff',weight:2,fillColor:css('--accent'),fillOpacity:1,pane:'markerPane'});
+function report(lat,lng,name){
+  const r=classify(lat,lng);if(!r)return;
+  document.getElementById('r-where').textContent=(name?name+' · ':'')+lat.toFixed(3)+'°N, '+Math.abs(lng).toFixed(3)+'°W';
+  document.getElementById('r-cat').textContent=r.t;
+  document.getElementById('r-what').textContent=r.d;
+  document.getElementById('result').style.borderLeftColor=css(r.c);
+  pin.setLatLng([lat,lng]).addTo(map);
+}
+map.on('click',e=>report(e.latlng.lat,e.latlng.lng));
+
+const dl=document.getElementById('placelist');
+PLACES.forEach(p=>{const o=document.createElement('option');o.value=p.en;o.label=p.ga;dl.appendChild(o);
+  const o2=document.createElement('option');o2.value=p.ga;o2.label=p.en;dl.appendChild(o2)});
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+const q=document.getElementById('q');
+function go(){const v=norm(q.value);if(!v)return;
+  const p=PLACES.find(p=>norm(p.en)===v||norm(p.ga)===v)||PLACES.find(p=>norm(p.en).startsWith(v)||norm(p.ga).startsWith(v));
+  if(!p)return;
+  map.flyTo([p.lat,p.lon],11,{duration:.8});
+  Object.values(lbl).forEach(m=>m.getElement()&&m.getElement().classList.remove('sel'));
+  const el=lbl[p.en]&&lbl[p.en].getElement();if(el)el.classList.add('sel');
+  report(p.lat,p.lon,p.en+' / '+p.ga);
+}
+q.addEventListener('change',go);q.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go()}});
+
+im.onload=()=>{cv.width=im.width;cv.height=im.height;ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(im,0,0);
+  const b=PLACES.find(p=>p.en==='Bonniconlon');report(b.lat,b.lon,'Bonniconlon / Muine Chonalláin');};
+im.src=IMG;
+</script>
+
+</body>
+</html>
