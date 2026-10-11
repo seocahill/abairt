@@ -108,6 +108,38 @@ forget.
 Ring them, explain it, then send a test question yourself and stay on the phone
 while they answer it. The first attempt has to succeed.
 
+## The learner's side
+
+Learners never touch WhatsApp. They install the site to their home screen and
+hold one button.
+
+The questions arrive spontaneously — mid-conversation, one hand free — so the
+whole learner side is built around three actions: **tap the icon, hold the
+button, let go.** The question uploads on release; there is no send step.
+
+* `/questions/new` is the one screen, and the PWA's `start_url`
+* `voice_question_controller.js` is the press-and-release interaction. It
+  auto-stops at 60 seconds and discards anything under 0.4s as a stray tap
+* `/manifest` and `/service-worker` are what make the browser offer "Add to
+  Home Screen". Their formats are pinned in `routes.rb` rather than negotiated
+  off the Accept header, which is Rails' default and 500s for a client asking
+  for `text/html`
+
+### Passwords
+
+A magic link is unusable on a phone mid-task — fetching a login link from email
+is exactly the friction this is meant to remove. So:
+
+* `has_secure_password validations: false` on `User`, because most users never
+  get a password (speakers are created with only a phone number) and the magic
+  link still works for everyone
+* signing in sets a **permanent signed cookie** holding a `remember_token`.
+  `Authentication#resume_session_from_cookie` uses it to repopulate
+  `session[:user_id]`, so everything already reading the session is unchanged
+* regenerating the token signs every device out; logout does this
+
+Set one at `/password/edit` after signing in by magic link once.
+
 ## Watching it
 
 `/admin/questions` shows the backlog, who is holding what, and whether each

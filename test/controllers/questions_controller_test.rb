@@ -33,7 +33,15 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @asker, question.asker
     assert_equal @speaker, question.speaker
     assert question.waiting?
-    assert_redirected_to questions_path
+    assert_redirected_to new_question_path
+  end
+
+  test "responds with a turbo stream so the PWA does not reload" do
+    post questions_url, params: {audio: audio_upload}, as: :turbo_stream
+
+    assert_response :success
+    assert_match "turbo-stream", response.media_type
+    assert_match dom_id(Question.last), response.body
   end
 
   test "will not create a question without audio" do

@@ -5,6 +5,7 @@ pin "@hotwired/turbo-rails", to: "turbo.js", preload: true
 pin "@hotwired/stimulus", to: "stimulus.js", preload: true
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
 pin_all_from "app/javascript/controllers", under: "controllers"
+pin "service_worker_registration"
 
 pin "process", to: "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/process-production.js"
 pin "util", to: "https://ga.jspm.io/npm:@jspm/core@2.0.0-beta.12/nodelibs/browser/util.js"

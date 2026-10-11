@@ -1,51 +1,63 @@
-<div class="container mx-auto px-4 py-8 max-w-2xl">
-  <h1 class="text-3xl font-bold mb-2">Cuir ceist</h1>
-  <p class="text-sm text-gray-500 mb-6">
-    Taifead do cheist agus freagróidh cainteoir dúchais í le teachtaireacht ghutha.
-  </p>
+<% content_for :head do %>
+  <style>
+    .mic-button { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    .mic-button.recording { transform: scale(0.96); }
+    /* Hidden at rest, or it sits opaque over the button and hides it. */
+    .mic-ring { opacity: 0; }
+    .mic-button.recording .mic-ring { animation: mic-pulse 1.4s ease-out infinite; }
+    @keyframes mic-pulse {
+      0%   { transform: scale(1);   opacity: 0.55; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+  </style>
+<% end %>
+
+<div class="max-w-md mx-auto px-4 py-8"
+     data-controller="voice-question"
+     data-voice-question-url-value="<%= questions_path %>">
 
   <% if @speaker.nil? %>
-    <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+    <div class="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-xl p-4 text-center">
       Níl aon chainteoir ag glacadh le ceisteanna faoi láthair.
     </div>
   <% else %>
-    <%= form_with url: questions_path, method: :post, local: true,
-                  class: "bg-white shadow rounded-lg p-6",
-                  data: { controller: "audio-recorder direct-upload" } do |form| %>
-
-      <%= form.file_field :audio, hidden: true, direct_upload: true,
-                          data: { target: "direct-upload.input" } %>
-
-      <div class="flex flex-wrap gap-3 items-center mb-4">
-        <button type="button"
-                class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50"
-                data-audio-recorder-target="recordButton"
-                data-action="audio-recorder#record">
-          Taifead
-        </button>
-
-        <button type="button"
-                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 disabled:opacity-50"
-                data-audio-recorder-target="stopButton"
-                data-action="audio-recorder#stop"
-                style="display: none;">
-          Stop
-        </button>
-      </div>
-
-      <p class="text-sm text-gray-600 mb-4">
-        Staid: <span data-audio-recorder-target="status">Réidh</span>
-        <span class="file-name"></span>
+    <div class="text-center">
+      <h1 class="text-2xl font-bold">Cuir ceist</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Freagróidh <%= @speaker.name %> le teachtaireacht ghutha.
       </p>
+    </div>
 
-      <% if @question.errors.any? %>
-        <div class="bg-red-50 border border-red-200 text-red-800 rounded p-3 mb-4 text-sm">
-          <%= @question.errors.full_messages.to_sentence %>
-        </div>
-      <% end %>
+    <%# The whole interaction. Press, speak, release. %>
+    <div class="flex flex-col items-center justify-center my-10 select-none">
+      <button type="button"
+              class="mic-button relative w-44 h-44 rounded-full bg-emerald-800 text-white shadow-lg
+                     flex items-center justify-center transition-transform
+                     focus:outline-none focus:ring-4 focus:ring-emerald-300"
+              aria-label="Coinnigh síos chun ceist a thaifeadadh"
+              data-voice-question-target="button"
+              data-action="pointerdown->voice-question#start
+                           pointerup->voice-question#stop
+                           pointercancel->voice-question#stop
+                           pointerleave->voice-question#stop
+                           contextmenu->voice-question#stop">
+        <span class="mic-ring absolute inset-0 rounded-full bg-emerald-500"></span>
+        <svg class="relative w-16 h-16" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z"/>
+          <path d="M5.5 9.5a.75.75 0 00-1.5 0 6 6 0 005.25 5.954V17H7.5a.75.75 0 000 1.5h5a.75.75 0 000-1.5h-1.75v-1.546A6 6 0 0016 9.5a.75.75 0 00-1.5 0 4.5 4.5 0 01-9 0z"/>
+        </svg>
+      </button>
 
-      <%= form.submit "Seol chuig #{@speaker.name}",
-                      class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
-    <% end %>
+      <p class="mt-5 text-base text-gray-700 min-h-6" data-voice-question-target="status"></p>
+      <p class="mt-1 text-sm tabular-nums text-gray-400 min-h-5" data-voice-question-target="timer"></p>
+    </div>
   <% end %>
+
+  <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Ceisteanna</h2>
+  <div id="questions" class="space-y-3">
+    <%= render partial: "questions/question", collection: @questions, as: :question %>
+  </div>
+  <p id="questions_empty" class="text-sm text-gray-400 <%= "hidden" if @questions.any? %>">
+    Níl aon cheist curtha agat go fóill.
+  </p>
 </div>

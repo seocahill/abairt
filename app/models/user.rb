@@ -3,13 +3,21 @@
 class User < ApplicationRecord
   has_secure_token :api_token
   has_secure_token :login_token
+  # Backs the long-lived "stay signed in" cookie. Regenerating it signs every
+  # device out, which is the only revocation a permanent cookie can have.
+  has_secure_token :remember_token
+
+  # validations: false because most users never get a password — speakers are
+  # created by hand with only a phone number, and the magic link still works
+  # for everyone else. Length is enforced below, only when one is being set.
+  has_secure_password validations: false
 
   belongs_to :location, optional: true
 
-  has_many :dictionary_entries #, foreign_key: :speaker_id
+  has_many :dictionary_entries # , foreign_key: :speaker_id
   has_many :spoken_dictionary_entries, foreign_key: :speaker_id, class_name: "DictionaryEntry"
   has_many :voice_recordings, -> { distinct }, through: :dictionary_entries
-  has_many :spoken_voice_recordings, -> { distinct }, through: :spoken_dictionary_entries,  class_name: "VoiceRecording", source: :voice_recording
+  has_many :spoken_voice_recordings, -> { distinct }, through: :spoken_dictionary_entries, class_name: "VoiceRecording", source: :voice_recording
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
@@ -20,39 +28,25 @@ class User < ApplicationRecord
   has_many :questions, foreign_key: :asker_id
   has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
 
-  enum :role, [
-    :student,
-    :speaker,
-    :teacher,
-    :admin,
-    :ai,
-    :place,
-    :temporary,
-    :api_user
-  ]
+  enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
   # WhatsApp identifies people by E.164 digits with no leading "+".
   normalizes :phone_number, with: ->(number) { number.to_s.gsub(/\D/, "").presence }
 
-  enum :voice, [:male, :female]
-  enum :dialect, [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
+  enum :voice, {male: 0, female: 1}
+  enum :dialect, {tuaisceart_mhaigh_eo: 0, "connacht_\u00F3_thuaidh": 1, acaill: 2, "l\u00E1r_chonnachta": 3, "can\u00FAint\u00ED_eile": 4}
   # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
-  enum :ability, %i[
-    A1
-    A2
-    B1
-    B2
-    C1
-    C2
-    native
-  ]
+  enum :ability, {A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5, native: 6}
 
   # Speakers are onboarded by phone and never touch a web form, so they have a
   # number instead of an email address.
   validates :email, presence: true, unless: -> { phone_number.present? }
   validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
   validates :phone_number, uniqueness: true, allow_nil: true
+  validates :password, length: {minimum: 8}, allow_nil: true
+  # has_secure_password(validations: false) skips this too, but the setter exists.
+  validates :password, confirmation: true, allow_nil: true
   validates :name, presence: true
-  validates :role, exclusion: { in: %w(teacher api_user admin) }, if: -> { role_changed? && Current.user&.admin? == false }
+  validates :role, exclusion: {in: %w[teacher api_user admin]}, if: -> { role_changed? && Current.user&.admin? == false }
 
   scope :active, -> { where.not(role: :temporary) }
   scope :answering, -> { where(answers_questions: true).where.not(phone_number: nil) }
@@ -65,7 +59,7 @@ class User < ApplicationRecord
     name_ids = []
     begin
       # Escape special FTS characters and quote the query
-      escaped_query = query.gsub(/["'\\]/, '')
+      escaped_query = query.gsub(/["'\\]/, "")
       name_ids = FtsUser.where("fts_users MATCH ?", escaped_query).pluck(:rowid) if escaped_query.present?
     rescue ActiveRecord::StatementInvalid
       # If FTS query fails, fall back to LIKE for name

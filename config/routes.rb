@@ -180,6 +180,16 @@ Rails.application.routes.draw do
 
   resources :login_requests, only: [:new, :create]
 
+  resource :password, only: [:edit, :update]
+
+  # Progressive web app: the learner installs this to the home screen so asking
+  # a question is tap, hold, release.
+  # Formats are pinned rather than negotiated: Rails' stock version of these
+  # routes resolves the template off the Accept header, which 500s for a client
+  # that asks for text/html.
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest, defaults: {format: :json}
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker, defaults: {format: :js}
+
   get 'home', to: 'home#index'
 
   # API Documentation
