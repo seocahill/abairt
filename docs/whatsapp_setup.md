@@ -64,8 +64,25 @@ Add under `whatsapp:` in `rails credentials:edit`, or as environment variables:
 | `verify_token` | `WHATSAPP_VERIFY_TOKEN` | Any string; used once at subscription |
 | `api_version` | `WHATSAPP_API_VERSION` | Optional, defaults to `v23.0` |
 
-The number connected to the Cloud API **cannot** also be used in the normal
-WhatsApp app. It must be a number nobody uses personally.
+#### Two numbers, and only one of them is special
+
+| | |
+|---|---|
+| **The Abairt number** | The one the API owns and sends from. Dedicated — registering a number with the Cloud API requires deleting its consumer WhatsApp account first, so this can never be a line anyone uses personally. |
+| **The speaker's number** | Entirely ordinary and entirely unchanged. They are a recipient: a voice note arrives from the Abairt contact in their normal WhatsApp and they hold the mic to reply. They register nothing with Meta and install nothing. |
+
+Only the first one has a constraint. Nothing in this design asks a speaker to
+change their number, their app, or anything else.
+
+(Coexistence — one number on both the app and the API — does not help here. It
+covers the WhatsApp *Business* app, not the consumer app that speakers use.)
+
+A physical pay-as-you-go SIM is the reliable way to get the Abairt number. It
+has to be able to **receive** an SMS or a voice call, because that is how Meta
+verifies ownership; outbound-only virtual numbers cannot be registered at all,
+and VoIP numbers are hit and miss. An Irish number also simply looks right to
+the person receiving it. Keep the SIM alive so the carrier never recycles the
+number out from under the registration.
 
 ### 2. Webhook
 
