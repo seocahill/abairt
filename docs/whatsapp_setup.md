@@ -142,6 +142,20 @@ button, let go.** The question uploads on release; there is no send step.
   off the Accept header, which is Rails' default and 500s for a client asking
   for `text/html`
 
+### What it looks like
+
+| | | |
+|---|---|---|
+| ![Sign in](screenshots/1-sign-in.png) | ![Ask](screenshots/2-ask.png) | ![Recording](screenshots/3-recording.png) |
+| Password first, magic link below | The whole learner side | Held down |
+| ![Sent](screenshots/4-sent.png) | ![Answers](screenshots/5-answers.png) | ![Password](screenshots/6-password.png) |
+| Sent on release | Answers play in place | Set a password once |
+
+The founder's view of the queue, at `/admin/questions` — who is holding what,
+whether each speaker's 24 hour window is open, and a manual nudge:
+
+![Admin backlog](screenshots/7-admin-backlog.png)
+
 ### Passwords
 
 A magic link is unusable on a phone mid-task — fetching a login link from email

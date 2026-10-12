@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # Essential gems
-ruby '~> 3.4'
+ruby '>= 3.3'
 gem 'bcrypt', '~> 3.1.7'
 gem 'puma', '~> 6.0'
 gem 'rails', '~> 8.1.0'
