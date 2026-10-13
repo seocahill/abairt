@@ -15,6 +15,8 @@ class QuestionQueueTest < ActiveSupport::TestCase
       content_type: "audio/mpeg"
     )
     question.save!
+    # The queue only ever sees questions the learner has actually sent.
+    question.send_to_speaker!
     question
   end
 
@@ -51,6 +53,20 @@ class QuestionQueueTest < ActiveSupport::TestCase
     @queue.deliver_next
 
     assert question.reload.waiting?
+  end
+
+  test "ignores drafts the learner has not sent" do
+    draft = Question.new(asker: users(:two), speaker: @speaker)
+    draft.audio.attach(
+      io: Rails.root.join("test/fixtures/files/sample.mp3").open,
+      filename: "sample.mp3",
+      content_type: "audio/mpeg"
+    )
+    draft.save!
+    Whatsapp::DeliverQuestion.any_instance.expects(:call).never
+
+    assert_nil @queue.deliver_next
+    assert draft.reload.draft?
   end
 
   test "outstanding returns the question the speaker is holding" do

@@ -34,8 +34,26 @@ class QuestionTest < ActiveSupport::TestCase
     assert_includes question.errors[:speaker], "is not taking questions"
   end
 
-  test "starts out waiting" do
-    assert build_question.waiting?
+  test "starts out a draft, not queued" do
+    assert build_question.draft?
+  end
+
+  test "send_to_speaker! moves a draft into the queue" do
+    question = build_question
+    question.save!
+
+    assert question.send_to_speaker!
+    assert question.waiting?
+  end
+
+  test "send_to_speaker! refuses anything that is not a draft" do
+    question = build_question
+    question.save!
+    question.send_to_speaker!
+
+    # A second tap, or a replayed request, must not re-queue it.
+    assert_not question.send_to_speaker!
+    assert question.waiting?
   end
 
   test "mark_sent! records the whatsapp message id" do

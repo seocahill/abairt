@@ -7,6 +7,19 @@
     <%= render "questions/status", question: question %>
   </div>
 
+  <% if question.draft? %>
+    <%# Listen back before it goes anywhere. %>
+    <audio controls preload="metadata" class="w-full mt-3" src="<%= url_for(question.audio) %>"></audio>
+
+    <div class="flex gap-2 mt-3">
+      <%= button_to "Seol", question_delivery_path(question), method: :post,
+            class: "flex-1 px-4 py-2 bg-emerald-800 text-white rounded-lg hover:bg-emerald-900 text-sm font-medium" %>
+      <%= button_to "Scrios", question_path(question), method: :delete,
+            form: { data: { turbo_confirm: "Scrios an taifeadadh seo?" } },
+            class: "px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm" %>
+    </div>
+  <% end %>
+
   <% if question.answer_audio.attached? %>
     <audio controls preload="none" class="w-full mt-3" src="<%= url_for(question.answer_audio) %>"></audio>
   <% end %>

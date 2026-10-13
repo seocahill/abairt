@@ -12,6 +12,14 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     fixture_file_upload("test/fixtures/files/sample.mp3", "audio/mpeg")
   end
 
+  def create_draft(asker: @asker)
+    question = Question.new(asker: asker, speaker: @speaker)
+    question.audio.attach(io: Rails.root.join("test/fixtures/files/sample.mp3").open,
+      filename: "sample.mp3", content_type: "audio/mpeg")
+    question.save!
+    question
+  end
+
   test "should get index" do
     get questions_url
     assert_response :success
@@ -22,9 +30,9 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "creates a question and pokes the speaker's queue" do
+  test "records a draft without sending it anywhere" do
     assert_difference("Question.count", 1) do
-      assert_enqueued_with(job: DeliverNextQuestionJob) do
+      assert_no_enqueued_jobs only: DeliverNextQuestionJob do
         post questions_url, params: {audio: audio_upload}
       end
     end
@@ -32,8 +40,49 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     question = Question.last
     assert_equal @asker, question.asker
     assert_equal @speaker, question.speaker
-    assert question.waiting?
+    assert question.draft?
     assert_redirected_to new_question_path
+  end
+
+  test "sending a draft queues it for the speaker" do
+    question = create_draft
+
+    assert_enqueued_with(job: DeliverNextQuestionJob) do
+      post question_delivery_url(question)
+    end
+
+    assert question.reload.waiting?
+    assert_redirected_to new_question_path
+  end
+
+  test "sending twice does not queue it twice" do
+    question = create_draft
+    post question_delivery_url(question)
+
+    assert_no_enqueued_jobs only: DeliverNextQuestionJob do
+      post question_delivery_url(question)
+    end
+
+    assert question.reload.waiting?
+  end
+
+  test "deletes a draft" do
+    question = create_draft
+
+    assert_difference("Question.count", -1) do
+      delete question_url(question)
+    end
+  end
+
+  test "will not send or delete someone else's question" do
+    theirs = create_draft(asker: users(:three))
+
+    post question_delivery_url(theirs)
+    assert_response :not_found
+
+    assert_no_difference("Question.count") do
+      delete question_url(theirs)
+    end
   end
 
   test "responds with a turbo stream so the PWA does not reload" do

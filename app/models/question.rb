@@ -14,12 +14,22 @@ class Question < ApplicationRecord
   has_one_attached :audio
   has_one_attached :answer_audio
 
-  enum :status, {waiting: 0, sent: 1, answered: 2}
+  # draft -> waiting -> sent -> answered. A recording stays a draft until the
+  # learner has listened back and sent it; only then does it join the queue.
+  enum :status, {draft: 0, waiting: 1, sent: 2, answered: 3}
 
   validates :audio, presence: true
   validate :speaker_answers_questions, on: :create
 
   scope :oldest_first, -> { order(created_at: :asc) }
+
+  # Joins the queue. Returns false if it is not a draft, so a double tap or a
+  # replayed request cannot queue the same recording twice.
+  def send_to_speaker!
+    return false unless draft?
+
+    update!(status: :waiting)
+  end
 
   def mark_sent!(wa_message_id)
     update!(status: :sent, sent_at: Time.current, wa_question_message_id: wa_message_id)

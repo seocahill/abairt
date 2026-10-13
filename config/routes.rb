@@ -199,7 +199,10 @@ Rails.application.routes.draw do
 
   resources :practice_recordings, only: [:create]
 
-  resources :questions, only: [:index, :new, :create, :show]
+  resources :questions, only: [:index, :new, :create, :show, :destroy] do
+    # A draft is sent by creating its delivery.
+    resource :delivery, only: [:create], module: :questions
+  end
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # health

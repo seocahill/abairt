@@ -254,6 +254,7 @@ CREATE UNIQUE INDEX "index_questions_on_wa_answer_message_id" ON "questions" ("w
 CREATE UNIQUE INDEX "index_users_on_phone_number" ON "users" ("phone_number");
 CREATE UNIQUE INDEX "index_users_on_remember_token" ON "users" ("remember_token");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261013120000'),
 ('20261011120000'),
 ('20260914120001'),
 ('20260914120000'),

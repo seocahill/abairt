@@ -91,7 +91,7 @@ export default class extends Controller {
       if (!response.ok) throw new Error(response.status)
 
       Turbo.renderStreamMessage(await response.text())
-      this.setStatus("Seolta. Gheobhaidh tú freagra go luath.", "sent")
+      this.setStatus("Éist leis, ansin seol é.", "recorded")
     } catch (error) {
       // The recording is gone at this point, so say so plainly rather than
       // pretending it is queued.

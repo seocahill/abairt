@@ -27,11 +27,13 @@ class QuestionsController < ApplicationController
     @question.audio.attach(params[:audio]) if params[:audio].present?
     authorize @question
 
+    # Saved as a draft, not sent. The learner listens back first — a recording
+    # made one-handed is often not the question they meant to ask, and once a
+    # question costs credits, sending unheard is the wrong default.
     if @question.save
-      DeliverNextQuestionJob.perform_later(@question.speaker)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to new_question_path, notice: "Seolta. Gheobhaidh tú freagra go luath." }
+        format.html { redirect_to new_question_path, notice: "Taifeadta. Éist leis sula seolann tú é." }
       end
     else
       respond_to do |format|
@@ -42,6 +44,17 @@ class QuestionsController < ApplicationController
           render :new, status: :unprocessable_entity
         end
       end
+    end
+  end
+
+  def destroy
+    question = current_user.questions.find(params[:id])
+    authorize question
+    question.destroy
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(question) }
+      format.html { redirect_to new_question_path, notice: "Scriosta." }
     end
   end
 

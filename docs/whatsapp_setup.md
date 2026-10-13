@@ -137,6 +137,10 @@ button, let go.** The question uploads on release; there is no send step.
 * `/questions/new` is the one screen, and the PWA's `start_url`
 * `voice_question_controller.js` is the press-and-release interaction. It
   auto-stops at 60 seconds and discards anything under 0.4s as a stray tap
+* releasing the button records a **draft**, it does not send. The learner plays
+  it back and then taps Seol or Scrios. A recording made one-handed is often not
+  the question you meant to ask, and once a question costs credits, sending
+  unheard is the wrong default. Sending is `POST /questions/:id/delivery`
 * `/manifest` and `/service-worker` are what make the browser offer "Add to
   Home Screen". Their formats are pinned in `routes.rb` rather than negotiated
   off the Accept header, which is Rails' default and 500s for a client asking
