@@ -23,9 +23,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef ffmpeg
+      # Plain apt-get: cache-apt-pkgs-action skips update-alternatives, so
+      # a cached ffmpeg can't find libblas.so.3.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
