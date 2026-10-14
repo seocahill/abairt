@@ -3,11 +3,11 @@
 module Whatsapp
   # Sends one question to the speaker as a voice note.
   #
-  #   Whatsapp::DeliverQuestion.new(question).call # => wamid, or nil
+  #   Whatsapp::DeliverQuestion.new(question).call # => message id, or nil
   #
-  # Returns the WhatsApp message id when the question actually reached them,
-  # and nil when it did not — in which case the question stays `waiting` and
-  # will go out on the next attempt.
+  # Returns the message id when the question actually reached them, and nil when
+  # it did not — in which case the question stays `waiting` and will go out on
+  # the next attempt.
   #
   # The nil case is the 24 hour window. WhatsApp only allows free-form messages
   # (audio included) within 24 hours of the speaker's last message to us, and
@@ -29,9 +29,9 @@ module Whatsapp
     def call
       return nudge unless @speaker.whatsapp_window_open?
 
-      media_id = upload
-      @client.send_audio(to: @speaker.phone_number, media_id: media_id)
-    rescue Client::Error, AudioForWhatsapp::TranscodeError => e
+      wamid = @client.send_audio(to: @speaker.phone_number, media_id: upload)
+      "whatsapp:#{wamid}"
+    rescue Client::Error, OpusVoiceNote::TranscodeError => e
       # Leave the question waiting rather than wedging the queue on one bad file.
       Rails.logger.error("DeliverQuestion failed for Question##{@question.id}: #{e.message}")
       nil
@@ -40,7 +40,7 @@ module Whatsapp
     private
 
     def upload
-      AudioForWhatsapp.new(@question.audio).open do |path|
+      OpusVoiceNote.new(@question.audio).open do |path|
         @client.upload_media(path)
       end
     end

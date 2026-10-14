@@ -65,3 +65,15 @@ whatsapp_speaker:
   answers_questions: true
   whatsapp_opted_in_at: <%= 1.month.ago.to_fs(:db) %>
   whatsapp_last_inbound_at: <%= 1.hour.ago.to_fs(:db) %>
+
+# answers_questions is off so that routing stays deterministic for every test
+# that does not care about Telegram; the ones that do turn it on.
+telegram_speaker:
+  name: Bríd Ní Mhaoldomhnaigh
+  role: speaker
+  ability: native
+  confirmed: true
+  phone_number: "353871112222"
+  answers_questions: false
+  channel: 1
+  telegram_chat_id: "99887766"

@@ -7,6 +7,11 @@ to the learner as the answer.
 The speaker's entire interface is WhatsApp. They never see a web page, never log
 in, never type a command. Everything below exists to keep it that way.
 
+One of two transports a speaker can be on, and the more demanding one to set up.
+Telegram is the other (`telegram_setup.md`), and `speaker_transport.md` is why
+there are two and which to reach for. A speaker's `channel` decides, so one can
+be on each at the same time.
+
 ## The one rule
 
 **A speaker holds one question at a time.** They are not sent a second question
@@ -26,10 +31,16 @@ for them to get wrong.
 | `Question` | asker, speaker, the question audio, the answer audio, status |
 | `QuestionQueue` | one at a time — sends the next question if the speaker is free |
 | `QuestionRouter` | picks the speaker with the shortest backlog |
+| `QuestionTransport` | picks WhatsApp or Telegram from the speaker's `channel` |
 | `Whatsapp::Client` | the four Cloud API calls this app makes |
-| `Whatsapp::ProcessInbound` | decides whether an inbound message is an answer |
+| `Whatsapp::InboundMessage` | one message, and who sent it |
 | `Whatsapp::DeliverQuestion` | sends a question, or nudges when the window is shut |
-| `Whatsapp::AudioForWhatsapp` | guarantees ogg/opus |
+| `ProcessInbound` | shared with Telegram — decides what arriving means |
+| `RecordAnswer` | shared — files a voice note as the answer |
+| `OpusVoiceNote` | shared — guarantees ogg/opus |
+
+Only the `Whatsapp::` three know what transport this is. Everything else is
+shared, which is what made adding Telegram small.
 
 ## Two platform constraints that shape the design
 
@@ -46,9 +57,11 @@ never sees a nudge.
 
 **ogg/opus or nothing.** WhatsApp renders ogg/opus as a playable voice bubble
 and every other format as a file attachment. A file attachment is a dead end for
-an elderly user, so `Whatsapp::AudioForWhatsapp` is not optional. Browsers record
-webm/opus, which is the same audio in a different container, so the usual case is
-a stream copy rather than a re-encode. Requires `ffmpeg` with `libopus`.
+an elderly user, so `OpusVoiceNote` is not optional. Browsers record webm/opus,
+which is the same audio in a different container, so the usual case is a stream
+copy rather than a re-encode. Requires `ffmpeg` with `libopus`. Telegram's
+`sendVoice` wants exactly the same thing, which is why this carried over
+unchanged.
 
 ## Setting it up
 
@@ -125,21 +138,17 @@ the button does the work.
 
 ### 4. The speaker
 
-Created in admin by hand — they never fill in a form:
-
-```ruby
-User.create!(
-  name: "...",
-  phone_number: "353861234567",   # E.164, no +
-  role: :speaker,
-  answers_questions: true,
-  whatsapp_opted_in_at: Time.current,
-  confirmed: true
-)
-```
+Created in admin: **Users → New User**. A name, their phone number, *Takes
+questions* checked, and the channel left on WhatsApp. They never fill in a form
+themselves — this is the only place a speaker can come from.
 
 Meta requires demonstrable opt-in but does not care which channel it came
-through, so consent gathered on a phone call is fine — record when and how.
+through, so consent gathered on a phone call is fine. Record when and how in
+`whatsapp_opted_in_at`, which is the one field the form does not expose:
+
+```ruby
+User.find_by(phone_number: "353861234567").update!(whatsapp_opted_in_at: Time.current)
+```
 
 Speakers have no email address and no password. There is nothing for them to
 forget.

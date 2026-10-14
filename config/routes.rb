@@ -48,6 +48,10 @@ Rails.application.routes.draw do
     get "whatsapp/webhook", to: "whatsapp/webhooks#show"
     post "whatsapp/webhook", to: "whatsapp/webhooks#create"
 
+    # Telegram Bot API webhook. No handshake to answer: setWebhook is a one-off
+    # call at setup, and the secret comes back in a header on every delivery.
+    post "telegram/webhook", to: "telegram/webhooks#create"
+
     # Speech to Text API endpoint
     post 'speech_to_text', to: 'speech_to_text#create'
 
@@ -140,7 +144,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :users, only: [:index, :show, :edit, :update, :destroy] do
+    resources :users, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
       member do
         post :approve
         post :reject

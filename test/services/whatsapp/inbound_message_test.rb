@@ -21,7 +21,7 @@ class Whatsapp::InboundMessageTest < ActiveSupport::TestCase
     assert_equal 1, messages.size
     message = messages.first
     assert message.audio?
-    assert_equal "wamid.abc", message.id
+    assert_equal "whatsapp:wamid.abc", message.id
     assert_equal "353861234567", message.from
     assert_equal "media-123", message.audio_media_id
   end

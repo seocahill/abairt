@@ -29,8 +29,19 @@ class User < ApplicationRecord
   has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
 
   enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
-  # WhatsApp identifies people by E.164 digits with no leading "+".
+  # How a speaker receives questions. Only read for speakers; everyone else
+  # carries the default and ignores it.
+  enum :channel, {whatsapp: 0, telegram: 1}
+  # `capitalize` would render WhatsApp as "Whatsapp".
+  CHANNEL_LABELS = {"whatsapp" => "WhatsApp", "telegram" => "Telegram"}.freeze
+  # Both transports identify people by E.164 digits with no leading "+", and
+  # Telegram's shared contact cards arrive with one.
   normalizes :phone_number, with: ->(number) { number.to_s.gsub(/\D/, "").presence }
+  # An empty string from the admin form would otherwise count as an address: it
+  # satisfies `IS NOT NULL` in the `answering` scope, so the speaker would be
+  # routed questions that could never be delivered — and a second blank one
+  # would collide on the unique index.
+  normalizes :telegram_chat_id, with: ->(id) { id.to_s.strip.presence }
 
   enum :voice, {male: 0, female: 1}
   enum :dialect, {tuaisceart_mhaigh_eo: 0, "connacht_\u00F3_thuaidh": 1, acaill: 2, "l\u00E1r_chonnachta": 3, "can\u00FAint\u00ED_eile": 4}
@@ -49,7 +60,16 @@ class User < ApplicationRecord
   validates :role, exclusion: {in: %w[teacher api_user admin]}, if: -> { role_changed? && Current.user&.admin? == false }
 
   scope :active, -> { where.not(role: :temporary) }
-  scope :answering, -> { where(answers_questions: true).where.not(phone_number: nil) }
+  # A speaker is only answering if we hold the address their channel needs —
+  # otherwise the queue would pick them and have nowhere to send to. Checked per
+  # channel rather than with a loose "either column is set".
+  scope :answering, -> {
+    where(answers_questions: true).where(
+      "(users.channel = :whatsapp AND users.phone_number IS NOT NULL) OR " \
+      "(users.channel = :telegram AND users.telegram_chat_id IS NOT NULL)",
+      whatsapp: channels[:whatsapp], telegram: channels[:telegram]
+    )
+  }
   scope :with_api_token, -> { where.not(api_token: nil) }
   scope :pending, -> { where(confirmed: false) }
   scope :by_role, ->(role) { where(role: role) if role.present? && roles.key?(role) }
@@ -71,6 +91,10 @@ class User < ApplicationRecord
 
   # WhatsApp only allows free-form messages (audio included) within 24 hours of
   # the person's last message to us. Outside it, all we may send is a template.
+  def channel_label
+    CHANNEL_LABELS.fetch(channel)
+  end
+
   def whatsapp_window_open?
     whatsapp_last_inbound_at.present? && whatsapp_last_inbound_at > 24.hours.ago
   end

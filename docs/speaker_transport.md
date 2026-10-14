@@ -62,12 +62,16 @@ two to raise its floor under him.
 
 ### Telegram becomes the Abairt app
 
-The useful accident: if his Telegram contains exactly one chat, the invariant
-the whole design rests on — *whatever voice note comes back is the answer to the
-one question he holds* — is enforced by the device rather than only by our
-queue. He opens it, there is one thing in it, he replies. There is no wrong
-thread to reply in, and every notification he ever gets from it is a learner's
-question rather than one banner among forty.
+The useful accident: if his Telegram contains essentially one chat, there is no
+wrong thread to reply in, and every notification he ever gets from it is a
+learner's question rather than one banner among forty.
+
+Not *exactly* one chat, and not an enforcement mechanism — registering creates a
+Telegram service chat, which is where his login code arrives, and Saved Messages
+sits alongside it. The invariant the design rests on — *whatever voice note
+comes back is the answer to the one question he holds* — is still `QuestionQueue`
+and nothing else. What the single chat buys is that he cannot plausibly reply in
+the wrong place, which is a usability property, not a correctness one.
 
 Set the bot's name to Abairt with `/setname`, give it the logo with
 `/setuserpic`, and leave `/setcommands` empty so there is no slash menu. The
@@ -79,22 +83,34 @@ word Telegram barely appears.
 2. **Deny the contacts permission.** Allow it and Telegram trawls his address
    book, finds people he knows and starts showing suggestions — and it stops
    being a single-purpose app.
-3. Open `t.me/<bot>` and tap **Start**. A bot cannot message someone who has
+3. **Lock down who can reach him.** Settings → Privacy: messages, calls and
+   group invites to Nobody or My Contacts. The default is everybody, and a fresh
+   number attracts spam — a likelier way this stops being a single-purpose app
+   than the contacts permission is.
+4. Open `t.me/<bot>` and tap **Start**. A bot cannot message someone who has
    not started it, so this is the opt-in, and it is better than Meta's rules:
    the consent *is* the mechanism, and it happens in front of you.
-4. **Tap Allow on the notification prompt.** The main failure mode — dismissing
+5. **Tap the one button that shares his number.** This is what connects his chat
+   to the speaker record: the number is matched against the one we already hold.
+   Telegram vouches for it, so it is better evidence than anything he could
+   type, and a contact card describing somebody else is refused.
+6. **Tap Allow on the notification prompt.** The main failure mode — dismissing
    prompts is a reflex. Push is APNs/FCM, so it arrives whether the app is
    running or not, but only if this is granted.
-5. Check the phone is not silent, and not caught in a Focus mode or iOS's
+7. Check the phone is not silent, and not caught in a Focus mode or iOS's
    Scheduled Summary.
-6. On Android, exclude Telegram from battery optimisation. Stock Android
+8. On Android, exclude Telegram from battery optimisation. Stock Android
    honours high-priority FCM in Doze, but manufacturer skins restrict apps that
    are rarely opened. Verify on the actual handset.
-7. Send a test question and watch it land. Then leave it an hour and send a
+9. Send a test question and watch it land. Then leave it an hour and send a
    second one cold, which is what catches the battery manager.
-8. Optional: a Shortcuts icon named "Abairt" opening `tg://resolve?domain=<bot>`
-   puts it on his home screen under the right name. Android does chat shortcuts
-   natively.
+10. Optional: a Shortcuts icon named "Abairt" opening `tg://resolve?domain=<bot>`
+    puts it on his home screen under the right name. Android does chat shortcuts
+    natively.
+
+Until step 5 there is no chat id, so `User.answering` leaves him out and nothing
+is routed to him — a question with nowhere to go would otherwise sit `waiting`
+with no explanation.
 
 ## The alternatives, and why they lost
 
@@ -125,11 +141,26 @@ silent loss of an answer is the one failure that would stop him bothering.
 
 **SMS/MMS.** Dead for audio. **RCS.** Google verification, Android only.
 
-## Not decided
+## Decided since
+
+**The channel is a `channel` enum on `User` plus a `telegram_chat_id`**, which
+is built. `QuestionTransport` is the only thing that reads it, so one speaker
+can be on Telegram and another on WhatsApp with the queue unchanged.
+
+`ProcessInbound`, `RecordAnswer` and the audio guarantee turned out to be
+genuinely shared rather than WhatsApp-shaped — what differs between the two
+transports is only who a sender is, how to fetch their audio, and what an
+unknown sender means, all of which the message object answers. The nudge and the
+24 hour window stayed behind in `Whatsapp::` where they belong.
+
+One wrinkle worth knowing: `getUpdates` and `setWebhook` are mutually exclusive,
+so local development needs `deleteWebhook` first — or, better, a second bot.
+
+## Still not decided
 
 - Whether to keep the WhatsApp adapter. It costs nothing to carry and is worth
   having if these trade-offs shift. Stripping it is easy if not.
 - Payments. `send_to_speaker!` is the chokepoint a balance check hangs off.
-- Whether a speaker's channel is a `channel` enum on `User` plus a
-  `telegram_chat_id`, which would let one speaker be on Telegram and another on
-  a phone line with the queue unchanged.
+- Whether to keep a call-in line in reserve. The audio argument against it has
+  not changed, but it remains the only option that asks nothing at all of the
+  speaker.

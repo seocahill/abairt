@@ -5,7 +5,7 @@ class ProcessWhatsappMessageJob < ApplicationJob
 
   def perform(payload)
     Whatsapp::InboundMessage.from_payload(payload).each do |message|
-      Whatsapp::ProcessInbound.new(message).call
+      ProcessInbound.new(message).call
     end
   end
 end

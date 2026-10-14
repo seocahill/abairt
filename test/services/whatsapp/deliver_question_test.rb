@@ -19,7 +19,7 @@ class Whatsapp::DeliverQuestionTest < ActiveSupport::TestCase
     @client.expects(:upload_media).returns("media-1")
     @client.expects(:send_audio).with(to: @speaker.phone_number, media_id: "media-1").returns("wamid.abc")
 
-    assert_equal "wamid.abc", Whatsapp::DeliverQuestion.new(@question, client: @client).call
+    assert_equal "whatsapp:wamid.abc", Whatsapp::DeliverQuestion.new(@question, client: @client).call
   end
 
   test "nudges with a template instead when the window is shut" do

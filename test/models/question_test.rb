@@ -56,14 +56,25 @@ class QuestionTest < ActiveSupport::TestCase
     assert question.waiting?
   end
 
-  test "mark_sent! records the whatsapp message id" do
+  test "mark_sent! records the transport's message id" do
     question = build_question
     question.save!
 
-    question.mark_sent!("wamid.abc")
+    question.mark_sent!("whatsapp:wamid.abc")
 
     assert question.sent?
-    assert_equal "wamid.abc", question.wa_question_message_id
+    assert_equal "whatsapp:wamid.abc", question.question_message_id
     assert_not_nil question.sent_at
+  end
+
+  test "mark_answered! records the transport's message id" do
+    question = build_question
+    question.save!
+
+    question.mark_answered!("telegram:99887766:42")
+
+    assert question.answered?
+    assert_equal "telegram:99887766:42", question.answer_message_id
+    assert_not_nil question.answered_at
   end
 end

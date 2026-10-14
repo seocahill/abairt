@@ -12,7 +12,7 @@ module Whatsapp
 
     BASE_URL = "https://graph.facebook.com"
 
-    class Error < StandardError; end
+    class Error < TransportError; end
 
     def initialize
       @access_token = credential(:access_token, "WHATSAPP_ACCESS_TOKEN")

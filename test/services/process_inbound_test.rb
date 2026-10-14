@@ -1,6 +1,8 @@
 require "test_helper"
 
-class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
+# The WhatsApp half of the shared ProcessInbound. Telegram's is in
+# test/services/telegram/process_inbound_test.rb and exercises the same class.
+class ProcessInboundTest < ActiveSupport::TestCase
   def setup
     @speaker = users(:whatsapp_speaker)
     Question.delete_all
@@ -31,12 +33,12 @@ class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
     Whatsapp::Client.any_instance.stubs(:download_media).returns("ogg-bytes")
     Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns(nil)
 
-    Whatsapp::ProcessInbound.new(inbound({})).call
+    ProcessInbound.new(inbound({})).call
 
     question.reload
     assert question.answered?
     assert question.answer_audio.attached?
-    assert_equal "wamid.abc", question.wa_answer_message_id
+    assert_equal "whatsapp:wamid.abc", question.answer_message_id
   end
 
   test "answering releases the next question in the queue" do
@@ -45,7 +47,7 @@ class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
     Whatsapp::Client.any_instance.stubs(:download_media).returns("ogg-bytes")
     Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns("wamid.next")
 
-    Whatsapp::ProcessInbound.new(inbound({})).call
+    ProcessInbound.new(inbound({})).call
 
     assert waiting.reload.sent?
   end
@@ -55,7 +57,7 @@ class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
     waiting = create_question
     Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns("wamid.next")
 
-    Whatsapp::ProcessInbound.new(inbound("type" => "button", "button" => {"text" => "Tá mé réidh"})).call
+    ProcessInbound.new(inbound("type" => "button", "button" => {"text" => "Tá mé réidh"})).call
 
     assert @speaker.reload.whatsapp_window_open?
     assert waiting.reload.sent?
@@ -66,7 +68,7 @@ class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
     Whatsapp::Client.any_instance.expects(:download_media).never
     Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns("wamid.next")
 
-    Whatsapp::ProcessInbound.new(inbound({})).call
+    ProcessInbound.new(inbound({})).call
 
     assert waiting.reload.sent?
   end
@@ -75,7 +77,7 @@ class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
     Whatsapp::DeliverQuestion.any_instance.expects(:call).never
 
     assert_nothing_raised do
-      Whatsapp::ProcessInbound.new(inbound("from" => "353869999999")).call
+      ProcessInbound.new(inbound("from" => "353869999999")).call
     end
   end
 
@@ -84,7 +86,7 @@ class Whatsapp::ProcessInboundTest < ActiveSupport::TestCase
     Whatsapp::Client.any_instance.stubs(:download_media).returns("ogg-bytes")
     Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns(nil)
 
-    2.times { Whatsapp::ProcessInbound.new(inbound({})).call }
+    2.times { ProcessInbound.new(inbound({})).call }
 
     assert_equal 1, question.reload.answer_audio.attachments.size
   end

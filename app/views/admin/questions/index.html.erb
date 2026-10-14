@@ -2,7 +2,7 @@
   <div class="mb-6">
     <h1 class="text-3xl font-bold">Questions</h1>
     <p class="text-sm text-gray-500 mt-1">
-      The queue behind the WhatsApp pipe. Speakers hold one question at a time.
+      Speakers hold one question at a time.
     </p>
   </div>
 
@@ -13,7 +13,10 @@
       <div class="bg-white shadow rounded-lg p-4">
         <p class="font-medium"><%= speaker.name %></p>
         <p class="text-sm text-gray-500">
-          <%= speaker.whatsapp_window_open? ? "Window open" : "Window shut — needs a nudge" %>
+          <%= speaker.channel_label %><%# The 24 hour window is a WhatsApp constraint; Telegram has nothing to report %>
+          <% if speaker.whatsapp? %>
+            — <%= speaker.whatsapp_window_open? ? "window open" : "window shut, needs a nudge" %>
+          <% end %>
         </p>
         <p class="text-sm mt-2">
           <% if outstanding %>

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Whatsapp::AudioForWhatsappTest < ActiveSupport::TestCase
+class OpusVoiceNoteTest < ActiveSupport::TestCase
   def attachment_for(path, content_type, identify: true)
     question = Question.new(asker: users(:two), speaker: users(:whatsapp_speaker))
     question.audio.attach(
@@ -19,7 +19,7 @@ class Whatsapp::AudioForWhatsappTest < ActiveSupport::TestCase
   test "produces an ogg/opus file from an mp3" do
     audio = attachment_for("test/fixtures/files/sample.mp3", "audio/mpeg")
 
-    Whatsapp::AudioForWhatsapp.new(audio).open do |path|
+    OpusVoiceNote.new(audio).open do |path|
       assert File.size?(path).present?
       assert_match(/Opus/i, `ffprobe -hide_banner #{path} 2>&1`)
     end
@@ -28,7 +28,7 @@ class Whatsapp::AudioForWhatsappTest < ActiveSupport::TestCase
   test "passes ogg straight through without re-encoding" do
     audio = attachment_for("test/fixtures/files/sample.mp3", "audio/ogg", identify: false)
 
-    Whatsapp::AudioForWhatsapp.new(audio).open do |path|
+    OpusVoiceNote.new(audio).open do |path|
       # Content type says ogg, so it is handed over untouched — no temp file.
       assert_match(/\.mp3\z/, path)
     end
