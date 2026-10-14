@@ -77,12 +77,36 @@ change their number, their app, or anything else.
 (Coexistence — one number on both the app and the API — does not help here. It
 covers the WhatsApp *Business* app, not the consumer app that speakers use.)
 
-A physical pay-as-you-go SIM is the reliable way to get the Abairt number. It
-has to be able to **receive** an SMS or a voice call, because that is how Meta
-verifies ownership; outbound-only virtual numbers cannot be registered at all,
-and VoIP numbers are hit and miss. An Irish number also simply looks right to
-the person receiving it. Keep the SIM alive so the carrier never recycles the
-number out from under the registration.
+The number has to be able to **receive** an SMS or a voice call, because that is
+how Meta verifies ownership. Outbound-only virtual numbers cannot be registered
+at all, VoIP numbers are hit and miss, and a data-only travel eSIM is no use —
+it has no number that can take an SMS. A real mobile line, physical SIM or eSIM.
+
+Make it an **Irish** number. Technically any country works and billing follows
+the *recipient's* country code rather than ours, but a +353 number is the
+difference between a voice note that looks like Abairt and one that looks like
+spam — and until the display name is approved, the recipient sees the raw
+number.
+
+Prefer a **bill-pay** line over pay-as-you-go. Once the number is registered to
+the Cloud API the SIM carries no traffic at all — every message goes out over
+HTTP, not the cellular network — so to the carrier the line looks dormant from
+day one and prepaid dormancy rules eventually reclaim it. A direct debit keeps
+it alive without anyone remembering to. Losing the number means losing the
+registration, and re-verifying is impossible once someone else holds it.
+
+#### Testing before you buy a number
+
+Meta's developer dashboard issues a free test number that sends and receives
+normally, delivers webhooks, and reaches a handful of recipients you add and
+confirm by code. That is enough to exercise the whole loop — signature checks,
+inbound audio, the ogg/opus bubble, the one-at-a-time rule — against your own
+phone or a friend's, with no SIM and no spend.
+
+It is not a stand-in for the real thing: it is not the business identity, it
+reaches only its allowlist, and templates made under it do not carry over, so
+`ceist_nua` still needs submitting against the real number. Use it to prove the
+plumbing, then buy the number for the pilot.
 
 ### 2. Webhook
 
@@ -132,7 +156,7 @@ hold one button.
 
 The questions arrive spontaneously — mid-conversation, one hand free — so the
 whole learner side is built around three actions: **tap the icon, hold the
-button, let go.** The question uploads on release; there is no send step.
+button, let go** — then listen back and send.
 
 * `/questions/new` is the one screen, and the PWA's `start_url`
 * `voice_question_controller.js` is the press-and-release interaction. It
@@ -152,8 +176,8 @@ button, let go.** The question uploads on release; there is no send step.
 |---|---|---|
 | ![Sign in](screenshots/1-sign-in.png) | ![Ask](screenshots/2-ask.png) | ![Recording](screenshots/3-recording.png) |
 | Password first, magic link below | The whole learner side | Held down |
-| ![Sent](screenshots/4-sent.png) | ![Answers](screenshots/5-answers.png) | ![Password](screenshots/6-password.png) |
-| Sent on release | Answers play in place | Set a password once |
+| ![Draft](screenshots/8-draft.png) | ![Sent](screenshots/9-sent.png) | ![Answers](screenshots/5-answers.png) |
+| Play it back, Seol or Scrios | Queued once sent | Answers play in place |
 
 The founder's view of the queue, at `/admin/questions` — who is holding what,
 whether each speaker's 24 hour window is open, and a manual nudge:
