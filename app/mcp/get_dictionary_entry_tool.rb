@@ -1,61 +1,27 @@
 # frozen_string_literal: true
 
-# MCP tool: fetch a single confirmed abairt dictionary entry with full detail.
-class GetDictionaryEntryTool < MCP::Tool
+# Fetch a single entry in full detail: translation, dialect/speaker context, the recording it
+# came from, and its translation/accuracy history.
+class GetDictionaryEntryTool < ApplicationTool
   tool_name "get_dictionary_entry"
-  description "Fetch a single confirmed abairt dictionary entry by id, including its " \
-              "translation, dialect, speaker and audio URL when available."
+  description "Fetch a single abairt dictionary entry by id in full detail: translation, dialect, " \
+              "speaker, tags, audio, the source recording and its edit history."
   input_schema(
-    properties: {
-      id: {
-        type: "integer",
-        description: "The dictionary entry id"
-      }
-    },
+    properties: {id: {type: "integer", description: "The dictionary entry id"}},
     required: ["id"]
   )
 
-  class << self
-    def call(id:, server_context:)
-      entry = DictionaryEntry.confirmed_accuracy
-        .includes(:speaker, :voice_recording, :tags)
-        .find_by(id: id)
+  def self.call(id:, server_context:)
+    guard do
+      entry = DictionaryEntry
+        .includes(
+          :speaker, :translator, :tags, :versions,
+          {media_attachment: :blob},
+          {voice_recording: [:users, {media_attachment: :blob}, {audio_track_attachment: :blob}]}
+        )
+        .find(id)
 
-      unless entry
-        return MCP::Tool::Response.new([{
-          type: "text",
-          text: "No confirmed dictionary entry found for id #{id}."
-        }])
-      end
-
-      MCP::Tool::Response.new([{
-        type: "text",
-        text: JSON.pretty_generate(detail(entry, server_context[:host]))
-      }])
-    end
-
-    private
-
-    def detail(entry, host)
-      {
-        id: entry.id,
-        word_or_phrase: entry.word_or_phrase,
-        translation: entry.translation,
-        dialect: entry.speaker&.dialect,
-        speaker: entry.speaker&.name,
-        tags: entry.tag_list,
-        voice_recording_id: entry.voice_recording_id,
-        audio_url: audio_url(entry, host),
-        updated_at: entry.updated_at.iso8601
-      }
-    end
-
-    def audio_url(entry, host)
-      return nil unless entry.media.attached?
-
-      Rails.application.routes.url_helpers.rails_blob_url(entry.media, host: host)
-    rescue
-      nil
+      ok(Mcp::EntryDetailSerializer.new(entry, params: {host: host(server_context)}).serializable_hash)
     end
   end
 end

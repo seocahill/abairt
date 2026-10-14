@@ -1,48 +1,33 @@
 # frozen_string_literal: true
 
-# MCP tool: list the most recently updated confirmed transcriptions.
-class ListRecentTranscriptionsTool < MCP::Tool
+# List recently updated entries, newest first, optionally filtered - useful for reviewing the
+# latest drafts awaiting translation or confirmation.
+class ListRecentTranscriptionsTool < ApplicationTool
   tool_name "list_recent_transcriptions"
-  description "List the most recently updated confirmed transcriptions from the abairt " \
-              "corpus, newest first."
+  description "List the most recently updated entries from the abairt corpus, newest first. " \
+              "Optionally filter by accuracy status or dialect."
   input_schema(
     properties: {
-      limit: {
-        type: "integer",
-        description: "Maximum number of transcriptions to return (default 20, max 50)"
-      }
+      accuracy_status: {type: "string", enum: %w[confirmed unconfirmed], description: "Filter by accuracy status"},
+      dialect: {type: "string", description: "Filter by speaker dialect"},
+      limit: {type: "integer", description: "Max results (default 20, max 50)"}
     },
     required: []
   )
 
-  class << self
-    def call(server_context:, limit: 20)
-      limit = limit.to_i.clamp(1, 50)
-
-      records = DictionaryEntry.confirmed_accuracy
-        .includes(:speaker, :tags)
+  def self.call(server_context:, accuracy_status: nil, dialect: nil, limit: 20)
+    guard do
+      records = DictionaryEntry
+        .includes(:speaker, :translator, :tags, :voice_recording, media_attachment: :blob)
         .order(updated_at: :desc)
-        .limit(limit)
+        .limit(limit.to_i.clamp(1, 50))
 
-      entries = records.map { |entry| summarise(entry) }
+      records = records.where(accuracy_status: accuracy_status) if accuracy_status.present?
+      records = records.joins(:speaker).where(users: {dialect: dialect}) if dialect.present?
 
-      MCP::Tool::Response.new([{
-        type: "text",
-        text: JSON.pretty_generate(count: entries.size, entries: entries)
-      }])
-    end
+      entries = Mcp::EntrySerializer.new(records, params: {host: host(server_context)}).serializable_hash
 
-    private
-
-    def summarise(entry)
-      {
-        id: entry.id,
-        word_or_phrase: entry.word_or_phrase,
-        translation: entry.translation,
-        dialect: entry.speaker&.dialect,
-        has_audio: entry.media.attached?,
-        updated_at: entry.updated_at.iso8601
-      }
+      ok(count: entries.size, entries: entries)
     end
   end
 end

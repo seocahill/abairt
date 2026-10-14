@@ -51,7 +51,7 @@ Abairt is an open-source platform for Irish language learning, featuring voice r
 
 1. **Clone the repository**
    ```bash
-   git clone https://gitlab.com/abairt/web-application
+   git clone https://github.com/seocahill/abairt
    cd abairt
    ```
 
@@ -160,41 +160,20 @@ bundle exec rake cron:monitor_services
 open http://localhost:3000/status
 ```
 
-### Visual Debugging with VNC (Production)
+### Debugging Fotheidil Transcription
 
-To visually debug browser automation (e.g., Fotheidil uploads) in production:
+Transcription runs against the Abair API v4 (<https://api.abair.ie/v4/docs>), so
+it is debuggable straight from the console — no browser involved:
 
-1. **Create SSH tunnel from your local machine:**
-   ```bash
-   ssh -i ~/.ssh/old/id_rsa -L 17900:127.0.0.1:7900 -N root@<your-server-ip>
-   ```
-   Keep this terminal open. The `-N` flag keeps it running without opening a shell.
+```ruby
+Fotheidil::ApiService.new.key_status
+# => {"tier" => "basic", "status" => "active", "tokens_left" => 499987, ...}
 
-2. **Open VNC in your browser:**
-   ```
-   http://localhost:17900
-   ```
-   You'll see the noVNC interface showing the Selenium Grid status.
-
-3. **Enable headful mode** (if not already enabled):
-   Ensure `SELENIUM_HEADFUL: "true"` is set in `docker-compose.production.yml` rails service environment.
-
-4. **Run your operation:**
-   When you run Fotheidil operations, you'll see the browser automation happening in real-time in the VNC viewer.
-
-**Note:** The VNC service is exposed on port 7900 on the server. The SSH tunnel forwards your local port 17900 to the server's port 7900. Use `127.0.0.1` (not `localhost`) in the tunnel command to ensure IPv4 is used — Docker doesn't listen on IPv6.
-
-**Troubleshooting: "Failed to connect to server"**
-
-If noVNC loads but shows "Failed to connect to server", the VNC server inside the Chrome container has likely crashed. Restart it:
-
-```bash
-ssh -i ~/.ssh/old/id_rsa root@<your-server-ip>
-export DOCKER_API_VERSION=1.44
-docker service update --force abairt_chrome
+Fotheidil::ProcessVideoOperation.call(voice_recording: VoiceRecording.find(210))
 ```
 
-Then restart your SSH tunnel and reconnect.
+See [docs/fotheidil_architecture.md](docs/fotheidil_architecture.md) for the
+pipeline, the segment shape and the API's quirks.
 
 ## 📦 Deployment
 

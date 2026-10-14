@@ -5,16 +5,20 @@ require "test_helper"
 # Covers the Streamable HTTP MCP endpoint: bearer-token authorization and tool invocation.
 class McpEndpointTest < ActionDispatch::IntegrationTest
   def setup
-    @user = users(:one)
+    @admin = users(:admin)
     @application = Doorkeeper::Application.create!(
       name: "Test MCP Client",
       redirect_uri: "https://claude.ai/api/mcp/auth_callback",
       scopes: "mcp",
       confidential: false
     )
-    @token = Doorkeeper::AccessToken.create!(
+    @token = token_for(@admin)
+  end
+
+  def token_for(user)
+    Doorkeeper::AccessToken.create!(
       application: @application,
-      resource_owner_id: @user.id,
+      resource_owner_id: user.id,
       scopes: "mcp",
       expires_in: 2.hours
     )
@@ -33,14 +37,96 @@ class McpEndpointTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  test "lists the abairt tools for an authorized client" do
+  test "a non-admin token is rejected" do
+    non_admin = token_for(users(:one)) # teacher, not admin
+    post "/mcp", params: rpc("tools/list"), headers: json_headers("Bearer #{non_admin.token}")
+    assert_response :unauthorized
+  end
+
+  test "lists the full abairt tool surface for an authorized admin" do
     post "/mcp", params: rpc("tools/list"), headers: json_headers("Bearer #{@token.token}")
     assert_response :success
 
     tool_names = mcp_result(response).fetch("tools").pluck("name")
-    assert_includes tool_names, "search_dictionary_entries"
-    assert_includes tool_names, "get_dictionary_entry"
-    assert_includes tool_names, "list_recent_transcriptions"
+    %w[search_dictionary_entries get_dictionary_entry list_recent_transcriptions
+      context_search get_voice_recording list_voice_recordings list_speakers get_speaker
+      list_tags list_word_lists get_word_list
+      save_translation create_dictionary_entry set_entry_accuracy tag_entry
+      create_word_list add_to_word_list].each do |name|
+      assert_includes tool_names, name
+    end
+  end
+
+  test "get_dictionary_entry exposes the entry audio blob url" do
+    entry = dictionary_entries(:one)
+    entry.media.attach(io: StringIO.new("audio"), filename: "entry.mp3", content_type: "audio/mpeg")
+
+    post "/mcp",
+      params: rpc("tools/call", name: "get_dictionary_entry", arguments: {id: entry.id}),
+      headers: json_headers("Bearer #{@token.token}")
+    assert_response :success
+
+    payload = JSON.parse(mcp_result(response).fetch("content").first.fetch("text"))
+    assert_match %r{/rails/active_storage/blobs/.+/entry\.mp3}, payload["audio_url"]
+  end
+
+  test "get_voice_recording exposes media and audio_track blob urls" do
+    recording = voice_recordings(:one)
+    recording.media.attach(io: StringIO.new("video"), filename: "clip.mp4", content_type: "video/mp4")
+    recording.audio_track.attach(io: StringIO.new("audio"), filename: "clip.mp3", content_type: "audio/mpeg")
+
+    post "/mcp",
+      params: rpc("tools/call", name: "get_voice_recording", arguments: {id: recording.id}),
+      headers: json_headers("Bearer #{@token.token}")
+    assert_response :success
+
+    rec = JSON.parse(mcp_result(response).fetch("content").first.fetch("text")).fetch("recording")
+    assert_match %r{/rails/active_storage/blobs/.+/clip\.mp4}, rec["media_url"]
+    assert_match %r{/rails/active_storage/blobs/.+/clip\.mp3}, rec["audio_track_url"]
+  end
+
+  test "reads expose unconfirmed drafts" do
+    draft = dictionary_entries(:one) # unconfirmed
+
+    post "/mcp",
+      params: rpc("tools/call", name: "get_dictionary_entry", arguments: {id: draft.id}),
+      headers: json_headers("Bearer #{@token.token}")
+    assert_response :success
+
+    payload = JSON.parse(mcp_result(response).fetch("content").first.fetch("text"))
+    assert_equal draft.id, payload["id"]
+    assert_equal "unconfirmed", payload["accuracy_status"]
+  end
+
+  test "save_translation edits a draft and records a version" do
+    draft = dictionary_entries(:one) # unconfirmed → editable
+
+    assert_difference -> { draft.versions.count }, +1 do
+      post "/mcp",
+        params: rpc("tools/call", name: "save_translation",
+          arguments: {id: draft.id, translation: "A fresh translation"}),
+        headers: json_headers("Bearer #{@token.token}")
+      assert_response :success
+    end
+
+    result = mcp_result(response)
+    refute result["isError"], "expected a successful tool result"
+    assert_equal "A fresh translation", draft.reload.translation
+    assert_equal @admin.id, draft.translator_id
+  end
+
+  test "save_translation refuses to edit a confirmed entry" do
+    confirmed = dictionary_entries(:two)
+
+    post "/mcp",
+      params: rpc("tools/call", name: "save_translation",
+        arguments: {id: confirmed.id, translation: "nope"}),
+      headers: json_headers("Bearer #{@token.token}")
+    assert_response :success
+
+    result = mcp_result(response)
+    assert result["isError"], "expected an error result for a locked confirmed entry"
+    refute_equal "nope", confirmed.reload.translation
   end
 
   test "calls the get_dictionary_entry tool" do

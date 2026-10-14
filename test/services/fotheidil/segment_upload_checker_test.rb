@@ -12,10 +12,10 @@ module Fotheidil
         duration_seconds: 100
       )
 
-      # Load real fixture data
-      @fixture_html = Rails.root.join("test/fixtures/files/fotheidil_video_1141.html").read
-      @parser = ParserService.new
-      @real_segments = @parser.parse_html(@fixture_html)
+      # Real segments as returned by the Abair API for video 1141
+      @real_segments = JSON.parse(
+        Rails.root.join("test/fixtures/files/fotheidil_video_1141_segments.json").read
+      )
     end
 
     test "complete? returns false when duration is zero" do

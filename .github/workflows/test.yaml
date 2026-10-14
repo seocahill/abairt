@@ -23,15 +23,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: ghostscript pdftk tesseract-ocr tesseract-ocr-deu tnef
-      # Both sides of this merge wanted ffmpeg in CI. It is installed directly
-      # rather than through the cache action above because that action restores
-      # only the packages it is given, so on a cache hit ffmpeg comes back
-      # without its shared libraries and dies on libblas.so.3.
+      # Plain apt-get: cache-apt-pkgs-action skips update-alternatives, so
+      # a cached ffmpeg can't find libblas.so.3.
       - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:

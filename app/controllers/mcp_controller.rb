@@ -17,13 +17,12 @@ class McpController < ActionController::API
       name: "abairt",
       title: "Abairt Irish Dictionary",
       version: "1.0.0",
-      instructions: "Search and read confirmed Irish-language dictionary entries and " \
-                    "transcriptions from the abairt corpus.",
-      tools: [
-        SearchDictionaryEntriesTool,
-        GetDictionaryEntryTool,
-        ListRecentTranscriptionsTool
-      ],
+      instructions: "Research and edit the abairt Irish-language corpus as a translation " \
+                    "assistant: search and read dictionary entries (including unconfirmed " \
+                    "drafts), recordings and their segments, speaker/dialect context and " \
+                    "translation history, and save translations, tags and confirmations. " \
+                    "All edits are versioned and reversible.",
+      tools: ApplicationTool.all,
       server_context: {
         user: current_user,
         host: request.base_url
@@ -50,7 +49,10 @@ class McpController < ActionController::API
     )
 
     if access_token&.acceptable?([MCP_SCOPE])
-      @current_user = User.find_by(id: access_token.resource_owner_id, confirmed: true)
+      user = User.find_by(id: access_token.resource_owner_id, confirmed: true)
+      # The assistant sees and edits the whole corpus, so it is restricted to admins.
+      # Per-record authorization for writes is still enforced by Pundit inside each tool.
+      @current_user = user if user&.admin?
     end
 
     render_unauthorized unless @current_user
