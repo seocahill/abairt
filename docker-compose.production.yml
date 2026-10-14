@@ -21,12 +21,10 @@ services:
       replicas: 1
     environment:
       REDIS_URL: redis://redis:6379
-      SELENIUM_URL: http://chrome:4444/wd/hub
       RAILS_SERVE_STATIC_FILES: "true"
       RAILS_LOG_TO_STDOUT: "true"
       BUNDLE_PATH: "/usr/local/bundle"
       BUNDLE_WITHOUT: "development:test"
-      SELENIUM_HEADFUL: "true"
     secrets:
       - source: master_key
         target: /rails/config/master.key
@@ -105,27 +103,6 @@ services:
   redis:
     image: redis:alpine
     ports: []
-
-  chrome:
-    image: selenium/standalone-chrome:4.17.0
-    deploy:
-      mode: replicated
-      replicas: 1
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
-      placement:
-        constraints:
-          - node.role == manager
-    tmpfs:
-      - /dev/shm:rw,noexec,nosuid,size=2g
-    environment:
-      - SE_NODE_MAX_SESSIONS=5
-      - SE_NODE_SESSION_TIMEOUT=300
-      - SE_JAVA_OPTS=-Xmx1536m -Xms512m
-
 
 volumes:
   db:
