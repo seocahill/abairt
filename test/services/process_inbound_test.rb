@@ -39,6 +39,9 @@ class ProcessInboundTest < ActiveSupport::TestCase
     assert question.answered?
     assert question.answer_audio.attached?
     assert_equal "whatsapp:wamid.abc", question.answer_message_id
+    # Not audio/opus, which is what Active Storage sniffs a voice note as and
+    # which no browser advertises support for.
+    assert_equal "audio/ogg", question.answer_audio.content_type
   end
 
   test "answering releases the next question in the queue" do

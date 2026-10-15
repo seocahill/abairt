@@ -14,7 +14,15 @@ module Telegram
   # Not for production, where the webhook earns its keep — this holds a
   # connection open and runs outside the request cycle.
   class Poller
-    class WebhookInTheWay < StandardError; end
+    # Telegram answers 409 to getUpdates for two quite different reasons, and
+    # says which in the description. Guessing one of them was worse than not
+    # guessing: "a webhook is set" sent you looking at production for what was
+    # really a second poller left running in another terminal.
+    class Conflict < StandardError; end
+
+    class WebhookInTheWay < Conflict; end
+
+    class AlreadyPolling < Conflict; end
 
     def initialize(client: Client.new, logger: Rails.logger)
       @client = client
@@ -40,12 +48,21 @@ module Telegram
     def fetch
       @client.get_updates(offset: @offset)
     rescue Client::Error => e
-      # Telegram says 409 when a webhook is set. Deleting it here could take
-      # production offline, so this stops and says so instead.
       raise unless e.message.include?("409")
 
-      raise WebhookInTheWay, "A webhook is set for this bot, so polling is refused. " \
-        "Use a separate bot for development, or call deleteWebhook if that webhook is not in use."
+      raise conflict_for(e.message)
+    end
+
+    def conflict_for(description)
+      if description.match?(/webhook/i)
+        # Deleting the webhook here could take production offline, so this
+        # stops and says so instead.
+        WebhookInTheWay.new("A webhook is set for this bot, so polling is refused. " \
+          "Use a separate bot for development, or call deleteWebhook if that webhook is not in use.")
+      else
+        AlreadyPolling.new("Another poller is already running for this bot. " \
+          "Telegram only allows one, so stop the other one — or use a separate bot.")
+      end
     end
 
     def handle(update)

@@ -5,7 +5,7 @@ namespace :telegram do
   task poll: :environment do
     puts "Polling for Telegram updates. Ctrl-C to stop."
     Telegram::Poller.new.run
-  rescue Telegram::Poller::WebhookInTheWay => e
+  rescue Telegram::Poller::Conflict => e
     abort e.message
   rescue Interrupt
     puts "\nStopped."

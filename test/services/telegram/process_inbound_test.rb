@@ -42,6 +42,7 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     assert question.answered?
     assert question.answer_audio.attached?
     assert_equal "telegram:99887766:42", question.answer_message_id
+    assert_equal "audio/ogg", question.answer_audio.content_type
   end
 
   test "answering releases the next question in the queue" do

@@ -34,11 +34,19 @@ class RecordAnswer
       Question.exists?(answer_message_id: @message.id)
   end
 
+  # `identify: false` because Active Storage otherwise re-sniffs the bytes and
+  # relabels a voice note `audio/opus`, which is not a container type any
+  # browser advertises: canPlayType("audio/opus") is "" where
+  # canPlayType("audio/ogg; codecs=opus") is "probably". Chromium sniffs and
+  # plays it anyway, Safari is stricter, and the learner's side is a phone.
+  # Both transports send ogg/opus by specification, so the declared type is
+  # right and the sniffed one is not.
   def attach_audio
     @question.answer_audio.attach(
       io: StringIO.new(@message.download_audio),
       filename: "answer_#{@question.id}.ogg",
-      content_type: "audio/ogg"
+      content_type: "audio/ogg",
+      identify: false
     )
   end
 

@@ -70,12 +70,31 @@ class Telegram::PollerTest < ActiveSupport::TestCase
 
   # Deleting the webhook here could take production offline.
   test "refuses to poll past a webhook rather than deleting it" do
-    @client.expects(:get_updates).raises(Telegram::Client::Error, "Telegram getUpdates failed: 409 Conflict")
+    @client.expects(:get_updates).raises(Telegram::Client::Error,
+      "Telegram getUpdates failed: 409 Conflict: can't use getUpdates method while webhook is active")
 
     error = assert_raises(Telegram::Poller::WebhookInTheWay) do
       Telegram::Poller.new(client: @client).poll
     end
-    assert_match(/separate bot/, error.message)
+    assert_match(/webhook is set/, error.message)
+  end
+
+  # Telegram answers 409 to both, and says which. Reporting a second poller as
+  # a webhook sends you looking at production for a stray terminal.
+  test "tells a second poller apart from a webhook" do
+    @client.expects(:get_updates).raises(Telegram::Client::Error,
+      "Telegram getUpdates failed: 409 Conflict: terminated by other getUpdates request; " \
+      "make sure that only one bot instance is running")
+
+    error = assert_raises(Telegram::Poller::AlreadyPolling) do
+      Telegram::Poller.new(client: @client).poll
+    end
+    assert_match(/Another poller/, error.message)
+  end
+
+  test "both conflicts share a parent the rake task can rescue" do
+    assert_operator Telegram::Poller::WebhookInTheWay, :<, Telegram::Poller::Conflict
+    assert_operator Telegram::Poller::AlreadyPolling, :<, Telegram::Poller::Conflict
   end
 
   test "lets any other client error through" do
