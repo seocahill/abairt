@@ -154,7 +154,9 @@ unknown sender means, all of which the message object answers. The nudge and the
 24 hour window stayed behind in `Whatsapp::` where they belong.
 
 One wrinkle worth knowing: `getUpdates` and `setWebhook` are mutually exclusive,
-so local development needs `deleteWebhook` first — or, better, a second bot.
+so local development wants a second bot rather than `deleteWebhook` against the
+one production is using. `bin/rails telegram:poll` does the polling, through the
+same path the webhook uses.
 
 ## Still not decided
 

@@ -52,6 +52,26 @@ module Telegram
       })
     end
 
+    # Long polling, for local development: no public URL and no tunnel. `offset`
+    # is the id after the last update already handled — Telegram keeps an update
+    # on the queue until an offset past it is acknowledged, so this is also what
+    # stops the same message arriving for ever.
+    #
+    # Mutually exclusive with a webhook. Telegram answers 409 if one is set,
+    # which the poller reports rather than deleting it: that webhook may be
+    # production's.
+    def get_updates(offset: nil, timeout: 30)
+      body = {timeout: timeout}
+      body[:offset] = offset if offset
+
+      response = self.class.post(
+        "#{BASE_URL}/bot#{@token}/getUpdates",
+        body: body,
+        timeout: timeout + 10
+      )
+      parse(response, "getUpdates")
+    end
+
     # Two hops, as with WhatsApp: the file id resolves to a path, which is
     # fetched from a different host. Returns the raw bytes.
     def download_file(file_id)

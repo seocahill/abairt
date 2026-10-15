@@ -64,10 +64,20 @@ curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook" \
 Check it with `getWebhookInfo`, which also reports the last delivery error if
 something is wrong.
 
-**Locally, do not set a webhook at all.** `getUpdates` long polling needs no
-tunnel — but the two are mutually exclusive, so call `deleteWebhook` before
-polling, and remember that polling locally while a webhook is set in production
-is fine only because they are different bots. Use a second bot for development.
+**Locally, do not set a webhook at all.** Poll instead:
+
+```sh
+bin/rails telegram:poll
+```
+
+It long polls and hands each update to the same `InboundMessage` and
+`ProcessInbound` the webhook uses, so what works under it works deployed. No
+tunnel, no public URL, which is what makes a first run with a real speaker
+possible from a laptop.
+
+The two are mutually exclusive — Telegram answers 409 to `getUpdates` while a
+webhook is set, and the task stops and says so rather than deleting it, since
+that webhook may be production's. **Use a second bot for development.**
 
 ### 4. The speaker
 
@@ -96,6 +106,9 @@ would otherwise sit as `waiting` with no explanation.
 Then send a test question and watch it land. Leave it an hour and send a second
 one cold — that is what catches an Android battery manager.
 
+For that first run, `bin/rails telegram:poll` on a laptop is enough. The webhook
+is only needed once it has to work while nobody is watching.
+
 ## How it fits together
 
 | | |
@@ -103,6 +116,7 @@ one cold — that is what catches an Android battery manager.
 | `Telegram::Client` | the four Bot API calls this app makes |
 | `Telegram::DeliverQuestion` | sends a question |
 | `Telegram::InboundMessage` | one update, and who sent it |
+| `Telegram::Poller` | long polling, for local runs — same path as the webhook |
 | `ProcessInbound` | shared with WhatsApp — decides what arriving means |
 | `RecordAnswer` | shared — files a voice note as the answer |
 | `OpusVoiceNote` | shared — guarantees ogg/opus |
