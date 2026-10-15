@@ -1,0 +1,16 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <%= link_to "← Back to Users", admin_users_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <h1 class="text-2xl font-bold text-gray-900">New User</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        A speaker is set up here: a name, a phone number and the box below checked. No email, no password, nothing for them to sign into.
+      </p>
+    </div>
+
+    <%= render "form", user: @user, submit_label: "Create User" %>
+  </div>
+</div>

@@ -128,6 +128,66 @@ module Admin
       assert_nil @user.reload.api_token
     end
 
+    # A speaker has no email, no password and never sees a web page, so this
+    # form is the only way one can exist. Before it, the answer was the Rails
+    # console on production.
+    test "creates a WhatsApp speaker with no email address" do
+      assert_difference -> { User.answering.count }, 1 do
+        post admin_users_path, params: {user: {
+          name: "Pápa",
+          role: "speaker",
+          phone_number: "353 86 123 9999",
+          answers_questions: "1",
+          channel: "whatsapp",
+          confirmed: "1"
+        }}
+      end
+
+      speaker = User.order(:created_at).last
+      assert_redirected_to admin_user_path(speaker)
+      assert_nil speaker.email
+      assert_equal "353861239999", speaker.phone_number
+      assert speaker.whatsapp?
+      assert speaker.answers_questions?
+    end
+
+    test "creates a Telegram speaker who is not yet routable" do
+      post admin_users_path, params: {user: {
+        name: "Bríd",
+        role: "speaker",
+        phone_number: "353871119999",
+        answers_questions: "1",
+        channel: "telegram",
+        confirmed: "1"
+      }}
+
+      speaker = User.order(:created_at).last
+      assert speaker.telegram?
+      # No chat id until they tap through, so nothing is routed to them yet.
+      assert_not_includes User.answering, speaker
+    end
+
+    test "re-renders the form when the user is invalid" do
+      assert_no_difference -> { User.count } do
+        post admin_users_path, params: {user: {name: "", role: "student"}}
+      end
+
+      assert_response :unprocessable_entity
+    end
+
+    test "non-admins cannot create users" do
+      sign_in_as(users(:two))
+
+      assert_no_difference -> { User.count } do
+        post admin_users_path, params: {user: {name: "Sneaky", role: "student", email: "s@example.com"}}
+      end
+    end
+
+    test "should get the new user form" do
+      get new_admin_user_path
+      assert_response :success
+    end
+
     private
 
     def sign_in_as(user)

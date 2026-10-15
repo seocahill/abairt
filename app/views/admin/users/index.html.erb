@@ -5,6 +5,7 @@
       <%= link_to "All Users", admin_users_path, class: "px-4 py-2 #{params[:pending].blank? && params[:role] != 'temporary' && params[:search].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
       <%= link_to "Pending Signups", admin_users_path(pending: true), class: "px-4 py-2 #{params[:pending] == 'true' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
       <%= link_to "Temporary Speakers", admin_users_path(role: "temporary"), class: "px-4 py-2 #{params[:role] == 'temporary' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+      <%= link_to "New User", new_admin_user_path, class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" %>
     </div>
   </div>
 

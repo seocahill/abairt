@@ -1,0 +1,9 @@
+<% label, colour = case question.status
+   when "answered" then ["Freagartha", "green"]
+   when "sent" then ["Á freagairt", "blue"]
+   when "waiting" then ["Ag fanacht", "gray"]
+   else ["Gan seoladh", "amber"]
+   end %>
+<span class="px-2 py-1 text-xs rounded-full bg-<%= colour %>-100 text-<%= colour %>-800">
+  <%= label %>
+</span>

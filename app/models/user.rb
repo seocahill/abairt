@@ -3,13 +3,21 @@
 class User < ApplicationRecord
   has_secure_token :api_token
   has_secure_token :login_token
+  # Backs the long-lived "stay signed in" cookie. Regenerating it signs every
+  # device out, which is the only revocation a permanent cookie can have.
+  has_secure_token :remember_token
+
+  # validations: false because most users never get a password — speakers are
+  # created by hand with only a phone number, and the magic link still works
+  # for everyone else. Length is enforced below, only when one is being set.
+  has_secure_password validations: false
 
   belongs_to :location, optional: true
 
-  has_many :dictionary_entries #, foreign_key: :speaker_id
+  has_many :dictionary_entries # , foreign_key: :speaker_id
   has_many :spoken_dictionary_entries, foreign_key: :speaker_id, class_name: "DictionaryEntry"
   has_many :voice_recordings, -> { distinct }, through: :dictionary_entries
-  has_many :spoken_voice_recordings, -> { distinct }, through: :spoken_dictionary_entries,  class_name: "VoiceRecording", source: :voice_recording
+  has_many :spoken_voice_recordings, -> { distinct }, through: :spoken_dictionary_entries, class_name: "VoiceRecording", source: :voice_recording
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
@@ -17,34 +25,51 @@ class User < ApplicationRecord
 
   has_many :word_lists
 
-  enum :role, [
-    :student,
-    :speaker,
-    :teacher,
-    :admin,
-    :ai,
-    :place,
-    :temporary,
-    :api_user
-  ]
-  enum :voice, [:male, :female]
-  enum :dialect, [:tuaisceart_mhaigh_eo, :connacht_ó_thuaidh, :acaill, :lár_chonnachta, :canúintí_eile]
-  # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
-  enum :ability, %i[
-    A1
-    A2
-    B1
-    B2
-    C1
-    C2
-    native
-  ]
+  has_many :questions, foreign_key: :asker_id
+  has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
+  # How a speaker receives questions. Only read for speakers; everyone else
+  # carries the default and ignores it.
+  enum :channel, {whatsapp: 0, telegram: 1}
+  # `capitalize` would render WhatsApp as "Whatsapp".
+  CHANNEL_LABELS = {"whatsapp" => "WhatsApp", "telegram" => "Telegram"}.freeze
+  # Both transports identify people by E.164 digits with no leading "+", and
+  # Telegram's shared contact cards arrive with one.
+  normalizes :phone_number, with: ->(number) { number.to_s.gsub(/\D/, "").presence }
+  # An empty string from the admin form would otherwise count as an address: it
+  # satisfies `IS NOT NULL` in the `answering` scope, so the speaker would be
+  # routed questions that could never be delivered — and a second blank one
+  # would collide on the unique index.
+  normalizes :telegram_chat_id, with: ->(id) { id.to_s.strip.presence }
+
+  enum :voice, {male: 0, female: 1}
+  enum :dialect, {tuaisceart_mhaigh_eo: 0, "connacht_\u00F3_thuaidh": 1, acaill: 2, "l\u00E1r_chonnachta": 3, "can\u00FAint\u00ED_eile": 4}
+  # ref: https://rm.coe.int/CoERMPublicCommonSearchServices/DisplayDCTMContent?documentId=090000168045bb52
+  enum :ability, {A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5, native: 6}
+
+  # Speakers are onboarded by phone and never touch a web form, so they have a
+  # number instead of an email address.
+  validates :email, presence: true, unless: -> { phone_number.present? }
+  validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
+  validates :phone_number, uniqueness: true, allow_nil: true
+  validates :password, length: {minimum: 8}, allow_nil: true
+  # has_secure_password(validations: false) skips this too, but the setter exists.
+  validates :password, confirmation: true, allow_nil: true
   validates :name, presence: true
-  validates :role, exclusion: { in: %w(teacher api_user admin) }, if: -> { role_changed? && Current.user&.admin? == false }
+  validates :role, exclusion: {in: %w[teacher api_user admin]}, if: -> { role_changed? && Current.user&.admin? == false }
 
   scope :active, -> { where.not(role: :temporary) }
+  # A speaker is only answering if we hold the address their channel needs —
+  # otherwise the queue would pick them and have nowhere to send to. Checked per
+  # channel rather than with a loose "either column is set".
+  scope :answering, -> {
+    where(answers_questions: true).where(
+      "(users.channel = :whatsapp AND users.phone_number IS NOT NULL) OR " \
+      "(users.channel = :telegram AND users.telegram_chat_id IS NOT NULL)",
+      whatsapp: channels[:whatsapp], telegram: channels[:telegram]
+    )
+  }
   scope :with_api_token, -> { where.not(api_token: nil) }
   scope :pending, -> { where(confirmed: false) }
   scope :by_role, ->(role) { where(role: role) if role.present? && roles.key?(role) }
@@ -54,7 +79,7 @@ class User < ApplicationRecord
     name_ids = []
     begin
       # Escape special FTS characters and quote the query
-      escaped_query = query.gsub(/["'\\]/, '')
+      escaped_query = query.gsub(/["'\\]/, "")
       name_ids = FtsUser.where("fts_users MATCH ?", escaped_query).pluck(:rowid) if escaped_query.present?
     rescue ActiveRecord::StatementInvalid
       # If FTS query fails, fall back to LIKE for name
@@ -63,6 +88,16 @@ class User < ApplicationRecord
     email_ids = where("LOWER(email) LIKE ?", "%#{query.downcase}%").pluck(:id)
     where(id: (name_ids + email_ids).uniq)
   }
+
+  # WhatsApp only allows free-form messages (audio included) within 24 hours of
+  # the person's last message to us. Outside it, all we may send is a template.
+  def channel_label
+    CHANNEL_LABELS.fetch(channel)
+  end
+
+  def whatsapp_window_open?
+    whatsapp_last_inbound_at.present? && whatsapp_last_inbound_at > 24.hours.ago
+  end
 
   def all_entries
     dictionary_entries.or(spoken_dictionary_entries)

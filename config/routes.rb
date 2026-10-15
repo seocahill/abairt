@@ -43,6 +43,15 @@ Rails.application.routes.draw do
       post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
     end
 
+    # WhatsApp Cloud API webhooks. GET is Meta's subscription handshake, POST
+    # carries inbound messages from speakers.
+    get "whatsapp/webhook", to: "whatsapp/webhooks#show"
+    post "whatsapp/webhook", to: "whatsapp/webhooks#create"
+
+    # Telegram Bot API webhook. No handshake to answer: setWebhook is a one-off
+    # call at setup, and the secret comes back in a header on every delivery.
+    post "telegram/webhook", to: "telegram/webhooks#create"
+
     # Speech to Text API endpoint
     post 'speech_to_text', to: 'speech_to_text#create'
 
@@ -123,13 +132,19 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :questions, only: [:index] do
+      member do
+        post :deliver
+      end
+    end
+
     resources :locations, only: [:index, :edit, :update] do
       member do
         post :geocode
       end
     end
 
-    resources :users, only: [:index, :show, :edit, :update, :destroy] do
+    resources :users, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
       member do
         post :approve
         post :reject
@@ -169,6 +184,16 @@ Rails.application.routes.draw do
 
   resources :login_requests, only: [:new, :create]
 
+  resource :password, only: [:edit, :update]
+
+  # Progressive web app: the learner installs this to the home screen so asking
+  # a question is tap, hold, release.
+  # Formats are pinned rather than negotiated: Rails' stock version of these
+  # routes resolves the template off the Accept header, which 500s for a client
+  # that asks for text/html.
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest, defaults: {format: :json}
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker, defaults: {format: :js}
+
   get 'home', to: 'home#index'
 
   # API Documentation
@@ -177,6 +202,11 @@ Rails.application.routes.draw do
   resources :translator_leaderboard, only: [:index, :show], controller: 'translator_leaderboard'
 
   resources :practice_recordings, only: [:create]
+
+  resources :questions, only: [:index, :new, :create, :show, :destroy] do
+    # A draft is sent by creating its delivery.
+    resource :delivery, only: [:create], module: :questions
+  end
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   # health

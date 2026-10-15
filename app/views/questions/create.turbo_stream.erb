@@ -1,0 +1,5 @@
+<%= turbo_stream.prepend "questions" do %>
+  <%= render "questions/question", question: @question %>
+<% end %>
+
+<%= turbo_stream.update "questions_empty", "" %>

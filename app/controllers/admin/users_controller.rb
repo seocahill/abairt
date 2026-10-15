@@ -24,6 +24,24 @@ module Admin
       # Authorization handled by ensure_admin
     end
 
+    def new
+      @user = User.new
+      authorize @user, :create?
+    end
+
+    # Speakers have no way to sign up: they never see a web page. This is where
+    # they come from.
+    def create
+      @user = User.new(user_params)
+      authorize @user, :create?
+
+      if @user.save
+        redirect_to admin_user_path(@user), notice: "User created successfully."
+      else
+        render :new, status: :unprocessable_entity
+      end
+    end
+
     def edit
       authorize @user, :update?
     end
@@ -121,7 +139,8 @@ module Admin
     end
 
     def user_params
-      params.require(:user).permit(:name, :email, :role, :about, :voice, :dialect, :ability, :address, :confirmed)
+      params.require(:user).permit(:name, :email, :role, :about, :voice, :dialect, :ability, :address, :confirmed,
+        :phone_number, :answers_questions, :channel, :telegram_chat_id)
     end
   end
 end
