@@ -41,7 +41,7 @@ class QuestionQueue
   end
 
   def deliver(question)
-    message_id = QuestionTransport.for(question).call
+    message_id = Telegram::DeliverQuestion.new(question).call
     question.mark_sent!(message_id) if message_id
   end
 end

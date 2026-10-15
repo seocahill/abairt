@@ -10,10 +10,6 @@
 #   * a voice note while holding a question  -> that is the answer
 #   * anything else (a button tap, a hello)  -> they are available, so send
 #                                               them whatever is waiting
-#
-# Identical on both transports, because the only things that differ — who the
-# sender is, how to fetch their audio, what an unknown sender means — are
-# answered by the message object itself.
 class ProcessInbound
   def initialize(message)
     @message = message
@@ -23,19 +19,14 @@ class ProcessInbound
     speaker = find_speaker
     return if speaker.nil?
 
-    # Recorded before anything decides whether it can send: on WhatsApp this is
-    # what reopens the 24 hour window.
-    @message.note_inbound(speaker)
-
     record_answer(speaker) if @message.audio?
     QuestionQueue.new(speaker).deliver_next
   end
 
   private
 
-  # A sender we do not know is routine on Telegram, where tapping Start is how a
-  # speaker first appears, and a dead end on WhatsApp. The channel decides, and
-  # may resolve to a speaker.
+  # A sender we do not know is routine: following an invite link is how a
+  # speaker first appears, so this may resolve to one.
   def find_speaker
     @message.speaker || @message.onboard
   end

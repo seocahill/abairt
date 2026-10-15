@@ -2,7 +2,7 @@ require "test_helper"
 
 class Telegram::InboundMessageTest < ActiveSupport::TestCase
   def setup
-    @speaker = users(:telegram_speaker)
+    @speaker = users(:speaker)
     @speaker.update!(answers_questions: true)
     @client = mock("client")
   end
@@ -14,8 +14,8 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
   def voice_note(overrides = {})
     {
       "message_id" => 42,
-      "from" => {"id" => 99887766},
-      "chat" => {"id" => 99887766},
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
       "voice" => {"file_id" => "file-abc", "mime_type" => "audio/ogg"}
     }.merge(overrides)
   end
@@ -36,7 +36,7 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
   test "namespaces the message id by chat" do
     message = Telegram::InboundMessage.new(voice_note, client: @client)
 
-    assert_equal "telegram:99887766:42", message.id
+    assert_equal "telegram:11223344:42", message.id
   end
 
   test "finds the speaker by chat id" do
@@ -47,14 +47,6 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
 
   test "does not find a speaker who is not taking questions" do
     @speaker.update!(answers_questions: false)
-    message = Telegram::InboundMessage.new(voice_note, client: @client)
-
-    assert_nil message.speaker
-  end
-
-  test "does not mistake a WhatsApp speaker for a Telegram one" do
-    @speaker.update!(telegram_chat_id: nil)
-    users(:whatsapp_speaker).update!(telegram_chat_id: "99887766")
     message = Telegram::InboundMessage.new(voice_note, client: @client)
 
     assert_nil message.speaker
@@ -145,7 +137,7 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
       "message_id" => 2,
       "from" => {"id" => 555},
       "chat" => {"id" => 555},
-      "contact" => {"phone_number" => "+353 87 111 2222", "user_id" => 555}
+      "contact" => {"phone_number" => "+353 86 123 4567", "user_id" => 555}
     }, client: @client)
 
     assert_equal @speaker, message.onboard
@@ -160,7 +152,7 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
       "message_id" => 2,
       "from" => {"id" => 555},
       "chat" => {"id" => 555},
-      "contact" => {"phone_number" => "353871112222", "user_id" => 999}
+      "contact" => {"phone_number" => "353861234567", "user_id" => 999}
     }, client: @client)
 
     assert_nil message.onboard

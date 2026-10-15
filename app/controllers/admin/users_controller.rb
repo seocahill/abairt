@@ -150,7 +150,7 @@ module Admin
 
     def user_params
       params.require(:user).permit(:name, :email, :role, :about, :voice, :dialect, :ability, :address, :confirmed,
-        :phone_number, :answers_questions, :channel, :telegram_chat_id)
+        :phone_number, :answers_questions, :telegram_chat_id)
     end
   end
 end

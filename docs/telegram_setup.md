@@ -1,22 +1,20 @@
 # Telegram questions
 
-One of two transports a speaker can be on. The other is WhatsApp
-(`whatsapp_setup.md`); why there are two, and why Telegram is the one to start
-with, is in `speaker_transport.md`.
+How a question reaches a speaker. The rest of the feature — the learner's side,
+the queue, admin — is `questions.md`; why Telegram and not WhatsApp, a phone
+line or our own app is `speaker_transport.md`.
 
 Everything above the transport — `QuestionQueue`, `QuestionRouter`, the
-draft/send flow, the admin backlog — is shared and knows nothing about
-Telegram. `QuestionTransport` is the only place that picks.
+draft/send flow, the admin backlog — knows nothing about Telegram.
 
-## Why this is the shorter document
+## Why there is so little to set up
 
 No 24 hour window, so no templates, no nudge and nothing waiting on approval.
 No business entity, no verification, no card on file. The webhook secret is a
 string Telegram echoes back rather than an HMAC over the body. Setting the whole
 thing up is five minutes with @BotFather.
 
-The audio requirement is the same — `sendVoice` wants ogg/opus, which is exactly
-what `OpusVoiceNote` already guarantees for WhatsApp.
+`sendVoice` wants ogg/opus, which is what `OpusVoiceNote` guarantees.
 
 ## Setting it up
 
@@ -136,12 +134,11 @@ is only needed once it has to work while nobody is watching.
 | `Telegram::InboundMessage` | one update, and who sent it |
 | `Telegram::Poller` | long polling, for local runs — same path as the webhook |
 | `User#telegram_invite_link` | the link to send a new speaker |
-| `ProcessInbound` | shared with WhatsApp — decides what arriving means |
-| `RecordAnswer` | shared — files a voice note as the answer |
-| `OpusVoiceNote` | shared — guarantees ogg/opus |
-| `QuestionTransport` | picks between this and WhatsApp |
+| `ProcessInbound` | decides what an arriving message means |
+| `RecordAnswer` | files a voice note as the answer |
+| `OpusVoiceNote` | guarantees ogg/opus |
 
 Inbound updates are secret-checked and handled idempotently, since Telegram
 redelivers anything it does not get a 200 for. Message ids are stored prefixed
-with their channel: a Telegram message id is only unique within its chat, and
-both transports' ids share one uniquely-indexed column.
+with their chat, because a Telegram message id is only unique within one and
+`answer_message_id` carries a unique index.

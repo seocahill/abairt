@@ -2,7 +2,7 @@ require "test_helper"
 
 class QuestionQueueTest < ActiveSupport::TestCase
   def setup
-    @speaker = users(:whatsapp_speaker)
+    @speaker = users(:speaker)
     @queue = QuestionQueue.new(@speaker)
     Question.delete_all
   end
@@ -23,7 +23,7 @@ class QuestionQueueTest < ActiveSupport::TestCase
   test "delivers the oldest waiting question" do
     newer = create_question(created_at: 1.minute.ago)
     older = create_question(created_at: 1.hour.ago)
-    Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns("wamid.abc")
+    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:11223344:1")
 
     delivered = @queue.deliver_next
 
@@ -35,20 +35,20 @@ class QuestionQueueTest < ActiveSupport::TestCase
   test "sends nothing while the speaker is still holding one" do
     create_question(created_at: 1.hour.ago).mark_sent!("wamid.first")
     create_question(created_at: 1.minute.ago)
-    Whatsapp::DeliverQuestion.any_instance.expects(:call).never
+    Telegram::DeliverQuestion.any_instance.expects(:call).never
 
     assert_nil @queue.deliver_next
   end
 
   test "does nothing when there is nothing waiting" do
-    Whatsapp::DeliverQuestion.any_instance.expects(:call).never
+    Telegram::DeliverQuestion.any_instance.expects(:call).never
 
     assert_nil @queue.deliver_next
   end
 
   test "leaves the question waiting when delivery did not happen" do
     question = create_question
-    Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns(nil)
+    Telegram::DeliverQuestion.any_instance.stubs(:call).returns(nil)
 
     @queue.deliver_next
 
@@ -63,7 +63,7 @@ class QuestionQueueTest < ActiveSupport::TestCase
       content_type: "audio/mpeg"
     )
     draft.save!
-    Whatsapp::DeliverQuestion.any_instance.expects(:call).never
+    Telegram::DeliverQuestion.any_instance.expects(:call).never
 
     assert_nil @queue.deliver_next
     assert draft.reload.draft?
@@ -71,7 +71,7 @@ class QuestionQueueTest < ActiveSupport::TestCase
 
   test "outstanding returns the question the speaker is holding" do
     question = create_question
-    question.mark_sent!("wamid.abc")
+    question.mark_sent!("telegram:11223344:1")
 
     assert_equal question, @queue.outstanding
   end

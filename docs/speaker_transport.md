@@ -143,6 +143,13 @@ silent loss of an answer is the one failure that would stop him bothering.
 
 ## Decided since
 
+**WhatsApp is gone.** It was built and it worked, but carrying a second
+transport meant a channel enum, a picker in admin, a webhook nobody called and
+a set of columns serving a 24 hour window that does not exist here. One
+transport is a smaller thing to reason about, and the WhatsApp adapter is in
+the history (PR #59) if the trade-offs ever shift.
+
+
 **The channel is a `channel` enum on `User` plus a `telegram_chat_id`**, which
 is built. `QuestionTransport` is the only thing that reads it, so one speaker
 can be on Telegram and another on WhatsApp with the queue unchanged.
@@ -160,8 +167,6 @@ same path the webhook uses.
 
 ## Still not decided
 
-- Whether to keep the WhatsApp adapter. It costs nothing to carry and is worth
-  having if these trade-offs shift. Stripping it is easy if not.
 - Payments. `send_to_speaker!` is the chokepoint a balance check hangs off.
 - Whether to keep a call-in line in reserve. The audio argument against it has
   not changed, but it remains the only option that asks nothing at all of the

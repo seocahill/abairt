@@ -50,7 +50,7 @@ module Telegram
     def speaker
       return nil if chat_id.blank?
 
-      User.answering.telegram.find_by(telegram_chat_id: chat_id)
+      User.answering.find_by(telegram_chat_id: chat_id)
     end
 
     # A stranger is how a speaker arrives. Two ways to find out who they are:
@@ -69,11 +69,6 @@ module Telegram
       contact? ? claim : ask_for_number
     end
 
-    # Telegram has no 24 hour window, so there is nothing to record. The method
-    # exists because the WhatsApp side of the shared ProcessInbound needs it.
-    def note_inbound(speaker)
-    end
-
     private
 
     def invite_token
@@ -83,7 +78,7 @@ module Telegram
     # Single use: the token is cleared as it is redeemed, so a link that gets
     # forwarded or screenshotted claims nothing afterwards.
     def redeem_invite
-      speaker = User.telegram.where(answers_questions: true)
+      speaker = User.where(answers_questions: true)
         .find_by(telegram_invite_token: invite_token)
 
       if speaker.nil?
@@ -117,7 +112,7 @@ module Telegram
 
       # Deliberately not `answering`, which requires the chat id this is about to
       # set — a speaker expecting a chat does not have one yet.
-      speaker = User.telegram.where(answers_questions: true)
+      speaker = User.where(answers_questions: true)
         .find_by(phone_number: @payload.dig("contact", "phone_number"))
       if speaker.nil?
         Rails.logger.warn("No speaker is expecting a Telegram chat for that number")

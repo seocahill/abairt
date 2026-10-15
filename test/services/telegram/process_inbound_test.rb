@@ -6,7 +6,7 @@ require "test_helper"
 # window, no templates and a different idea of who a sender is.
 class Telegram::ProcessInboundTest < ActiveSupport::TestCase
   def setup
-    @speaker = users(:telegram_speaker)
+    @speaker = users(:speaker)
     @speaker.update!(answers_questions: true)
     Question.delete_all
   end
@@ -14,8 +14,8 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
   def inbound(overrides = {})
     Telegram::InboundMessage.new({
       "message_id" => 42,
-      "from" => {"id" => 99887766},
-      "chat" => {"id" => 99887766},
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
       "voice" => {"file_id" => "file-abc", "mime_type" => "audio/ogg"}
     }.merge(overrides))
   end
@@ -41,7 +41,7 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     question.reload
     assert question.answered?
     assert question.answer_audio.attached?
-    assert_equal "telegram:99887766:42", question.answer_message_id
+    assert_equal "telegram:11223344:42", question.answer_message_id
     assert_equal "audio/ogg", question.answer_audio.content_type
   end
 
@@ -49,7 +49,7 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     answered = create_question(status: :sent)
     waiting = create_question
     Telegram::Client.any_instance.stubs(:download_file).returns("ogg-bytes")
-    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:99887766:43")
+    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:11223344:43")
 
     ProcessInbound.new(inbound).call
 
@@ -60,12 +60,12 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
   test "a hello with nothing outstanding sends what is waiting" do
     waiting = create_question
     Telegram::Client.any_instance.expects(:download_file).never
-    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:99887766:43")
+    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:11223344:43")
 
     ProcessInbound.new(Telegram::InboundMessage.new({
       "message_id" => 43,
-      "from" => {"id" => 99887766},
-      "chat" => {"id" => 99887766},
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
       "text" => "Dia dhuit"
     })).call
 
@@ -98,7 +98,7 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
       "message_id" => 1,
       "from" => {"id" => 5},
       "chat" => {"id" => 5},
-      "contact" => {"phone_number" => "353871112222", "user_id" => 5}
+      "contact" => {"phone_number" => "353861234567", "user_id" => 5}
     })).call
 
     assert_equal "5", @speaker.reload.telegram_chat_id

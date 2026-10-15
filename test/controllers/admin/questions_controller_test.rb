@@ -3,7 +3,7 @@ require "test_helper"
 class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @admin = users(:admin)
-    @speaker = users(:whatsapp_speaker)
+    @speaker = users(:speaker)
     ApplicationController.any_instance.stubs(:current_user).returns(@admin)
     ApplicationController.any_instance.stubs(:admin_user?).returns(true)
     ApplicationController.any_instance.stubs(:ensure_admin).returns(true)
@@ -34,7 +34,7 @@ class Admin::QuestionsControllerTest < ActionDispatch::IntegrationTest
 
   test "deliver checks the speaker's queue by hand" do
     question = create_question
-    Whatsapp::DeliverQuestion.any_instance.stubs(:call).returns("wamid.abc")
+    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:11223344:1")
 
     post deliver_admin_question_url(question)
 
