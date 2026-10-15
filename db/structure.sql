@@ -140,16 +140,10 @@ CREATE INDEX "index_media_imports_on_status" ON "media_imports" ("status");
 CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
 CREATE TABLE IF NOT EXISTS "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_settings_on_key" ON "settings" ("key");
-CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar, "location_id" integer, "phone_number" varchar, "answers_questions" boolean DEFAULT FALSE NOT NULL, "whatsapp_opted_in_at" datetime(6), "whatsapp_last_inbound_at" datetime(6), "whatsapp_nudged_at" datetime(6), "password_digest" varchar, "remember_token" varchar, "channel" integer DEFAULT 0 NOT NULL, "telegram_chat_id" varchar);
-CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
-CREATE INDEX "index_users_on_token" ON "users" ("token");
-CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
-CREATE UNIQUE INDEX "index_users_on_api_token" ON "users" ("api_token");
 CREATE TABLE IF NOT EXISTS "locations" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "irish_name" varchar, "location_type" integer DEFAULT 0 NOT NULL, "dialect_region" integer DEFAULT 0 NOT NULL, "latitude" decimal(10,7), "longitude" decimal(10,7), "parent_id" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE INDEX "index_locations_on_parent_id" ON "locations" ("parent_id");
 CREATE INDEX "index_locations_on_name" ON "locations" ("name");
 CREATE INDEX "index_locations_on_dialect_region" ON "locations" ("dialect_region");
-CREATE INDEX "index_users_on_location_id" ON "users" ("location_id");
 CREATE INDEX "index_voice_recordings_on_location_id" ON "voice_recordings" ("location_id");
 CREATE VIRTUAL TABLE vec_dictionary_entry_embeddings
 USING vec0(
@@ -213,16 +207,6 @@ CREATE TRIGGER update_tags_search AFTER UPDATE ON tags BEGIN
         INSERT INTO fts_tags(fts_tags, rowid, name) VALUES('delete', old.id, old.name);
         INSERT INTO fts_tags(rowid, name) VALUES (new.id, new.name);
       END;
-CREATE TRIGGER insert_users_search AFTER INSERT ON users BEGIN
-        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
-      END;
-CREATE TRIGGER delete_users_search AFTER DELETE ON users BEGIN
-        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
-      END;
-CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
-        INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
-        INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
-      END;
 CREATE TABLE IF NOT EXISTS "oauth_applications" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "uid" varchar NOT NULL, "secret" varchar NOT NULL, "redirect_uri" text, "scopes" varchar DEFAULT '' NOT NULL, "confidential" boolean DEFAULT 1 NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_oauth_applications_on_uid" ON "oauth_applications" ("uid");
 CREATE TABLE IF NOT EXISTS "oauth_access_grants" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "resource_owner_id" integer NOT NULL, "application_id" integer NOT NULL, "token" varchar NOT NULL, "expires_in" integer NOT NULL, "redirect_uri" text NOT NULL, "scopes" varchar DEFAULT '' NOT NULL, "created_at" datetime(6) NOT NULL, "revoked_at" datetime(6), CONSTRAINT "fk_rails_b4b53e07b0"
@@ -240,9 +224,6 @@ CREATE INDEX "index_oauth_access_tokens_on_resource_owner_id" ON "oauth_access_t
 CREATE INDEX "index_oauth_access_tokens_on_application_id" ON "oauth_access_tokens" ("application_id");
 CREATE UNIQUE INDEX "index_oauth_access_tokens_on_token" ON "oauth_access_tokens" ("token");
 CREATE UNIQUE INDEX "index_oauth_access_tokens_on_refresh_token" ON "oauth_access_tokens" ("refresh_token");
-CREATE UNIQUE INDEX "index_users_on_phone_number" ON "users" ("phone_number");
-CREATE UNIQUE INDEX "index_users_on_remember_token" ON "users" ("remember_token");
-CREATE UNIQUE INDEX "index_users_on_telegram_chat_id" ON "users" ("telegram_chat_id");
 CREATE TABLE IF NOT EXISTS "questions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asker_id" integer NOT NULL, "speaker_id" integer NOT NULL, "status" integer DEFAULT 0 NOT NULL, "sent_at" datetime(6), "answered_at" datetime(6), "question_message_id" varchar, "answer_message_id" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_fbda342dc9"
 FOREIGN KEY ("asker_id")
   REFERENCES "users" ("id")
@@ -254,7 +235,29 @@ CREATE INDEX "index_questions_on_asker_id" ON "questions" ("asker_id");
 CREATE INDEX "index_questions_on_speaker_id" ON "questions" ("speaker_id");
 CREATE INDEX "index_questions_on_speaker_id_and_status" ON "questions" ("speaker_id", "status");
 CREATE UNIQUE INDEX "index_questions_on_answer_message_id" ON "questions" ("answer_message_id");
+CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar, "location_id" integer, "phone_number" varchar, "answers_questions" boolean DEFAULT FALSE NOT NULL, "password_digest" varchar, "remember_token" varchar, "telegram_chat_id" varchar, "telegram_invite_token" varchar);
+CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
+CREATE INDEX "index_users_on_token" ON "users" ("token");
+CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
+CREATE UNIQUE INDEX "index_users_on_api_token" ON "users" ("api_token");
+CREATE INDEX "index_users_on_location_id" ON "users" ("location_id");
+CREATE UNIQUE INDEX "index_users_on_phone_number" ON "users" ("phone_number");
+CREATE UNIQUE INDEX "index_users_on_remember_token" ON "users" ("remember_token");
+CREATE UNIQUE INDEX "index_users_on_telegram_chat_id" ON "users" ("telegram_chat_id");
+CREATE UNIQUE INDEX "index_users_on_telegram_invite_token" ON "users" ("telegram_invite_token");
+CREATE TRIGGER insert_users_search AFTER INSERT ON users BEGIN
+  INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
+END;
+CREATE TRIGGER delete_users_search AFTER DELETE ON users BEGIN
+  INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
+END;
+CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
+  INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
+  INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
+END;
 INSERT INTO "schema_migrations" (version) VALUES
+('20261015190000'),
+('20261015180000'),
 ('20261014230000'),
 ('20261013120000'),
 ('20261011120000'),

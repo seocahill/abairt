@@ -20,15 +20,15 @@ class RecordAnswer
     @question.mark_answered!(@message.id)
     notify_asker
     true
-  rescue TransportError => e
+  rescue Telegram::Client::Error => e
     Rails.logger.error("RecordAnswer failed for Question##{@question.id}: #{e.message}")
     false
   end
 
   private
 
-  # Both transports redeliver a webhook they did not hear a 200 for, so the same
-  # voice note can arrive more than once.
+  # Telegram redelivers anything it did not get a 200 for, so the same voice
+  # note can arrive more than once.
   def already_recorded?
     @question.answer_message_id == @message.id ||
       Question.exists?(answer_message_id: @message.id)
@@ -39,8 +39,8 @@ class RecordAnswer
   # browser advertises: canPlayType("audio/opus") is "" where
   # canPlayType("audio/ogg; codecs=opus") is "probably". Chromium sniffs and
   # plays it anyway, Safari is stricter, and the learner's side is a phone.
-  # Both transports send ogg/opus by specification, so the declared type is
-  # right and the sniffed one is not.
+  # Telegram sends ogg/opus by specification, so the declared type is right and
+  # the sniffed one is not.
   def attach_audio
     @question.answer_audio.attach(
       io: StringIO.new(@message.download_audio),

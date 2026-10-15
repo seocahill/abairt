@@ -131,14 +131,13 @@ module Admin
     # A speaker has no email, no password and never sees a web page, so this
     # form is the only way one can exist. Before it, the answer was the Rails
     # console on production.
-    test "creates a WhatsApp speaker with no email address" do
-      assert_difference -> { User.answering.count }, 1 do
+    test "creates a speaker who is not routable until they follow their link" do
+      assert_no_difference -> { User.answering.count } do
         post admin_users_path, params: {user: {
           name: "Pápa",
           role: "speaker",
           phone_number: "353 86 123 9999",
           answers_questions: "1",
-          channel: "whatsapp",
           confirmed: "1"
         }}
       end
@@ -147,24 +146,59 @@ module Admin
       assert_redirected_to admin_user_path(speaker)
       assert_nil speaker.email
       assert_equal "353861239999", speaker.phone_number
-      assert speaker.whatsapp?
       assert speaker.answers_questions?
+      # No chat id until they follow the link, so nothing is routed to them yet.
+      assert_not_includes User.answering, speaker
     end
 
-    test "creates a Telegram speaker who is not yet routable" do
+    # The point of invite links: a Telegram speaker needs neither an email nor a
+    # phone number, because the link identifies them.
+    test "creates a Telegram speaker with no email and no phone number" do
       post admin_users_path, params: {user: {
-        name: "Bríd",
+        name: "Pápa",
         role: "speaker",
-        phone_number: "353871119999",
         answers_questions: "1",
-        channel: "telegram",
         confirmed: "1"
       }}
 
       speaker = User.order(:created_at).last
-      assert speaker.telegram?
-      # No chat id until they tap through, so nothing is routed to them yet.
+      assert_redirected_to admin_user_path(speaker)
+      assert_nil speaker.email
+      assert_nil speaker.phone_number
+      assert speaker.telegram_invite_token.present?
       assert_not_includes User.answering, speaker
+    end
+
+    test "still requires an email from anyone who is not a speaker" do
+      assert_no_difference -> { User.count } do
+        post admin_users_path, params: {user: {name: "Gan Ríomhphost", role: "student"}}
+      end
+
+      assert_response :unprocessable_entity
+    end
+
+    # Fixtures and any row not created through the model have no token, so a
+    # speaker who predates invite links could otherwise never be invited.
+    test "issues an invite link for a speaker that has none" do
+      speaker = users(:speaker)
+      speaker.update!(answers_questions: true, telegram_invite_token: nil)
+
+      assert_changes -> { speaker.reload.telegram_invite_token } do
+        post telegram_invite_admin_user_path(speaker)
+      end
+
+      assert_redirected_to admin_user_path(speaker)
+    end
+
+    test "issuing a new link invalidates the old one" do
+      speaker = users(:speaker)
+      speaker.update!(answers_questions: true)
+      speaker.regenerate_telegram_invite_token
+      old_token = speaker.telegram_invite_token
+
+      post telegram_invite_admin_user_path(speaker)
+
+      assert_not_equal old_token, speaker.reload.telegram_invite_token
     end
 
     test "re-renders the form when the user is invalid" do

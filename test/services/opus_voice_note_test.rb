@@ -2,7 +2,7 @@ require "test_helper"
 
 class OpusVoiceNoteTest < ActiveSupport::TestCase
   def attachment_for(path, content_type, identify: true)
-    question = Question.new(asker: users(:two), speaker: users(:whatsapp_speaker))
+    question = Question.new(asker: users(:two), speaker: users(:speaker))
     question.audio.attach(
       io: Rails.root.join(path).open,
       filename: File.basename(path),

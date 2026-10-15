@@ -16,7 +16,7 @@ module Telegram
 
     BASE_URL = "https://api.telegram.org"
 
-    class Error < TransportError; end
+    class Error < StandardError; end
 
     def initialize
       @token = credential(:bot_token, "TELEGRAM_BOT_TOKEN")

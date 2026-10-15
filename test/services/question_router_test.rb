@@ -2,7 +2,7 @@ require "test_helper"
 
 class QuestionRouterTest < ActiveSupport::TestCase
   def setup
-    @speaker = users(:whatsapp_speaker)
+    @speaker = users(:speaker)
     @asker = users(:two)
     Question.delete_all
   end
@@ -37,7 +37,7 @@ class QuestionRouterTest < ActiveSupport::TestCase
 
   test "prefers the speaker with the shorter unanswered backlog" do
     other = User.create!(name: "Nóra", confirmed: true, role: :speaker,
-      phone_number: "353869999999", answers_questions: true)
+      phone_number: "353869999999", answers_questions: true, telegram_chat_id: "55667788")
     question(:waiting)
     question(:waiting)
     question(:waiting, speaker: other)
@@ -47,7 +47,7 @@ class QuestionRouterTest < ActiveSupport::TestCase
 
   test "answered and draft questions do not count against a speaker" do
     other = User.create!(name: "Nóra", confirmed: true, role: :speaker,
-      phone_number: "353869999999", answers_questions: true)
+      phone_number: "353869999999", answers_questions: true, telegram_chat_id: "55667788")
     3.times { question(:answered) }
     question(:draft)
     question(:waiting, speaker: other)

@@ -3,7 +3,7 @@ require "test_helper"
 class QuestionTest < ActiveSupport::TestCase
   def setup
     @asker = users(:two)
-    @speaker = users(:whatsapp_speaker)
+    @speaker = users(:speaker)
   end
 
   def build_question(attributes = {})
@@ -60,10 +60,10 @@ class QuestionTest < ActiveSupport::TestCase
     question = build_question
     question.save!
 
-    question.mark_sent!("whatsapp:wamid.abc")
+    question.mark_sent!("telegram:11223344:1")
 
     assert question.sent?
-    assert_equal "whatsapp:wamid.abc", question.question_message_id
+    assert_equal "telegram:11223344:1", question.question_message_id
     assert_not_nil question.sent_at
   end
 

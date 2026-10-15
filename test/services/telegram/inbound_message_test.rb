@@ -2,7 +2,7 @@ require "test_helper"
 
 class Telegram::InboundMessageTest < ActiveSupport::TestCase
   def setup
-    @speaker = users(:telegram_speaker)
+    @speaker = users(:speaker)
     @speaker.update!(answers_questions: true)
     @client = mock("client")
   end
@@ -14,8 +14,8 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
   def voice_note(overrides = {})
     {
       "message_id" => 42,
-      "from" => {"id" => 99887766},
-      "chat" => {"id" => 99887766},
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
       "voice" => {"file_id" => "file-abc", "mime_type" => "audio/ogg"}
     }.merge(overrides)
   end
@@ -36,7 +36,7 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
   test "namespaces the message id by chat" do
     message = Telegram::InboundMessage.new(voice_note, client: @client)
 
-    assert_equal "telegram:99887766:42", message.id
+    assert_equal "telegram:11223344:42", message.id
   end
 
   test "finds the speaker by chat id" do
@@ -47,14 +47,6 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
 
   test "does not find a speaker who is not taking questions" do
     @speaker.update!(answers_questions: false)
-    message = Telegram::InboundMessage.new(voice_note, client: @client)
-
-    assert_nil message.speaker
-  end
-
-  test "does not mistake a WhatsApp speaker for a Telegram one" do
-    @speaker.update!(telegram_chat_id: nil)
-    users(:whatsapp_speaker).update!(telegram_chat_id: "99887766")
     message = Telegram::InboundMessage.new(voice_note, client: @client)
 
     assert_nil message.speaker
@@ -73,13 +65,79 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
     assert_nil message.onboard
   end
 
+  # The link is the way in that needs nothing from the speaker but one tap, and
+  # nothing from us but their name.
+  test "an invite link claims the speaker it names" do
+    @speaker.update!(telegram_chat_id: nil, phone_number: nil, email: nil)
+    # Fixtures bypass has_secure_token, as does any row not made through the
+    # model — which is why admin can issue one.
+    @speaker.regenerate_telegram_invite_token
+    token = @speaker.telegram_invite_token
+    @client.expects(:send_text).with(chat_id: "555", text: Telegram::InboundMessage::WELCOME)
+
+    message = Telegram::InboundMessage.new({
+      "message_id" => 2,
+      "from" => {"id" => 555},
+      "chat" => {"id" => 555},
+      "text" => "/start #{token}"
+    }, client: @client)
+
+    assert_equal @speaker, message.onboard
+    assert_equal "555", @speaker.reload.telegram_chat_id
+  end
+
+  test "an invite link only works once" do
+    @speaker.update!(telegram_chat_id: nil)
+    @speaker.regenerate_telegram_invite_token
+    token = @speaker.telegram_invite_token
+    @client.stubs(:send_text)
+
+    Telegram::InboundMessage.new({
+      "message_id" => 2, "from" => {"id" => 555}, "chat" => {"id" => 555},
+      "text" => "/start #{token}"
+    }, client: @client).onboard
+
+    assert_nil @speaker.reload.telegram_invite_token
+
+    # Somebody else with the same link gets nothing.
+    @client.expects(:send_text).never
+    later = Telegram::InboundMessage.new({
+      "message_id" => 3, "from" => {"id" => 777}, "chat" => {"id" => 777},
+      "text" => "/start #{token}"
+    }, client: @client)
+
+    assert_nil later.onboard
+    assert_equal "555", @speaker.reload.telegram_chat_id
+  end
+
+  test "an unknown invite token claims nothing" do
+    @client.expects(:send_text).never
+    message = Telegram::InboundMessage.new({
+      "message_id" => 2, "from" => {"id" => 555}, "chat" => {"id" => 555},
+      "text" => "/start not-a-real-token"
+    }, client: @client)
+
+    assert_nil message.onboard
+  end
+
+  # A bare /start is somebody arriving without a link, so fall back to asking.
+  test "a plain start is not mistaken for an invite" do
+    @client.expects(:request_contact).once
+    message = Telegram::InboundMessage.new({
+      "message_id" => 2, "from" => {"id" => 555}, "chat" => {"id" => 555},
+      "text" => "/start"
+    }, client: @client)
+
+    assert_nil message.onboard
+  end
+
   test "a shared number claims the speaker expecting it" do
     @speaker.update!(telegram_chat_id: nil)
     message = Telegram::InboundMessage.new({
       "message_id" => 2,
       "from" => {"id" => 555},
       "chat" => {"id" => 555},
-      "contact" => {"phone_number" => "+353 87 111 2222", "user_id" => 555}
+      "contact" => {"phone_number" => "+353 86 123 4567", "user_id" => 555}
     }, client: @client)
 
     assert_equal @speaker, message.onboard
@@ -94,7 +152,7 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
       "message_id" => 2,
       "from" => {"id" => 555},
       "chat" => {"id" => 555},
-      "contact" => {"phone_number" => "353871112222", "user_id" => 999}
+      "contact" => {"phone_number" => "353861234567", "user_id" => 999}
     }, client: @client)
 
     assert_nil message.onboard

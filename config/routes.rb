@@ -43,11 +43,6 @@ Rails.application.routes.draw do
       post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
     end
 
-    # WhatsApp Cloud API webhooks. GET is Meta's subscription handshake, POST
-    # carries inbound messages from speakers.
-    get "whatsapp/webhook", to: "whatsapp/webhooks#show"
-    post "whatsapp/webhook", to: "whatsapp/webhooks#create"
-
     # Telegram Bot API webhook. No handshake to answer: setWebhook is a one-off
     # call at setup, and the secret comes back in a header on every delivery.
     post "telegram/webhook", to: "telegram/webhooks#create"
@@ -146,6 +141,7 @@ Rails.application.routes.draw do
 
     resources :users, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
       member do
+        post :telegram_invite
         post :approve
         post :reject
         post :generate_api_token

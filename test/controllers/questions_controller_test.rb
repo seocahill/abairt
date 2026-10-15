@@ -7,7 +7,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     # stubbing current_user would walk straight past the thing under test.
     @asker = users(:two)
     @asker.update!(role: :admin)
-    @speaker = users(:whatsapp_speaker)
+    @speaker = users(:speaker)
     sign_in_as(@asker)
     Question.delete_all
   end

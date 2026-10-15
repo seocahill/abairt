@@ -5,7 +5,7 @@ module Admin
     include HasScope
 
     before_action :ensure_admin
-    before_action :set_user, only: [:show, :edit, :update, :approve, :reject, :destroy, :generate_api_token, :regenerate_api_token, :revoke_api_token]
+    before_action :set_user, only: [:show, :edit, :update, :approve, :reject, :destroy, :telegram_invite, :generate_api_token, :regenerate_api_token, :revoke_api_token]
     skip_after_action :verify_authorized, only: [:index, :show]
 
     has_scope :pending, type: :boolean
@@ -44,6 +44,16 @@ module Admin
 
     def edit
       authorize @user, :update?
+    end
+
+    # A speaker who predates invite links has no token, and one who lost their
+    # link or changed phone needs a new one. Issuing a new token invalidates
+    # the old link.
+    def telegram_invite
+      authorize @user, :update?
+      @user.regenerate_telegram_invite_token
+
+      redirect_to admin_user_path(@user), notice: "New invite link ready to send."
     end
 
     def update
@@ -140,7 +150,7 @@ module Admin
 
     def user_params
       params.require(:user).permit(:name, :email, :role, :about, :voice, :dialect, :ability, :address, :confirmed,
-        :phone_number, :answers_questions, :channel, :telegram_chat_id)
+        :phone_number, :answers_questions, :telegram_chat_id)
     end
   end
 end

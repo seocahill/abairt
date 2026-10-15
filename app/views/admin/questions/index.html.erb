@@ -12,12 +12,6 @@
       <% outstanding = QuestionQueue.new(speaker).outstanding %>
       <div class="bg-white shadow rounded-lg p-4">
         <p class="font-medium"><%= speaker.name %></p>
-        <p class="text-sm text-gray-500">
-          <%= speaker.channel_label %><%# The 24 hour window is a WhatsApp constraint; Telegram has nothing to report %>
-          <% if speaker.whatsapp? %>
-            — <%= speaker.whatsapp_window_open? ? "window open" : "window shut, needs a nudge" %>
-          <% end %>
-        </p>
         <p class="text-sm mt-2">
           <% if outstanding %>
             Holding #<%= outstanding.id %> since <%= time_ago_in_words(outstanding.sent_at || outstanding.created_at) %> ago

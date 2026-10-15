@@ -29,6 +29,34 @@
       </div>
     </div>
 
+    <%# How a Telegram speaker is connected to their chat: send them this, they
+        tap it once, and the token tells us who they are. No phone number, no
+        typing, nothing for them to read out. %>
+    <% if @user.telegram_speaker? %>
+      <div class="px-6 py-4 bg-blue-50 border-b border-blue-100">
+        <h3 class="text-sm font-medium text-blue-900 mb-1">Telegram</h3>
+        <% if @user.telegram_chat_id.present? %>
+          <p class="text-sm text-blue-800">Connected. Questions will reach them.</p>
+        <% elsif @user.telegram_invite_link %>
+          <p class="text-sm text-blue-800 mb-2">
+            Not connected yet. Send them this link — one tap connects them, and it stops working once used.
+          </p>
+          <code class="block text-sm bg-white border border-blue-200 rounded px-3 py-2 break-all"><%= @user.telegram_invite_link %></code>
+          <%= button_to "Issue a new link", telegram_invite_admin_user_path(@user), method: :post,
+                class: "mt-2 text-sm text-blue-700 underline",
+                form: { data: { turbo_confirm: "The link you already sent will stop working." } } %>
+        <% elsif @user.bot_username.blank? %>
+          <p class="text-sm text-blue-800">
+            Not connected, and no link can be built: set <code>telegram.bot_username</code> in credentials.
+          </p>
+        <% else %>
+          <p class="text-sm text-blue-800 mb-2">Not connected, and no invite link yet.</p>
+          <%= button_to "Create an invite link", telegram_invite_admin_user_path(@user), method: :post,
+                class: "px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700" %>
+        <% end %>
+      </div>
+    <% end %>
+
     <!-- User Details -->
     <div class="px-6 py-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

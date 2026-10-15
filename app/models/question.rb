@@ -2,12 +2,11 @@
 
 # A question a learner asks a native speaker.
 #
-# The speaker's whole interface is a messaging app — WhatsApp or Telegram, see
-# QuestionTransport. A voice note arrives, they hold the mic button and reply.
-# Nothing else is ever asked of them. That is only workable because they are
-# never holding more than one question at a time — see QuestionQueue — which is
-# also what lets an incoming reply be matched to a question without ids,
-# keywords or quoting.
+# The speaker's whole interface is Telegram. A voice note arrives, they hold the
+# mic button and reply. Nothing else is ever asked of them. That is only
+# workable because they are never holding more than one question at a time —
+# see QuestionQueue — which is also what lets an incoming reply be matched to a
+# question without ids, keywords or quoting.
 class Question < ApplicationRecord
   belongs_to :asker, class_name: "User"
   belongs_to :speaker, class_name: "User"
@@ -32,9 +31,9 @@ class Question < ApplicationRecord
     update!(status: :waiting)
   end
 
-  # The message ids are the transport's own, prefixed with the channel that
-  # issued them: a Telegram message id is only unique within its chat, and
-  # answer_message_id carries a unique index.
+  # Message ids are prefixed with the chat that issued them: a Telegram message
+  # id is only unique within its chat, and answer_message_id carries a unique
+  # index.
   def mark_sent!(message_id)
     update!(status: :sent, sent_at: Time.current, question_message_id: message_id)
   end

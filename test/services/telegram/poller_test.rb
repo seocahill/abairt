@@ -2,7 +2,7 @@ require "test_helper"
 
 class Telegram::PollerTest < ActiveSupport::TestCase
   def setup
-    @speaker = users(:telegram_speaker)
+    @speaker = users(:speaker)
     @speaker.update!(answers_questions: true)
     Question.delete_all
     @client = mock("client")
@@ -15,8 +15,8 @@ class Telegram::PollerTest < ActiveSupport::TestCase
   def voice_note
     {
       "message_id" => 42,
-      "from" => {"id" => 99887766},
-      "chat" => {"id" => 99887766},
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
       "voice" => {"file_id" => "file-abc", "mime_type" => "audio/ogg"}
     }
   end

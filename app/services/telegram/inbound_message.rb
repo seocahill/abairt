@@ -11,6 +11,10 @@ module Telegram
   class InboundMessage
     GREETING = "Fáilte! Brúigh an cnaipe thíos chun tosú."
     SHARE_BUTTON = "Seol m'uimhir"
+    WELCOME = "Tá tú istigh. Gheobhaidh tú ceist anseo go luath."
+    # `t.me/<bot>?start=<token>` arrives as this. Telegram allows base64url in
+    # the payload, which is what has_secure_token produces.
+    INVITE = %r{\A/start\s+([A-Za-z0-9_-]+)\z}
 
     attr_reader :payload
 
@@ -46,23 +50,53 @@ module Telegram
     def speaker
       return nil if chat_id.blank?
 
-      User.answering.telegram.find_by(telegram_chat_id: chat_id)
+      User.answering.find_by(telegram_chat_id: chat_id)
     end
 
-    # A stranger is how a speaker arrives: they tap Start before we know their
-    # chat id. Sharing their number identifies them against the record we
-    # already hold, and Telegram vouches for the number, so it is better
-    # evidence than anything they could type.
+    # A stranger is how a speaker arrives. Two ways to find out who they are:
+    #
+    #   * they followed an invite link, which carries a token naming them. One
+    #     tap, nothing typed, and no phone number needed.
+    #   * they shared their phone number, which is matched against a record we
+    #     already hold. Telegram vouches for the number, so it is better
+    #     evidence than anything they could type.
+    #
+    # The link is the one to hand out. The number is the fallback for a speaker
+    # who arrives without one.
     def onboard
+      return redeem_invite if invite_token.present?
+
       contact? ? claim : ask_for_number
     end
 
-    # Telegram has no 24 hour window, so there is nothing to record. The method
-    # exists because the WhatsApp side of the shared ProcessInbound needs it.
-    def note_inbound(speaker)
+    private
+
+    def invite_token
+      @payload["text"].to_s[INVITE, 1]
     end
 
-    private
+    # Single use: the token is cleared as it is redeemed, so a link that gets
+    # forwarded or screenshotted claims nothing afterwards.
+    def redeem_invite
+      speaker = User.where(answers_questions: true)
+        .find_by(telegram_invite_token: invite_token)
+
+      if speaker.nil?
+        Rails.logger.warn("Telegram invite token does not match any speaker")
+        return nil
+      end
+
+      speaker.update!(telegram_chat_id: chat_id, telegram_invite_token: nil)
+      say_hello
+      speaker
+    end
+
+    def say_hello
+      @client.send_text(chat_id: chat_id, text: WELCOME)
+    rescue Client::Error => e
+      # They are connected either way; the greeting is a courtesy.
+      Rails.logger.error("Could not greet Telegram chat #{chat_id}: #{e.message}")
+    end
 
     def contact?
       @payload.key?("contact")
@@ -78,7 +112,7 @@ module Telegram
 
       # Deliberately not `answering`, which requires the chat id this is about to
       # set — a speaker expecting a chat does not have one yet.
-      speaker = User.telegram.where(answers_questions: true)
+      speaker = User.where(answers_questions: true)
         .find_by(phone_number: @payload.dig("contact", "phone_number"))
       if speaker.nil?
         Rails.logger.warn("No speaker is expecting a Telegram chat for that number")
