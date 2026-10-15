@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class QuestionPolicy < ApplicationPolicy
+  # Admins only while this is in beta. The controllers say so too; this is the
+  # half that holds if a new entry point forgets to.
   def create?
-    user.present?
+    user&.admin? == true
   end
 
   def new?

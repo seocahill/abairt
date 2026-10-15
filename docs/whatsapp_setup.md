@@ -160,6 +160,11 @@ while they answer it. The first attempt has to succeed.
 
 ## The learner's side
 
+**Admins only, for now.** Asking a question spends a native speaker's time
+and, once payments exist, real money. `QuestionsController` and
+`QuestionPolicy` both say so — two places deliberately, so neither alone opens
+it by accident.
+
 Learners never touch WhatsApp. They install the site to their home screen and
 hold one button.
 

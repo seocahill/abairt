@@ -3,8 +3,10 @@
 module Questions
   # Sending a draft is its own resource rather than a verb on the question, in
   # the same shape as voice_recordings/diarizations.
+  # Admins only while the feature is in beta, as with QuestionsController.
   class DeliveriesController < ApplicationController
     before_action :require_login
+    before_action :ensure_admin
 
     def create
       @question = current_user.questions.find(params[:question_id])

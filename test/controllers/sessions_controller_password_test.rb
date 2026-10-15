@@ -5,8 +5,10 @@ require "test_helper"
 # otherwise send the learner off to find a login link in their email.
 class SessionsControllerPasswordTest < ActionDispatch::IntegrationTest
   setup do
+    # An admin because the questions side is admin-only while in beta, and the
+    # questions screen is where a resurrected session is supposed to land.
     @user = users(:two)
-    @user.update!(password: "sruthan-gaeilge", password_confirmation: "sruthan-gaeilge")
+    @user.update!(password: "sruthan-gaeilge", password_confirmation: "sruthan-gaeilge", role: :admin)
   end
 
   test "signs in with an email and password" do

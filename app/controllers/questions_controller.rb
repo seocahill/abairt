@@ -4,8 +4,14 @@
 #
 # `new` is the installed-to-home-screen screen — one button, held down. It is
 # also the PWA's start_url, so opening the app lands straight on it.
+#
+# **Admins only, for now.** Asking a question spends a real person's time and,
+# once payments exist, real money, and none of it has been through anyone but
+# us. Lifting this is one line here and one in QuestionPolicy — deliberately
+# two, so neither alone opens it by accident.
 class QuestionsController < ApplicationController
   before_action :require_login
+  before_action :ensure_admin
 
   def index
     @questions = recent_questions.limit(100)
