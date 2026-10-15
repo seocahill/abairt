@@ -6,6 +6,10 @@ class User < ApplicationRecord
   # Backs the long-lived "stay signed in" cookie. Regenerating it signs every
   # device out, which is the only revocation a permanent cookie can have.
   has_secure_token :remember_token
+  # Handed to a speaker as a t.me link so they can be connected to their chat
+  # without us holding a phone number. Cleared when redeemed — see
+  # Telegram::InboundMessage.
+  has_secure_token :telegram_invite_token
 
   # validations: false because most users never get a password — speakers are
   # created by hand with only a phone number, and the magic link still works
@@ -34,6 +38,11 @@ class User < ApplicationRecord
   enum :channel, {whatsapp: 0, telegram: 1}
   # `capitalize` would render WhatsApp as "Whatsapp".
   CHANNEL_LABELS = {"whatsapp" => "WhatsApp", "telegram" => "Telegram"}.freeze
+  # A speaker has no email, but the admin form still posts an empty string for
+  # it. Stored as nothing rather than "" so "no email" is one value, not two.
+  # Not downcased: existing rows were never normalised and rewriting them is a
+  # separate question from this one.
+  normalizes :email, with: ->(address) { address.to_s.strip.presence }
   # Both transports identify people by E.164 digits with no leading "+", and
   # Telegram's shared contact cards arrive with one.
   normalizes :phone_number, with: ->(number) { number.to_s.gsub(/\D/, "").presence }
@@ -50,7 +59,9 @@ class User < ApplicationRecord
 
   # Speakers are onboarded by phone and never touch a web form, so they have a
   # number instead of an email address.
-  validates :email, presence: true, unless: -> { phone_number.present? }
+  # A speaker needs no email: they never see a web page. On Telegram they need
+  # no phone number either, because an invite link identifies them instead.
+  validates :email, presence: true, unless: -> { phone_number.present? || telegram_speaker? }
   validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
   validates :phone_number, uniqueness: true, allow_nil: true
   validates :password, length: {minimum: 8}, allow_nil: true
@@ -91,12 +102,28 @@ class User < ApplicationRecord
 
   # WhatsApp only allows free-form messages (audio included) within 24 hours of
   # the person's last message to us. Outside it, all we may send is a template.
+  def telegram_speaker?
+    answers_questions? && telegram?
+  end
+
+  # nil once redeemed, and nil if we do not know the bot's username — in which
+  # case admin says so rather than printing a link that goes nowhere.
+  def telegram_invite_link
+    return nil if telegram_invite_token.blank? || bot_username.blank?
+
+    "https://t.me/#{bot_username}?start=#{telegram_invite_token}"
+  end
+
   def channel_label
     CHANNEL_LABELS.fetch(channel)
   end
 
   def whatsapp_window_open?
     whatsapp_last_inbound_at.present? && whatsapp_last_inbound_at > 24.hours.ago
+  end
+
+  def bot_username
+    Rails.application.credentials.dig(:telegram, :bot_username) || ENV["TELEGRAM_BOT_USERNAME"]
   end
 
   def all_entries

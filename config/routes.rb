@@ -146,6 +146,7 @@ Rails.application.routes.draw do
 
     resources :users, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
       member do
+        post :telegram_invite
         post :approve
         post :reject
         post :generate_api_token

@@ -142,6 +142,21 @@ class UserTest < ActiveSupport::TestCase
     assert_nil second.telegram_chat_id
   end
 
+  # The admin form posts "" for an untouched field, and a speaker has no email.
+  test "a blank email is stored as nothing at all" do
+    speaker = User.create!(name: "Gan Ríomhphost", role: :speaker, email: "  ",
+      answers_questions: true, channel: :telegram, confirmed: true)
+
+    assert_nil speaker.reload.email
+  end
+
+  test "two speakers can have no email at once" do
+    attrs = {role: :speaker, email: "", answers_questions: true, channel: :telegram, confirmed: true}
+    User.create!(attrs.merge(name: "Duine Amháin"))
+
+    assert_nothing_raised { User.create!(attrs.merge(name: "Duine Eile")) }
+  end
+
   test "answering excludes anyone not taking questions" do
     speaker = users(:whatsapp_speaker)
     speaker.update!(answers_questions: false)

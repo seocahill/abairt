@@ -73,6 +73,72 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
     assert_nil message.onboard
   end
 
+  # The link is the way in that needs nothing from the speaker but one tap, and
+  # nothing from us but their name.
+  test "an invite link claims the speaker it names" do
+    @speaker.update!(telegram_chat_id: nil, phone_number: nil, email: nil)
+    # Fixtures bypass has_secure_token, as does any row not made through the
+    # model — which is why admin can issue one.
+    @speaker.regenerate_telegram_invite_token
+    token = @speaker.telegram_invite_token
+    @client.expects(:send_text).with(chat_id: "555", text: Telegram::InboundMessage::WELCOME)
+
+    message = Telegram::InboundMessage.new({
+      "message_id" => 2,
+      "from" => {"id" => 555},
+      "chat" => {"id" => 555},
+      "text" => "/start #{token}"
+    }, client: @client)
+
+    assert_equal @speaker, message.onboard
+    assert_equal "555", @speaker.reload.telegram_chat_id
+  end
+
+  test "an invite link only works once" do
+    @speaker.update!(telegram_chat_id: nil)
+    @speaker.regenerate_telegram_invite_token
+    token = @speaker.telegram_invite_token
+    @client.stubs(:send_text)
+
+    Telegram::InboundMessage.new({
+      "message_id" => 2, "from" => {"id" => 555}, "chat" => {"id" => 555},
+      "text" => "/start #{token}"
+    }, client: @client).onboard
+
+    assert_nil @speaker.reload.telegram_invite_token
+
+    # Somebody else with the same link gets nothing.
+    @client.expects(:send_text).never
+    later = Telegram::InboundMessage.new({
+      "message_id" => 3, "from" => {"id" => 777}, "chat" => {"id" => 777},
+      "text" => "/start #{token}"
+    }, client: @client)
+
+    assert_nil later.onboard
+    assert_equal "555", @speaker.reload.telegram_chat_id
+  end
+
+  test "an unknown invite token claims nothing" do
+    @client.expects(:send_text).never
+    message = Telegram::InboundMessage.new({
+      "message_id" => 2, "from" => {"id" => 555}, "chat" => {"id" => 555},
+      "text" => "/start not-a-real-token"
+    }, client: @client)
+
+    assert_nil message.onboard
+  end
+
+  # A bare /start is somebody arriving without a link, so fall back to asking.
+  test "a plain start is not mistaken for an invite" do
+    @client.expects(:request_contact).once
+    message = Telegram::InboundMessage.new({
+      "message_id" => 2, "from" => {"id" => 555}, "chat" => {"id" => 555},
+      "text" => "/start"
+    }, client: @client)
+
+    assert_nil message.onboard
+  end
+
   test "a shared number claims the speaker expecting it" do
     @speaker.update!(telegram_chat_id: nil)
     message = Telegram::InboundMessage.new({

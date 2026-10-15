@@ -140,7 +140,7 @@ CREATE INDEX "index_media_imports_on_status" ON "media_imports" ("status");
 CREATE UNIQUE INDEX "index_media_imports_on_url" ON "media_imports" ("url");
 CREATE TABLE IF NOT EXISTS "settings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_settings_on_key" ON "settings" ("key");
-CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar, "location_id" integer, "phone_number" varchar, "answers_questions" boolean DEFAULT FALSE NOT NULL, "whatsapp_opted_in_at" datetime(6), "whatsapp_last_inbound_at" datetime(6), "whatsapp_nudged_at" datetime(6), "password_digest" varchar, "remember_token" varchar, "channel" integer DEFAULT 0 NOT NULL, "telegram_chat_id" varchar);
+CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar, "location_id" integer, "phone_number" varchar, "answers_questions" boolean DEFAULT FALSE NOT NULL, "whatsapp_opted_in_at" datetime(6), "whatsapp_last_inbound_at" datetime(6), "whatsapp_nudged_at" datetime(6), "password_digest" varchar, "remember_token" varchar, "channel" integer DEFAULT 0 NOT NULL, "telegram_chat_id" varchar, "telegram_invite_token" varchar);
 CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
 CREATE INDEX "index_users_on_token" ON "users" ("token");
 CREATE INDEX "index_users_on_grupa_id" ON "users" ("grupa_id");
@@ -254,7 +254,9 @@ CREATE INDEX "index_questions_on_asker_id" ON "questions" ("asker_id");
 CREATE INDEX "index_questions_on_speaker_id" ON "questions" ("speaker_id");
 CREATE INDEX "index_questions_on_speaker_id_and_status" ON "questions" ("speaker_id", "status");
 CREATE UNIQUE INDEX "index_questions_on_answer_message_id" ON "questions" ("answer_message_id");
+CREATE UNIQUE INDEX "index_users_on_telegram_invite_token" ON "users" ("telegram_invite_token");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261015180000'),
 ('20261014230000'),
 ('20261013120000'),
 ('20261011120000'),
