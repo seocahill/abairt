@@ -1,7 +1,7 @@
 <div id="<%= dom_id(question) %>" class="bg-white shadow-sm rounded-xl p-4">
   <div class="flex justify-between items-center gap-3">
     <div class="min-w-0">
-      <p class="text-sm font-medium truncate"><%= question.speaker.name %></p>
+      <p class="text-sm font-medium truncate"><%= question.speaker&.name || "Ag fanacht le cainteoir" %></p>
       <p class="text-xs text-gray-400"><%= time_ago_in_words(question.created_at) %> ó shin</p>
     </div>
     <%= render "questions/status", question: question %>

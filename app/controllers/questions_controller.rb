@@ -29,7 +29,9 @@ class QuestionsController < ApplicationController
   end
 
   def create
-    @question = Question.new(asker: current_user, speaker: QuestionRouter.new.speaker)
+    # No speaker here on purpose: one is chosen when the question is sent,
+    # so recording works whether or not anybody is connected yet.
+    @question = Question.new(asker: current_user)
     @question.audio.attach(params[:audio]) if params[:audio].present?
     authorize @question
 
@@ -45,7 +47,7 @@ class QuestionsController < ApplicationController
       respond_to do |format|
         format.turbo_stream { render :error, status: :unprocessable_entity }
         format.html do
-          @speaker = @question.speaker
+          @speaker = QuestionRouter.new.speaker
           @questions = recent_questions.limit(10)
           render :new, status: :unprocessable_entity
         end

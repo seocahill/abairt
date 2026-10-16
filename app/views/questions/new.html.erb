@@ -14,49 +14,56 @@
 
 <div class="max-w-md mx-auto px-4 py-8">
 
-  <% if @speaker.nil? %>
-    <div class="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-xl p-4 text-center">
-      Níl aon chainteoir ag glacadh le ceisteanna faoi láthair.
-    </div>
-  <% else %>
-    <div class="text-center">
-      <h1 class="text-2xl font-bold">Cuir ceist</h1>
-      <p class="text-sm text-gray-500 mt-1">
+  <div class="text-center">
+    <h1 class="text-2xl font-bold">Cuir ceist</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      <% if @speaker %>
         Freagróidh <%= @speaker.name %> le teachtaireacht ghutha.
-      </p>
-    </div>
+      <% else %>
+        Níl aon chainteoir ceangailte fós.
+      <% end %>
+    </p>
+  </div>
 
-    <%# The whole interaction. Press, speak, release.
-
-        The controller hangs here rather than on the page root so that it is
-        only instantiated alongside its targets. On the root it also connected
-        in the no-speaker branch above, where the button, status and timer do
-        not exist, and connect() threw on the first setStatus. %>
-    <div class="flex flex-col items-center justify-center my-10 select-none"
-         data-controller="voice-question"
-         data-voice-question-url-value="<%= questions_path %>">
-      <button type="button"
-              class="mic-button relative w-44 h-44 rounded-full bg-emerald-800 text-white shadow-lg
-                     flex items-center justify-center transition-transform
-                     focus:outline-none focus:ring-4 focus:ring-emerald-300"
-              aria-label="Coinnigh síos chun ceist a thaifeadadh"
-              data-voice-question-target="button"
-              data-action="pointerdown->voice-question#start
-                           pointerup->voice-question#stop
-                           pointercancel->voice-question#stop
-                           pointerleave->voice-question#stop
-                           contextmenu->voice-question#stop">
-        <span class="mic-ring absolute inset-0 rounded-full bg-emerald-500"></span>
-        <svg class="relative w-16 h-16" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-          <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z"/>
-          <path d="M5.5 9.5a.75.75 0 00-1.5 0 6 6 0 005.25 5.954V17H7.5a.75.75 0 000 1.5h5a.75.75 0 000-1.5h-1.75v-1.546A6 6 0 0016 9.5a.75.75 0 00-1.5 0 4.5 4.5 0 01-9 0z"/>
-        </svg>
-      </button>
-
-      <p class="mt-5 text-base text-gray-700 min-h-6" data-voice-question-target="status"></p>
-      <p class="mt-1 text-sm tabular-nums text-gray-400 min-h-5" data-voice-question-target="timer"></p>
-    </div>
+  <%# Recording works with nobody connected: the question waits in the queue
+      and goes out to the first speaker who arrives. Said plainly here, because
+      a recording that appears to vanish is worse than one that is refused. %>
+  <% if @speaker.nil? %>
+    <p class="mt-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm text-center p-3">
+      Is féidir leat ceist a chur mar sin féin — seolfar í chomh luath is a
+      cheanglaíonn cainteoir.
+    </p>
   <% end %>
+
+  <%# The whole interaction. Press, speak, release.
+
+      The controller hangs on the recorder rather than on the page root so that
+      it is never instantiated away from its targets: connect() reads the status
+      target immediately, so a controller without one throws. %>
+  <div class="flex flex-col items-center justify-center my-10 select-none"
+       data-controller="voice-question"
+       data-voice-question-url-value="<%= questions_path %>">
+    <button type="button"
+            class="mic-button relative w-44 h-44 rounded-full bg-emerald-800 text-white shadow-lg
+                   flex items-center justify-center transition-transform
+                   focus:outline-none focus:ring-4 focus:ring-emerald-300"
+            aria-label="Coinnigh síos chun ceist a thaifeadadh"
+            data-voice-question-target="button"
+            data-action="pointerdown->voice-question#start
+                         pointerup->voice-question#stop
+                         pointercancel->voice-question#stop
+                         pointerleave->voice-question#stop
+                         contextmenu->voice-question#stop">
+      <span class="mic-ring absolute inset-0 rounded-full bg-emerald-500"></span>
+      <svg class="relative w-16 h-16" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z"/>
+        <path d="M5.5 9.5a.75.75 0 00-1.5 0 6 6 0 005.25 5.954V17H7.5a.75.75 0 000 1.5h5a.75.75 0 000-1.5h-1.75v-1.546A6 6 0 0016 9.5a.75.75 0 00-1.5 0 4.5 4.5 0 01-9 0z"/>
+      </svg>
+    </button>
+
+    <p class="mt-5 text-base text-gray-700 min-h-6" data-voice-question-target="status"></p>
+    <p class="mt-1 text-sm tabular-nums text-gray-400 min-h-5" data-voice-question-target="timer"></p>
+  </div>
 
   <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Ceisteanna</h2>
   <div id="questions" class="space-y-3">

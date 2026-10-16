@@ -224,17 +224,6 @@ CREATE INDEX "index_oauth_access_tokens_on_resource_owner_id" ON "oauth_access_t
 CREATE INDEX "index_oauth_access_tokens_on_application_id" ON "oauth_access_tokens" ("application_id");
 CREATE UNIQUE INDEX "index_oauth_access_tokens_on_token" ON "oauth_access_tokens" ("token");
 CREATE UNIQUE INDEX "index_oauth_access_tokens_on_refresh_token" ON "oauth_access_tokens" ("refresh_token");
-CREATE TABLE IF NOT EXISTS "questions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asker_id" integer NOT NULL, "speaker_id" integer NOT NULL, "status" integer DEFAULT 0 NOT NULL, "sent_at" datetime(6), "answered_at" datetime(6), "question_message_id" varchar, "answer_message_id" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_fbda342dc9"
-FOREIGN KEY ("asker_id")
-  REFERENCES "users" ("id")
-, CONSTRAINT "fk_rails_1d9eac793f"
-FOREIGN KEY ("speaker_id")
-  REFERENCES "users" ("id")
-);
-CREATE INDEX "index_questions_on_asker_id" ON "questions" ("asker_id");
-CREATE INDEX "index_questions_on_speaker_id" ON "questions" ("speaker_id");
-CREATE INDEX "index_questions_on_speaker_id_and_status" ON "questions" ("speaker_id", "status");
-CREATE UNIQUE INDEX "index_questions_on_answer_message_id" ON "questions" ("answer_message_id");
 CREATE TABLE IF NOT EXISTS "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar(255), "name" varchar(255), "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "confirmed" boolean DEFAULT FALSE NOT NULL, "token" varchar(255), "master_id" bigint, "grupa_id" bigint, "lat_lang" varchar, "role" integer DEFAULT 0 NOT NULL, "voice" integer DEFAULT 0 NOT NULL, "dialect" integer DEFAULT 0 NOT NULL, "login_token" varchar, "about" text, "address" varchar, "ability" integer DEFAULT 0 NOT NULL, "api_token" varchar, "location_id" integer, "phone_number" varchar, "answers_questions" boolean DEFAULT FALSE NOT NULL, "password_digest" varchar, "remember_token" varchar, "telegram_chat_id" varchar, "telegram_invite_token" varchar);
 CREATE INDEX "index_users_on_master_id" ON "users" ("master_id");
 CREATE INDEX "index_users_on_token" ON "users" ("token");
@@ -255,7 +244,19 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
   INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
   INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
 END;
+CREATE TABLE IF NOT EXISTS "questions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asker_id" integer NOT NULL, "speaker_id" integer, "status" integer DEFAULT 0 NOT NULL, "sent_at" datetime(6), "answered_at" datetime(6), "question_message_id" varchar, "answer_message_id" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_1d9eac793f"
+FOREIGN KEY ("speaker_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_fbda342dc9"
+FOREIGN KEY ("asker_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_questions_on_asker_id" ON "questions" ("asker_id");
+CREATE INDEX "index_questions_on_speaker_id" ON "questions" ("speaker_id");
+CREATE INDEX "index_questions_on_speaker_id_and_status" ON "questions" ("speaker_id", "status");
+CREATE UNIQUE INDEX "index_questions_on_answer_message_id" ON "questions" ("answer_message_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261017000000'),
 ('20261015190000'),
 ('20261015180000'),
 ('20261014230000'),

@@ -3,7 +3,7 @@
 
   <div class="bg-white shadow rounded-lg p-6 mt-4">
     <div class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold">Ceist do <%= @question.speaker.name %></h1>
+      <h1 class="text-2xl font-bold"><%= @question.speaker ? "Ceist do #{@question.speaker.name}" : "Ceist ag fanacht le cainteoir" %></h1>
       <%= render "questions/status", question: @question %>
     </div>
 

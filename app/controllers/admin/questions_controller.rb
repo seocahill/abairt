@@ -19,7 +19,11 @@ module Admin
 
     # Nudges the queue by hand when something has got stuck.
     def deliver
-      speaker = Question.find(params[:id]).speaker
+      speaker = Question.find(params[:id]).speaker || QuestionRouter.new.speaker
+      if speaker.nil?
+        return redirect_to admin_questions_path, alert: "Níl aon chainteoir ceangailte fós."
+      end
+
       QuestionQueue.new(speaker).deliver_next
 
       redirect_to admin_questions_path, notice: "Sheiceáil muid an scuaine do #{speaker.name}."

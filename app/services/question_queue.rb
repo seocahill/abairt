@@ -36,11 +36,19 @@ class QuestionQueue
     outstanding.present?
   end
 
+  # Questions with no speaker are the pool every free speaker draws from:
+  # one recorded before anybody was connected belongs to whoever arrives
+  # first. Their own waiting questions are considered alongside it, oldest
+  # of either wins.
   def next_waiting
-    @speaker.asked_questions.waiting.oldest_first.first
+    Question.waiting.where(speaker: [nil, @speaker]).oldest_first.first
   end
 
   def deliver(question)
+    # Claimed on the way out, which is the only point at which we know who
+    # is actually free to take it.
+    question.update!(speaker: @speaker) if question.speaker.nil?
+
     message_id = Telegram::DeliverQuestion.new(question).call
     question.mark_sent!(message_id) if message_id
   end
