@@ -1,9 +1,5 @@
 require "test_helper"
 
-# The Telegram half of the shared ProcessInbound. The WhatsApp half is in
-# test/services/process_inbound_test.rb and exercises the same class — the point
-# of these is that the behaviour is identical on a transport with no 24 hour
-# window, no templates and a different idea of who a sender is.
 class Telegram::ProcessInboundTest < ActiveSupport::TestCase
   def setup
     @speaker = users(:speaker)

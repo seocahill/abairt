@@ -31,8 +31,8 @@ class Telegram::InboundMessageTest < ActiveSupport::TestCase
     assert_empty Telegram::InboundMessage.from_payload({"update_id" => 1, "edited_message" => voice_note})
   end
 
-  # A Telegram message id is only unique within its chat, and both transports'
-  # ids land in the same uniquely-indexed column.
+  # A Telegram message id is only unique within its chat, and answer_message_id
+  # carries a unique index.
   test "namespaces the message id by chat" do
     message = Telegram::InboundMessage.new(voice_note, client: @client)
 
