@@ -50,7 +50,6 @@
 .pagy-combo-nav-js .next {
   @apply text-gray-900 border-r border-transparent;
 }
-@import 'actiontext.css';
 
 /* Installed to the home screen, the app is only the asking half: tap the icon,
    hold the button, let go. The site's own navigation — Transcriptions,

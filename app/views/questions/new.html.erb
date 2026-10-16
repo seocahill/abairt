@@ -12,9 +12,7 @@
   </style>
 <% end %>
 
-<div class="max-w-md mx-auto px-4 py-8"
-     data-controller="voice-question"
-     data-voice-question-url-value="<%= questions_path %>">
+<div class="max-w-md mx-auto px-4 py-8">
 
   <% if @speaker.nil? %>
     <div class="bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-xl p-4 text-center">
@@ -28,8 +26,15 @@
       </p>
     </div>
 
-    <%# The whole interaction. Press, speak, release. %>
-    <div class="flex flex-col items-center justify-center my-10 select-none">
+    <%# The whole interaction. Press, speak, release.
+
+        The controller hangs here rather than on the page root so that it is
+        only instantiated alongside its targets. On the root it also connected
+        in the no-speaker branch above, where the button, status and timer do
+        not exist, and connect() threw on the first setStatus. %>
+    <div class="flex flex-col items-center justify-center my-10 select-none"
+         data-controller="voice-question"
+         data-voice-question-url-value="<%= questions_path %>">
       <button type="button"
               class="mic-button relative w-44 h-44 rounded-full bg-emerald-800 text-white shadow-lg
                      flex items-center justify-center transition-transform

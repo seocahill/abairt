@@ -40,6 +40,21 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # The recorder and the Stimulus controller that drives it live in the same
+  # branch on purpose. Mounted on the page root instead, the controller also
+  # connected here, where its button, status and timer targets do not exist,
+  # and connect() threw on the first setStatus.
+  test "new leaves the recorder out entirely when nobody is taking questions" do
+    User.update_all(answers_questions: false)
+
+    get new_question_path
+
+    assert_response :success
+    assert_match "Níl aon chainteoir ag glacadh le ceisteanna faoi láthair.", response.body
+    assert_select "[data-controller='voice-question']", false
+    assert_select "[data-voice-question-target='status']", false
+  end
+
   test "records a draft without sending it anywhere" do
     assert_difference("Question.count", 1) do
       assert_no_enqueued_jobs only: DeliverNextQuestionJob do
