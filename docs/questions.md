@@ -35,6 +35,26 @@ get wrong.
 `QuestionQueue`, `QuestionRouter` and the draft/send flow never name a
 transport. Only `Telegram::` does.
 
+## The speaker is chosen last
+
+A question is recorded before it is addressed to anyone. `speaker_id` is
+nullable, and a question with none is simply waiting for whoever comes free:
+`QuestionQueue` claims it on the way out.
+
+This matters twice over. Nothing is gated on somebody being connected, so a
+learner can record with no speaker at all and the question goes out the moment
+one arrives — that is what the asking screen promises when it says *seolfar í
+chomh luath is a cheanglaíonn cainteoir*. And the choice is made when the
+question actually goes out rather than when the button was released, so it
+cannot be stale by the time it is used.
+
+A speaker arriving needs no special path: `ProcessInbound` already runs the
+queue after onboarding, so following an invite link delivers whatever is
+waiting.
+
+Only `sent` and `answered` insist on a speaker — having gone out with nobody to
+have sent it to is a bug, and the model says so.
+
 ## The learner's side
 
 **Admins only, for now.** Asking a question spends a native speaker's time and,

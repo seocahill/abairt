@@ -16,8 +16,8 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     }.merge(overrides))
   end
 
-  def create_question(status: :waiting)
-    question = Question.new(asker: users(:two), speaker: @speaker, status: status)
+  def create_question(status: :waiting, speaker: @speaker)
+    question = Question.new(asker: users(:two), speaker: speaker, status: status)
     question.audio.attach(
       io: Rails.root.join("test/fixtures/files/sample.mp3").open,
       filename: "sample.mp3",
@@ -25,6 +25,30 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     )
     question.save!
     question
+  end
+
+  # The promise the asking screen makes: record with nobody connected and the
+  # question goes out the moment somebody arrives. Nothing in the Telegram path
+  # had to learn about it — onboarding already ran the queue, and the queue now
+  # claims a question that is waiting for nobody in particular.
+  test "a speaker following an invite link picks up a question that was waiting for nobody" do
+    @speaker.update!(telegram_chat_id: nil)
+    @speaker.regenerate_telegram_invite_token
+    orphan = create_question(status: :waiting, speaker: nil)
+
+    Telegram::Client.any_instance.stubs(:send_text)
+    Telegram::DeliverQuestion.any_instance.stubs(:call).returns("telegram:11223344:7")
+
+    ProcessInbound.new(Telegram::InboundMessage.new({
+      "message_id" => 7,
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
+      "text" => "/start #{@speaker.telegram_invite_token}"
+    })).call
+
+    orphan.reload
+    assert_equal @speaker, orphan.speaker
+    assert orphan.sent?
   end
 
   test "a voice note answers the question the speaker is holding" do

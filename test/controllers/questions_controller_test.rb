@@ -22,8 +22,8 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     fixture_file_upload("test/fixtures/files/sample.mp3", "audio/mpeg")
   end
 
-  def create_draft(asker: @asker)
-    question = Question.new(asker: asker, speaker: @speaker)
+  def create_draft(asker: @asker, speaker: @speaker)
+    question = Question.new(asker: asker, speaker: speaker)
     question.audio.attach(io: Rails.root.join("test/fixtures/files/sample.mp3").open,
       filename: "sample.mp3", content_type: "audio/mpeg")
     question.save!
@@ -40,6 +40,32 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # Recording is not gated on anybody being connected: the question waits.
+  # The screen says so rather than leaving a recording to look like it vanished.
+  test "new still offers the recorder when nobody is connected" do
+    User.update_all(answers_questions: false)
+
+    get new_question_path
+
+    assert_response :success
+    assert_match "Níl aon chainteoir ceangailte fós.", response.body
+    assert_match "Is féidir leat ceist a chur mar sin féin", response.body
+    assert_select "[data-controller='voice-question']"
+    assert_select "[data-voice-question-target='status']"
+  end
+
+  # The controller reads its status target in connect(), so it must never be
+  # mounted away from its targets — that threw "Missing target element".
+  test "the recorder's controller is never mounted without its targets" do
+    get new_question_path
+
+    assert_select "[data-controller='voice-question']" do
+      assert_select "[data-voice-question-target='button']"
+      assert_select "[data-voice-question-target='status']"
+      assert_select "[data-voice-question-target='timer']"
+    end
+  end
+
   test "records a draft without sending it anywhere" do
     assert_difference("Question.count", 1) do
       assert_no_enqueued_jobs only: DeliverNextQuestionJob do
@@ -49,9 +75,34 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
 
     question = Question.last
     assert_equal @asker, question.asker
-    assert_equal @speaker, question.speaker
+    # Addressed to nobody yet: the speaker is chosen as it is delivered, so a
+    # recording made with nobody connected is still a perfectly good draft.
+    assert_nil question.speaker
     assert question.draft?
     assert_redirected_to new_question_path
+  end
+
+  test "records a draft even when nobody is connected" do
+    User.update_all(answers_questions: false)
+
+    assert_difference("Question.count", 1) do
+      post questions_path, params: {audio: audio_upload}
+    end
+
+    assert_nil Question.last.speaker
+    assert Question.last.draft?
+  end
+
+  test "a question sent with nobody connected waits unassigned" do
+    question = create_draft(speaker: nil)
+    User.update_all(answers_questions: false)
+
+    assert_no_enqueued_jobs only: DeliverNextQuestionJob do
+      post question_delivery_path(question)
+    end
+
+    assert question.reload.waiting?
+    assert_nil question.speaker
   end
 
   test "sending a draft queues it for the speaker" do

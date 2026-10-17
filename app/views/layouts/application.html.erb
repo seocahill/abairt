@@ -13,6 +13,9 @@
     <%= stylesheet_link_tag 'application', 'actiontext', media: 'all' %>
     <link rel="manifest" href="<%= pwa_manifest_path %>">
     <meta name="theme-color" content="#1e3a2f">
+    <%# Both: the standard name is what Chrome reads, the apple- prefixed one
+        is still what older iOS Safari needs for a standalone home screen app. %>
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="<%= asset_path("pwa/icon-192.png") %>">

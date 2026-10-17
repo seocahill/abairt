@@ -9,7 +9,10 @@
 # question without ids, keywords or quoting.
 class Question < ApplicationRecord
   belongs_to :asker, class_name: "User"
-  belongs_to :speaker, class_name: "User"
+  # Optional because a question is recorded before it is addressed to
+  # anyone: with nobody connected it still records and waits. The speaker
+  # is chosen as it is delivered — see QuestionQueue.
+  belongs_to :speaker, class_name: "User", optional: true
 
   has_one_attached :audio
   has_one_attached :answer_audio
@@ -20,6 +23,9 @@ class Question < ApplicationRecord
 
   validates :audio, presence: true
   validate :speaker_answers_questions, on: :create
+  # Waiting without a speaker is the queue. Having gone out without one is
+  # a bug, so the two states that imply a delivery insist on one.
+  validates :speaker, presence: true, if: -> { sent? || answered? }
 
   scope :oldest_first, -> { order(created_at: :asc) }
 

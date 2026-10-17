@@ -20,6 +20,34 @@ class QuestionTest < ActiveSupport::TestCase
     assert build_question.valid?
   end
 
+  # Waiting without a speaker is the queue, not an error.
+  test "is valid as a draft with no speaker at all" do
+    assert build_question(speaker: nil).valid?
+  end
+
+  test "may wait without a speaker" do
+    question = build_question(speaker: nil)
+    question.save!
+
+    assert question.send_to_speaker!
+    assert question.reload.waiting?
+    assert_nil question.speaker
+  end
+
+  # Having gone out with nobody to have sent it to is a bug, so the two states
+  # that imply a delivery insist on a speaker.
+  test "cannot be sent or answered without a speaker" do
+    question = build_question(speaker: nil)
+    question.save!
+
+    question.status = :sent
+    assert_not question.valid?
+    assert_includes question.errors[:speaker], "can't be blank"
+
+    question.status = :answered
+    assert_not question.valid?
+  end
+
   test "requires audio" do
     question = Question.new(asker: @asker, speaker: @speaker)
 

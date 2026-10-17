@@ -51,7 +51,7 @@
           <tr>
             <td class="px-4 py-3 text-sm"><%= question.id %></td>
             <td class="px-4 py-3 text-sm"><%= question.asker.name %></td>
-            <td class="px-4 py-3 text-sm"><%= question.speaker.name %></td>
+            <td class="px-4 py-3 text-sm"><%= question.speaker&.name || "—" %></td>
             <td class="px-4 py-3 text-sm"><%= render "questions/status", question: question %></td>
             <td class="px-4 py-3 text-sm text-gray-500"><%= time_ago_in_words(question.created_at) %> ago</td>
             <td class="px-4 py-3 text-sm">
