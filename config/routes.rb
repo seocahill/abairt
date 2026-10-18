@@ -75,6 +75,7 @@ Rails.application.routes.draw do
         post :deconfirm
       end
     end
+    resource :claim, module: :voice_recordings, only: [:create, :destroy]
     resources :speakers, module: :voice_recordings, only: [:index, :update] do
       collection do
         get :search

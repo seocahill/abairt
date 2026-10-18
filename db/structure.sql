@@ -74,11 +74,6 @@ CREATE INDEX "index_user_lists_on_user_id" ON "user_lists" ("user_id");
 CREATE INDEX "index_user_lists_on_word_list_id" ON "user_lists" ("word_list_id");
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
-CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer NOT NULL PRIMARY KEY, "title" varchar DEFAULT NULL, "description" text DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json DEFAULT NULL, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" jsonb, "diarization_status" varchar, "import_status" varchar, "location_id" integer, "metadata_analysis" json, CONSTRAINT "fk_rails_91ca04707d"
-FOREIGN KEY ("user_id")
-  REFERENCES "users" ("id")
-);
-CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id");
 CREATE TABLE IF NOT EXISTS "versions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "item_type" varchar NOT NULL, "item_id" bigint NOT NULL, "event" varchar NOT NULL, "whodunnit" varchar, "object" json, "created_at" datetime(6));
 CREATE INDEX "index_versions_on_item_type_and_item_id" ON "versions" ("item_type", "item_id");
 CREATE TABLE IF NOT EXISTS "learning_sessions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "learnable_type" varchar NOT NULL, "learnable_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_e54f74cd15"
@@ -114,7 +109,6 @@ FOREIGN KEY ("user_id")
 CREATE INDEX "index_articles_on_user_id" ON "articles" ("user_id");
 CREATE TABLE IF NOT EXISTS "action_text_rich_texts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "body" text, "record_type" varchar NOT NULL, "record_id" bigint NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_action_text_rich_texts_uniqueness" ON "action_text_rich_texts" ("record_type", "record_id", "name");
-CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
 CREATE TABLE IF NOT EXISTS "dictionary_entries" ("id" integer NOT NULL PRIMARY KEY, "word_or_phrase" varchar(255) DEFAULT NULL, "translation" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "region_start" decimal DEFAULT NULL, "region_end" decimal DEFAULT NULL, "region_id" varchar DEFAULT NULL, "voice_recording_id" integer DEFAULT NULL, "speaker_id" integer DEFAULT NULL, "user_id" integer NOT NULL, "quality" integer DEFAULT 0 NOT NULL, "standard_irish" varchar DEFAULT NULL, "notes" text DEFAULT NULL, "translator_id" integer DEFAULT NULL, "status" integer DEFAULT 0 NOT NULL, "accuracy_status" integer DEFAULT 0 NOT NULL, CONSTRAINT "fk_rails_43cc55d212"
 FOREIGN KEY ("user_id")
   REFERENCES "users" ("id")
@@ -144,7 +138,6 @@ CREATE TABLE IF NOT EXISTS "locations" ("id" integer PRIMARY KEY AUTOINCREMENT N
 CREATE INDEX "index_locations_on_parent_id" ON "locations" ("parent_id");
 CREATE INDEX "index_locations_on_name" ON "locations" ("name");
 CREATE INDEX "index_locations_on_dialect_region" ON "locations" ("dialect_region");
-CREATE INDEX "index_voice_recordings_on_location_id" ON "voice_recordings" ("location_id");
 CREATE VIRTUAL TABLE vec_dictionary_entry_embeddings
 USING vec0(
   dictionary_entry_id INTEGER NOT NULL,
@@ -255,7 +248,19 @@ CREATE INDEX "index_questions_on_asker_id" ON "questions" ("asker_id");
 CREATE INDEX "index_questions_on_speaker_id" ON "questions" ("speaker_id");
 CREATE INDEX "index_questions_on_speaker_id_and_status" ON "questions" ("speaker_id", "status");
 CREATE UNIQUE INDEX "index_questions_on_answer_message_id" ON "questions" ("answer_message_id");
+CREATE TABLE IF NOT EXISTS "voice_recordings" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar, "description" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "peaks" json, "user_id" integer NOT NULL, "transcription" text, "transcription_en" text, "dictionary_entries_count" integer DEFAULT 0 NOT NULL, "duration_seconds" float DEFAULT 0.0 NOT NULL, "diarization_data" json, "diarization_status" varchar, "import_status" varchar, "location_id" integer, "metadata_analysis" json, "claimed_by_id" integer, "claimed_at" datetime(6), CONSTRAINT "fk_rails_91ca04707d"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_dd195e7bf7"
+FOREIGN KEY ("claimed_by_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id");
+CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
+CREATE INDEX "index_voice_recordings_on_location_id" ON "voice_recordings" ("location_id");
+CREATE INDEX "index_voice_recordings_on_claimed_by_id" ON "voice_recordings" ("claimed_by_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261018000000'),
 ('20261017000000'),
 ('20261015190000'),
 ('20261015180000'),
