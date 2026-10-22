@@ -18,6 +18,9 @@ module Telegram
 
     class Error < StandardError; end
 
+    # Telegram rejects a caption longer than this.
+    CAPTION_LIMIT = 1024
+
     def initialize
       @token = credential(:bot_token, "TELEGRAM_BOT_TOKEN")
     end
@@ -25,9 +28,18 @@ module Telegram
     # Returns Telegram's message id. sendVoice is the one that renders as a
     # playable voice bubble rather than a file; it wants ogg/opus, which
     # OpusVoiceNote guarantees.
-    def send_voice(chat_id:, path:)
+    #
+    # `caption` rides along under the voice bubble, and `button` puts one key
+    # above the keyboard. A reply keyboard rather than an inline one on purpose:
+    # tapping it sends an ordinary message, so there is no callback_query to
+    # handle and the speaker's side stays one code path.
+    def send_voice(chat_id:, path:, caption: nil, button: nil)
       File.open(path) do |file|
-        result = post("sendVoice", {chat_id: chat_id, voice: file}, multipart: true)
+        body = {chat_id: chat_id, voice: file}
+        body[:caption] = caption.truncate(CAPTION_LIMIT) if caption.present?
+        body[:reply_markup] = one_key(button) if button.present?
+
+        result = post("sendVoice", body, multipart: true)
         result.fetch("message_id")
       end
     end
@@ -88,6 +100,14 @@ module Telegram
     end
 
     private
+
+    def one_key(button)
+      {
+        keyboard: [[{text: button}]],
+        resize_keyboard: true,
+        one_time_keyboard: true
+      }.to_json
+    end
 
     def post(method, body, multipart: false)
       response = self.class.post("#{BASE_URL}/bot#{@token}/#{method}", body: body, multipart: multipart)

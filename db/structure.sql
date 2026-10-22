@@ -259,7 +259,19 @@ CREATE INDEX "index_voice_recordings_on_user_id" ON "voice_recordings" ("user_id
 CREATE INDEX "index_voice_recordings_on_diarization_status" ON "voice_recordings" ("diarization_status");
 CREATE INDEX "index_voice_recordings_on_location_id" ON "voice_recordings" ("location_id");
 CREATE INDEX "index_voice_recordings_on_claimed_by_id" ON "voice_recordings" ("claimed_by_id");
+CREATE TABLE IF NOT EXISTS "segment_prompts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "dictionary_entry_id" integer NOT NULL, "speaker_id" integer NOT NULL, "status" integer DEFAULT 0 NOT NULL, "sent_at" datetime(6), "answered_at" datetime(6), "message_id" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_a44936850a"
+FOREIGN KEY ("dictionary_entry_id")
+  REFERENCES "dictionary_entries" ("id")
+, CONSTRAINT "fk_rails_c982c94e45"
+FOREIGN KEY ("speaker_id")
+  REFERENCES "users" ("id")
+);
+CREATE INDEX "index_segment_prompts_on_dictionary_entry_id" ON "segment_prompts" ("dictionary_entry_id");
+CREATE INDEX "index_segment_prompts_on_speaker_id" ON "segment_prompts" ("speaker_id");
+CREATE INDEX "index_segment_prompts_on_speaker_id_and_status" ON "segment_prompts" ("speaker_id", "status");
+CREATE UNIQUE INDEX "index_segment_prompts_on_message_id" ON "segment_prompts" ("message_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261022000000'),
 ('20261018000000'),
 ('20261017000000'),
 ('20261015190000'),

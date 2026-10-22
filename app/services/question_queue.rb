@@ -32,8 +32,10 @@ class QuestionQueue
 
   private
 
+  # Spans both kinds: a speaker holding a segment is not free for a question
+  # either, or a voice note coming back would be ambiguous. See SpeakerSlot.
   def outstanding?
-    outstanding.present?
+    !SpeakerSlot.new(@speaker).free?
   end
 
   # Questions with no speaker are the pool every free speaker draws from:

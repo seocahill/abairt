@@ -31,6 +31,11 @@ class User < ApplicationRecord
 
   has_many :questions, foreign_key: :asker_id
   has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
+  # Recordings this speaker has taken to check through. The claim decides
+  # only whose Telegram the automatic prompts go to — anybody may still
+  # translate any recording in the web app.
+  has_many :claimed_voice_recordings, foreign_key: :claimed_by_id, class_name: "VoiceRecording"
+  has_many :segment_prompts, foreign_key: :speaker_id
 
   enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
   # A speaker has no email, but the admin form still posts an empty string for

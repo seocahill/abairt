@@ -5,6 +5,24 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     @speaker = users(:speaker)
     @speaker.update!(answers_questions: true)
     Question.delete_all
+    SegmentPrompt.delete_all
+  end
+
+  def text_message(body)
+    Telegram::InboundMessage.new({
+      "message_id" => 77,
+      "from" => {"id" => 11223344},
+      "chat" => {"id" => 11223344},
+      "text" => body
+    })
+  end
+
+  def sent_prompt
+    SegmentPrompt.create!(
+      dictionary_entry: dictionary_entries(:one),
+      speaker: @speaker,
+      sent_at: Time.current
+    )
   end
 
   def inbound(overrides = {})
@@ -49,6 +67,38 @@ class Telegram::ProcessInboundTest < ActiveSupport::TestCase
     orphan.reload
     assert_equal @speaker, orphan.speaker
     assert orphan.sent?
+  end
+
+  # Holding a segment rather than a question, the same voice note means
+  # something else entirely — and nothing had to be tagged for us to know.
+  test "a voice note against a segment is a correction, not an answer" do
+    prompt = sent_prompt
+    Telegram::Client.any_instance.stubs(:download_file).returns("ogg-bytes")
+
+    ProcessInbound.new(inbound).call
+
+    prompt.reload
+    assert prompt.corrected?
+    assert prompt.correction_audio.attached?
+    # Deliberately not confirmed: somebody still has to write it down.
+    assert dictionary_entries(:one).reload.unconfirmed?
+  end
+
+  test "the button says the transcription was already right" do
+    prompt = sent_prompt
+
+    ProcessInbound.new(text_message(Telegram::DeliverSegment::CONFIRM)).call
+
+    assert prompt.reload.confirmed?
+    assert dictionary_entries(:one).reload.confirmed?
+  end
+
+  test "anything else leaves the segment out with them" do
+    prompt = sent_prompt
+
+    ProcessInbound.new(text_message("Dia dhuit")).call
+
+    assert prompt.reload.sent?
   end
 
   test "a voice note answers the question the speaker is holding" do
