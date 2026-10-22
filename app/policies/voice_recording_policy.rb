@@ -35,6 +35,16 @@ class VoiceRecordingPolicy < ApplicationPolicy
     true if user == record.owner
   end
 
+  # Whoever may confirm an entry may take a recording to check through.
+  def claim?
+    user && !user.student?
+  end
+
+  # Your own claim, or an admin freeing one somebody never got back to.
+  def release_claim?
+    user && (user.admin? || user == record.claimed_by)
+  end
+
   def retranscribe?
     user&.admin?
   end

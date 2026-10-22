@@ -8,11 +8,37 @@ class VoiceRecording < ApplicationRecord
 
   belongs_to :owner, class_name: "User", foreign_key: "user_id"
   belongs_to :location, optional: true
+  belongs_to :claimed_by, class_name: "User", optional: true
 
   has_many :voice_recording_locations, dependent: :destroy
   has_many :locations, through: :voice_recording_locations
 
   acts_as_taggable_on :tags
+
+  scope :unclaimed, -> { where(claimed_by_id: nil) }
+  scope :claimed, -> { where.not(claimed_by_id: nil) }
+
+  # Takes the recording to check through, or returns false if somebody else
+  # already holds it. The condition lives in the UPDATE rather than in a read
+  # followed by a write, so two people pressing at the same moment cannot both
+  # come away believing it is theirs. Re-claiming your own is a no-op.
+  def claim(user)
+    rows = self.class
+      .where(id: id, claimed_by_id: [nil, user.id])
+      .update_all(claimed_by_id: user.id, claimed_at: Time.current)
+    return false if rows.zero?
+
+    reload
+    true
+  end
+
+  def release!
+    update!(claimed_by: nil, claimed_at: nil)
+  end
+
+  def claimed?
+    claimed_by_id.present?
+  end
 
   # Provide direct access to diarization_data JSON fields
   store_accessor :diarization_data, :segments, :source, :fotheidil_video_id, :diarization

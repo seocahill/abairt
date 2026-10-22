@@ -43,6 +43,10 @@ module Telegram
       @payload.key?("voice")
     end
 
+    def text
+      @payload["text"].to_s
+    end
+
     def download_audio
       @client.download_file(@payload.dig("voice", "file_id"))
     end
