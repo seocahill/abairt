@@ -46,6 +46,15 @@ class DictionaryEntry < ApplicationRecord
   end
   scope :updated_since, ->(timestamp) { where("updated_at > ?", timestamp) }
 
+  # Entries whose Irish contains the given words, best match first. Searched as
+  # a phrase in the full-text index, so accents and case don't matter.
+  scope :matching_irish, ->(text) {
+    phrase = text.to_s.delete('"').squish
+    joins(:fts_dictionary_entries)
+      .where("fts_dictionary_entries MATCH ?", %(word_or_phrase : "#{phrase}"))
+      .reorder("rank")
+  }
+
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }
 
   validate :dictionary_entries_cannot_exceed_segments_count, on: :create

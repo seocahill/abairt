@@ -21,6 +21,8 @@ module Api
       end
     end
 
+    def auth = { "Authorization" => "Bearer #{@user.api_token}" }
+
     test "should require authentication" do
       get api_transcriptions_path
       assert_response :unauthorized
@@ -46,6 +48,44 @@ module Api
       
       json = JSON.parse(response.body)
       assert json['entries'].is_a?(Array)
+    end
+
+    test "q finds entries whose Irish contains the words, ignoring accents" do
+      get api_transcriptions_path, params: { q: "cen chaoi" }, headers: auth
+      assert_response :success
+
+      ids = JSON.parse(response.body)["entries"].map { |e| e["id"] }
+      assert_equal [ @confirmed_entry.id ], ids
+    end
+
+    test "q searches the Irish, not the English" do
+      get api_transcriptions_path, params: { q: "How did you" }, headers: auth
+
+      assert_empty JSON.parse(response.body)["entries"]
+    end
+
+    test "has_audio leaves out entries without a recording" do
+      get api_transcriptions_path, params: { has_audio: "true" }, headers: auth
+
+      ids = JSON.parse(response.body)["entries"].map { |e| e["id"] }
+      assert_includes ids, @confirmed_entry.id
+      refute_includes ids, dictionary_entries(:four).id
+    end
+
+    test "mayo keeps only entries spoken in a Mayo dialect" do
+      users(:one).update!(dialect: "canúintí_eile")
+      get api_transcriptions_path, params: { mayo: "true" }, headers: auth
+      assert_empty JSON.parse(response.body)["entries"]
+
+      users(:one).update!(dialect: :acaill)
+      get api_transcriptions_path, params: { mayo: "true" }, headers: auth
+      assert_includes JSON.parse(response.body)["entries"].map { |e| e["id"] }, @confirmed_entry.id
+    end
+
+    test "q with search syntax in it is taken literally" do
+      get api_transcriptions_path, params: { q: 'chaoi" OR (*' }, headers: auth
+
+      assert_response :success
     end
 
     test "should return single confirmed entry" do
