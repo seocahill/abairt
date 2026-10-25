@@ -65,6 +65,27 @@ module Api
                     type: "string",
                     format: "date-time"
                   }
+                },
+                {
+                  name: "q",
+                  in: "query",
+                  description: "Only transcriptions whose Irish contains these words, as a phrase (accents and case ignored), best match first",
+                  required: false,
+                  schema: { type: "string" }
+                },
+                {
+                  name: "mayo",
+                  in: "query",
+                  description: "Only transcriptions spoken in a Mayo dialect",
+                  required: false,
+                  schema: { type: "boolean" }
+                },
+                {
+                  name: "has_audio",
+                  in: "query",
+                  description: "Only transcriptions with a recording",
+                  required: false,
+                  schema: { type: "boolean" }
                 }
               ],
               responses: {

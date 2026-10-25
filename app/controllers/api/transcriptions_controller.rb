@@ -14,6 +14,11 @@ module Api
       scope
     end
 
+    # Searching for recordings of a word or phrase, e.g. from the Mayo Irish course.
+    has_scope(:q) { |_controller, scope, value| scope.matching_irish(value) }
+    has_scope(:mayo, type: :boolean) { |_controller, scope| scope.mayo_dialect }
+    has_scope(:has_audio, type: :boolean) { |_controller, scope| scope.has_recording }
+
     def index
       entries = apply_scopes(DictionaryEntry.confirmed_accuracy)
         .with_attached_media
