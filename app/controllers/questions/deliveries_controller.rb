@@ -12,14 +12,7 @@ module Questions
       @question = current_user.questions.find(params[:question_id])
       authorize @question, :update?
 
-      if @question.send_to_speaker!
-        # Nobody connected yet simply means it waits: it is in the queue,
-        # and the first speaker to arrive picks it up through the ordinary
-        # path in ProcessInbound. A draft that already names a speaker is one
-        # recorded before the speaker was chosen at delivery, so it keeps them.
-        speaker = @question.speaker || QuestionRouter.new.speaker
-        DeliverNextQuestionJob.perform_later(speaker) if speaker
-      end
+      SendQuestion.new(@question).call
 
       respond_to do |format|
         format.turbo_stream { render turbo_stream: turbo_stream.replace(@question, partial: "questions/question", locals: {question: @question}) }

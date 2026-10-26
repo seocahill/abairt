@@ -234,6 +234,59 @@ module Api
                 }
               }
             }
+          },
+          "/api/questions": {
+            post: {
+              summary: "Ask a native speaker",
+              description: "Sends a spoken question to a native speaker over Telegram, on behalf of someone using another app. The API user is the asker; asker_label says who actually asked. The question is sent straight away (no draft step) and waits in the queue if no speaker is connected. Only accounts allowed to ask questions can use it.",
+              operationId: "createQuestion",
+              tags: ["Questions"],
+              requestBody: {
+                required: true,
+                content: {
+                  "multipart/form-data": {
+                    schema: {
+                      type: "object",
+                      required: ["audio"],
+                      properties: {
+                        audio: { type: "string", format: "binary", description: "The spoken question: any audio a browser records, up to 10 MB" },
+                        asker_label: { type: "string", description: "Who is asking, e.g. a learner's name and app (up to 100 characters)" }
+                      }
+                    }
+                  }
+                }
+              },
+              responses: {
+                "201": {
+                  description: "Question sent",
+                  content: { "application/json": { schema: { "$ref": "#/components/schemas/Question" } } }
+                },
+                "401": { "$ref": "#/components/responses/Unauthorized" },
+                "403": { description: "This account can't ask questions" },
+                "422": { description: "Missing or unsupported audio" },
+                "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+              }
+            }
+          },
+          "/api/questions/{id}": {
+            get: {
+              summary: "Get a question",
+              description: "Returns one of the API user's questions, with the answer's audio once a speaker has replied",
+              operationId: "getQuestion",
+              tags: ["Questions"],
+              parameters: [
+                { name: "id", in: "path", required: true, description: "Question ID", schema: { type: "integer" } }
+              ],
+              responses: {
+                "200": {
+                  description: "Successful response",
+                  content: { "application/json": { schema: { "$ref": "#/components/schemas/Question" } } }
+                },
+                "401": { "$ref": "#/components/responses/Unauthorized" },
+                "404": { "$ref": "#/components/responses/NotFound" },
+                "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+              }
+            }
           }
         },
         components: {
@@ -245,6 +298,19 @@ module Api
             }
           },
           schemas: {
+            Question: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                status: { type: "string", enum: ["draft", "waiting", "sent", "answered"], description: "waiting: queued for a speaker; sent: with a speaker; answered: the reply is in answer_audio_url" },
+                asker_label: { type: "string", nullable: true },
+                created_at: { type: "string", format: "date-time" },
+                sent_at: { type: "string", format: "date-time", nullable: true },
+                answered_at: { type: "string", format: "date-time", nullable: true },
+                audio_url: { type: "string", format: "uri", description: "The question as asked" },
+                answer_audio_url: { type: "string", format: "uri", nullable: true, description: "The speaker's spoken answer (Ogg Opus), once answered" }
+              }
+            },
             Transcription: {
               type: "object",
               properties: {
