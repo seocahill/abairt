@@ -237,7 +237,7 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
   INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
   INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
 END;
-CREATE TABLE IF NOT EXISTS "questions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asker_id" integer NOT NULL, "speaker_id" integer, "status" integer DEFAULT 0 NOT NULL, "sent_at" datetime(6), "answered_at" datetime(6), "question_message_id" varchar, "answer_message_id" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_1d9eac793f"
+CREATE TABLE IF NOT EXISTS "questions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asker_id" integer NOT NULL, "speaker_id" integer, "status" integer DEFAULT 0 NOT NULL, "sent_at" datetime(6), "answered_at" datetime(6), "question_message_id" varchar, "answer_message_id" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "asked_via" varchar DEFAULT 'abairt' NOT NULL, "asker_label" varchar, CONSTRAINT "fk_rails_1d9eac793f"
 FOREIGN KEY ("speaker_id")
   REFERENCES "users" ("id")
 , CONSTRAINT "fk_rails_fbda342dc9"
@@ -271,6 +271,7 @@ CREATE INDEX "index_segment_prompts_on_speaker_id" ON "segment_prompts" ("speake
 CREATE INDEX "index_segment_prompts_on_speaker_id_and_status" ON "segment_prompts" ("speaker_id", "status");
 CREATE UNIQUE INDEX "index_segment_prompts_on_message_id" ON "segment_prompts" ("message_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261026120000'),
 ('20261022000000'),
 ('20261018000000'),
 ('20261017000000'),

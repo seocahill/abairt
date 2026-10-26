@@ -58,6 +58,9 @@ Rails.application.routes.draw do
 
     # Island context: find Mayo dialect entries relevant to a Caotharnach island description
     resources :island_context, only: [:create]
+
+    # Questions to native speakers, asked from other apps on behalf of their learners
+    resources :questions, only: [:create, :show]
     
     # OpenAPI schema
     get 'openapi', to: 'openapi#show', defaults: { format: 'json' }

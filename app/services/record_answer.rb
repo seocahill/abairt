@@ -50,7 +50,9 @@ class RecordAnswer
     )
   end
 
+  # Apps asking through the API show the answer themselves, and their API user
+  # is not the person who asked.
   def notify_asker
-    QuestionMailer.answered(@question).deliver_later
+    QuestionMailer.answered(@question).deliver_later if @question.asked_via == "abairt"
   end
 end
