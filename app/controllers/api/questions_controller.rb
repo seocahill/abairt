@@ -10,7 +10,10 @@ module Api
   class QuestionsController < BaseController
     MAX_AUDIO_BYTES = 10.megabytes
 
-    rate_limit to: 60, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }
+    # Looking a question up is cheap and apps check for answers often; asking
+    # spends a speaker's time, so it is the one held back.
+    rate_limit to: 60, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }, only: :create, name: "ask"
+    rate_limit to: 1000, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }, only: :show, name: "look_up"
 
     # POST /api/questions
     # Params:
