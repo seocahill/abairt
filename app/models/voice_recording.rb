@@ -48,6 +48,19 @@ class VoiceRecording < ApplicationRecord
     AnalyzeVoiceRecordingJob.perform_later(self)
   end
 
+  # The audio a listener hears: the extracted track of a video, or the
+  # recording itself when it is audio. Nil when there is nothing to play.
+  def listening_audio
+    return audio_track if audio_track.attached?
+
+    media if media.attached? && media.audio?
+  end
+
+  # The confirmed lines of the transcript, in the order they are heard.
+  def transcript_lines
+    dictionary_entries.confirmed_accuracy.where.not(region_start: nil).includes(:speaker).reorder(:region_start)
+  end
+
   def analyzed?
     metadata_analysis.present?
   end

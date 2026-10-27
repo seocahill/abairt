@@ -39,7 +39,8 @@ Rails.application.routes.draw do
   match "/mcp", to: "mcp#handle", via: %i[get post delete]
 
   namespace :api do
-    resources :voice_recordings, only: [] do
+    # A recording with its timed transcript, for apps that play it to learners
+    resources :voice_recordings, only: [:show] do
       post 'diarization_webhook', to: 'voice_recordings/diarization_webhooks#create'
     end
 

@@ -235,6 +235,26 @@ module Api
               }
             }
           },
+          "/api/voice_recordings/{id}": {
+            get: {
+              summary: "Get a recording with its transcript",
+              description: "Returns a whole recording to listen to, with its confirmed transcript line by line, each line timed in seconds from the start. For playing a recording to learners with the words following along.",
+              operationId: "getVoiceRecording",
+              tags: ["Recordings"],
+              parameters: [
+                { name: "id", in: "path", required: true, description: "Recording ID", schema: { type: "integer" } }
+              ],
+              responses: {
+                "200": {
+                  description: "Successful response",
+                  content: { "application/json": { schema: { "$ref": "#/components/schemas/RecordingTranscript" } } }
+                },
+                "401": { "$ref": "#/components/responses/Unauthorized" },
+                "404": { description: "No such recording, or it has no audio" },
+                "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+              }
+            }
+          },
           "/api/questions": {
             post: {
               summary: "Ask a native speaker",
@@ -298,6 +318,31 @@ module Api
             }
           },
           schemas: {
+            RecordingTranscript: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                title: { type: "string" },
+                duration_seconds: { type: "number", format: "float" },
+                dialect_region: { type: "string", nullable: true },
+                audio_url: { type: "string", format: "uri", description: "The recording's audio (the extracted track for a video)" },
+                lines: {
+                  type: "array",
+                  description: "Confirmed lines of the transcript, in the order they are heard",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "integer", description: "Transcription ID" },
+                      irish: { type: "string" },
+                      translation: { type: "string", nullable: true },
+                      start: { type: "number", format: "float", description: "Start time in seconds" },
+                      end: { type: "number", format: "float", description: "End time in seconds" },
+                      speaker: { "$ref": "#/components/schemas/Speaker" }
+                    }
+                  }
+                }
+              }
+            },
             Question: {
               type: "object",
               properties: {
