@@ -1,2 +1,0 @@
-module VoiceRecordings::DictionaryEntriesHelper
-end

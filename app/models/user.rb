@@ -25,10 +25,6 @@ class User < ApplicationRecord
 
   has_many :fts_users, class_name: "FtsUser", foreign_key: "rowid"
 
-  has_many :vocabulary_entries, through: :word_lists, source: :dictionary_entries
-
-  has_many :word_lists
-
   has_many :questions, foreign_key: :asker_id
   has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
   # Recordings this speaker has taken to check through. The claim decides
