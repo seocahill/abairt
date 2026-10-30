@@ -49,29 +49,6 @@ FOREIGN KEY ("rang_id")
 );
 CREATE INDEX "index_seomras_on_user_id" ON "seomras" ("user_id");
 CREATE INDEX "index_seomras_on_rang_id" ON "seomras" ("rang_id");
-CREATE TABLE IF NOT EXISTS "word_lists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "description" varchar, "starred" boolean, "user_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "script" text, CONSTRAINT "fk_rails_4aed2b283b"
-FOREIGN KEY ("user_id")
-  REFERENCES "users" ("id")
-);
-CREATE INDEX "index_word_lists_on_user_id" ON "word_lists" ("user_id");
-CREATE TABLE IF NOT EXISTS "word_list_dictionary_entries" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "dictionary_entry_id" integer NOT NULL, "word_list_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_d7de3d0dac"
-FOREIGN KEY ("dictionary_entry_id")
-  REFERENCES "dictionary_entries" ("id")
-, CONSTRAINT "fk_rails_db6c34d026"
-FOREIGN KEY ("word_list_id")
-  REFERENCES "word_lists" ("id")
-);
-CREATE INDEX "index_word_list_dictionary_entries_on_dictionary_entry_id" ON "word_list_dictionary_entries" ("dictionary_entry_id");
-CREATE INDEX "index_word_list_dictionary_entries_on_word_list_id" ON "word_list_dictionary_entries" ("word_list_id");
-CREATE TABLE IF NOT EXISTS "user_lists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "word_list_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_7b6eb4d716"
-FOREIGN KEY ("user_id")
-  REFERENCES "users" ("id")
-, CONSTRAINT "fk_rails_01825ad5a3"
-FOREIGN KEY ("word_list_id")
-  REFERENCES "word_lists" ("id")
-);
-CREATE INDEX "index_user_lists_on_user_id" ON "user_lists" ("user_id");
-CREATE INDEX "index_user_lists_on_word_list_id" ON "user_lists" ("word_list_id");
 CREATE TABLE IF NOT EXISTS "active_storage_blobs" ("id" integer NOT NULL PRIMARY KEY, "key" varchar(255) NOT NULL, "filename" varchar(255) NOT NULL, "content_type" varchar(255) DEFAULT NULL, "metadata" text DEFAULT NULL, "service_name" varchar(255) NOT NULL, "byte_size" integer NOT NULL, "checksum" varchar(255) DEFAULT NULL, "created_at" datetime NOT NULL);
 CREATE UNIQUE INDEX "index_active_storage_blobs_on_key" ON "active_storage_blobs" ("key");
 CREATE TABLE IF NOT EXISTS "versions" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "item_type" varchar NOT NULL, "item_id" bigint NOT NULL, "event" varchar NOT NULL, "whodunnit" varchar, "object" json, "created_at" datetime(6));
@@ -271,6 +248,7 @@ CREATE INDEX "index_segment_prompts_on_speaker_id" ON "segment_prompts" ("speake
 CREATE INDEX "index_segment_prompts_on_speaker_id_and_status" ON "segment_prompts" ("speaker_id", "status");
 CREATE UNIQUE INDEX "index_segment_prompts_on_message_id" ON "segment_prompts" ("message_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261030120000'),
 ('20261026120000'),
 ('20261022000000'),
 ('20261018000000'),
