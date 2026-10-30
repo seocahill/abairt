@@ -1,2 +1,0 @@
-module Rangs::DictionaryEntriesHelper
-end

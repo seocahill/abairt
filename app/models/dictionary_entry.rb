@@ -16,7 +16,6 @@ class DictionaryEntry < ApplicationRecord
   belongs_to :voice_recording, optional: true, counter_cache: true
 
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
-  has_many :word_list_dictionary_entries, dependent: :destroy
   has_many :segment_prompts, dependent: :destroy
 
   acts_as_taggable_on :tags

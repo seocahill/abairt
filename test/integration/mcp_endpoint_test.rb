@@ -50,9 +50,8 @@ class McpEndpointTest < ActionDispatch::IntegrationTest
     tool_names = mcp_result(response).fetch("tools").pluck("name")
     %w[search_dictionary_entries get_dictionary_entry list_recent_transcriptions
       context_search get_voice_recording list_voice_recordings list_speakers get_speaker
-      list_tags list_word_lists get_word_list
-      save_translation create_dictionary_entry set_entry_accuracy tag_entry
-      create_word_list add_to_word_list].each do |name|
+      list_tags
+      save_translation create_dictionary_entry set_entry_accuracy tag_entry].each do |name|
       assert_includes tool_names, name
     end
   end

@@ -3,370 +3,199 @@
 <section class="bg-white dark:bg-gray-900">
   <div class="grid max-w-screen-xl px-4 lg:pt-20 pb-8 mx-auto lg:gap-8 lg:py-16 lg:grid-cols-12 lg:pt-28">
     <div class="mb-4 lg:mt-0 lg:col-span-5 lg:flex lg:mb-0">
-      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="<%= image_path('person-speaking.jpg') %>" alt="hero image" preservesPitch>
+      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="<%= image_path('person-speaking.jpg') %>" aria-label="A monolingual Irish speaker">
         <source src="//assets.abairt.com/Monolingual Irish Speaker.mp4" type="video/mp4">
       </video>
     </div>
     <div class="ml-auto place-self-center lg:col-span-7">
-      <h1 class="max-w-2xl mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl dark:text-white">Learn Connacht Irish<br>
-        through native speech.</h1>
+      <h1 class="max-w-2xl mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl dark:text-white">Mayo Irish,<br>in its speakers' own voices.</h1>
       <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
-        To learn the dialects of North Connacht you have to memorise words and phrases (abairtí), listen to them spoken properly in the natural flow of conversation and practice yourself with a native speaker. This website will help you with all three.</p>
+        Abairt is a growing collection of recordings of native speakers from Mayo, transcribed and translated line by line. Listen, read along, and search for any word or phrase.</p>
       <div class="space-y-4 sm:flex sm:space-y-0 sm:space-x-4">
-        <a href="/registrations/new" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-white bg-blue-500 border border-blue-500 rounded-lg sm:w-auto hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
-          Sign up
-        </a>
-        <a href="#faq" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
-          Learn more
-        </a>
+        <%= link_to "Browse recordings", voice_recordings_path, class: "inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-white bg-blue-500 border border-blue-500 rounded-lg sm:w-auto hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800" %>
+        <%= link_to "Learning Irish? Start with the course", "#learn", class: "inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800" %>
       </div>
     </div>
   </div>
 </section>
-<!-- End block -->
-<!-- Start block -->
+
 <section class="bg-white dark:bg-gray-900">
   <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-16">
     <div class="grid grid-cols-2 gap-8 text-gray-500 sm:gap-12 sm:grid-cols-3 lg:grid-cols-6 dark:text-gray-400">
       <a href="https://turassiar.ie/" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('turassiar.png') %>">
+        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('turassiar.png') %>" alt="Turas Siar">
       </a>
       <a href="https://www.irishlanguageincountymayo.com/" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('ilcm.png') %>">
+        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('ilcm.png') %>" alt="Irish Language in County Mayo">
       </a>
       <a href="http://focailfholaithe.fng.ie/counties/maigh-eo" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('fng.png') %>">
+        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('fng.png') %>" alt="Focail Fholaithe, Foras na Gaeilge">
       </a>
-      <a href="http://www.gaeilgeiorrais.ie/" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('gi.png') %>">
+      <a href="https://www.gaeilgeiorrais.ie/" class="flex items-center lg:justify-center">
+        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('gi.png') %>" alt="Gaeilge Iorras">
       </a>
       <a href="https://www.youtube.com/@dazpatreg" class="flex items-center lg:justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-youtube"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> Youtube
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-youtube" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> Youtube
       </a>
-      <a href="https://gitlab.com/abairt/web-application" class="flex items-center lg:justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg >Github
+      <a href="https://github.com/seocahill/abairt" class="flex items-center lg:justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Github
       </a>
     </div>
   </div>
 </section>
-<!-- End block -->
-<!-- Start block -->
+
+<%# The context a newcomer needs first: what Mayo Irish is and where it is
+    spoken, in the same terms as lesson 0 of the Mayo Irish course. %>
 <section class="bg-gray-50 dark:bg-gray-800">
   <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
-    <!-- Row -->
     <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16" data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
       <div class="text-gray-500 sm:text-lg dark:text-gray-400">
-        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Find Speakers</h2>
-        <p class="mb-8 font-light lg:text-xl">Click on the map to listen to recordings of native speakers from all over Mayo. Follow the links to view transcriptions, words and phrases for each speaker.</p>
-        <!-- List -->
-        <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Longform transcriptions of recordings of native speakers</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Full text search in Irish and English</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Filter by voice, dialect, tag and location</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Find pubs and other locations where Irish is spoken in public</span>
-          </li>
-        </ul>
-        <p class="mb-8 font-light lg:text-xl">Every speaker has their own page with all of their contributions listed. Speakers can create wordlists that learners can follow and download for use in learning apps like <a class="hover:text-purple-700 hover:underline" href="https://apps.ankiweb.net/">Anki</a> for example.</p>
+        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">The Irish of Mayo</h2>
+        <p class="mb-4 font-light lg:text-xl">Most courses and dictionaries follow Connemara Irish or the standard. The speakers here come from Erris, Achill, Tourmakeady and east Mayo, and from the neighbouring districts where Irish was once spoken.</p>
+        <p class="mb-4 font-light lg:text-xl">Irish is still a community language in three Mayo Gaeltacht areas: <strong>Erris, Achill and Tourmakeady</strong>. In the 2022 census about 10,500 people lived in the Mayo Gaeltacht, 5,956 of them said they could speak Irish, and 555 spoke it every day outside school (<a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://www.cso.ie/en/csolatestnews/pressreleases/2023pressreleases/pressstatementcensus2022resultsprofile8-theirishlanguageandeducationmayo">CSO</a>).</p>
+        <p class="mb-8 font-light lg:text-xl">A century ago far more of the county spoke it. <a class="text-purple-600 dark:text-purple-500 hover:underline" href="/1926">Find your own parish on the 1926 Gaeltacht map</a> to see how it was classed then.</p>
+        <p class="hidden font-medium text-gray-900 lg:block dark:text-white">Click on the map to listen to speakers from all over Mayo and follow the links to their recordings, words and phrases.</p>
       </div>
       <div class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex" data-map-target="desktopContainer">
         <div id="map" class="w-full h-[450px]"></div>
       </div>
     </div>
-    <!-- Row -->
-    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
-      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="https://assets.abairt.com/transcription-demo-poster.png" preservesPitch>
-        <source src="https://assets.abairt.com/transcription-demo.mp4" type="video/mp4">
-      </video>
-      <div class="text-gray-500 sm:text-lg dark:text-gray-400">
-        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Transcriptions</h2>
-        <p class="mb-8 font-light lg:text-xl">Native speakers can transcribe recordings with ease by uploading audio and slicing tracks into regions which can then be annotated.</p>
-        <!-- List -->
-        <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Upload and transcribe audio using simple interface.</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Export subtitles in English or Irish.</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Toggle English and Irish subtitles</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Slow down, isolate and loop playback</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Search, filter, tag full recording or constituent transcriptions</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <!-- Row -->
-    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
-      <div class="text-gray-500 sm:text-lg dark:text-gray-400">
-        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Auto Transcription & Audio Generation</h2>
-        <p class="mb-8 font-light lg:text-xl">Abairt uses the abair.ie api to automatically transcribe audio recordings and generate high-quality Irish speech synthesis when no audio exists.</p>
-        <!-- List -->
-        <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Automatic speech recognition for Irish audio</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">High-quality text-to-speech synthesis</span>
-          </li>
-          <li class="flex space-x-3">
-            <!-- Icon -->
-            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Native Irish pronunciation</span>
-          </li>
-        </ul>
-        <p class="mb-8 font-light lg:text-xl"><a href="https://abair.ie" class="text-purple-600 dark:text-purple-500 hover:underline font-medium">Abair.ie</a> is a vital Irish language technology project providing by far the best speech recognition and synthesis models for the Irish language. There is no public API for these models, so we use them as sparingly as possible. Unfortunately, this means that the service is not always available. Please check the status to see if the service is currently operational.</p>
-      </div>
-      <div class="w-full mb-4 rounded-lg lg:mb-0 lg:flex">
-        <div class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Service Status</h3>
-          <div class="space-y-4">
-            <!-- TTS Status -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-3 h-3 <%= @tts_status&.up? ? 'bg-green-500' : 'bg-red-500' %> rounded-full"></div>
-                <span class="text-sm font-medium text-gray-900 dark:text-white">Text-to-Speech</span>
-              </div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">
-                <%= @tts_status&.up? ? 'Operational' : 'Down' %>
-              </span>
-            </div>
-            <!-- ASR Status -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-3 h-3 <%= @asr_status&.up? ? 'bg-green-500' : 'bg-red-500' %> rounded-full"></div>
-                <span class="text-sm font-medium text-gray-900 dark:text-white">Speech Recognition</span>
-              </div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">
-                <%= @asr_status&.up? ? 'Operational' : 'Down' %>
-              </span>
-            </div>
-            <!-- Pyannote Status -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-3 h-3 <%= @pyannote_status&.up? ? 'bg-green-500' : 'bg-red-500' %> rounded-full"></div>
-                <span class="text-sm font-medium text-gray-900 dark:text-white">Speaker Diarization</span>
-              </div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">
-                <%= @pyannote_status&.up? ? 'Operational' : 'Down' %>
-              </span>
-            </div>
-            <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
-              <a href="/status" class="text-sm text-purple-600 dark:text-purple-500 hover:underline">
-                View detailed status →
-              </a>
-            </div>
-          </div>
+
+    <div>
+      <h2 class="mb-6 text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">How the dialects divide</h2>
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 text-gray-500 dark:text-gray-400">
+        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Tuaisceart Mhaigh Eo</h3>
+          <p class="text-sm">Erris and the north-west of the county. Still a Gaeltacht.</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Acaill</h3>
+          <p class="text-sm">Achill and the coast around it. Still a Gaeltacht. Like Erris, it shares a good deal of vocabulary and pronunciation with Ulster Irish.</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Lár Chonnachta</h3>
+          <p class="text-sm">South Mayo, including Tourmakeady, with most of Roscommon and north and east Galway. Tourmakeady is still a Gaeltacht.</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Connachta ó Thuaidh</h3>
+          <p class="text-sm">North-east Mayo, Sligo and the north of Roscommon and Leitrim. Irish has died out here as a community language, but recordings of its last speakers survive.</p>
         </div>
       </div>
+      <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">The divisions follow Tomás Ó Máille's account of Connacht Irish as it stood in 1927.</p>
     </div>
   </div>
 </section>
-<!-- End block -->
-<!-- Start block -->
-<section class="bg-white dark:bg-gray-900">
-  <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-24 lg:px-6">
-    <div class="text-center mb-12 lg:mb-20">
-      <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">How does it work?</h2>
-      <p class="font-light text-gray-500 sm:text-lg lg:text-xl dark:text-gray-400 max-w-3xl mx-auto">
-        Abairt combines community contributions with automated processing to create a comprehensive Irish learning resource.
-      </p>
-    </div>
-    
-    <div class="space-y-16 lg:space-y-20">
-      <!-- Process Step 1 -->
-      <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
-        <div class="text-gray-500 sm:text-lg dark:text-gray-400">
-          <div class="flex items-center mb-4">
-            <div class="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg dark:bg-purple-900 mr-4">
-              <span class="text-lg font-semibold text-purple-600 dark:text-purple-300">1</span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Content Collection</h3>
-          </div>
-          <p class="mb-6 font-light lg:text-lg">
-            Audio recordings come from multiple sources: native speakers upload their own recordings, community members contribute content, and our automated system imports from Irish language media sources nightly.
-          </p>
-          <ul role="list" class="space-y-3">
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Direct uploads from native speakers</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Community contributions and submissions</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Automated imports from Irish media sources (primarily turassiar.ie)</span>
-            </li>
-          </ul>
-        </div>
-        <div class="w-full mb-4 rounded-lg lg:mb-0 lg:flex">
-          <div class="w-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900 dark:to-blue-900 rounded-lg p-8 flex items-center justify-center">
-            <svg class="w-32 h-32 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Process Step 2 -->
-      <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
-        <div class="w-full mb-4 rounded-lg lg:mb-0 lg:flex lg:order-1">
-          <div class="w-full bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-8 flex items-center justify-center">
-            <svg class="w-32 h-32 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-            </svg>
-          </div>
-        </div>
-        <div class="text-gray-500 sm:text-lg dark:text-gray-400 lg:order-0">
-          <div class="flex items-center mb-4">
-            <div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg dark:bg-green-900 mr-4">
-              <span class="text-lg font-semibold text-green-600 dark:text-green-300">2</span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Audio Processing</h3>
-          </div>
-          <p class="mb-6 font-light lg:text-lg">
-            Once uploaded, each recording undergoes automated processing to separate speakers, transcribe speech, and provide translations, making the content searchable and accessible to learners.
-          </p>
-          <ul role="list" class="space-y-3">
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Diarization separates multiple speakers into distinct segments</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Automatic Speech Recognition (ASR) generates Irish transcripts</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">AI translation provides English equivalents for learning</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      
-      <!-- Process Step 3 -->
-      <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
-        <div class="text-gray-500 sm:text-lg dark:text-gray-400">
-          <div class="flex items-center mb-4">
-            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg dark:bg-blue-900 mr-4">
-              <span class="text-lg font-semibold text-blue-600 dark:text-blue-300">3</span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Community Enhancement</h3>
-          </div>
-          <p class="mb-6 font-light lg:text-lg">
-            Native speakers and community members refine the automatically generated content, correcting transcriptions, translations and adding speaker information to ensure accuracy and authenticity.
-          </p>
-          <ul role="list" class="space-y-3">
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Automatic transcriptions improved by user refinement and correction</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">English translations, tags, and contextual notes once approved</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              <span class="text-gray-900 dark:text-white">Speaker identification and regional mapping</span>
-            </li>
-          </ul>
-        </div>
-        <div class="w-full mb-4 rounded-lg lg:mb-0 lg:flex">
-          <div class="w-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-8 flex items-center justify-center">
-            <svg class="w-32 h-32 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End block -->
-<!-- Start block -->
+
 <section class="bg-white dark:bg-gray-900">
   <div class="items-center max-w-screen-xl px-4 py-8 mx-auto lg:grid lg:grid-cols-4 lg:gap-16 xl:gap-24 lg:py-24 lg:px-6">
     <div class="col-span-2 mb-8">
-      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="https://assets.abairt.com/darren.png" preservesPitch>
+      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="https://assets.abairt.com/darren.png" aria-label="Darren Ó Riagáin, a non-native speaker, speaking Irish">
         <source src="https://assets.abairt.com/darren-reagan-bofield.mp4" type="video/mp4">
       </video>
     </div>
     <div class="col-span-2 space-y-8 md:grid md:grid-cols-2 md:gap-12 md:space-y-0">
       <div>
-        <svg class="w-10 h-10 mb-2 text-purple-600 md:w-12 md:h-12 dark:text-purple-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z"></path>
-        </svg>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= VoiceRecording.count %> transcriptions</h3>
-        <p class="font-light text-gray-500 dark:text-gray-400">Interviews, stories, songs.</p>
+        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:recordings]) %> recordings</h3>
+        <p class="font-light text-gray-500 dark:text-gray-400">Interviews, stories, songs, transcribed line by line.</p>
       </div>
       <div>
-        <svg class="w-10 h-10 mb-2 text-purple-600 md:w-12 md:h-12 dark:text-purple-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M13.92 3.845a19.361 19.361 0 01-6.3 1.98C6.765 5.942 5.89 6 5 6a4 4 0 00-.504 7.969 15.974 15.974 0 001.271 3.341c.397.77 1.342 1 2.05.59l.867-.5c.726-.42.94-1.321.588-2.021-.166-.33-.315-.666-.448-1.004 1.8.358 3.511.964 5.096 1.78A17.964 17.964 0 0015 10c0-2.161-.381-4.234-1.08-6.155zM15.243 3.097A19.456 19.456 0 0116.5 10c0 2.431-.445 4.758-1.257 6.904l-.03.077a.75.75 0 001.401.537 20.902 20.902 0 001.312-5.745 1.999 1.999 0 000-3.545 20.902 20.902 0 00-1.312-5.745.75.75 0 00-1.4.537l.029.077z"></path>
-        </svg>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= User.speaker.count %> Native speakers</h3>
-        <p class="font-light text-gray-500 dark:text-gray-400">Speakers of all existing Mayo Dialects</p>
-      </div>
-
-      <div>
-        <svg class="w-10 h-10 mb-2 text-purple-600 md:w-12 md:h-12 dark:text-purple-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7.75 2.75a.75.75 0 00-1.5 0v1.258a32.987 32.987 0 00-3.599.278.75.75 0 10.198 1.487A31.545 31.545 0 018.7 5.545 19.381 19.381 0 017 9.56a19.418 19.418 0 01-1.002-2.05.75.75 0 00-1.384.577 20.935 20.935 0 001.492 2.91 19.613 19.613 0 01-3.828 4.154.75.75 0 10.945 1.164A21.116 21.116 0 007 12.331c.095.132.192.262.29.391a.75.75 0 001.194-.91c-.204-.266-.4-.538-.59-.815a20.888 20.888 0 002.333-5.332c.31.031.618.068.924.108a.75.75 0 00.198-1.487 32.832 32.832 0 00-3.599-.278V2.75z"></path>
-          <path clip-rule="evenodd" d="M13 8a.75.75 0 01.671.415l4.25 8.5a.75.75 0 11-1.342.67L15.787 16h-5.573l-.793 1.585a.75.75 0 11-1.342-.67l4.25-8.5A.75.75 0 0113 8zm2.037 6.5L13 10.427 10.964 14.5h4.073z" fill-rule="evenodd"></path>
-        </svg>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= DictionaryEntry.where.not(speaker_id: nil).count %> words and phrases</h3>
-        <p class="font-light text-gray-500 dark:text-gray-400">Folca, Seanráite, Seanchas, Abairtí.</p>
+        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:speakers]) %> native speakers</h3>
+        <p class="font-light text-gray-500 dark:text-gray-400">From across the Mayo dialects.</p>
       </div>
       <div>
-        <svg class="w-10 h-10 mb-2 text-purple-600 md:w-12 md:h-12 dark:text-purple-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z"></path>
-          <path d="M5.5 9.643a.75.75 0 00-1.5 0V10c0 3.06 2.29 5.585 5.25 5.954V17.5h-1.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-1.5v-1.546A6.001 6.001 0 0016 10v-.357a.75.75 0 00-1.5 0V10a4.5 4.5 0 01-9 0v-.357z"></path>
-        </svg>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= ActiveStorage::Attachment.count %> recordings</h3>
-        <p class="font-light text-gray-500 dark:text-gray-400">Longform, short phrases, single pronunciations.</p>
+        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:phrases]) %> words and phrases</h3>
+        <p class="font-light text-gray-500 dark:text-gray-400">Folca, seanráite, seanchas, abairtí.</p>
+      </div>
+      <div>
+        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:with_audio]) %> with audio</h3>
+        <p class="font-light text-gray-500 dark:text-gray-400">Words and phrases you can hear as well as read.</p>
       </div>
     </div>
   </div>
 </section>
-<!-- End block -->
-<!-- Start block -->
+
 <section class="bg-gray-50 dark:bg-gray-800">
+  <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
+    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="https://assets.abairt.com/transcription-demo-poster.png" aria-label="Demonstration of the transcription tools">
+        <source src="https://assets.abairt.com/transcription-demo.mp4" type="video/mp4">
+      </video>
+      <div class="text-gray-500 sm:text-lg dark:text-gray-400">
+        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Listen, read, search</h2>
+        <p class="mb-8 font-light lg:text-xl">Every recording has a transcript you can follow as it plays, in Irish or English.</p>
+        <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
+          <%= render "home/point", text: "Toggle Irish and English subtitles, or export them" %>
+          <%= render "home/point", text: "Slow down, isolate and loop any passage" %>
+          <%= render "home/point", text: "Full text search in Irish and English" %>
+          <%= render "home/point", text: "Filter by speaker, dialect, tag and location" %>
+          <%= render "home/point", text: "Find pubs and other places where Irish is spoken in public" %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="learn" class="bg-white dark:bg-gray-900">
+  <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-24 lg:px-6">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Learning Irish?</h2>
+      <p class="mb-4 font-light text-gray-500 sm:text-lg lg:text-xl dark:text-gray-400">
+        Abairt is the collection. For structured lessons, there is the <strong>Mayo Irish course</strong>: Mícheál Ó Siadhail's <em>Learning Irish</em>, adapted lesson by lesson for the Irish of Mayo, with the speakers you hear on Abairt.
+      </p>
+      <p class="mb-8 font-light text-gray-500 sm:text-lg dark:text-gray-400">
+        It is free, and invite-only while it is being built.
+      </p>
+      <%= link_to "Go to the Mayo Irish course", @course_url, class: "inline-flex items-center justify-center px-5 py-3 text-sm font-medium text-center text-white bg-blue-500 border border-blue-500 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800" %>
+      <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+        The best way to learn is still to spend time among native speakers, in the Gaeltacht or with a speaker who becomes a friend. Use what is here alongside that.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="bg-gray-50 dark:bg-gray-800">
+  <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-24 lg:px-6">
+    <div class="text-center mb-12 lg:mb-16">
+      <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Where the recordings come from</h2>
+      <p class="font-light text-gray-500 sm:text-lg lg:text-xl dark:text-gray-400 max-w-3xl mx-auto">
+        Community contributions and automated processing, checked by native speakers.
+      </p>
+    </div>
+    <div class="grid gap-8 lg:grid-cols-3 text-gray-500 dark:text-gray-400">
+      <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="flex items-center justify-center w-10 h-10 mb-4 bg-purple-100 rounded-lg dark:bg-purple-900">
+          <span class="text-lg font-semibold text-purple-600 dark:text-purple-300">1</span>
+        </div>
+        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Collect</h3>
+        <p class="font-light">Native speakers and community members upload recordings, and a nightly import brings in Irish-language media, mostly from <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://turassiar.ie/">Turas Siar</a>.</p>
+      </div>
+      <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="flex items-center justify-center w-10 h-10 mb-4 bg-green-100 rounded-lg dark:bg-green-900">
+          <span class="text-lg font-semibold text-green-600 dark:text-green-300">2</span>
+        </div>
+        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Process</h3>
+        <p class="font-light">Each recording is split by speaker, transcribed with <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://abair.ie">ABAIR</a>'s speech recognition and given a draft English translation.</p>
+      </div>
+      <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="flex items-center justify-center w-10 h-10 mb-4 bg-blue-100 rounded-lg dark:bg-blue-900">
+          <span class="text-lg font-semibold text-blue-600 dark:text-blue-300">3</span>
+        </div>
+        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Check</h3>
+        <p class="font-light">Native speakers correct the transcripts and translations, and add speakers and places. Only checked entries are confirmed.</p>
+      </div>
+    </div>
+    <p class="mt-8 text-center text-gray-500 dark:text-gray-400">
+      Are you a native speaker or a fluent Irish speaker?
+      <%= link_to "Sign up", new_registration_path, class: "text-purple-600 dark:text-purple-500 hover:underline font-medium" %> to help check recordings.
+      Building something? There is an <%= link_to "open API", api_docs_path, class: "text-purple-600 dark:text-purple-500 hover:underline font-medium" %>.
+    </p>
+  </div>
+</section>
+
+<section class="bg-white dark:bg-gray-900">
   <div class="max-w-screen-xl px-4 py-8 mx-auto text-center lg:py-24 lg:px-6">
     <figure class="max-w-screen-md mx-auto">
-      <svg class="h-12 mx-auto mb-3 text-gray-400 dark:text-gray-600" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="h-12 mx-auto mb-3 text-gray-400 dark:text-gray-600" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M14.017 18L14.017 10.609C14.017 4.905 17.748 1.039 23 0L23.995 2.151C21.563 3.068 20 5.789 20 8H24V18H14.017ZM0 18V10.609C0 4.905 3.748 1.038 9 0L9.996 2.151C7.563 3.068 6 5.789 6 8H9.983L9.983 18L0 18Z" fill="currentColor"/>
       </svg>
       <blockquote>
@@ -375,139 +204,38 @@
     </figure>
   </div>
 </section>
-<!-- End block -->
-<!-- Start block -->
-<section class="bg-white dark:bg-gray-900">
-  <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-24 lg:px-6 ">
+
+<section class="bg-gray-50 dark:bg-gray-800">
+  <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-24 lg:px-6">
     <h2 id="faq" class="mb-6 p-6 text-3xl font-extrabold tracking-tight text-center text-gray-900 lg:mb-8 lg:text-3xl dark:text-white">Frequently asked questions</h2>
     <div class="max-w-screen-md mx-auto">
-      <div id="accordion-flush">
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-900 bg-white border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-white" data-action="click->collapse#toggle">
-            <span>How long will it take me to learn to speak the Mayo dialect?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Language learning is an innate skill everyone possesses. The rate of acquisition varies according to experience, confidence, access, commitment level and time resources. Given some basic school Irish and a medium commitment level (one or two classes per month, on and off) <b>two years</b> is a reasonable timeframe to go from no conversational ability to being able to converse with a native speaker.</p>
-            <p class="text-gray-500 dark:text-gray-400 mb-2">People with better starting ability and self-confidence can certainly manage it in half the time, likewise complete beginners might take an extra year or two.</p>
-            <p class="text-gray-500 dark:text-gray-400  mb-2">You may give up multiple times, that's perfectly normal. Life, work intervenes. One thing is certain - if you persevere, you will succeed eventually.</p>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>Is Abairt free?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Yes all resources on this site are free. Our goal is to provide a high quality dataset of native Irish speech for learners to use in their own learning journey. We don't want to block anyone from using it for want of money.</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Abairt is not operated for any commercial gain, we don't track you or your data, or collect any metrics. If you sign up your email is used for login and app related notifications, that's it.</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">We make no claim on the material on this site. It's freely shared and the copyright and licensing is the exclusive right of the owners of the original recordings.</p>
-            <p class="text-gray-500 dark:text-gray-400">You are welcome to <a href="https://gitlab.com/abairt/web-application" class="text-purple-600 dark:text-purple-500 hover:underline">fork the code</a> and build your own language community.</p>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>How do I get started learning?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-4 text-gray-500 dark:text-gray-400">While we're developing formal courses, here's a proven approach to learning Mayo Irish:</p>
-            <ol class="pl-5 text-gray-500 list-decimal dark:text-gray-400 space-y-2">
-              <li><strong>Find a mentor:</strong> Connect with a native speaker for one-on-one guidance, either online or in person. This is the single most important factor for success.</li>
-              <li><strong>Build vocabulary:</strong> Use spaced repetition apps like <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://apps.ankiweb.net/">Anki</a> with word lists from this site that include native audio and context.</li>
-              <li><strong>Listen actively:</strong> Study recordings on this site, repeat phrases, and copy the sounds and rhythm. Also listen to <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://rnag.ie">Raidió na Gaeltachta</a> regularly.</li>
-              <li><strong>Learn grammar later:</strong> Unless you're an experienced language learner, focus on speaking first. When ready, try <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://archive.org/details/learning-irish-3rd-ed">Learning Irish by Mícheál Ó Siadhail</a> or <a href="http://nualeargais.ie/gnag/gram.htm" class="text-purple-600 dark:text-purple-500 hover:underline">Nualeargais</a>.</li>
-              <li><strong>Read contemporary Irish:</strong> Follow <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://nos.ie">nos.ie</a> and <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://tuairisc.ie">tuairisc.ie</a> for daily news. Use browser translation tools to create vocabulary lists.</li>
-            </ol>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>Do I need to sign up?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400"><strong>No:</strong> you do not need to sign up to use this site. Sign up if you want to contribute to the site.</p>
-            <p class="mb-2 text-gray-500 dark:text-gray-400">After you've been granted access, you just need to click on 'login' and enter your email to receive a login link. There are no passwords.</p>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>Is it really possible to sound like a native speaker?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Yes, one of the founders of this site is a non-native speaker, Darren Ó Riagáin, who is said by native speakers from Dún Chaocháin to sound indistinguishable from them. There are a few aspects to achieving native like fluency:</p>
-            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400">
-              <li>Use the sounds of Irish, don't use the sounds of English. Many monoglot English speakers will be unaware that the English language has a particular set of pronunciations that clearly distinguish it (as do all languages). If you use these sounds instead of Irish ones, you will always sound like you're speaking English, even if you use Irish words. Abairt helps here by allowing you to hear native pronunciation when learning, in a natural conversation flow.</li>
-              <li>Use Irish idioms and syntax. If you translate English into Irish directly it will sound like English to people who know it (almost everyone these days, unfortunately).</li>
-              <li>Time. You will be able to speak after a couple of years but achieving native fluency is a matter of time, experience and accumulation.</li>
-            </ul>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>How do I use this site effectively?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-4 text-gray-500 dark:text-gray-400">Here are some tips to get the most from Abairt:</p>
-            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400 space-y-2">
-              <li><strong>Start with the map:</strong> Click on locations to discover speakers from different areas and hear regional variations.</li>
-              <li><strong>Use the search:</strong> Search for specific words or phrases in Irish or English to find relevant recordings.</li>
-              <li><strong>Adjust playback:</strong> Use the speed controls to slow down speech, loop segments, and practice pronunciation.</li>
-              <li><strong>Read transcriptions:</strong> Toggle between Irish and English subtitles to understand context and meaning.</li>
-            </ul>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>What happened to the old features?</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-4 text-gray-500 dark:text-gray-400">Earlier versions of Abairt included features like integrated chat, spaced repetition learning, video calling, and various interactive tools. These have been removed to focus on what we do best.</p>
-            <p class="mb-4 text-gray-500 dark:text-gray-400"><strong>Why the change?</strong> While these features seemed useful in theory, they weren't very good in practice. Rather than maintain mediocre learning tools, we decided to concentrate on building the highest-quality dataset of native Irish speech possible.</p>
-            <p class="mb-4 text-gray-500 dark:text-gray-400"><strong>The new approach:</strong> By focusing exclusively on data collection, transcription, and community curation, we can provide a superior foundation that specialized tool creators can use to build much better learning applications than we ever could.</p>
-            <p class="text-gray-500 dark:text-gray-400">This means you get access to authentic, well-curated Irish language content that can be used with the learning tools and methods that work best for you - whether that's Anki, language exchange apps, or whatever new tools emerge in the future.</p>
-          </div>
-        </div>
-        </div>
-        <div data-controller="collapse">
-          <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400" data-action="click->collapse#toggle">
-            <span>Technical issues & limitations</span>
-            <svg data-collapse-target="icon" class="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        <div data-collapse-target="content" class="hidden">
-          <div class="py-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-4 text-gray-500 dark:text-gray-400">Please be aware of these current limitations:</p>
-            <ul class="pl-5 text-gray-500 list-disc dark:text-gray-400 space-y-2">
-              <li><strong>Desktop recommended:</strong> This site works best on larger screens. Mobile support is limited but planned for future development.</li>
-              <li><strong>Performance considerations:</strong> Abairt runs on modest infrastructure to keep costs low. You may occasionally experience slower performance or brief downtime during maintenance.</li>
-              <li><strong>Service dependencies:</strong> Some features depend on external services (like abair.ie) which may be temporarily unavailable.</li>
-              <li><strong>Bug reports:</strong> Found an issue? Please <a href="https://gitlab.com/abairt/web-application/issues" class="text-purple-600 dark:text-purple-500 hover:underline">report it on GitHub</a> - we appreciate your feedback!</li>
-            </ul>
-          </div>
-        </div>
-        </div>
-      </div>
+      <%= render "home/faq_item", question: "Is Abairt free?" do %>
+        <p>Yes. The aim is a high-quality collection of native Irish speech that anyone can use, and we don't want money to stand in the way.</p>
+        <p>Abairt is not run for commercial gain and has no analytics or tracking. If you sign up, your email is used for login and notifications, nothing else.</p>
+        <p>We make no claim on the material. It is shared freely, and the copyright and licensing belong to the owners of the original recordings.</p>
+        <p>You are welcome to <a href="https://github.com/seocahill/abairt" class="text-purple-600 dark:text-purple-500 hover:underline">fork the code</a> and build a community of your own.</p>
+      <% end %>
+      <%= render "home/faq_item", question: "Do I need to sign up?" do %>
+        <p><strong>No.</strong> Everything you can listen to, read and search is open. Sign up if you want to help check and improve recordings.</p>
+      <% end %>
+      <%= render "home/faq_item", question: "How do I get the most from the recordings?" do %>
+        <ul class="pl-5 space-y-2 list-disc">
+          <li><strong>Start with the map</strong> to hear speakers from different areas and notice how the Irish changes.</li>
+          <li><strong>Search</strong> for a word or phrase in Irish or English to hear it in context.</li>
+          <li><strong>Slow it down and loop it</strong> until you can copy the sounds and the rhythm.</li>
+          <li><strong>Read along</strong> with Irish or English subtitles to follow the meaning.</li>
+        </ul>
+      <% end %>
+      <%= render "home/faq_item", question: "Is the transcription always right?" do %>
+        <p>Not always. Transcripts and translations start as machine drafts and are corrected by native speakers; entries marked as confirmed have been checked.</p>
+        <p>The speech services come from <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://abair.ie">ABAIR</a> and are not always available. <%= link_to "Check their status", status_path, class: "text-purple-600 dark:text-purple-500 hover:underline" %> if something isn't working.</p>
+      <% end %>
+      <%= render "home/faq_item", question: "Found a problem?" do %>
+        <p>Please <a href="https://github.com/seocahill/abairt/issues" class="text-purple-600 dark:text-purple-500 hover:underline">report it on GitHub</a>. Abairt runs on modest infrastructure, so it may occasionally be slow or briefly down.</p>
+      <% end %>
     </div>
   </div>
 </section>
-<!-- End block -->
 
 <%= content_for :footer do %>
   <footer class="bg-white dark:bg-gray-800">
@@ -516,86 +244,46 @@
       <div>
         <h3 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">This Site</h3>
         <ul class="text-gray-500 dark:text-gray-400">
-          <li class="mb-4">
-            <a href="https://gitlab.com/abairt/web-application/blob/master/docs/about.md" class=" hover:underline">About</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://gitlab.com/abairt/web-application/blob/master/docs/privacy.md" class="hover:underline">Privacy</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://gitlab.com/abairt/web-application/blob/master/docs/terms.md" class="hover:underline">Terms</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://www.youtube.com/channel/UCtvIonFuDW5PeM2x_tzzM7A" class="hover:underline">Vlog</a>
-          </li>
+          <li class="mb-4"><a href="https://github.com/seocahill/abairt/blob/master/docs/about.md" class="hover:underline">About</a></li>
+          <li class="mb-4"><a href="https://github.com/seocahill/abairt/blob/master/docs/privacy.md" class="hover:underline">Privacy</a></li>
+          <li class="mb-4"><a href="https://github.com/seocahill/abairt/blob/master/docs/terms.md" class="hover:underline">Terms</a></li>
+          <li class="mb-4"><a href="https://www.youtube.com/channel/UCtvIonFuDW5PeM2x_tzzM7A" class="hover:underline">Vlog</a></li>
         </ul>
       </div>
       <div>
         <h3 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Reading</h3>
         <ul class="text-gray-500 dark:text-gray-400">
-          <li class="mb-4">
-            <a href="https://shop.dias.ie/product/the-irish-of-erris-co-mayo-a-phonemic-study/" class="hover:underline">The Irish of County Mayo, Mhac an Fhailigh</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://www.mayobooks.ie/Cosgrove-Seoda-Mhuigheo-Thuaidh" class="hover:underline">Seoda Mhuigheo Thuaidh, Cosgrove, Kileen.</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://mayo.spydus.ie/cgi-bin/spydus.exe/FULL/WPAC/BIBENQ/189600456/992090,1" class="hover:underline">Learning Irish, Ó Siadhail</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://mayo.spydus.ie/cgi-bin/spydus.exe/FULL/WPAC/BIBENQ/189601828/4773480,2" class="hover:underline">The Irish of Achill, Co. Mayo, Stockman</a>
-          </li>
+          <li class="mb-4"><a href="https://shop.dias.ie/product/the-irish-of-erris-co-mayo-a-phonemic-study/" class="hover:underline">The Irish of Erris, Co. Mayo, Mhac an Fhailigh</a></li>
+          <li class="mb-4"><a href="https://www.mayobooks.ie/Cosgrove-Seoda-Mhuigheo-Thuaidh" class="hover:underline">Seoda Mhuigheo Thuaidh, Cosgrove, Kileen.</a></li>
+          <li class="mb-4"><a href="https://mayo.spydus.ie/cgi-bin/spydus.exe/FULL/WPAC/BIBENQ/189600456/992090,1" class="hover:underline">Learning Irish, Ó Siadhail</a></li>
+          <li class="mb-4"><a href="https://mayo.spydus.ie/cgi-bin/spydus.exe/FULL/WPAC/BIBENQ/189601828/4773480,2" class="hover:underline">The Irish of Achill, Co. Mayo, Stockman</a></li>
         </ul>
       </div>
       <div>
         <h3 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Media</h3>
         <ul class="text-gray-500 dark:text-gray-400">
-          <li class="mb-4">
-            <a href="https://archive-cartlann.turassiar.ie/p/press/search?source=nav" class="hover:underline">Turas Siar archive</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://www.irishlanguageincountymayo.com/conversations" class="hover:underline">Irish Language County Mayo</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://bba.duchas.ie/ga" class="hover:underline">Bailiúchán Béaloidis Áran</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://rnag.ie" class="hover:underline">Radio na Gaeltachta</a>
-          </li>
+          <li class="mb-4"><a href="https://archive-cartlann.turassiar.ie/p/press/search?source=nav" class="hover:underline">Turas Siar archive</a></li>
+          <li class="mb-4"><a href="https://www.irishlanguageincountymayo.com/conversations" class="hover:underline">Irish Language County Mayo</a></li>
+          <li class="mb-4"><a href="https://bba.duchas.ie/ga" class="hover:underline">Bailiúchán Béaloidis Áran</a></li>
+          <li class="mb-4"><a href="https://rnag.ie" class="hover:underline">Radio na Gaeltachta</a></li>
         </ul>
       </div>
       <div>
         <h3 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">How to</h3>
         <ul class="text-gray-500 dark:text-gray-400">
-          <li class="mb-4">
-            <a href="https://youtu.be/_TYvqfTnqM0" class=" hover:underline">Import into Anki.</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://youtu.be/C7Lnlb93Sgw" class="hover:underline">Use LLM AI to study.</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://en.y2mate.is" class="hover:underline">Transcode media (e.g youtube video) to mp3 for upload.</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://gitlab.com/seocahill/abairt" class="hover:underline">Contribute</a>
-          </li>
+          <li class="mb-4"><a href="/1926" class="hover:underline">Explore the 1926 Gaeltacht map</a></li>
+          <li class="mb-4"><%= link_to "Use the API", api_docs_path, class: "hover:underline" %></li>
+          <li class="mb-4"><a href="https://en.y2mate.is" class="hover:underline">Transcode media (e.g. YouTube) to mp3 for upload</a></li>
+          <li class="mb-4"><a href="https://github.com/seocahill/abairt" class="hover:underline">Contribute</a></li>
         </ul>
       </div>
       <div>
         <h3 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Useful tools</h3>
         <ul class="text-gray-500 dark:text-gray-400">
-          <li class="mb-4">
-            <a href="https://apps.ankiweb.net/" class="hover:underline">Anki</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://caotharnach.seosamh.dev/" class="hover:underline">AI Chat</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://www.teanglann.ie/ga/" class="hover:underline">Legacy Dictionaries</a>
-          </li>
-          <li class="mb-4">
-            <a href="https://www.focloir.ie/ga/" class="hover:underline">New Dictionary</a>
-          </li>
+          <li class="mb-4"><%= link_to "Mayo Irish course", @course_url, class: "hover:underline" %></li>
+          <li class="mb-4"><a href="https://www.teanglann.ie/ga/" class="hover:underline">Legacy Dictionaries</a></li>
+          <li class="mb-4"><a href="https://www.focloir.ie/ga/" class="hover:underline">New Dictionary</a></li>
+          <li class="mb-4"><%= link_to "Service status", status_path, class: "hover:underline" %></li>
         </ul>
       </div>
     </div>
