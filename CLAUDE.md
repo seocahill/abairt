@@ -35,3 +35,14 @@ Repeat until code is clean, performant and maintainable
 - use modern syntax e.g. no begin blocks
 
 
+
+## Agent roles
+
+- **Architect** (weekly): `docs/product/ARCHITECT.md`. Proposes, never codes.
+- **Builder** (nightly): `docs/product/BUILDER.md`. Builds approved issues.
+- The owner's decisions and preferences: `docs/product/DECISIONS.md`.
+- Learner/contributor-visible changes go behind a Flipper flag.
+- Never write or "correct" dialect content (Irish forms, transcriptions,
+  translations, glosses). That is the owner's and native speakers' domain.
+- Default branch is `master`; it deploys to production once the `Test`
+  workflow passes. Never push code to `master` directly.
