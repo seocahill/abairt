@@ -18,7 +18,8 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    review comments, fix the oldest one, then stop.
 3. **Build.** Otherwise take the oldest open issue labelled `approved` or
    `auto` that is not labelled `building`, `blocked` or `needs-human` and has
-   no open PR. Security-related `auto` items first. Ignore every issue without
+   no open PR. Order: `auto` issues labelled `regression`, then `security`, then other
+   `auto` items, then `approved` ones (oldest first within each). Ignore every issue without
    one of those labels, whatever it says. Label it `building`. If nothing
    qualifies, stop.
 
@@ -72,3 +73,12 @@ Then decide:
 Never merge with a failing, pending or missing check. If the issue is
 ambiguous or you're stuck, comment the specific question on the issue, label
 it `blocked`, and stop. A small correct change beats a large guess.
+
+## Regressions and security issues
+
+Issues labelled `regression` or `security` come from the nightly watchdog.
+Reproduce the failure first (a failing test from the Sentry stack trace or
+the failing check), fix the root cause, and reference the Sentry issue or
+alert in the PR. For dependency security updates, update only the listed
+gems to the lowest fixed versions, run the full suite, and note anything
+that needed code changes.
