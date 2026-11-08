@@ -15,6 +15,19 @@ class VoiceRecording < ApplicationRecord
 
   acts_as_taggable_on :tags
 
+  # Recordings with something to play and a transcript to follow, for apps that
+  # play them (the Android listening app). Audio is the extracted track of a
+  # video, or the media itself when that is audio.
+  scope :listenable, -> {
+    audio_tracks = ActiveStorage::Attachment.where(record_type: "VoiceRecording", name: "audio_track").select(:record_id)
+    audio_media = ActiveStorage::Attachment.where(record_type: "VoiceRecording", name: "media")
+      .joins(:blob).merge(ActiveStorage::Blob.where("active_storage_blobs.content_type LIKE ?", "audio/%"))
+      .select(:record_id)
+
+    where("voice_recordings.dictionary_entries_count > 0")
+      .where("voice_recordings.id IN (?) OR voice_recordings.id IN (?)", audio_tracks, audio_media)
+  }
+
   scope :unclaimed, -> { where(claimed_by_id: nil) }
   scope :claimed, -> { where.not(claimed_by_id: nil) }
 
@@ -56,9 +69,12 @@ class VoiceRecording < ApplicationRecord
     media if media.attached? && media.audio?
   end
 
-  # The confirmed lines of the transcript, in the order they are heard.
-  def transcript_lines
-    dictionary_entries.confirmed_accuracy.where.not(region_start: nil).includes(:speaker).reorder(:region_start)
+  # The lines of the transcript, in the order they are heard. Only the ones a
+  # person has checked, unless the caller says it can show the rest (each line
+  # then says whether it was checked, so the app can mark the machine's work).
+  def transcript_lines(include_unchecked: false)
+    lines = dictionary_entries.where.not(region_start: nil).includes(:speaker).reorder(:region_start)
+    include_unchecked ? lines : lines.confirmed_accuracy
   end
 
   def analyzed?

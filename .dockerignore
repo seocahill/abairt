@@ -32,3 +32,5 @@ queue.db-shm
 queue.db-wal
 db/queue*.sqlite3
 db/queue*.sqlite3-*
+# Android app: built and tested by its own workflow, not part of the Rails image
+android
