@@ -23,6 +23,11 @@
     <string name="loop_line">Repeat this line</string>
     <string name="back">Back</string>
     <string name="speed_label">Speed %1$s</string>
+    <string name="slow">Slow</string>
+    <string name="slow_down">Slow down</string>
+    <string name="normal_speed">Normal speed</string>
+    <string name="show_transcript">Show transcript</string>
+    <string name="hide_transcript">Hide transcript</string>
     <string name="sleep_timer">Sleep timer</string>
     <plurals name="sleep_minutes">
         <item quantity="one">%1$d minute</item>

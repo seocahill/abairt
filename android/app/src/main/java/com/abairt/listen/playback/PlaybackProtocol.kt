@@ -15,6 +15,9 @@ object PlaybackProtocol {
     val SLEEP_TIMER = SessionCommand(PREFIX + "SLEEP_TIMER", Bundle.EMPTY)
     val LOOP_LINE = SessionCommand(PREFIX + "LOOP_LINE", Bundle.EMPTY)
 
+    /** Switch between the usual speed and the slow one (the lock-screen button). */
+    val TOGGLE_SLOW = SessionCommand(PREFIX + "TOGGLE_SLOW", Bundle.EMPTY)
+
     // Command arguments
     const val ARG_MINUTES = "minutes"
     const val ARG_START_MS = "start_ms"

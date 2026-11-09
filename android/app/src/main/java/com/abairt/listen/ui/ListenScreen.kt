@@ -91,10 +91,11 @@ fun ListenScreen(
                 IconButton(onClick = onSettings) {
                     Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.open_settings))
                 }
+                if (ui.hasMedia) TranscriptToggle(open = false, onToggle = { onStudy() })
             }
             Spacer(Modifier.weight(1f))
             if (ui.hasMedia) {
-                NowPlaying(viewModel, ui)
+                NowPlaying(viewModel, ui, settings)
             } else {
                 StartPanel(configured = settings.connection.isConfigured, onStart = start, onSettings = onSettings)
             }
@@ -137,7 +138,7 @@ private fun StartPanel(configured: Boolean, onStart: () -> Unit, onSettings: () 
 }
 
 @Composable
-private fun NowPlaying(viewModel: PlayerViewModel, ui: PlayerUi) {
+private fun NowPlaying(viewModel: PlayerViewModel, ui: PlayerUi, settings: AppSettings) {
     val position by viewModel.position.collectAsStateWithLifecycle(initialValue = 0L)
     val transcript = (ui.transcript as? TranscriptState.Ready)?.transcript
     val speaker = transcript?.lines?.getOrNull(transcript.activeIndexAt(position))?.speaker
@@ -184,6 +185,7 @@ private fun NowPlaying(viewModel: PlayerViewModel, ui: PlayerUi) {
     }
     Spacer(Modifier.height(24.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SlowChip(settings.slow, onToggle = viewModel::toggleSlow)
         SpeedChip(ui.speed, onSelect = viewModel::setSpeed)
         SleepChip(
             state = ui.service,

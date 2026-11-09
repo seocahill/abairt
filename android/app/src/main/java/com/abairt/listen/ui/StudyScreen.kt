@@ -1,5 +1,11 @@
 package com.abairt.listen.ui
 
+import android.app.Activity
+import android.os.Build
+import android.view.WindowManager
+import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.DragInteraction
@@ -71,6 +77,7 @@ fun StudyScreen(
     onBack: () -> Unit,
 ) {
     val position by viewModel.position.collectAsStateWithLifecycle(initialValue = 0L)
+    NightReading(playing = ui.isPlaying || ui.isBuffering)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -82,9 +89,10 @@ fun StudyScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                     }
                 },
+                actions = { TranscriptToggle(open = true, onToggle = { onBack() }) },
             )
         },
-        bottomBar = { StudyControls(viewModel, ui, position) },
+        bottomBar = { StudyControls(viewModel, ui, settings, position) },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             when (val state = ui.transcript) {
@@ -233,7 +241,7 @@ private fun LineRow(
 
 /** Line-sized controls: step back a line, repeat it, slow it down. */
 @Composable
-private fun StudyControls(viewModel: PlayerViewModel, ui: PlayerUi, position: Long) {
+private fun StudyControls(viewModel: PlayerViewModel, ui: PlayerUi, settings: AppSettings, position: Long) {
     val transcript = (ui.transcript as? TranscriptState.Ready)?.transcript
     val activeLine = transcript?.lines?.getOrNull(transcript.activeIndexAt(position))
     val looping = activeLine != null && ui.service.loopStartMs == activeLine.startMs
@@ -271,6 +279,7 @@ private fun StudyControls(viewModel: PlayerViewModel, ui: PlayerUi, position: Lo
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                SlowChip(settings.slow, onToggle = viewModel::toggleSlow)
                 SpeedChip(ui.speed, onSelect = viewModel::setSpeed)
                 SleepChip(
                     state = ui.service,
@@ -279,6 +288,40 @@ private fun StudyControls(viewModel: PlayerViewModel, ui: PlayerUi, position: Lo
                     onCancel = viewModel::cancelSleep,
                 )
             }
+        }
+    }
+}
+
+/**
+ * Reading in bed: while the transcript is open and the audio is playing, the
+ * screen stays on (so it stops when the sleep timer pauses), and the transcript
+ * shows over the lock screen without unlocking. Leaving it (back, or the
+ * transcript button) brings the lock back; nothing else is reachable from here.
+ */
+@Composable
+private fun NightReading(playing: Boolean) {
+    val view = LocalView.current
+    val activity = LocalActivity.current
+
+    DisposableEffect(view, playing) {
+        view.keepScreenOn = playing
+        onDispose { view.keepScreenOn = false }
+    }
+    DisposableEffect(activity) {
+        activity?.showOverLockScreen(true)
+        onDispose { activity?.showOverLockScreen(false) }
+    }
+}
+
+private fun Activity.showOverLockScreen(show: Boolean) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+        setShowWhenLocked(show)
+    } else {
+        @Suppress("DEPRECATION")
+        if (show) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
         }
     }
 }

@@ -23,12 +23,25 @@ data class AppSettings(
     /** Show lines no person has checked yet (the machine's transcript), marked as such. */
     val showUnchecked: Boolean = true,
     val translations: TranslationMode = TranslationMode.TAP,
+    /** The usual speed. */
     val speed: Float = 1f,
+    /** One tap away (in the app or on the lock screen) for a hard stretch. */
+    val slowSpeed: Float = DEFAULT_SLOW_SPEED,
+    val slow: Boolean = false,
+    /** Whether the transcript was open last, so the app opens where you left it. */
+    val studyView: Boolean = false,
 ) {
     val connection: Connection get() = Connection(serverUrl.trim(), token.trim())
 
+    /** The speed to play at now. */
+    val playbackSpeed: Float get() = if (slow) slowSpeed else speed
+
+    /** Picking a speed sets the one in use: the slow speed while slowed down, else the usual one. */
+    fun withPlaybackSpeed(chosen: Float): AppSettings = if (slow) copy(slowSpeed = chosen) else copy(speed = chosen)
+
     companion object {
         const val DEFAULT_SERVER = "https://abairt.com"
+        const val DEFAULT_SLOW_SPEED = 0.75f
     }
 }
 
@@ -44,12 +57,17 @@ class SettingsStore(private val context: Context) {
         context.dataStore.edit { prefs -> prefs.write(change(prefs.toSettings())) }
     }
 
+    suspend fun toggleSlow() = update { it.copy(slow = !it.slow) }
+
     private fun Preferences.toSettings() = AppSettings(
         serverUrl = this[SERVER_URL] ?: AppSettings.DEFAULT_SERVER,
         token = this[TOKEN] ?: "",
         showUnchecked = this[SHOW_UNCHECKED] ?: true,
         translations = this[TRANSLATIONS]?.let { runCatching { TranslationMode.valueOf(it) }.getOrNull() } ?: TranslationMode.TAP,
         speed = this[SPEED] ?: 1f,
+        slowSpeed = this[SLOW_SPEED] ?: AppSettings.DEFAULT_SLOW_SPEED,
+        slow = this[SLOW] ?: false,
+        studyView = this[STUDY_VIEW] ?: false,
     )
 
     private fun androidx.datastore.preferences.core.MutablePreferences.write(settings: AppSettings) {
@@ -58,6 +76,9 @@ class SettingsStore(private val context: Context) {
         this[SHOW_UNCHECKED] = settings.showUnchecked
         this[TRANSLATIONS] = settings.translations.name
         this[SPEED] = settings.speed
+        this[SLOW_SPEED] = settings.slowSpeed
+        this[SLOW] = settings.slow
+        this[STUDY_VIEW] = settings.studyView
     }
 
     private companion object {
@@ -66,5 +87,8 @@ class SettingsStore(private val context: Context) {
         val SHOW_UNCHECKED = booleanPreferencesKey("show_unchecked")
         val TRANSLATIONS = stringPreferencesKey("translations")
         val SPEED = floatPreferencesKey("speed")
+        val SLOW_SPEED = floatPreferencesKey("slow_speed")
+        val SLOW = booleanPreferencesKey("slow")
+        val STUDY_VIEW = booleanPreferencesKey("study_view")
     }
 }

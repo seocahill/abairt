@@ -206,9 +206,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         if (play) c.play()
     }
 
+    // The playback service follows the speed settings, so the lock-screen button and these agree.
     fun setSpeed(speed: Float) {
-        controller?.setPlaybackSpeed(speed)
-        viewModelScope.launch { graph.settings.update { it.copy(speed = speed) } }
+        viewModelScope.launch { graph.settings.update { it.withPlaybackSpeed(speed) } }
+    }
+
+    fun toggleSlow() {
+        viewModelScope.launch { graph.settings.toggleSlow() }
     }
 
     // --- Studying a line ---------------------------------------------------
@@ -252,6 +256,11 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     // --- Settings ----------------------------------------------------------
+
+    /** The settings as stored, rather than the defaults [settings] starts with before they load. */
+    suspend fun storedSettings(): AppSettings = graph.settings.current()
+
+    fun rememberStudyView(open: Boolean) = saveSettings { it.copy(studyView = open) }
 
     fun saveSettings(change: (AppSettings) -> AppSettings) {
         viewModelScope.launch { graph.settings.update(change) }

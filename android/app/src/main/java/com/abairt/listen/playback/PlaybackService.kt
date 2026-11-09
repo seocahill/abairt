@@ -35,6 +35,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 
@@ -71,9 +73,9 @@ class PlaybackService : MediaSessionService() {
         session = MediaSession.Builder(this, player)
             .setCallback(SessionCallback())
             .setSessionActivity(openAppIntent())
-            .setMediaButtonPreferences(skipButtons())
+            .setMediaButtonPreferences(lockScreenButtons(slow = false))
             .build()
-        launchSettingsSpeedSync()
+        followSpeedSettings()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
@@ -118,20 +120,21 @@ class PlaybackService : MediaSessionService() {
     }
 
     /**
-     * "Back 10 seconds" and "forward 10" in the notification and lock screen, in the secondary
-     * slots so that previous and next recording stay where headset buttons expect them.
-     * Scanning back is the thing a language learner does most.
+     * The two extra buttons in the notification and on the lock screen: "back 10 seconds"
+     * (scanning back is what a learner does most) and slowing down a hard stretch, both without
+     * unlocking the phone in the dark. They go in the overflow slot, which the system shows
+     * beside previous/next recording; it ignores the *_SECONDARY slots.
      */
-    private fun skipButtons() = listOf(
+    private fun lockScreenButtons(slow: Boolean) = listOf(
         CommandButton.Builder(CommandButton.ICON_SKIP_BACK_10)
             .setPlayerCommand(Player.COMMAND_SEEK_BACK)
             .setDisplayName(getString(R.string.back_10))
-            .setSlots(CommandButton.SLOT_BACK_SECONDARY)
+            .setSlots(CommandButton.SLOT_OVERFLOW)
             .build(),
-        CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD_10)
-            .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
-            .setDisplayName(getString(R.string.forward_10))
-            .setSlots(CommandButton.SLOT_FORWARD_SECONDARY)
+        CommandButton.Builder(if (slow) CommandButton.ICON_PLAYBACK_SPEED_1_0 else CommandButton.ICON_PLAYBACK_SPEED)
+            .setSessionCommand(PlaybackProtocol.TOGGLE_SLOW)
+            .setDisplayName(getString(if (slow) R.string.normal_speed else R.string.slow_down))
+            .setSlots(CommandButton.SLOT_OVERFLOW)
             .build(),
     )
 
@@ -142,10 +145,19 @@ class PlaybackService : MediaSessionService() {
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
-    /** The listener's chosen speed holds across restarts, so bedtime listening starts slow if it ended slow. */
-    private fun launchSettingsSpeedSync() {
+    /**
+     * Speed lives in the settings, whoever changes it (the app, or the lock-screen button), and
+     * holds across restarts, so bedtime listening starts slow if it ended slow.
+     */
+    private fun followSpeedSettings() {
         scope.launch {
-            player.setPlaybackParameters(player.playbackParameters.withSpeed(graph.settings.current().speed))
+            graph.settings.settings
+                .map { it.playbackSpeed to it.slow }
+                .distinctUntilChanged()
+                .collect { (speed, slow) ->
+                    player.setPlaybackParameters(player.playbackParameters.withSpeed(speed))
+                    session?.setMediaButtonPreferences(lockScreenButtons(slow))
+                }
         }
     }
 
@@ -293,6 +305,7 @@ class PlaybackService : MediaSessionService() {
                 .add(PlaybackProtocol.START_RADIO)
                 .add(PlaybackProtocol.SLEEP_TIMER)
                 .add(PlaybackProtocol.LOOP_LINE)
+                .add(PlaybackProtocol.TOGGLE_SLOW)
                 .build()
             return MediaSession.ConnectionResult.AcceptedResultBuilder(session, controller)
                 .setAvailableSessionCommands(commands)
@@ -321,6 +334,11 @@ class PlaybackService : MediaSessionService() {
                 val end = args.getLong(PlaybackProtocol.ARG_END_MS, -1)
                 if (start >= 0 && end > start) startLoop(start, end) else clearLoop()
                 Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+            }
+
+            PlaybackProtocol.TOGGLE_SLOW.customAction -> scope.future {
+                graph.settings.toggleSlow()
+                SessionResult(SessionResult.RESULT_SUCCESS)
             }
 
             else -> Futures.immediateFuture(SessionResult(SessionError.ERROR_NOT_SUPPORTED))

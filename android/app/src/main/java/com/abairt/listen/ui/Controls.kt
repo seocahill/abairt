@@ -6,12 +6,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SlowMotionVideo
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconToggleButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
@@ -23,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -76,6 +81,33 @@ fun SpeedChip(speed: Float, onSelect: (Float) -> Unit) {
                 )
             }
         }
+    }
+}
+
+/** One tap between the usual speed and the slow one; the speed chip sets how slow. */
+@Composable
+fun SlowChip(slow: Boolean, onToggle: () -> Unit) {
+    FilterChip(
+        selected = slow,
+        onClick = onToggle,
+        label = { Text(stringResource(R.string.slow)) },
+        leadingIcon = { Icon(Icons.Filled.SlowMotionVideo, contentDescription = null, modifier = Modifier.size(18.dp)) },
+    )
+}
+
+/** Shows or hides the transcript; the same button in the same corner on both screens. */
+@Composable
+fun TranscriptToggle(open: Boolean, onToggle: (Boolean) -> Unit) {
+    FilledTonalIconToggleButton(
+        checked = open,
+        onCheckedChange = onToggle,
+        // Filled only when open, so it reads as on/off.
+        colors = IconButtonDefaults.filledTonalIconToggleButtonColors(containerColor = Color.Transparent),
+    ) {
+        Icon(
+            Icons.Filled.Subtitles,
+            contentDescription = stringResource(if (open) R.string.hide_transcript else R.string.show_transcript),
+        )
     }
 }
 

@@ -15,20 +15,30 @@ git subtree split --prefix=android -b android-app   # then push that branch to t
 ## What it does
 
 **Listening mode** (the home screen): nothing to read. The title, the voice you are hearing,
-a thin seek bar, big controls (previous/next recording, back/forward 10 seconds), a speed
-chip and a sleep timer. Dark theme is true black.
+a thin seek bar, big controls (previous/next recording, back/forward 10 seconds), "Slow",
+speed and sleep timer chips. Dark theme is true black.
 
 - **Radio**: "Start radio" queues random recordings that have a transcript, and keeps a few
   waiting ahead of the one playing so it does not stop in the night. It does not repeat a
   recording within a run, and retries quietly when the connection drops.
 - **Native controls**: it is a Media3 `MediaSessionService`, so the notification, lock screen,
-  Bluetooth and headset buttons all work (play/pause, next/previous recording, back/forward 10
-  seconds), as does audio focus (calls pause it) and unplugging headphones. Swiping the app
-  away while it plays does not stop it.
+  Bluetooth and headset buttons all work (play/pause, next/previous recording, plus "back 10
+  seconds" and the slow toggle in the notification and on the lock screen), as does audio focus
+  (calls pause it) and unplugging headphones. Swiping the app away while it plays does not stop it.
 - **Sleep timer**: 15 to 90 minutes with a 30 second fade-out, or "end of this recording".
-- **Speed**: 0.5x to 1.3x, pitch preserved, remembered between runs.
+- **Slow**: one tap (in the app, or on the lock screen without unlocking) switches between your
+  usual speed and a slow one (0.75x to start). While slowed down, the speed chip sets how slow.
+- **Speed**: 0.5x to 1.3x, pitch preserved, remembered between runs, as is whether you were
+  slowed down.
 
-**Study mode** (tap "Transcript"): the transcript follows the audio, current line highlighted.
+**Study mode** (tap "Transcript", or the transcript button top right, which also closes it):
+the transcript follows the audio, current line highlighted. The app reopens in whichever mode
+you left it in.
+
+- Made for reading in bed: while the transcript is open and the audio is playing, the screen
+  stays on (until the sleep timer pauses it), and it shows over the lock screen, so pressing
+  the power button brings the transcript straight back without unlocking. Leaving the
+  transcript brings the lock back; nothing else in the app is reachable from there.
 
 - Tap a line to hear it. "Back one line" restarts the current line, and pressed again soon
   after goes to the line before (so you can step back a sentence at a time).
