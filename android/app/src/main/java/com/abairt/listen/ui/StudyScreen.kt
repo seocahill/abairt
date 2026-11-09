@@ -109,7 +109,7 @@ fun StudyScreen(
                     } else {
                         TranscriptList(
                             transcript = state.transcript,
-                            position = position,
+                            position = { position },
                             translations = settings.translations,
                             loopStartMs = ui.service.loopStartMs,
                             onPlayLine = viewModel::playLine,
@@ -123,13 +123,15 @@ fun StudyScreen(
 @Composable
 private fun TranscriptList(
     transcript: Transcript,
-    position: Long,
+    // A lambda, so derivedStateOf reads the position's State and tracks it: the
+    // list then recomposes when the playing line changes, not on every tick.
+    position: () -> Long,
     translations: TranslationMode,
     loopStartMs: Long?,
     onPlayLine: (Line) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val activeIndex by remember(transcript) { derivedStateOf { transcript.activeIndexAt(position) } }
+    val activeIndex by remember(transcript) { derivedStateOf { transcript.activeIndexAt(position()) } }
     var following by rememberSaveable { mutableStateOf(true) }
     var revealed by rememberSaveable { mutableStateOf(setOf<Long>()) }
 

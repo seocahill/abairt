@@ -63,6 +63,15 @@ module Api
       assert_response :not_found
     end
 
+    test "leaves out segments that have no words yet" do
+      spoken = line("a line", 1.0, confirmed: false)
+      line("placeholder", 4.0, confirmed: false).update_column(:word_or_phrase, nil)
+      line("placeholder", 7.0, confirmed: false).update_column(:word_or_phrase, "")
+
+      get api_voice_recording_path(@recording, unchecked: true), headers: auth
+      assert_equal [spoken.id], JSON.parse(response.body)["lines"].pluck("id")
+    end
+
     test "leaves out lines nobody has checked unless asked for them" do
       checked = line("checked line", 1.0)
       unchecked = line("machine line", 4.0, confirmed: false)

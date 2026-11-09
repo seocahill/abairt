@@ -103,6 +103,13 @@ class AbairtApiTest {
     }
 
     @Test
+    fun `a response it cannot read is an API error, not a crash`() {
+        server.enqueue(MockResponse().setBody("""{"id":1,"title":"t","lines":[{"id":2,"irish":null,"start":0,"end":1}]}"""))
+
+        assertThrows(ApiException.Unreadable::class.java) { runBlocking { api.transcript(1, true) } }
+    }
+
+    @Test
     fun `does not call out until it knows where and as whom`() {
         val unconfigured = AbairtApi(OkHttpClient(), connection = { Connection("", "") })
 

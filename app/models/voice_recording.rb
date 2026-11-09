@@ -73,7 +73,9 @@ class VoiceRecording < ApplicationRecord
   # person has checked, unless the caller says it can show the rest (each line
   # then says whether it was checked, so the app can mark the machine's work).
   def transcript_lines(include_unchecked: false)
-    lines = dictionary_entries.where.not(region_start: nil).includes(:speaker).reorder(:region_start)
+    # Segments with no words yet (diarized, not transcribed) aren't lines.
+    lines = dictionary_entries.where.not(region_start: nil).where.not(word_or_phrase: [nil, ""])
+      .includes(:speaker).reorder(:region_start)
     include_unchecked ? lines : lines.confirmed_accuracy
   end
 
