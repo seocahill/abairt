@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Five bars of a sound wave, in the middle of the adaptive icon's safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M30,48 L30,60" android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M42,40 L42,68" android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M54,32 L54,76" android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M66,40 L66,68" android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M78,48 L78,60" android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" />
+</vector>

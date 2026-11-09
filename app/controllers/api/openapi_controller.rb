@@ -235,6 +235,27 @@ module Api
               }
             }
           },
+          "/api/voice_recordings": {
+            get: {
+              summary: "List recordings to play",
+              description: "Recordings that have audio and a transcript, newest first or in random order. Transcripts are fetched per recording. Use shuffle with exclude_ids to run a radio that does not repeat itself.",
+              operationId: "listVoiceRecordings",
+              tags: ["Recordings"],
+              parameters: [
+                { name: "shuffle", in: "query", required: false, description: "Random order instead of newest first", schema: { type: "boolean", default: false } },
+                { name: "limit", in: "query", required: false, description: "How many to return (default 10, at most 50)", schema: { type: "integer", default: 10, maximum: 50 } },
+                { name: "exclude_ids[]", in: "query", required: false, description: "Recording IDs to leave out, such as ones already heard", schema: { type: "array", items: { type: "integer" } } }
+              ],
+              responses: {
+                "200": {
+                  description: "Successful response",
+                  content: { "application/json": { schema: { type: "object", properties: { recordings: { type: "array", items: { "$ref": "#/components/schemas/RecordingSummary" } } } } } }
+                },
+                "401": { "$ref": "#/components/responses/Unauthorized" },
+                "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+              }
+            }
+          },
           "/api/voice_recordings/{id}": {
             get: {
               summary: "Get a recording with its transcript",
@@ -242,7 +263,8 @@ module Api
               operationId: "getVoiceRecording",
               tags: ["Recordings"],
               parameters: [
-                { name: "id", in: "path", required: true, description: "Recording ID", schema: { type: "integer" } }
+                { name: "id", in: "path", required: true, description: "Recording ID", schema: { type: "integer" } },
+                { name: "unchecked", in: "query", required: false, description: "Also return lines no person has checked yet (each line's checked says which)", schema: { type: "boolean", default: false } }
               ],
               responses: {
                 "200": {
@@ -335,12 +357,24 @@ module Api
                       id: { type: "integer", description: "Transcription ID" },
                       irish: { type: "string" },
                       translation: { type: "string", nullable: true },
+                      checked: { type: "boolean", description: "Whether a person has checked this line" },
                       start: { type: "number", format: "float", description: "Start time in seconds" },
                       end: { type: "number", format: "float", description: "End time in seconds" },
                       speaker: { "$ref": "#/components/schemas/Speaker" }
                     }
                   }
                 }
+              }
+            },
+            RecordingSummary: {
+              type: "object",
+              properties: {
+                id: { type: "integer" },
+                title: { type: "string" },
+                duration_seconds: { type: "number", format: "float" },
+                dialect_region: { type: "string", nullable: true },
+                lines_count: { type: "integer", description: "Lines in the transcript, checked or not" },
+                audio_url: { type: "string", format: "uri" }
               }
             },
             Question: {
