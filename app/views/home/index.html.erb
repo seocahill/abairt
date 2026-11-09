@@ -8,6 +8,11 @@
       </video>
     </div>
     <div class="ml-auto place-self-center lg:col-span-7">
+      <%= link_to "/1926", class: "inline-flex items-center justify-between px-1 py-1 pr-4 mb-6 text-sm text-gray-700 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700" do %>
+        <span class="text-xs bg-blue-600 rounded-full text-white px-4 py-1.5 mr-3">1926</span>
+        <span class="text-sm font-medium">Was your area Irish-speaking? Find it on the first Gaeltacht map</span>
+        <svg class="w-2.5 h-2.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/></svg>
+      <% end %>
       <h1 class="max-w-2xl mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl dark:text-white">Mayo Irish,<br>in its speakers' own voices.</h1>
       <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
         Abairt is a growing collection of recordings of native speakers from Mayo, transcribed and translated line by line. Listen, read along, and search for any word or phrase.</p>
@@ -41,6 +46,22 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Github
       </a>
     </div>
+  </div>
+</section>
+
+<%# The 1926 map is the best way in for anyone curious about Irish where
+    they live: find your own parish, then hear the speakers. %>
+<section class="bg-white dark:bg-gray-900">
+  <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-16">
+    <%= link_to "/1926", class: "group grid items-center overflow-hidden bg-gray-50 border border-gray-200 rounded-2xl shadow-sm lg:grid-cols-2 hover:border-blue-500 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-400" do %>
+      <%= image_tag "home/gaeltacht-1926-map.webp", alt: "The 1926 Gaeltacht map of Mayo, each district coloured by how much Irish was spoken there", width: 1150, height: 625, loading: "lazy", class: "w-full h-full object-cover" %>
+      <div class="p-6 lg:p-10">
+        <p class="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase dark:text-blue-400">The 1926 Gaeltacht map</p>
+        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 lg:text-4xl dark:text-white">Was your area Irish-speaking in 1926?</h2>
+        <p class="mb-6 font-light text-gray-500 lg:text-xl dark:text-gray-400">In 1926 the new Irish state published the first official map of the Gaeltacht, district by district. Find your town or parish and see how it was classed.</p>
+        <span class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-white bg-blue-500 rounded-lg group-hover:bg-blue-700">Find your parish on the map<svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></span>
+      </div>
+    <% end %>
   </div>
 </section>
 
@@ -117,18 +138,15 @@
 <section class="bg-gray-50 dark:bg-gray-800">
   <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
     <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
-      <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="https://assets.abairt.com/transcription-demo-poster.png" aria-label="Demonstration of the transcription tools">
-        <source src="https://assets.abairt.com/transcription-demo.mp4" type="video/mp4">
-      </video>
+      <%= image_tag "home/recording-player.webp", alt: "A recording playing on Abairt: the line being spoken is highlighted, with the Irish, its English translation, the speaker and the time", width: 1280, height: 800, loading: "lazy", class: "w-full mb-4 border border-gray-200 rounded-lg shadow-lg lg:mb-0 dark:border-gray-700" %>
       <div class="text-gray-500 sm:text-lg dark:text-gray-400">
         <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Listen, read, search</h2>
-        <p class="mb-8 font-light lg:text-xl">Every recording has a transcript you can follow as it plays, in Irish or English.</p>
+        <p class="mb-8 font-light lg:text-xl">Recordings come with a transcript that follows along as they play, the Irish with the English beneath it.</p>
         <ul role="list" class="pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700">
-          <%= render "home/point", text: "Toggle Irish and English subtitles, or export them" %>
-          <%= render "home/point", text: "Slow down, isolate and loop any passage" %>
-          <%= render "home/point", text: "Full text search in Irish and English" %>
-          <%= render "home/point", text: "Filter by speaker, dialect, tag and location" %>
-          <%= render "home/point", text: "Find pubs and other places where Irish is spoken in public" %>
+          <%= render "home/point", text: "Play any line on its own, or shift-click to loop it" %>
+          <%= render "home/point", text: "Slow down to half speed" %>
+          <%= render "home/point", text: "Search recordings, and filter by dialect and topic" %>
+          <%= render "home/point", text: "Browse recordings on a map" %>
         </ul>
       </div>
     </div>
@@ -223,7 +241,7 @@
           <li><strong>Start with the map</strong> to hear speakers from different areas and notice how the Irish changes.</li>
           <li><strong>Search</strong> for a word or phrase in Irish or English to hear it in context.</li>
           <li><strong>Slow it down and loop it</strong> until you can copy the sounds and the rhythm.</li>
-          <li><strong>Read along</strong> with Irish or English subtitles to follow the meaning.</li>
+          <li><strong>Read along</strong> with the transcript, the English beneath the Irish, to follow the meaning.</li>
         </ul>
       <% end %>
       <%= render "home/faq_item", question: "Is the transcription always right?" do %>
