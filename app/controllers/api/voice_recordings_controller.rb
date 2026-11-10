@@ -3,12 +3,16 @@
 module Api
   # Recordings with their transcript, line by line with times, for apps that
   # play them to learners, such as the Mayo Irish course and the Android
-  # listening app.
+  # listening app. Open to anyone, like the recordings on the website.
   class VoiceRecordingsController < BaseController
     DEFAULT_LIMIT = 10
     MAX_LIMIT = 50
 
-    rate_limit to: 100, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }
+    skip_before_action :authenticate_api_token!
+    before_action :identify_api_user
+
+    # A night of radio on short recordings is near a hundred requests an hour.
+    rate_limit to: 300, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }
 
     # GET /api/voice_recordings
     #

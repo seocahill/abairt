@@ -240,6 +240,7 @@ module Api
               summary: "List recordings to play",
               description: "Recordings that have audio and a transcript, newest first or in random order. Transcripts are fetched per recording. Use shuffle with exclude_ids to run a radio that does not repeat itself.",
               operationId: "listVoiceRecordings",
+              security: [],
               tags: ["Recordings"],
               parameters: [
                 { name: "shuffle", in: "query", required: false, description: "Random order instead of newest first", schema: { type: "boolean", default: false } },
@@ -261,6 +262,7 @@ module Api
               summary: "Get a recording with its transcript",
               description: "Returns a whole recording to listen to, with its confirmed transcript line by line, each line timed in seconds from the start. For playing a recording to learners with the words following along.",
               operationId: "getVoiceRecording",
+              security: [],
               tags: ["Recordings"],
               parameters: [
                 { name: "id", in: "path", required: true, description: "Recording ID", schema: { type: "integer" } },

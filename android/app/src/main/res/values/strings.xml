@@ -6,7 +6,7 @@
     <!-- Listening -->
     <string name="start_blurb">Random recordings, one after another. Put it on and listen.</string>
     <string name="start_radio">Start radio</string>
-    <string name="setup_needed">Add your API token in settings first.</string>
+    <string name="setup_needed">Set the server in settings first.</string>
     <string name="open_settings">Settings</string>
     <string name="transcript">Transcript</string>
     <string name="speaker_credit">%1$s</string>
@@ -51,8 +51,6 @@
     <!-- Settings -->
     <string name="settings">Settings</string>
     <string name="server">Server</string>
-    <string name="api_token">API token</string>
-    <string name="api_token_help">Make one on your user page on Abairt (Generate API token), then paste it here.</string>
     <string name="line_on_lock_screen">Show the current line on the lock screen</string>
     <string name="line_on_lock_screen_help">The line being spoken, with its English, in place of the title, so you can glance at it without unlocking.</string>
     <string name="show_unchecked">Show lines nobody has checked yet</string>
