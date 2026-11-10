@@ -30,6 +30,8 @@ data class AppSettings(
     val slow: Boolean = false,
     /** Whether the transcript was open last, so the app opens where you left it. */
     val studyView: Boolean = false,
+    /** Show the line being spoken on the lock screen, to read it without unlocking. */
+    val lineOnLockScreen: Boolean = true,
 ) {
     val connection: Connection get() = Connection(serverUrl.trim(), token.trim())
 
@@ -68,6 +70,7 @@ class SettingsStore(private val context: Context) {
         slowSpeed = this[SLOW_SPEED] ?: AppSettings.DEFAULT_SLOW_SPEED,
         slow = this[SLOW] ?: false,
         studyView = this[STUDY_VIEW] ?: false,
+        lineOnLockScreen = this[LINE_ON_LOCK_SCREEN] ?: true,
     )
 
     private fun androidx.datastore.preferences.core.MutablePreferences.write(settings: AppSettings) {
@@ -79,6 +82,7 @@ class SettingsStore(private val context: Context) {
         this[SLOW_SPEED] = settings.slowSpeed
         this[SLOW] = settings.slow
         this[STUDY_VIEW] = settings.studyView
+        this[LINE_ON_LOCK_SCREEN] = settings.lineOnLockScreen
     }
 
     private companion object {
@@ -90,5 +94,6 @@ class SettingsStore(private val context: Context) {
         val SLOW_SPEED = floatPreferencesKey("slow_speed")
         val SLOW = booleanPreferencesKey("slow")
         val STUDY_VIEW = booleanPreferencesKey("study_view")
+        val LINE_ON_LOCK_SCREEN = booleanPreferencesKey("line_on_lock_screen")
     }
 }

@@ -1,5 +1,6 @@
 package com.abairt.listen.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -102,25 +103,39 @@ fun SettingsScreen(viewModel: PlayerViewModel, settings: AppSettings, onBack: ()
                 status?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.show_unchecked), style = MaterialTheme.typography.titleSmall)
-                    Text(
-                        stringResource(R.string.show_unchecked_help),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(
-                    checked = settings.showUnchecked,
-                    onCheckedChange = { checked -> viewModel.saveSettings { it.copy(showUnchecked = checked) } },
-                )
-            }
+            SettingSwitch(
+                title = R.string.line_on_lock_screen,
+                help = R.string.line_on_lock_screen_help,
+                checked = settings.lineOnLockScreen,
+                onChange = { checked -> viewModel.saveSettings { it.copy(lineOnLockScreen = checked) } },
+            )
+
+            SettingSwitch(
+                title = R.string.show_unchecked,
+                help = R.string.show_unchecked_help,
+                checked = settings.showUnchecked,
+                onChange = { checked -> viewModel.saveSettings { it.copy(showUnchecked = checked) } },
+            )
 
             Text(stringResource(R.string.translations), style = MaterialTheme.typography.titleSmall)
             TranslationOption(R.string.translations_tap, TranslationMode.TAP, settings.translations, viewModel)
             TranslationOption(R.string.translations_always, TranslationMode.ALWAYS, settings.translations, viewModel)
         }
+    }
+}
+
+@Composable
+private fun SettingSwitch(@StringRes title: Int, @StringRes help: Int, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(title), style = MaterialTheme.typography.titleSmall)
+            Text(
+                stringResource(help),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onChange)
     }
 }
 

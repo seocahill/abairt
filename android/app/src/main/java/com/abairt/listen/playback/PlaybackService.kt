@@ -35,8 +35,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 
@@ -52,8 +50,13 @@ class PlaybackService : MediaSessionService() {
     private val radio = RadioQueue()
 
     private lateinit var player: ExoPlayer
+    private lateinit var linePlayer: LinePlayer
+    private lateinit var follower: TranscriptFollower
     private var session: MediaSession? = null
     private lateinit var sleepTimer: SleepTimer
+
+    private var slow = false
+    private var buttonsFor: Pair<Boolean, Boolean>? = null
 
     private var loadingMore: Job? = null
     private var loopMessage: PlayerMessage? = null
@@ -70,12 +73,16 @@ class PlaybackService : MediaSessionService() {
             onChange = { publishState() },
         )
         player.addListener(PlayerEvents())
-        session = MediaSession.Builder(this, player)
+        // The system sees the player through LinePlayer, so the lock screen can show the line spoken.
+        linePlayer = LinePlayer(player)
+        follower = TranscriptFollower(player, linePlayer, graph.transcripts, scope, onTranscriptChanged = ::updateButtons)
+        player.addListener(follower)
+        session = MediaSession.Builder(this, linePlayer)
             .setCallback(SessionCallback())
             .setSessionActivity(openAppIntent())
-            .setMediaButtonPreferences(lockScreenButtons(slow = false))
             .build()
-        followSpeedSettings()
+        updateButtons()
+        followSettings()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
@@ -89,7 +96,7 @@ class PlaybackService : MediaSessionService() {
         scope.cancel()
         session?.release()
         session = null
-        player.release()
+        linePlayer.release() // and the ExoPlayer it wraps
         super.onDestroy()
     }
 
@@ -119,18 +126,35 @@ class PlaybackService : MediaSessionService() {
             .build()
     }
 
+    /** Sets the lock-screen buttons, when what they depend on has changed. */
+    private fun updateButtons() {
+        val hasTranscript = follower.transcript != null
+        if (buttonsFor == slow to hasTranscript) return
+        buttonsFor = slow to hasTranscript
+        session?.setMediaButtonPreferences(lockScreenButtons(hasTranscript))
+    }
+
     /**
-     * The two extra buttons in the notification and on the lock screen: "back 10 seconds"
-     * (scanning back is what a learner does most) and slowing down a hard stretch, both without
-     * unlocking the phone in the dark. They go in the overflow slot, which the system shows
-     * beside previous/next recording; it ignores the *_SECONDARY slots.
+     * The two extra buttons in the notification and on the lock screen, both for the dark
+     * without unlocking: scanning back (a line at a time when there is a transcript, else 10
+     * seconds), which is what a learner does most, and slowing down a hard stretch. They go in
+     * the overflow slot, which the system shows beside previous/next recording; it ignores the
+     * *_SECONDARY slots.
      */
-    private fun lockScreenButtons(slow: Boolean) = listOf(
-        CommandButton.Builder(CommandButton.ICON_SKIP_BACK_10)
-            .setPlayerCommand(Player.COMMAND_SEEK_BACK)
-            .setDisplayName(getString(R.string.back_10))
-            .setSlots(CommandButton.SLOT_OVERFLOW)
-            .build(),
+    private fun lockScreenButtons(hasTranscript: Boolean) = listOf(
+        if (hasTranscript) {
+            CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
+                .setSessionCommand(PlaybackProtocol.BACK_LINE)
+                .setDisplayName(getString(R.string.back_one_line))
+                .setSlots(CommandButton.SLOT_OVERFLOW)
+                .build()
+        } else {
+            CommandButton.Builder(CommandButton.ICON_SKIP_BACK_10)
+                .setPlayerCommand(Player.COMMAND_SEEK_BACK)
+                .setDisplayName(getString(R.string.back_10))
+                .setSlots(CommandButton.SLOT_OVERFLOW)
+                .build()
+        },
         CommandButton.Builder(if (slow) CommandButton.ICON_PLAYBACK_SPEED_1_0 else CommandButton.ICON_PLAYBACK_SPEED)
             .setSessionCommand(PlaybackProtocol.TOGGLE_SLOW)
             .setDisplayName(getString(if (slow) R.string.normal_speed else R.string.slow_down))
@@ -147,17 +171,19 @@ class PlaybackService : MediaSessionService() {
 
     /**
      * Speed lives in the settings, whoever changes it (the app, or the lock-screen button), and
-     * holds across restarts, so bedtime listening starts slow if it ended slow.
+     * holds across restarts, so bedtime listening starts slow if it ended slow. So do whether to
+     * show the line on the lock screen and whether to include lines nobody has checked.
      */
-    private fun followSpeedSettings() {
+    private fun followSettings() {
         scope.launch {
-            graph.settings.settings
-                .map { it.playbackSpeed to it.slow }
-                .distinctUntilChanged()
-                .collect { (speed, slow) ->
-                    player.setPlaybackParameters(player.playbackParameters.withSpeed(speed))
-                    session?.setMediaButtonPreferences(lockScreenButtons(slow))
+            graph.settings.settings.collect { settings ->
+                if (player.playbackParameters.speed != settings.playbackSpeed) {
+                    player.setPlaybackParameters(player.playbackParameters.withSpeed(settings.playbackSpeed))
                 }
+                slow = settings.slow
+                updateButtons()
+                follower.settingsChanged(settings.showUnchecked, settings.lineOnLockScreen)
+            }
         }
     }
 
@@ -306,6 +332,7 @@ class PlaybackService : MediaSessionService() {
                 .add(PlaybackProtocol.SLEEP_TIMER)
                 .add(PlaybackProtocol.LOOP_LINE)
                 .add(PlaybackProtocol.TOGGLE_SLOW)
+                .add(PlaybackProtocol.BACK_LINE)
                 .build()
             return MediaSession.ConnectionResult.AcceptedResultBuilder(session, controller)
                 .setAvailableSessionCommands(commands)
@@ -339,6 +366,11 @@ class PlaybackService : MediaSessionService() {
             PlaybackProtocol.TOGGLE_SLOW.customAction -> scope.future {
                 graph.settings.toggleSlow()
                 SessionResult(SessionResult.RESULT_SUCCESS)
+            }
+
+            PlaybackProtocol.BACK_LINE.customAction -> {
+                if (!follower.backOneLine()) player.seekBack()
+                Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
 
             else -> Futures.immediateFuture(SessionResult(SessionError.ERROR_NOT_SUPPORTED))

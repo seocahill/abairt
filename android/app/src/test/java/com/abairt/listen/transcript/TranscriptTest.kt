@@ -66,4 +66,19 @@ class TranscriptTest {
         assertNull(empty.nextTargetMs(5_000))
         assertNull(empty.backTargetMs(5_000))
     }
+
+    @Test
+    fun `the line to show is the one playing, none before the first`() {
+        assertNull(transcript.lineAt(500))
+        assertEquals(2L, transcript.lineAt(6_000)?.id)
+        assertEquals(2L, transcript.lineAt(8_500)?.id) // the pause after a line keeps it
+    }
+
+    @Test
+    fun `waits until the next line starts, in real time at the speed playing`() {
+        assertEquals(4_000L, transcript.msUntilNextLine(1_000, speed = 1f))
+        assertEquals(8_000L, transcript.msUntilNextLine(1_000, speed = 0.5f))
+        assertEquals(1_000L, transcript.msUntilNextLine(0, speed = 1f))
+        assertNull(transcript.msUntilNextLine(10_000, speed = 1f))
+    }
 }

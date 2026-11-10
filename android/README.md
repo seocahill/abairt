@@ -22,9 +22,14 @@ speed and sleep timer chips. Dark theme is true black.
   waiting ahead of the one playing so it does not stop in the night. It does not repeat a
   recording within a run, and retries quietly when the connection drops.
 - **Native controls**: it is a Media3 `MediaSessionService`, so the notification, lock screen,
-  Bluetooth and headset buttons all work (play/pause, next/previous recording, plus "back 10
-  seconds" and the slow toggle in the notification and on the lock screen), as does audio focus
+  Bluetooth and headset buttons all work (play/pause, next/previous recording, plus "back one
+  line" and the slow toggle in the notification and on the lock screen), as does audio focus
   (calls pause it) and unplugging headphones. Swiping the app away while it plays does not stop it.
+  Without a transcript, "back one line" is "back 10 seconds".
+- **The line on the lock screen**: while a recording plays, the lock-screen card shows the line
+  being spoken (the Irish, with the English beneath) in place of the title, so in bed you can
+  step back a line and glance at it without unlocking. It follows the audio with the screen off,
+  waking only when the next line starts. Settings can turn it off.
 - **Sleep timer**: 15 to 90 minutes with a 30 second fade-out, or "end of this recording".
 - **Slow**: one tap (in the app, or on the lock screen without unlocking) switches between your
   usual speed and a slow one (0.75x to start). While slowed down, the speed chip sets how slow.

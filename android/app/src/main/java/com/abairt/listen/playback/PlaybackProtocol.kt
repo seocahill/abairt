@@ -18,6 +18,9 @@ object PlaybackProtocol {
     /** Switch between the usual speed and the slow one (the lock-screen button). */
     val TOGGLE_SLOW = SessionCommand(PREFIX + "TOGGLE_SLOW", Bundle.EMPTY)
 
+    /** Restart the line playing, or go to the one before (back 10 seconds without a transcript). */
+    val BACK_LINE = SessionCommand(PREFIX + "BACK_LINE", Bundle.EMPTY)
+
     // Command arguments
     const val ARG_MINUTES = "minutes"
     const val ARG_START_MS = "start_ms"

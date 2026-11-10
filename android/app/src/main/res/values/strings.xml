@@ -53,6 +53,8 @@
     <string name="server">Server</string>
     <string name="api_token">API token</string>
     <string name="api_token_help">Make one on your user page on Abairt (Generate API token), then paste it here.</string>
+    <string name="line_on_lock_screen">Show the current line on the lock screen</string>
+    <string name="line_on_lock_screen_help">The line being spoken, with its English, in place of the title, so you can glance at it without unlocking.</string>
     <string name="show_unchecked">Show lines nobody has checked yet</string>
     <string name="show_unchecked_help">Most recordings are only transcribed by machine so far. These lines are marked, and may be wrong.</string>
     <string name="translations">English translations</string>

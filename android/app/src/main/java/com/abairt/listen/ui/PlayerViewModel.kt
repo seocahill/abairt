@@ -66,7 +66,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val graph = application.graph
     private var controller: MediaController? = null
     private var transcriptJob: Job? = null
-    private val transcriptCache = LinkedHashMap<Pair<Long, Boolean>, Transcript>()
 
     private val _ui = MutableStateFlow(PlayerUi())
     val ui: StateFlow<PlayerUi> = _ui.asStateFlow()
@@ -123,7 +122,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun refresh() {
         val c = controller ?: return
-        val metadata = c.mediaMetadata
+        // The media item's own metadata: the player's shows the line being spoken, for the lock screen.
+        val metadata = c.currentMediaItem?.mediaMetadata ?: c.mediaMetadata
         val previousId = _ui.value.recordingId
         val id = c.currentMediaItem?.mediaId?.toLongOrNull()
         _ui.update {
@@ -150,18 +150,10 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             return
         }
         val unchecked = settings.value.showUnchecked
-        val cached = transcriptCache[id to unchecked]
-        if (cached != null && !force) {
-            _ui.update { it.copy(transcript = TranscriptState.Ready(cached)) }
-            return
-        }
         _ui.update { it.copy(transcript = TranscriptState.Loading) }
         transcriptJob = viewModelScope.launch {
             val next = try {
-                val transcript = Transcript(graph.api.transcript(id, includeUnchecked = unchecked).lines)
-                transcriptCache[id to unchecked] = transcript
-                while (transcriptCache.size > CACHED_TRANSCRIPTS) transcriptCache.remove(transcriptCache.keys.first())
-                TranscriptState.Ready(transcript)
+                TranscriptState.Ready(graph.transcripts.get(id, unchecked, refresh = force))
             } catch (e: ApiException) {
                 TranscriptState.Failed(e.message.orEmpty())
             }
@@ -219,9 +211,10 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun readyTranscript(): Transcript? = (_ui.value.transcript as? TranscriptState.Ready)?.transcript
 
+    /** The same "back one line" as the lock-screen button. */
     fun lineBack() {
         val c = controller ?: return
-        readyTranscript()?.backTargetMs(c.currentPosition)?.let { seekTo(it, play = true) }
+        viewModelScope.launch { c.sendCustomCommand(PlaybackProtocol.BACK_LINE, Bundle.EMPTY).await() }
     }
 
     fun lineNext() {
@@ -284,6 +277,5 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private companion object {
         const val POSITION_TICK_MS = 200L
-        const val CACHED_TRANSCRIPTS = 8
     }
 }
