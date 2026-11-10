@@ -22,7 +22,7 @@ import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
-import com.abairt.listen.MainActivity
+import com.abairt.listen.LockScreenTranscriptActivity
 import com.abairt.listen.R
 import com.abairt.listen.data.ApiException
 import com.abairt.listen.graph
@@ -79,7 +79,7 @@ class PlaybackService : MediaSessionService() {
         player.addListener(follower)
         session = MediaSession.Builder(this, linePlayer)
             .setCallback(SessionCallback())
-            .setSessionActivity(openAppIntent())
+            .setSessionActivity(openTranscriptIntent())
             .build()
         updateButtons()
         followSettings()
@@ -162,10 +162,11 @@ class PlaybackService : MediaSessionService() {
             .build(),
     )
 
-    private fun openAppIntent(): PendingIntent = PendingIntent.getActivity(
+    /** Tapping the media card opens the transcript, over the lock screen if locked, to read the whole line. */
+    private fun openTranscriptIntent(): PendingIntent = PendingIntent.getActivity(
         this,
         0,
-        Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+        Intent(this, LockScreenTranscriptActivity::class.java),
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 

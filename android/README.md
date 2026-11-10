@@ -29,7 +29,9 @@ speed and sleep timer chips. Dark theme is true black.
 - **The line on the lock screen**: while a recording plays, the lock-screen card shows the line
   being spoken (the Irish, with the English beneath) in place of the title, so in bed you can
   step back a line and glance at it without unlocking. It follows the audio with the screen off,
-  waking only when the next line starts. Settings can turn it off.
+  waking only when the next line starts. The card fits only so much; tap it to read the whole
+  line in the transcript, which opens over the lock screen without unlocking (back returns to
+  the lock screen; nothing else in the app is reachable from it). Settings can turn it off.
 - **Sleep timer**: 15 to 90 minutes with a 30 second fade-out, or "end of this recording".
 - **Slow**: one tap (in the app, or on the lock screen without unlocking) switches between your
   usual speed and a slow one (0.75x to start). While slowed down, the speed chip sets how slow.
