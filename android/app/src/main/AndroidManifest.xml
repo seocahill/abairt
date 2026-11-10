@@ -27,6 +27,19 @@
             </intent-filter>
         </activity>
 
+        <!-- Opened by tapping the media card. showWhenLocked is declared here because the
+             system checks the manifest before launching from the lock screen: without it the
+             tap asks to unlock first. It shows only the transcript, in its own task, so
+             nothing else in the app is reachable while locked. -->
+        <activity
+            android:name=".LockScreenTranscriptActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            tools:targetApi="27"
+            android:taskAffinity="com.abairt.listen.transcript"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true" />
+
         <!-- Exported on purpose: the system media controls, Bluetooth and Android Auto bind to it to find the session. -->
         <service
             android:name=".playback.PlaybackService"

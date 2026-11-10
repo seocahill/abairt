@@ -9,6 +9,7 @@ import androidx.media3.datasource.cache.SimpleCache
 import com.abairt.listen.data.AbairtApi
 import com.abairt.listen.data.Connection
 import com.abairt.listen.data.SettingsStore
+import com.abairt.listen.transcript.TranscriptRepository
 import java.io.File
 import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
@@ -23,6 +24,8 @@ class AppGraph(context: Context) {
         .build()
 
     val api = AbairtApi(httpClient, connection = { settings.current().connection })
+
+    val transcripts = TranscriptRepository(api)
 
     /** An API client for settings not saved yet, to test them. */
     fun apiFor(connection: Connection) = AbairtApi(httpClient, connection = { connection })

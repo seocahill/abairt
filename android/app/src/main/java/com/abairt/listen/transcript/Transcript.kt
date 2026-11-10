@@ -51,6 +51,16 @@ class Transcript(lines: List<Line>) {
     /** The start of the line after the one playing, or null at the last line. */
     fun nextTargetMs(positionMs: Long): Long? = lines.getOrNull(activeIndexAt(positionMs) + 1)?.startMs
 
+    /** The line playing at [positionMs], or null before the first. */
+    fun lineAt(positionMs: Long): Line? = lines.getOrNull(activeIndexAt(positionMs))
+
+    /**
+     * How long, in real time at [speed], until the next line starts, or null
+     * after the last one has started: when to look again to follow along.
+     */
+    fun msUntilNextLine(positionMs: Long, speed: Float): Long? =
+        nextTargetMs(positionMs)?.let { ((it - positionMs) / speed).toLong() }
+
     companion object {
         /** Pressing back this soon after a line began goes to the line before. */
         const val RESTART_WITHIN_MS = 1_500L
