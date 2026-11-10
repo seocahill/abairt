@@ -19,20 +19,20 @@ class AbairtApiTest {
     @Before
     fun setUp() {
         server.start()
-        api = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString(), "secret-token") })
+        api = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString()) })
     }
 
     @After
     fun tearDown() = server.shutdown()
 
     @Test
-    fun `asks for a shuffled batch, leaving out what was heard, and sends the token`() = runBlocking {
+    fun `asks for a shuffled batch, leaving out what was heard, without signing in`() = runBlocking {
         server.enqueue(MockResponse().setBody("""{"recordings":[]}"""))
 
         api.radioBatch(limit = 5, excludeIds = listOf(7, 9))
 
         val request = server.takeRequest()
-        assertEquals("Bearer secret-token", request.getHeader("Authorization"))
+        assertNull(request.getHeader("Authorization"))
         assertEquals("/api/voice_recordings", request.requestUrl!!.encodedPath)
         assertEquals("true", request.requestUrl!!.queryParameter("shuffle"))
         assertEquals("5", request.requestUrl!!.queryParameter("limit"))
@@ -84,13 +84,6 @@ class AbairtApiTest {
     }
 
     @Test
-    fun `says so when the token is not accepted`() {
-        server.enqueue(MockResponse().setResponseCode(401))
-
-        assertThrows(ApiException.Unauthorized::class.java) { runBlocking { api.radioBatch(5) } }
-    }
-
-    @Test
     fun `tells rate limiting, missing recordings and server errors apart`() {
         server.enqueue(MockResponse().setResponseCode(429))
         server.enqueue(MockResponse().setResponseCode(404))
@@ -110,11 +103,11 @@ class AbairtApiTest {
     }
 
     @Test
-    fun `does not call out until it knows where and as whom`() {
-        val unconfigured = AbairtApi(OkHttpClient(), connection = { Connection("", "") })
+    fun `does not call out until it knows where`() {
+        val unconfigured = AbairtApi(OkHttpClient(), connection = { Connection("") })
 
         assertThrows(ApiException.NotConfigured::class.java) { runBlocking { unconfigured.radioBatch(5) } }
         assertEquals(0, server.requestCount)
-        assertFalse(Connection("not a url", "t").isConfigured)
+        assertFalse(Connection("not a url").isConfigured)
     }
 }

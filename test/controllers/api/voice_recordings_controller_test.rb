@@ -18,10 +18,13 @@ module Api
         region_start: start, region_end: start + 2, accuracy_status: confirmed ? 1 : 0)
     end
 
-    test "requires a token" do
+    test "is open to anyone, like the website" do
+      line("a line", 1.0)
+
       get api_voice_recording_path(@recording)
 
-      assert_response :unauthorized
+      assert_response :success
+      assert_equal 1, JSON.parse(response.body)["lines"].size
     end
 
     test "returns the recording's audio and its confirmed lines in order, with times" do
@@ -113,10 +116,13 @@ module Api
       assert_equal 1, JSON.parse(response.body)["recordings"].size
     end
 
-    test "listing requires a token" do
+    test "listing is open to anyone" do
+      line("a line", 1.0)
+
       get api_voice_recordings_path
 
-      assert_response :unauthorized
+      assert_response :success
+      assert_equal [@recording.id], JSON.parse(response.body)["recordings"].pluck("id")
     end
   end
 end

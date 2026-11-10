@@ -60,18 +60,14 @@ same names translates it; it is deliberately left to native speakers.
 
 ## Setup
 
-1. Sign in on abairt.com, open your user page and generate an API token.
-2. Install the app, open Settings, paste the token (the server defaults to `https://abairt.com`),
-   and tap "Test connection".
-3. Back on the home screen, "Start radio".
-
-The token is kept in the app's private storage and excluded from backups. A proper sign-in
-(the server already has an OAuth provider with PKCE for the MCP server) would be nicer than pasting
-a token; see "Next".
+Install the app and tap "Start radio". There is no sign-in: listening is open to anyone, like
+the recordings on abairt.com. The server defaults to `https://abairt.com`; Settings can point it
+at another (e.g. a Rails server on your machine, see below).
 
 ## API
 
-It uses two endpoints (see `/api/openapi` on the server, and `AbairtApi.kt`):
+It uses two endpoints, open to anyone with no token (see `/api/openapi` on the server, and
+`AbairtApi.kt`):
 
 - `GET /api/voice_recordings?shuffle=true&limit=5&exclude_ids[]=…` lists recordings that have audio
   and a transcript, as summaries.
@@ -79,8 +75,9 @@ It uses two endpoints (see `/api/openapi` on the server, and `AbairtApi.kt`):
   each line says whether a person has checked it. Without `unchecked`, only checked lines come
   back, which is what the Mayo Irish course uses, so that stays as it was.
 
-The API is rate limited to 100 requests an hour per token. A radio makes roughly one request
-per recording played, so this is plenty.
+They are rate limited to 300 requests an hour per IP (or per token, for apps that send one, so
+a server calling for all its users is not limited as one IP). A radio makes roughly one request
+per recording played, so this is plenty even on short recordings.
 
 ## Build
 
@@ -117,7 +114,7 @@ small fixes once it is on a phone.
 
 ## Next
 
-- Sign in with the server's OAuth instead of pasting a token.
+- Sign in (by emailed code) once the app does something per person, such as saving recordings.
 - Keep recordings offline (the audio cache only holds what was played).
 - A browse tree for Android Auto and Bluetooth displays.
 - Deep links from the web ("open this moment in the app").

@@ -259,7 +259,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch { graph.settings.update(change) }
     }
 
-    /** Null when the server accepts the token, else why not. */
+    /** Null when the server answers, else why not. */
     suspend fun checkConnection(candidate: AppSettings): String? {
         return try {
             graph.apiFor(candidate.connection).radioBatch(limit = 1)

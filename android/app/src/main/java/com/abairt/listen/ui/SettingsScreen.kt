@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.abairt.listen.R
 import com.abairt.listen.data.AppSettings
@@ -46,13 +45,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(viewModel: PlayerViewModel, settings: AppSettings, onBack: () -> Unit) {
     var server by remember(settings.serverUrl) { mutableStateOf(settings.serverUrl) }
-    var token by remember(settings.token) { mutableStateOf(settings.token) }
     var status by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val connected = stringResource(R.string.connection_ok)
     val saved = stringResource(R.string.saved)
 
-    LaunchedEffect(server, token) { status = null }
+    LaunchedEffect(server) { status = null }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -79,24 +77,14 @@ fun SettingsScreen(viewModel: PlayerViewModel, settings: AppSettings, onBack: ()
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Uri),
                 modifier = Modifier.fillMaxWidth(),
             )
-            OutlinedTextField(
-                value = token,
-                onValueChange = { token = it },
-                label = { Text(stringResource(R.string.api_token)) },
-                supportingText = { Text(stringResource(R.string.api_token_help)) },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth(),
-            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
-                    viewModel.saveSettings { it.copy(serverUrl = server.trim(), token = token.trim()) }
+                    viewModel.saveSettings { it.copy(serverUrl = server.trim()) }
                     status = saved
                 }) { Text(stringResource(R.string.save)) }
                 OutlinedButton(onClick = {
                     scope.launch {
-                        val candidate = settings.copy(serverUrl = server, token = token)
+                        val candidate = settings.copy(serverUrl = server)
                         status = viewModel.checkConnection(candidate) ?: connected
                     }
                 }) { Text(stringResource(R.string.test_connection)) }

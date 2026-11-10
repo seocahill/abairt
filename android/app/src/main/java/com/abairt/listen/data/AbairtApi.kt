@@ -17,15 +17,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
-/** Where the app talks to, and as whom. */
-data class Connection(val baseUrl: String, val token: String) {
-    val isConfigured: Boolean get() = baseUrl.toHttpUrlOrNull() != null && token.isNotBlank()
+/** Where the app talks to. Listening is open to anyone, like the website, so there is no sign-in. */
+data class Connection(val baseUrl: String) {
+    val isConfigured: Boolean get() = baseUrl.toHttpUrlOrNull() != null
 }
 
 /** Why a request to Abairt did not give us what we wanted. */
 sealed class ApiException(message: String, cause: Throwable? = null) : Exception(message, cause) {
-    class NotConfigured : ApiException("Set the server and your API token in settings.")
-    class Unauthorized : ApiException("Abairt did not accept the API token.")
+    class NotConfigured : ApiException("Set the server in settings.")
     class RateLimited : ApiException("Abairt says too many requests. Try again later.")
     class NotFound : ApiException("Abairt has no such recording.")
     class Server(val code: Int) : ApiException("Abairt answered with an error ($code).")
@@ -35,7 +34,7 @@ sealed class ApiException(message: String, cause: Throwable? = null) : Exception
 
 /**
  * The slice of the Abairt API this app uses: recordings to play, and the
- * transcript of one. The token is an API token from the user's page on Abairt.
+ * transcript of one.
  */
 class AbairtApi(
     private val client: OkHttpClient,
@@ -69,7 +68,6 @@ class AbairtApi(
         }.build()
         return Request.Builder()
             .url(url)
-            .header("Authorization", "Bearer ${conn.token}")
             .header("Accept", "application/json")
             .build()
     }
@@ -89,7 +87,6 @@ class AbairtApi(
                 } catch (e: SerializationException) {
                     throw ApiException.Unreadable(e)
                 }
-                401 -> throw ApiException.Unauthorized()
                 404 -> throw ApiException.NotFound()
                 429 -> throw ApiException.RateLimited()
                 else -> throw ApiException.Server(it.code)
