@@ -93,6 +93,26 @@ cd android
 Open `android/` in Android Studio to run it on a device or emulator. From the emulator, a Rails
 server on your machine is `http://10.0.2.2:3000` (cleartext is allowed for that address only).
 
+## Releasing
+
+Releases are GitHub Releases of this repository, so no app store is involved. People install
+from the home page link (`releases/latest/download/abairt-listen.apk`) or add the repository to
+[Obtainium](https://obtainium.imranr.dev/), which keeps it updated.
+
+1. Bump `versionCode` and `versionName` in `app/build.gradle.kts` and merge to master.
+2. Tag that commit `android-v<versionName>` and push the tag, e.g.
+   `git tag android-v0.3.0 && git push origin android-v0.3.0`.
+3. `.github/workflows/android-release.yml` checks the tag matches the version, runs the tests,
+   builds a minified release, checks it is signed with the release key, and publishes it as the
+   latest release with `abairt-listen.apk` attached.
+
+The release key lives in the repository secrets (`ANDROID_KEYSTORE_BASE64`,
+`ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`), with a backup kept by the owner. Android only
+installs an update signed with the same key, so it must never change: if it were lost, everyone
+would have to uninstall and reinstall. To build a signed release locally, set those three as
+environment variables (`ANDROID_KEYSTORE_PATH` pointing at the keystore file) and run
+`./gradlew assembleRelease`. Without them the release build is unsigned.
+
 ## Code map
 
 | | |

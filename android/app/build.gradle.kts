@@ -16,11 +16,27 @@ android {
         versionName = "0.3.0"
     }
 
+    // Releases are signed with the permanent key, given to the build through the environment
+    // (from repository secrets in .github/workflows/android-release.yml). Android only installs an
+    // update signed with the same key, so that key must never change or be lost.
+    val releaseKeystore = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = file(releaseKeystore)
+                storePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").get()
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 
