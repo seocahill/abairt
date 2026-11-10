@@ -53,7 +53,6 @@ registers itself, so `McpController` exposes the full set automatically.
   speakers and their entries.
 - `get_speaker` / `list_speakers` – user/dialect context and a person's recent entries.
 - `list_tags` – the tag vocabulary with usage counts.
-- `get_word_list` / `list_word_lists` – curated collections.
 
 **Write (Pundit-gated, versioned)**
 
@@ -62,7 +61,6 @@ registers itself, so `McpController` exposes the full set automatically.
 - `create_dictionary_entry` – create a new draft entry.
 - `set_entry_accuracy` – confirm / deconfirm an entry.
 - `tag_entry` – add/remove tags.
-- `create_word_list` / `add_to_word_list` – build and curate collections.
 
 ## Connecting from Claude web
 

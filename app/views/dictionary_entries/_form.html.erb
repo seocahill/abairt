@@ -2,7 +2,7 @@
                class: "contents", 
                html: { 
                  multipart: true,
-                 id: "practice_recording_form_#{dictionary_entry.id || 'new'}"
+                 id: "dictionary_entry_form_#{dictionary_entry.id || 'new'}"
                },
                ) do |form| %>
   <% if dictionary_entry.errors.any? %>
@@ -16,7 +16,7 @@
     </div>
   <% end %>
 
-  <div class="my-5" data-rang-target="wordSearch">
+  <div class="my-5">
     <%= form.label :word_or_phrase %>
     <%= form.text_area :word_or_phrase, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full", id: "autoComplete", rows: 2 %>
   </div>

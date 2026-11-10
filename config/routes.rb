@@ -48,9 +48,6 @@ Rails.application.routes.draw do
     # call at setup, and the secret comes back in a header on every delivery.
     post "telegram/webhook", to: "telegram/webhooks#create"
 
-    # Speech to Text API endpoint
-    post 'speech_to_text', to: 'speech_to_text#create'
-
     # Text to Speech API endpoint
     resources :text_to_speech, only: [:create]
 
@@ -67,7 +64,6 @@ Rails.application.routes.draw do
     get 'openapi', to: 'openapi#show', defaults: { format: 'json' }
   end
 
-  resources :word_lists
   resources :registrations, only: [:new, :create]
   resources :voice_recordings do
     collection do
@@ -181,8 +177,6 @@ Rails.application.routes.draw do
     post :generate_audio, on: :member
   end
 
-  resources :word_list_dictionary_entries, only: [:create, :destroy, :update]
-
   resources :login_requests, only: [:new, :create]
 
   resource :password, only: [:edit, :update]
@@ -201,8 +195,6 @@ Rails.application.routes.draw do
   get 'api/docs', to: 'api_docs#show', as: :api_docs
   
   resources :translator_leaderboard, only: [:index, :show], controller: 'translator_leaderboard'
-
-  resources :practice_recordings, only: [:create]
 
   resources :questions, only: [:index, :new, :create, :show, :destroy] do
     # A draft is sent by creating its delivery.

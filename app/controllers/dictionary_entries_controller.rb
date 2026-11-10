@@ -33,7 +33,6 @@ class DictionaryEntriesController < ApplicationController
     if current_user
       @new_dictionary_entry = current_user.dictionary_entries.build(speaker: current_user)
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
-      @practice_word_list = current_user.word_lists.find_or_create_by!(name: 'Practice')
     end
 
     @pagy, @dictionary_entries = pagy(records, items: 15)

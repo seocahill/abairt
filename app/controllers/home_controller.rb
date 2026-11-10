@@ -3,8 +3,11 @@ class HomeController < ApplicationController
 
   def index
     @pins = User.where(role: [:speaker, :teacher]).pins
-    @tts_status = ServiceStatus.current_status('tts')
-    @asr_status = ServiceStatus.current_status('asr')
-    @pyannote_status = ServiceStatus.current_status('pyannote')
+    @stats = {
+      recordings: VoiceRecording.count,
+      speakers: User.speaker.count,
+      phrases: DictionaryEntry.where.not(speaker_id: nil).count,
+      with_audio: DictionaryEntry.has_recording.count
+    }
   end
 end

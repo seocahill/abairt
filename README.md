@@ -1,13 +1,13 @@
 # Abairt
 
-**A comprehensive Irish language learning and corpus platform**
+**A corpus of recordings of Mayo Irish, transcribed and translated by its community**
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://abairt.com)
 [![License](https://img.shields.io/badge/license-Open_Source-blue)](LICENSE)
 [![Ruby](https://img.shields.io/badge/ruby-3.4-red)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/rails-7.1-red)](https://rubyonrails.org/)
 
-Abairt is an open-source platform for Irish language learning, featuring voice recording transcription, dictionary management, and comprehensive language tools. Share, search, and download Irish sentences, translations, and pronunciations with advanced AI-powered features.
+Abairt is an open-source platform for collecting, transcribing and searching recordings of native Irish speakers from Mayo. Learning tools live in the separate Mayo Irish course, which builds on this corpus through the API.
 
 ## ✨ Features
 
@@ -21,13 +21,11 @@ Abairt is an open-source platform for Irish language learning, featuring voice r
 ### 📚 Dictionary & Language Tools
 - **Collaborative Dictionary** - User-generated Irish-English dictionary entries
 - **Smart Tagging** - AI-powered automatic tagging of content
-- **Word Lists** - Create and manage custom vocabulary lists
 - **Full-Text Search** - Fast FTS5-powered search across all content
-- **CSV Export** - Export word lists for Anki and other SRS applications
+- **CSV Export** - Export dictionary entries as CSV
 
-### 🌍 Community & Learning
+### 🌍 Community
 - **User Authentication** - Secure user accounts and permissions
-- **Practice Mode** - Interactive pronunciation practice
 - **Translator Leaderboard** - Gamified contribution tracking
 - **Admin Panel** - Comprehensive administrative interface
 
@@ -116,7 +114,6 @@ SENTRY_DSN=your_sentry_dsn
 - **DictionaryEntry** - Core translation pairs with metadata
 - **VoiceRecording** - Audio files with transcriptions and speakers
 - **User** - Authentication and user management
-- **WordList** - Custom vocabulary collections
 - **ServiceStatus** - Health monitoring for external APIs
 
 ### External Services
@@ -228,4 +225,4 @@ This project is open source. Please check the LICENSE file for specific terms.
 
 ---
 
-**Abairt** - Empowering Irish language learning through technology 🇮🇪
+**Abairt** - Recordings of Mayo Irish, in its speakers' own voices 🇮🇪
