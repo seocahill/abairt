@@ -1,5 +1,6 @@
 package com.abairt.listen.data
 
+import android.util.Log
 import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -78,6 +79,7 @@ class AbairtApi(
         val response = try {
             client.newCall(request).await()
         } catch (e: IOException) {
+            Log.w(TAG, "Request to ${request.url.host} failed", e)
             throw ApiException.Network(e)
         }
         response.use {
@@ -102,3 +104,5 @@ private suspend fun Call.await(): Response = suspendCancellableCoroutine { conti
     })
     continuation.invokeOnCancellation { cancel() }
 }
+
+private const val TAG = "AbairtApi"

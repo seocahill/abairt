@@ -1,0 +1,71 @@
+name: Android release
+
+# Publishes the Android app: pushing a tag `android-v<versionName>` (e.g. android-v0.3.0) builds a
+# release signed with the permanent key from the repository secrets and attaches it to a GitHub
+# Release as abairt-listen.apk. Obtainium installs and updates from these releases, and the home
+# page links to releases/latest/download/abairt-listen.apk.
+on:
+  push:
+    tags: ["android-v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    env:
+      # SHA-256 of the release signing certificate. Android only installs an update signed with
+      # the same key, so a release signed with anything else must not be published.
+      SIGNING_CERT_SHA256: 9c2bf61fd9e65f2e2c62432516de935c384d2c641c5cd193353da28f6b655ee2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: The tag matches the app's version
+        run: |
+          version=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts)
+          if [ "android-v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match versionName $version in app/build.gradle.kts"
+            exit 1
+          fi
+
+      - name: Restore the signing key
+        run: printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Test and build
+        run: ./gradlew testDebugUnitTest assembleRelease
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+
+      - name: Signed with the release key
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs app/build/outputs/apk/release/app-release.apk \
+            | grep -q "SHA-256 digest: $SIGNING_CERT_SHA256" \
+            || { echo "The release APK is not signed with the release key"; exit 1; }
+
+      - name: Publish
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk abairt-listen.apk
+          gh release create "$GITHUB_REF_NAME" abairt-listen.apk \
+            --title "Abairt Android ${GITHUB_REF_NAME#android-v}" \
+            --notes "Install: open this release on your phone and download abairt-listen.apk, or add https://github.com/${GITHUB_REPOSITORY} to Obtainium to get updates automatically. No account needed." \
+            --latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Forget the signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"

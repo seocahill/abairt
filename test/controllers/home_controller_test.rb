@@ -18,4 +18,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: "The Irish of Mayo"
     assert_select "a[href=?]", "/1926"
   end
+
+  test "links the Android app's latest release" do
+    get home_path
+
+    assert_select "a[href=?]", "https://github.com/seocahill/abairt/releases/latest/download/abairt-listen.apk", text: "Download the Android app"
+  end
 end
