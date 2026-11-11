@@ -69,6 +69,23 @@ fun SettingsScreen(viewModel: PlayerViewModel, settings: AppSettings, onBack: ()
             modifier = Modifier.padding(padding).padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            if (settings.isSignedIn) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        if (settings.accountName.isBlank()) {
+                            stringResource(R.string.signed_in)
+                        } else {
+                            stringResource(R.string.signed_in_as, settings.accountName)
+                        },
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    OutlinedButton(onClick = {
+                        viewModel.signOut()
+                        onBack()
+                    }) { Text(stringResource(R.string.sign_out)) }
+                }
+            }
             OutlinedTextField(
                 value = server,
                 onValueChange = { server = it },
@@ -82,7 +99,7 @@ fun SettingsScreen(viewModel: PlayerViewModel, settings: AppSettings, onBack: ()
                     viewModel.saveSettings { it.copy(serverUrl = server.trim()) }
                     status = saved
                 }) { Text(stringResource(R.string.save)) }
-                OutlinedButton(onClick = {
+                OutlinedButton(enabled = settings.isSignedIn, onClick = {
                     scope.launch {
                         val candidate = settings.copy(serverUrl = server)
                         status = viewModel.checkConnection(candidate) ?: connected

@@ -23,7 +23,12 @@ class AppGraph(context: Context) {
         .callTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    val api = AbairtApi(httpClient, connection = { settings.current().connection })
+    // Abairt stopped accepting the token (revoked, or the account is gone): forget it, so the app asks to sign in again.
+    val api = AbairtApi(
+        httpClient,
+        connection = { settings.current().connection },
+        onSignedOut = { settings.update { it.copy(apiToken = "", accountName = "") } },
+    )
 
     val transcripts = TranscriptRepository(api)
 

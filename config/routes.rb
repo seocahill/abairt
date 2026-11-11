@@ -30,6 +30,8 @@ Rails.application.routes.draw do
 
   # OAuth discovery metadata. The path-suffixed variants support clients that append the
   # protected resource path (e.g. `/.well-known/oauth-protected-resource/mcp`).
+  # Android App Links: lets the sign-in link in the email open the app.
+  get "/.well-known/assetlinks.json", to: "well_known#assetlinks"
   get "/.well-known/oauth-protected-resource", to: "well_known#oauth_protected_resource"
   get "/.well-known/oauth-protected-resource/*resource", to: "well_known#oauth_protected_resource"
   get "/.well-known/oauth-authorization-server", to: "well_known#oauth_authorization_server"
@@ -47,6 +49,11 @@ Rails.application.routes.draw do
     # Telegram Bot API webhook. No handshake to answer: setWebhook is a one-off
     # call at setup, and the secret comes back in a header on every delivery.
     post "telegram/webhook", to: "telegram/webhooks#create"
+
+    # Signing in to an app (the Android listening app): ask for a link by email,
+    # then swap the link's token for an API token.
+    resources :login_requests, only: :create
+    resources :sessions, only: :create
 
     # Text to Speech API endpoint
     resources :text_to_speech, only: [:create]
@@ -178,6 +185,8 @@ Rails.application.routes.draw do
   end
 
   resources :login_requests, only: [:new, :create]
+  # Where the emailed app sign-in link lands when the app is not installed.
+  get "app_login/:token", to: "app_logins#show", as: :app_login
 
   resource :password, only: [:edit, :update]
 

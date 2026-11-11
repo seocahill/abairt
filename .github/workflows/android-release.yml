@@ -61,7 +61,7 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk abairt-listen.apk
           gh release create "$GITHUB_REF_NAME" abairt-listen.apk \
             --title "Abairt Android ${GITHUB_REF_NAME#android-v}" \
-            --notes "Install: open this release on your phone and download abairt-listen.apk, or add https://github.com/${GITHUB_REPOSITORY} to Obtainium to get updates automatically. No account needed." \
+            --notes "Install: open this release on your phone and download abairt-listen.apk, or add https://github.com/${GITHUB_REPOSITORY} to Obtainium to get updates automatically. Sign in with your Abairt account by email link." \
             --latest
         env:
           GH_TOKEN: ${{ github.token }}

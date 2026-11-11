@@ -15,24 +15,29 @@ import org.junit.Test
 class AbairtApiTest {
     private val server = MockWebServer()
     private lateinit var api: AbairtApi
+    private var signedOut = 0
 
     @Before
     fun setUp() {
         server.start()
-        api = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString()) })
+        api = AbairtApi(
+            OkHttpClient(),
+            connection = { Connection(server.url("/").toString(), token = "the-token") },
+            onSignedOut = { signedOut++ },
+        )
     }
 
     @After
     fun tearDown() = server.shutdown()
 
     @Test
-    fun `asks for a shuffled batch, leaving out what was heard, without signing in`() = runBlocking {
+    fun `asks for a shuffled batch, leaving out what was heard, as the signed-in listener`() = runBlocking {
         server.enqueue(MockResponse().setBody("""{"recordings":[]}"""))
 
         api.radioBatch(limit = 5, excludeIds = listOf(7, 9))
 
         val request = server.takeRequest()
-        assertNull(request.getHeader("Authorization"))
+        assertEquals("Bearer the-token", request.getHeader("Authorization"))
         assertEquals("/api/voice_recordings", request.requestUrl!!.encodedPath)
         assertEquals("true", request.requestUrl!!.queryParameter("shuffle"))
         assertEquals("5", request.requestUrl!!.queryParameter("limit"))
@@ -109,5 +114,58 @@ class AbairtApiTest {
         assertThrows(ApiException.NotConfigured::class.java) { runBlocking { unconfigured.radioBatch(5) } }
         assertEquals(0, server.requestCount)
         assertFalse(Connection("not a url").isConfigured)
+    }
+
+    @Test
+    fun `does not call out until signed in`() {
+        val signedOutApi = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString()) })
+
+        assertThrows(ApiException.SignedOut::class.java) { runBlocking { signedOutApi.radioBatch(5) } }
+        assertEquals(0, server.requestCount)
+    }
+
+    @Test
+    fun `forgets a token Abairt no longer accepts`() {
+        server.enqueue(MockResponse().setResponseCode(401))
+
+        assertThrows(ApiException.SignedOut::class.java) { runBlocking { api.radioBatch(5) } }
+        assertEquals(1, signedOut)
+    }
+
+    @Test
+    fun `asks for a sign-in link by email, with no token`() = runBlocking {
+        server.enqueue(MockResponse().setResponseCode(202))
+        val noToken = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString()) })
+
+        noToken.requestLoginLink("seosamh@example.com")
+
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/login_requests", request.requestUrl!!.encodedPath)
+        assertNull(request.getHeader("Authorization"))
+        assertEquals("""{"email":"seosamh@example.com"}""", request.body.readUtf8())
+    }
+
+    @Test
+    fun `swaps the link's token for the account's API token`() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"api_token":"abc123","name":"Seosamh"}"""))
+        val noToken = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString()) })
+
+        val signedIn = noToken.signIn("link-token")
+
+        val request = server.takeRequest()
+        assertEquals("/api/sessions", request.requestUrl!!.encodedPath)
+        assertEquals("""{"token":"link-token"}""", request.body.readUtf8())
+        assertEquals("abc123", signedIn.apiToken)
+        assertEquals("Seosamh", signedIn.name)
+    }
+
+    @Test
+    fun `a link that has run out is told apart from being signed out`() {
+        server.enqueue(MockResponse().setResponseCode(401))
+        val noToken = AbairtApi(OkHttpClient(), connection = { Connection(server.url("/").toString()) }, onSignedOut = { signedOut++ })
+
+        assertThrows(ApiException.LinkExpired::class.java) { runBlocking { noToken.signIn("old") } }
+        assertEquals(0, signedOut)
     }
 }

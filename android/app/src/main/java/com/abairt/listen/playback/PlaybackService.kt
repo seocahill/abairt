@@ -224,6 +224,9 @@ class PlaybackService : MediaSessionService() {
                 radio.queued(batch.map { it.id })
                 player.addMediaItems(batch.map { it.toMediaItem() })
                 true
+            } catch (e: ApiException.SignedOut) {
+                loadingMore = null // nothing to retry until the listener signs in again
+                return@launch
             } catch (e: ApiException) {
                 false
             }

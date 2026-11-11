@@ -19,6 +19,10 @@ enum class TranslationMode {
 
 data class AppSettings(
     val serverUrl: String = DEFAULT_SERVER,
+    /** What says who is asking, from signing in with an emailed link. Empty when signed out. */
+    val apiToken: String = "",
+    /** The name on the account, to say who is signed in. */
+    val accountName: String = "",
     /** Show lines no person has checked yet (the machine's transcript), marked as such. */
     val showUnchecked: Boolean = true,
     val translations: TranslationMode = TranslationMode.TAP,
@@ -32,7 +36,9 @@ data class AppSettings(
     /** Show the line being spoken on the lock screen, to read it without unlocking. */
     val lineOnLockScreen: Boolean = true,
 ) {
-    val connection: Connection get() = Connection(serverUrl.trim())
+    val connection: Connection get() = Connection(serverUrl.trim(), apiToken)
+
+    val isSignedIn: Boolean get() = apiToken.isNotBlank()
 
     /** The speed to play at now. */
     val playbackSpeed: Float get() = if (slow) slowSpeed else speed
@@ -62,6 +68,8 @@ class SettingsStore(private val context: Context) {
 
     private fun Preferences.toSettings() = AppSettings(
         serverUrl = this[SERVER_URL] ?: AppSettings.DEFAULT_SERVER,
+        apiToken = this[API_TOKEN] ?: "",
+        accountName = this[ACCOUNT_NAME] ?: "",
         showUnchecked = this[SHOW_UNCHECKED] ?: true,
         translations = this[TRANSLATIONS]?.let { runCatching { TranslationMode.valueOf(it) }.getOrNull() } ?: TranslationMode.TAP,
         speed = this[SPEED] ?: 1f,
@@ -73,7 +81,8 @@ class SettingsStore(private val context: Context) {
 
     private fun androidx.datastore.preferences.core.MutablePreferences.write(settings: AppSettings) {
         this[SERVER_URL] = settings.serverUrl
-        remove(LEGACY_TOKEN) // from before listening needed no sign-in; not kept on the phone
+        if (settings.apiToken.isBlank()) remove(API_TOKEN) else this[API_TOKEN] = settings.apiToken
+        this[ACCOUNT_NAME] = settings.accountName
         this[SHOW_UNCHECKED] = settings.showUnchecked
         this[TRANSLATIONS] = settings.translations.name
         this[SPEED] = settings.speed
@@ -85,7 +94,8 @@ class SettingsStore(private val context: Context) {
 
     private companion object {
         val SERVER_URL = stringPreferencesKey("server_url")
-        val LEGACY_TOKEN = stringPreferencesKey("api_token")
+        val API_TOKEN = stringPreferencesKey("api_token")
+        val ACCOUNT_NAME = stringPreferencesKey("account_name")
         val SHOW_UNCHECKED = booleanPreferencesKey("show_unchecked")
         val TRANSLATIONS = stringPreferencesKey("translations")
         val SPEED = floatPreferencesKey("speed")

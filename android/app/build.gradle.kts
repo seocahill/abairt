@@ -12,8 +12,8 @@ android {
         applicationId = "com.abairt.listen"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.4.0"
     }
 
     // Releases are signed with the permanent key, given to the build through the environment

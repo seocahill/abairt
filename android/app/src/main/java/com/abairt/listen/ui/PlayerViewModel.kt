@@ -41,6 +41,15 @@ sealed interface TranscriptState {
     data class Failed(val message: String) : TranscriptState
 }
 
+/** Where signing in to the app has got to. */
+sealed interface SignInState {
+    data object Idle : SignInState
+    data object Sending : SignInState
+    data class LinkSent(val email: String) : SignInState
+    data object SigningIn : SignInState
+    data class Failed(val message: String) : SignInState
+}
+
 /** Everything the screens need to know about what is playing, apart from the position (see [PlayerViewModel.position]). */
 data class PlayerUi(
     val hasMedia: Boolean = false,
@@ -69,6 +78,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _ui = MutableStateFlow(PlayerUi())
     val ui: StateFlow<PlayerUi> = _ui.asStateFlow()
+
+    private val _signIn = MutableStateFlow<SignInState>(SignInState.Idle)
+    val signInState: StateFlow<SignInState> = _signIn.asStateFlow()
 
     val settings: StateFlow<AppSettings> =
         graph.settings.settings.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
@@ -257,6 +269,51 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun saveSettings(change: (AppSettings) -> AppSettings) {
         viewModelScope.launch { graph.settings.update(change) }
+    }
+
+    // --- Signing in --------------------------------------------------------
+
+    /** Asks Abairt to email a sign-in link to this address. */
+    fun requestLink(email: String) {
+        val address = email.trim()
+        if (address.isEmpty()) return
+        _signIn.value = SignInState.Sending
+        viewModelScope.launch {
+            _signIn.value = try {
+                graph.api.requestLoginLink(address)
+                SignInState.LinkSent(address)
+            } catch (e: ApiException) {
+                SignInState.Failed(e.message.orEmpty())
+            }
+        }
+    }
+
+    /** From the link in the email, opened on this phone. The link works once. */
+    fun signIn(linkToken: String) {
+        _signIn.value = SignInState.SigningIn
+        viewModelScope.launch {
+            _signIn.value = try {
+                val signedIn = graph.api.signIn(linkToken)
+                graph.settings.update { it.copy(apiToken = signedIn.apiToken, accountName = signedIn.name.orEmpty()) }
+                SignInState.Idle
+            } catch (e: ApiException) {
+                SignInState.Failed(e.message.orEmpty())
+            }
+        }
+    }
+
+    /** Back to asking for an email address, e.g. to correct it. */
+    fun restartSignIn() {
+        _signIn.value = SignInState.Idle
+    }
+
+    fun signOut() {
+        controller?.run {
+            stop()
+            clearMediaItems()
+        }
+        _signIn.value = SignInState.Idle
+        saveSettings { it.copy(apiToken = "", accountName = "") }
     }
 
     /** Null when the server answers, else why not. */

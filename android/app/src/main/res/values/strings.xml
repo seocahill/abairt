@@ -11,6 +11,18 @@
     <string name="transcript">Transcript</string>
     <string name="speaker_credit">%1$s</string>
 
+    <!-- Signing in -->
+    <string name="sign_in_title">Sign in</string>
+    <string name="sign_in_blurb">Enter the email address of your Abairt account and we will send you a link. Open it on this phone to sign in. No password.</string>
+    <string name="email">Email address</string>
+    <string name="email_me_a_link">Email me a link</string>
+    <string name="check_email">Check your email, %1$s. Open the link in it on this phone. It works once, for fifteen minutes.</string>
+    <string name="use_another_email">Use a different address</string>
+    <string name="signing_in">Signing you in…</string>
+    <string name="sign_out">Sign out</string>
+    <string name="signed_in">Signed in</string>
+    <string name="signed_in_as">Signed in as %1$s</string>
+
     <!-- Controls -->
     <string name="play">Play</string>
     <string name="pause">Pause</string>

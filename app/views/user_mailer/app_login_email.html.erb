@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  </head>
+  <body>
+    <h1>Sign in to the Abairt app</h1>
+    <p>Hello <%= @user.email %>,
+      <%= link_to "open this link on your phone to sign in to the Abairt app.", @link %>
+    </p>
+    <p>The link works once and runs out after fifteen minutes. If you did not ask for it, you can ignore this email.</p>
+    <p>Thank you!</p>
+  </body>
+</html>

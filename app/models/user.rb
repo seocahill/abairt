@@ -3,6 +3,13 @@
 class User < ApplicationRecord
   has_secure_token :api_token
   has_secure_token :login_token
+
+  # The link emailed to someone signing in to the Android app. It carries no
+  # secret of its own: it stops working once it is used (the app swaps it for
+  # an API token, which replaces login_token) or after fifteen minutes.
+  generates_token_for :app_login, expires_in: 15.minutes do
+    login_token
+  end
   # Backs the long-lived "stay signed in" cookie. Regenerating it signs every
   # device out, which is the only revocation a permanent cookie can have.
   has_secure_token :remember_token

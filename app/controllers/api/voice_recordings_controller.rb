@@ -3,13 +3,11 @@
 module Api
   # Recordings with their transcript, line by line with times, for apps that
   # play them to learners, such as the Mayo Irish course and the Android
-  # listening app. Open to anyone, like the recordings on the website.
+  # listening app. Needs an API token: the website is open to read, but the API
+  # is for apps that identify themselves, so one can be limited or revoked.
   class VoiceRecordingsController < BaseController
     DEFAULT_LIMIT = 10
     MAX_LIMIT = 50
-
-    skip_before_action :authenticate_api_token!
-    before_action :identify_api_user
 
     # A night of radio on short recordings is near a hundred requests an hour.
     rate_limit to: 300, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }

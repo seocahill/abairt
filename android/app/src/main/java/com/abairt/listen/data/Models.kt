@@ -3,6 +3,13 @@ package com.abairt.listen.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/** The answer to `POST /api/sessions`: the account's API token, for the app to send from then on. */
+@Serializable
+data class SignedIn(
+    @SerialName("api_token") val apiToken: String,
+    val name: String? = null,
+)
+
 /** A recording to pick from, as listed by `GET /api/voice_recordings`. */
 @Serializable
 data class RecordingSummary(

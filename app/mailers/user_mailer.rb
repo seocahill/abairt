@@ -5,6 +5,12 @@ class UserMailer < ApplicationMailer
     mail(to: @user.email, subject: 'Login link')
   end
 
+  def app_login_email(user)
+    @user = user
+    @link = app_login_url(user.generate_token_for(:app_login))
+    mail(to: @user.email, subject: "Sign in to the Abairt app")
+  end
+
   def new_user_email(user)
     @user = user
     mail(to: User.admin.pluck(:email), subject: 'New User Signed up')

@@ -20,6 +20,16 @@ class UserMailerTest < ActionMailer::TestCase
     assert email_body.include?("passwordless"), "Email should mention passwordless login"
   end
 
+  test 'app_login_email' do
+    user = users(:john)
+    email = UserMailer.app_login_email(user).deliver_now
+
+    assert_equal [user.email], email.to
+    assert_equal "Sign in to the Abairt app", email.subject
+    token = email.body.to_s[%r{/app_login/([^"\s]+)}, 1]
+    assert_equal user, User.find_by_token_for(:app_login, CGI.unescape(token))
+  end
+
   test 'signup_pending_email' do
     user = users(:john)
     email = UserMailer.signup_pending_email(user).deliver_now

@@ -22,4 +22,14 @@ class AppSettingsTest {
         assertEquals(1f, slowed.speed)
         assertEquals(0.5f, slowed.slowSpeed)
     }
+
+    @Test
+    fun `is signed in once it has a token, and the connection carries it`() {
+        assertEquals(false, AppSettings().isSignedIn)
+
+        val settings = AppSettings(serverUrl = " https://abairt.com ", apiToken = "tok")
+
+        assertEquals(true, settings.isSignedIn)
+        assertEquals(Connection("https://abairt.com", "tok"), settings.connection)
+    }
 }
