@@ -1,13 +1,13 @@
 <%= content_for(:page_title, "") %>
 <div class="flex-1">
 <section class="bg-white dark:bg-gray-900">
-  <div class="grid max-w-screen-xl px-4 lg:pt-20 pb-8 mx-auto lg:gap-8 lg:py-16 lg:grid-cols-12 lg:pt-28">
-    <div class="mb-4 lg:mt-0 lg:col-span-5 lg:flex lg:mb-0">
+  <div class="grid max-w-screen-xl px-4 pt-6 lg:pt-20 pb-8 mx-auto lg:gap-8 lg:py-16 lg:grid-cols-12 lg:pt-28">
+    <div class="order-2 mt-8 mb-4 lg:order-none lg:mt-0 lg:col-span-5 lg:flex lg:mb-0">
       <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="<%= image_path('person-speaking.jpg') %>" aria-label="A monolingual Irish speaker">
         <source src="//assets.abairt.com/Monolingual Irish Speaker.mp4" type="video/mp4">
       </video>
     </div>
-    <div class="ml-auto place-self-center lg:col-span-7">
+    <div class="order-1 ml-auto place-self-center lg:order-none lg:col-span-7">
       <%= link_to "/1926", class: "inline-flex items-center justify-between px-1 py-1 pr-4 mb-6 text-sm text-gray-700 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700" do %>
         <span class="text-xs bg-blue-600 rounded-full text-white px-4 py-1.5 mr-3">1926</span>
         <span class="text-sm font-medium">Was your area Irish-speaking? Find it on the first Gaeltacht map</span>
@@ -25,23 +25,23 @@
 
 <section class="bg-white dark:bg-gray-900">
   <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-16">
-    <div class="grid grid-cols-2 gap-8 text-gray-500 sm:gap-12 sm:grid-cols-3 lg:grid-cols-6 dark:text-gray-400">
-      <a href="https://turassiar.ie/" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('turassiar.png') %>" alt="Turas Siar">
+    <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-5 text-gray-500 sm:gap-x-12 lg:justify-between dark:text-gray-400">
+      <a href="https://turassiar.ie/" class="flex items-center gap-2">
+        <img class="w-auto h-7 sm:h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('turassiar.png') %>" alt="Turas Siar">
       </a>
-      <a href="https://www.irishlanguageincountymayo.com/" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('ilcm.png') %>" alt="Irish Language in County Mayo">
+      <a href="https://www.irishlanguageincountymayo.com/" class="flex items-center gap-2">
+        <img class="w-auto h-7 sm:h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('ilcm.png') %>" alt="Irish Language in County Mayo">
       </a>
-      <a href="http://focailfholaithe.fng.ie/counties/maigh-eo" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('fng.png') %>" alt="Focail Fholaithe, Foras na Gaeilge">
+      <a href="http://focailfholaithe.fng.ie/counties/maigh-eo" class="flex items-center gap-2">
+        <img class="w-auto h-7 sm:h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('fng.png') %>" alt="Focail Fholaithe, Foras na Gaeilge">
       </a>
-      <a href="https://www.gaeilgeiorrais.ie/" class="flex items-center lg:justify-center">
-        <img class="h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('gi.png') %>" alt="Gaeilge Iorras">
+      <a href="https://www.gaeilgeiorrais.ie/" class="flex items-center gap-2">
+        <img class="w-auto h-7 sm:h-9 hover:text-gray-900 dark:hover:text-white" src="<%= image_path('gi.png') %>" alt="Gaeilge Iorras">
       </a>
-      <a href="https://www.youtube.com/@dazpatreg" class="flex items-center lg:justify-center">
+      <a href="https://www.youtube.com/@dazpatreg" class="flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-youtube" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> Youtube
       </a>
-      <a href="https://github.com/seocahill/abairt" class="flex items-center lg:justify-center">
+      <a href="https://github.com/seocahill/abairt" class="flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> Github
       </a>
     </div>
@@ -113,21 +113,21 @@
         <source src="https://assets.abairt.com/darren-reagan-bofield.mp4" type="video/mp4">
       </video>
     </div>
-    <div class="col-span-2 space-y-8 md:grid md:grid-cols-2 md:gap-12 md:space-y-0">
+    <div class="grid grid-cols-2 col-span-2 gap-6 md:gap-12">
       <div>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:recordings]) %> recordings</h3>
+        <h3 class="mb-2 text-xl font-bold md:text-2xl dark:text-white"><%= number_with_delimiter(@stats[:recordings]) %> recordings</h3>
         <p class="font-light text-gray-500 dark:text-gray-400">Interviews, stories, songs, transcribed line by line.</p>
       </div>
       <div>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:speakers]) %> native speakers</h3>
+        <h3 class="mb-2 text-xl font-bold md:text-2xl dark:text-white"><%= number_with_delimiter(@stats[:speakers]) %> native speakers</h3>
         <p class="font-light text-gray-500 dark:text-gray-400">From across the Mayo dialects.</p>
       </div>
       <div>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:phrases]) %> words and phrases</h3>
+        <h3 class="mb-2 text-xl font-bold md:text-2xl dark:text-white"><%= number_with_delimiter(@stats[:phrases]) %> words and phrases</h3>
         <p class="font-light text-gray-500 dark:text-gray-400">Folca, seanráite, seanchas, abairtí.</p>
       </div>
       <div>
-        <h3 class="mb-2 text-2xl font-bold dark:text-white"><%= number_with_delimiter(@stats[:with_audio]) %> with audio</h3>
+        <h3 class="mb-2 text-xl font-bold md:text-2xl dark:text-white"><%= number_with_delimiter(@stats[:with_audio]) %> with audio</h3>
         <p class="font-light text-gray-500 dark:text-gray-400">Words and phrases you can hear as well as read.</p>
       </div>
     </div>
