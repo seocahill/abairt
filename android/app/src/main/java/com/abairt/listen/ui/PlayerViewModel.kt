@@ -55,6 +55,8 @@ data class PlayerUi(
     val hasMedia: Boolean = false,
     val isPlaying: Boolean = false,
     val isBuffering: Boolean = false,
+    /** "Start radio" was tapped and nothing is queued yet: Abairt is being asked for recordings. */
+    val starting: Boolean = false,
     val recordingId: Long? = null,
     val title: String = "",
     val region: String? = null,
@@ -141,6 +143,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         _ui.update {
             it.copy(
                 hasMedia = c.mediaItemCount > 0,
+                starting = it.starting && c.mediaItemCount == 0,
                 isPlaying = c.isPlaying,
                 isBuffering = c.playWhenReady && c.playbackState == Player.STATE_BUFFERING,
                 recordingId = id,
@@ -181,11 +184,23 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun startRadio() {
         val c = controller ?: return
+        if (_ui.value.starting) return // already on its way: a second tap must not ask again
+        _ui.update { it.copy(starting = true) }
         viewModelScope.launch {
-            val result = c.sendCustomCommand(PlaybackProtocol.START_RADIO, Bundle.EMPTY).await()
-            if (result.resultCode != SessionResult.RESULT_SUCCESS) {
+            val result = try {
+                c.sendCustomCommand(PlaybackProtocol.START_RADIO, Bundle.EMPTY).await()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _ui.update { it.copy(starting = false, message = "The radio could not start.") }
+                return@launch
+            }
+            if (result.resultCode == SessionResult.RESULT_SUCCESS) {
+                // Recordings are queued; refresh() ends "starting" once the player reports them.
+                _ui.update { it.copy(starting = it.starting && c.mediaItemCount == 0) }
+            } else {
                 val reason = result.extras.getString(PlaybackProtocol.RESULT_MESSAGE)
-                _ui.update { it.copy(message = reason ?: "The radio could not start.") }
+                _ui.update { it.copy(starting = false, message = reason ?: "The radio could not start.") }
             }
         }
     }

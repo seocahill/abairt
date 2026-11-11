@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -97,7 +98,12 @@ fun ListenScreen(
             if (ui.hasMedia) {
                 NowPlaying(viewModel, ui, settings)
             } else {
-                StartPanel(configured = settings.connection.isConfigured, onStart = start, onSettings = onSettings)
+                StartPanel(
+                    configured = settings.connection.isConfigured,
+                    starting = ui.starting,
+                    onStart = start,
+                    onSettings = onSettings,
+                )
             }
             Spacer(Modifier.weight(1f))
             if (ui.hasMedia) {
@@ -110,7 +116,7 @@ fun ListenScreen(
 }
 
 @Composable
-private fun StartPanel(configured: Boolean, onStart: () -> Unit, onSettings: () -> Unit) {
+private fun StartPanel(configured: Boolean, starting: Boolean, onStart: () -> Unit, onSettings: () -> Unit) {
     Icon(
         Icons.Filled.GraphicEq,
         contentDescription = null,
@@ -124,7 +130,16 @@ private fun StartPanel(configured: Boolean, onStart: () -> Unit, onSettings: () 
         textAlign = TextAlign.Center,
     )
     Spacer(Modifier.height(32.dp))
-    if (configured) {
+    if (starting) {
+        // Asking Abairt for the first recordings can take a few seconds: show that it is working.
+        CircularProgressIndicator()
+        Spacer(Modifier.height(12.dp))
+        Text(
+            stringResource(R.string.starting_radio),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    } else if (configured) {
         Button(onClick = onStart) { Text(stringResource(R.string.start_radio)) }
     } else {
         Text(
@@ -161,7 +176,15 @@ private fun NowPlaying(viewModel: PlayerViewModel, ui: PlayerUi, settings: AppSe
             color = MaterialTheme.colorScheme.primary,
         )
     }
-    Spacer(Modifier.height(24.dp))
+    // Space is kept either way, so the controls do not jump when the recording has loaded.
+    Spacer(Modifier.height(4.dp))
+    Text(
+        if (ui.isBuffering) stringResource(R.string.loading_recording) else "",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.height(20.dp),
+    )
+    Spacer(Modifier.height(16.dp))
     SeekBar(position = position, durationMs = ui.durationMs, onSeek = { viewModel.seekTo(it) })
     Spacer(Modifier.height(16.dp))
     Row(
