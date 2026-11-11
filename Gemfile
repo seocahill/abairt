@@ -56,7 +56,7 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # Development gems
 group :development do
   gem 'dotenv-rails', '~> 2.7'
-  gem 'listen', '~> 3.3'
+  gem 'listen', '~> 3.10'
   gem 'web-console', '>= 4.1.0'
 end
 
