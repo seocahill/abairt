@@ -3,7 +3,7 @@
 **A corpus of recordings of Mayo Irish, transcribed and translated by its community**
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://abairt.com)
-[![License](https://img.shields.io/badge/license-Open_Source-blue)](LICENSE)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Ruby](https://img.shields.io/badge/ruby-3.4-red)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/rails-7.1-red)](https://rubyonrails.org/)
 
@@ -207,7 +207,11 @@ We welcome contributions! Please:
 
 ## 📄 License
 
-This project is open source. Please check the LICENSE file for specific terms.
+The code is licensed under the [GNU Affero General Public License v3.0](LICENSE).
+
+The recordings, transcripts and API on abairt.com are **not** covered by that
+licence. Charging for access to them, or reselling or proxying the API, is not
+allowed. See [DATA_AND_API_TERMS.md](DATA_AND_API_TERMS.md).
 
 ## 🙏 Acknowledgments
 

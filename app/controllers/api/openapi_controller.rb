@@ -14,7 +14,8 @@ module Api
         info: {
           title: "Abairt Transcription API",
           version: "1.0.0",
-          description: "API for accessing confirmed transcription data from Abairt"
+          description: "API for accessing confirmed transcription data from Abairt. Free and non-commercial use only: charging for access, or reselling or proxying the API, is not allowed. See https://github.com/seocahill/abairt/blob/master/DATA_AND_API_TERMS.md",
+          termsOfService: "https://github.com/seocahill/abairt/blob/master/DATA_AND_API_TERMS.md"
         },
         servers: [
           {

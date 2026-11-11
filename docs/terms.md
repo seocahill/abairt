@@ -14,7 +14,7 @@ c. Your use of our website is voluntary and at your own risk. We do not guarante
 
 a. All copyrights, trademarks, and other intellectual property rights related to the content and materials on our website are the property of their respective owners. This includes but is not limited to the original creators, authors, or publishers of the content.
 
-b. You may use the content and materials on our website for personal, non-commercial purposes only. Any unauthorized use, reproduction, distribution, or modification of the content without the explicit permission of the respective owners is strictly prohibited.
+b. You may use the content and materials on our website for personal, non-commercial purposes only. In particular, you may not charge for access to our recordings, transcripts or API, or resell or proxy them; see the [Data and API terms](../DATA_AND_API_TERMS.md). Any unauthorized use, reproduction, distribution, or modification of the content without the explicit permission of the respective owners is strictly prohibited.
 
 3. Third-Party Content
 
