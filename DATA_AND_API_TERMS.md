@@ -1,9 +1,10 @@
 # Abairt data and API terms
 
-The code in this repository is licensed under the [GNU Affero General Public
-License v3.0](LICENSE). That licence covers the **software**. It does not
-cover the recordings, transcripts, translations and other material on
-abairt.com, nor access to abairt.com's servers and API. Those are covered here.
+The code in this repository is licensed under the [PolyForm Noncommercial
+License 1.0.0](LICENSE). That licence covers the **software**, and forbids
+commercial use of it. It does not cover the recordings, transcripts,
+translations and other material on abairt.com, nor access to abairt.com's
+servers and API. Those are covered here.
 
 Abairt exists to help people hear, study and learn Mayo Irish from its speakers.
 It is not run for commercial gain. These terms keep it that way.
@@ -32,12 +33,16 @@ Without the written permission of the Abairt owner, you may not:
    Abairt content to train, fine-tune or evaluate a commercial speech or
    language model needs permission first.
 
-Using AGPL-licensed code from this repository does not give you any of the
-above permissions. You may run your own fork of the code, but it does not grant
-you the right to the recordings or transcripts held on abairt.com.
+Using the code from this repository does not give you any of the above
+permissions. You may run your own fork of the code, with your own content, but
+it does not grant you the right to the recordings or transcripts held on
+abairt.com. A fork must not charge for access either: the code licence forbids
+it.
 
 ## What is welcome
 
+- Forking the code, hosting your own copy and uploading your own recordings and
+  content, free of charge, to build a community of your own.
 - Listening, reading and searching on abairt.com, and in the official Abairt
   Android app.
 - Free, non-commercial apps, courses, research, teaching and community projects
