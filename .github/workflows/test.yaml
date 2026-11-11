@@ -6,7 +6,7 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -38,7 +38,7 @@ jobs:
       # TZ: "Europe/Berlin"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Plain apt-get: cache-apt-pkgs-action skips update-alternatives, so
       # a cached ffmpeg can't find libblas.so.3.
       - name: Install ffmpeg
