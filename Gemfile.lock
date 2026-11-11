@@ -440,8 +440,8 @@ GEM
       sprockets (>= 3.0.0)
     sqlite-vec (0.1.7-arm64-darwin)
     sqlite-vec (0.1.7-x86_64-linux)
-    sqlite3 (2.8.1-arm64-darwin)
-    sqlite3 (2.8.1-x86_64-linux-gnu)
+    sqlite3 (2.10.2-arm64-darwin)
+    sqlite3 (2.10.2-x86_64-linux-gnu)
     standard (1.51.1)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -569,7 +569,7 @@ DEPENDENCIES
   solid_queue (~> 1.0)
   sprockets-rails
   sqlite-vec
-  sqlite3 (~> 2.1)
+  sqlite3 (~> 2.10)
   standard (>= 1.35.1)
   standard-rails
   tailwindcss-rails

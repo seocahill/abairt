@@ -47,7 +47,7 @@ gem 'sentry-rails', '~> 6.7'
 gem 'sentry-ruby', '~> 6.7'
 gem 'sequel', '~> 5.76'
 gem 'sprockets-rails'
-gem 'sqlite3', '~> 2.1'
+gem 'sqlite3', '~> 2.10'
 gem 'tailwindcss-rails'
 gem 'tiktoken_ruby', '~> 0.0.6'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
