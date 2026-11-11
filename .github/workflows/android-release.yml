@@ -22,7 +22,7 @@ jobs:
       # the same key, so a release signed with anything else must not be published.
       SIGNING_CERT_SHA256: 9c2bf61fd9e65f2e2c62432516de935c384d2c641c5cd193353da28f6b655ee2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
