@@ -3,6 +3,22 @@ name: Test
 on: [push]
 
 jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Brakeman (static security scan)
+        run: bin/brakeman --no-pager
+      - name: bundler-audit (known gem CVEs)
+        # Advisory only until the dependency updates in #78 land; remove
+        # continue-on-error then so new CVEs fail the build.
+        continue-on-error: true
+        run: bin/bundler-audit check --update
+
   test:
     runs-on: ubuntu-latest
 
@@ -22,7 +38,7 @@ jobs:
       # TZ: "Europe/Berlin"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # Plain apt-get: cache-apt-pkgs-action skips update-alternatives, so
       # a cached ffmpeg can't find libblas.so.3.
       - name: Install ffmpeg

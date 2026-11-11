@@ -31,7 +31,7 @@ class AudioTranscriptionService
     # Additional rate limiting before hitting abair.ie API
     Rails.logger.info("Starting transcription request to abair.ie API")
     
-    audio_blob = `ffmpeg -i "#{@file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
+    audio_blob = AudioBlob.wav_base64(@file_path)
     uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true

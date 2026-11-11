@@ -23,7 +23,6 @@ class ServiceMonitoringService
       uri = URI.parse(@tts_url)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.read_timeout = 30
       http.open_timeout = 10
       
@@ -82,7 +81,7 @@ class ServiceMonitoringService
       # Create a minimal ASR request with a small audio blob
       # We'll use a very short base64-encoded audio sample
       file_path = DictionaryEntry.with_attached_media.last.media.url || Rails.root.join('test/fixtures/files/deasaigh.mp3').to_s
-      audio_blob = `ffmpeg -i "#{file_path}" -f wav -acodec pcm_s16le -ac 1 -ar 16000 - | base64`
+      audio_blob = AudioBlob.wav_base64(file_path)
       
       uri = URI.parse(@asr_url)
       http = Net::HTTP.new(uri.host, uri.port)

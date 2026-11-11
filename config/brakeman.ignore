@@ -1,0 +1,130 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "0ee43518dcf6d1849a42f2d241aebd9b78e2effb92901bde7c7bf4bc6c0e5fe1",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/admin/users_controller.rb",
+      "line": 152,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:user).permit(:name, :email, :role, :about, :voice, :dialect, :ability, :address, :confirmed, :phone_number, :answers_questions, :telegram_chat_id)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::UsersController",
+        "method": "user_params"
+      },
+      "confidence": "Medium",
+      "note": "Admin-only controller; :role/:confirmed are intended admin fields."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "3b6f8d9dcfe98d7ebd9cd5200f2a0dc4c442d0169fc10214541f98ac2057fedc",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/api/telegram/webhooks_controller.rb",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::Telegram::WebhooksController",
+        "method": "create"
+      },
+      "confidence": "Medium",
+      "note": "Webhook is guarded by verify_secret; params go to a job. Permit-all is intentional, to be narrowed later."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "609f0e89383796fd3edb3dd3c845d9bb28af685d059d5685a99d8fe34f86454e",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/admin/users_controller.rb",
+      "line": 144,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit(:pending, :role, :search, :per_page)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::UsersController",
+        "method": "filter_params"
+      },
+      "confidence": "Medium",
+      "note": "Admin-only controller; :role/:confirmed are intended admin fields."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "e8e3bca81c4e3235f36d269059db6ffffbc61236d99c1fe85f1b1266774aee96",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/media_imports/show.html.erb",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(MediaImport.find(params[:id]).url, MediaImport.find(params[:id]).url, :target => \"_blank\", :class => \"text-blue-600 hover:underline break-all\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::MediaImportsController",
+          "method": "show",
+          "line": 28,
+          "file": "app/controllers/admin/media_imports_controller.rb",
+          "rendered": {
+            "name": "admin/media_imports/show",
+            "file": "app/views/admin/media_imports/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/media_imports/show"
+      },
+      "confidence": "Weak",
+      "note": "Admin-only controller; :role/:confirmed are intended admin fields."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "e89b6a0bfb12a628df55f1804418856cef6624cd0415381aedcfa0f4f89f30f8",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/users_controller.rb",
+      "line": 181,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:user).permit(:name, :email, :dialect, :voice, :lat_lang, :address, :ability, :about, :role)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UsersController",
+        "method": "user_params"
+      },
+      "confidence": "Medium",
+      "note": "Reviewed: :role is only permitted for admins (see UsersController#user_params); the field is flagged by name."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "b99d086c7ce71c538a0780e2c63814ae3acbed1e131e1458e6f2455156af30dc",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/api/voice_recordings/diarization_webhooks_controller.rb",
+      "line": 11,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::VoiceRecordings::DiarizationWebhooksController",
+        "method": "create"
+      },
+      "confidence": "Medium",
+      "note": "Authenticated by DIARIZATION_WEBHOOK_SECRET token when set (opt-in until configured in production). permit! is passed to handle_webhook, which checks jobId."
+    }
+  ],
+  "brakeman_version": "8.1.0"
+}
