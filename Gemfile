@@ -74,4 +74,6 @@ group :development, :test do
   gem 'pry-byebug', '~> 3.8'
   gem "standard", ">= 1.35.1"
   gem 'standard-rails'
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
 end

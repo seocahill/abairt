@@ -10,8 +10,6 @@ class SynthesizeTextToSpeechService
     uri = URI.parse('https://api.abair.ie/v3/synthesis')
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    # Disable SSL verification for this specific request
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     request = Net::HTTP::Post.new(uri.path)
     request.body = {
       synthinput: { text: @entry.word_or_phrase, ssml: 'string' },

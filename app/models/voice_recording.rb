@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 class VoiceRecording < ApplicationRecord
   has_one_attached :media
   has_one_attached :audio_track
@@ -121,7 +123,7 @@ class VoiceRecording < ApplicationRecord
   end
 
   def calculate_duration(path)
-    result = `ffprobe -i  #{path} -v quiet -print_format json -show_format -show_streams -hide_banner`
+    result, = Open3.capture2("ffprobe", "-i", path.to_s, "-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", "-hide_banner")
     JSON.parse(result).dig("format", "duration").to_f
   rescue => e
     # Return nil (not the truthy result of Logger#warn) so callers can rely on

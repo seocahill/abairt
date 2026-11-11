@@ -71,4 +71,11 @@ class VoiceRecordingTest < ActiveSupport::TestCase
 
     VoiceRecording.import_from_archive
   end
+
+  test "calculate_duration reads a real file and returns zero for a non-media file" do
+    recording = VoiceRecording.new
+
+    assert_operator recording.calculate_duration(Rails.root.join("test/fixtures/files/deasaigh.mp3")), :>, 0
+    assert_equal 0.0, recording.calculate_duration(Rails.root.join("Gemfile"))
+  end
 end

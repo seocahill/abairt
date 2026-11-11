@@ -30,13 +30,10 @@ class AudioSnippetService
   def process_audio_segment(input_path)
     require 'open3'
 
-    command = if @voice_recording.media.audio?
-      "ffmpeg -ss #{@entry.region_start} -i #{input_path} -t #{@duration} -c:a copy #{@output_path}"
-    else
-      "ffmpeg -ss #{@entry.region_start} -i #{input_path} -t #{@duration} -vn #{@output_path}"
-    end
+    codec_args = @voice_recording.media.audio? ? ["-c:a", "copy"] : ["-vn"]
+    command = ["ffmpeg", "-ss", @entry.region_start.to_s, "-i", input_path.to_s, "-t", @duration.to_s, *codec_args, @output_path.to_s]
 
-    stdout, stderr, status = Open3.capture3(command)
+    _stdout, stderr, status = Open3.capture3(*command)
 
     unless status.success?
       Rails.logger.error("FFmpeg error: #{stderr}")
