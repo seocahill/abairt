@@ -16,10 +16,6 @@
     </div>
     <div class="lg:col-span-7 lg:col-start-6 lg:row-start-2 lg:self-start">
       <%= link_to "Browse recordings", voice_recordings_path, class: "inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-white bg-blue-500 border border-blue-500 rounded-lg sm:w-auto hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800" %>
-      <%= link_to "/1926", class: "flex items-center gap-1 mt-5 text-sm font-medium text-purple-600 dark:text-purple-500 hover:underline" do %>
-        Was your area Irish-speaking in 1926? Find it on the first Gaeltacht map
-        <svg class="w-2.5 h-2.5 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/></svg>
-      <% end %>
     </div>
   </div>
 </section>
@@ -44,23 +40,24 @@
 
 <%# The 1926 map is the best way in for anyone curious about Irish where
     they live: find your own parish, then hear the speakers. %>
-<section class="bg-white dark:bg-gray-900">
-  <div class="max-w-screen-xl px-4 pb-8 mx-auto lg:pb-16">
-    <%= link_to "/1926", class: "group grid items-center overflow-hidden bg-gray-50 border border-gray-200 rounded-2xl shadow-sm lg:grid-cols-2 hover:border-blue-500 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-400" do %>
-      <%= image_tag "home/gaeltacht-1926-map.webp", alt: "The 1926 Gaeltacht map of Mayo, each district coloured by how much Irish was spoken there", width: 1150, height: 625, loading: "lazy", class: "w-full h-full object-cover" %>
-      <div class="p-6 lg:p-10">
-        <p class="mb-2 text-sm font-semibold tracking-wide text-blue-600 uppercase dark:text-blue-400">The 1926 Gaeltacht map</p>
-        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 lg:text-4xl dark:text-white">Was your area Irish-speaking in 1926?</h2>
-        <p class="mb-6 font-light text-gray-500 lg:text-xl dark:text-gray-400">In 1926 the new Irish state published the first official map of the Gaeltacht, district by district. Find your town or parish and see how it was classed.</p>
-        <span class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-white bg-blue-500 rounded-lg group-hover:bg-blue-700">Find your parish on the map<svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></span>
+<section class="bg-gray-50 dark:bg-gray-800">
+  <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-24 lg:px-6">
+    <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+      <%= link_to "/1926" do %>
+        <%= image_tag "home/gaeltacht-1926-map.webp", alt: "The 1926 Gaeltacht map of Mayo, each district coloured by how much Irish was spoken there", width: 1150, height: 625, loading: "lazy", class: "w-full mb-4 border border-gray-200 rounded-lg shadow-lg lg:mb-0 dark:border-gray-700" %>
+      <% end %>
+      <div class="text-gray-500 sm:text-lg dark:text-gray-400">
+        <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Was your area Irish-speaking in 1926?</h2>
+        <p class="mb-8 font-light lg:text-xl">In 1926 the new Irish state published the first official map of the Gaeltacht, district by district. Find your town or parish and see how it was classed.</p>
+        <%= link_to "Find your parish on the map", "/1926", class: "inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-white bg-blue-500 border border-blue-500 rounded-lg sm:w-auto hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800" %>
       </div>
-    <% end %>
+    </div>
   </div>
 </section>
 
 <%# The context a newcomer needs first: what Mayo Irish is and where it is
     spoken. %>
-<section class="bg-gray-50 dark:bg-gray-800">
+<section class="bg-white dark:bg-gray-900">
   <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
     <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16" data-controller="map" data-map-pins-value="<%= @pins.to_json %>">
       <div class="text-gray-500 sm:text-lg dark:text-gray-400">
@@ -78,19 +75,19 @@
     <div>
       <h2 class="mb-6 text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">How the dialects divide</h2>
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 text-gray-500 dark:text-gray-400">
-        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="p-6 bg-gray-50 rounded-lg shadow-md dark:bg-gray-800">
           <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Tuaisceart Mhaigh Eo</h3>
           <p class="text-sm">Erris and the north-west of the county. Still a Gaeltacht.</p>
         </div>
-        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="p-6 bg-gray-50 rounded-lg shadow-md dark:bg-gray-800">
           <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Acaill</h3>
           <p class="text-sm">Achill and the coast around it. Still a Gaeltacht. Like Erris, it shares a good deal of vocabulary and pronunciation with Ulster Irish.</p>
         </div>
-        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="p-6 bg-gray-50 rounded-lg shadow-md dark:bg-gray-800">
           <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Lár Chonnachta</h3>
           <p class="text-sm">South Mayo, including Tourmakeady, with most of Roscommon and north and east Galway. Tourmakeady is still a Gaeltacht.</p>
         </div>
-        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-900">
+        <div class="p-6 bg-gray-50 rounded-lg shadow-md dark:bg-gray-800">
           <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Connachta ó Thuaidh</h3>
           <p class="text-sm">North-east Mayo, Sligo and the north of Roscommon and Leitrim. Irish has died out here as a community language, but recordings of its last speakers survive.</p>
         </div>
@@ -100,7 +97,7 @@
   </div>
 </section>
 
-<section class="bg-white dark:bg-gray-900">
+<section class="bg-gray-50 dark:bg-gray-800">
   <div class="items-center max-w-screen-xl px-4 py-8 mx-auto lg:grid lg:grid-cols-4 lg:gap-16 xl:gap-24 lg:py-24 lg:px-6">
     <div class="col-span-2 mb-8">
       <video class="w-full mb-4 rounded-lg lg:mb-0 lg:flex" controls preload="none" poster="https://assets.abairt.com/darren.png" aria-label="Darren Ó Riagáin, a non-native speaker, speaking Irish">
@@ -128,7 +125,7 @@
   </div>
 </section>
 
-<section class="bg-gray-50 dark:bg-gray-800">
+<section class="bg-white dark:bg-gray-900">
   <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
     <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
       <%= image_tag "home/recording-player.webp", alt: "A recording playing on Abairt: the line being spoken is highlighted, with the Irish, its English translation, the speaker and the time", width: 1280, height: 800, loading: "lazy", class: "w-full mb-4 border border-gray-200 rounded-lg shadow-lg lg:mb-0 dark:border-gray-700" %>
@@ -237,7 +234,7 @@
   </div>
 </section>
 
-<%= content_for :footer do %>
+<% content_for :footer do %>
   <footer class="bg-white dark:bg-gray-800">
   <div class="max-w-screen-xl p-4 py-6 mx-auto lg:py-16 md:p-8 lg:p-10">
     <div class="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
