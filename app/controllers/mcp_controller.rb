@@ -29,7 +29,11 @@ class McpController < ActionController::API
       }
     )
 
-    transport = MCP::Server::Transports::StreamableHTTPTransport.new(server, stateless: true)
+    transport = MCP::Server::Transports::StreamableHTTPTransport.new(
+      server,
+      stateless: true,
+      allowed_hosts: Rails.configuration.x.mcp.allowed_hosts
+    )
 
     # Rails may have already consumed the body while parsing params; rewind so the transport
     # can read the raw JSON-RPC payload.

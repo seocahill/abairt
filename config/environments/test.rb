@@ -68,4 +68,7 @@ Rails.application.configure do
   # Set default URL options for URL helpers in tests
   config.action_controller.default_url_options = { host: 'localhost', port: 3000 }
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+  # Integration tests send `Host: www.example.com`.
+  config.x.mcp.allowed_hosts += %w[www.example.com]
 end

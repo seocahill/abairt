@@ -4,6 +4,9 @@ class Api::Telegram::WebhooksControllerTest < ActionDispatch::IntegrationTest
   SECRET = "test_webhook_secret"
 
   def setup
+    # Credentials win over ENV, so a decryptable local credentials file would
+    # otherwise replace SECRET with the real one.
+    Rails.application.credentials.stubs(:dig).with(:telegram, :webhook_secret).returns(nil)
     ENV["TELEGRAM_WEBHOOK_SECRET"] = SECRET
   end
 

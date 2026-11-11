@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Essential gems
 ruby '~> 3.4'
 gem 'bcrypt', '~> 3.1.7'
-gem 'puma', '~> 6.0'
+gem 'puma', '~> 7.2', '>= 7.2.1'
 gem 'rails', '~> 8.1.0'
 gem 'minitest', '~> 5.25'
 gem 'redis', '~> 4.0'
@@ -29,9 +29,9 @@ gem 'solid_queue', '~> 1.7'
 gem 'mission_control-jobs', '~> 0.1'
 gem 'mailjet', '~> 1.7'
 gem 'alba', '~> 2.4'
-gem 'oj', '~> 3.16'
+gem 'oj', '~> 3.17', '>= 3.17.3'
 gem 'doorkeeper', '~> 5.9' # OAuth 2 provider for MCP authorization
-gem 'mcp', '~> 0.22' # Model Context Protocol server for Claude web
+gem 'mcp', '~> 1.2' # Model Context Protocol server for Claude web
 gem 'has_scope', '~> 0.9'
 gem 'mini_portile2', '~> 2.8.5'
 gem 'multi_json', '~> 1.15'
@@ -61,11 +61,8 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '>= 3.26'
   gem 'mocha'
   gem 'rails-controller-testing'
-  gem 'selenium-webdriver'
-  gem 'webdrivers'
 end
 
 # Development and test gems

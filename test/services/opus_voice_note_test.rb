@@ -29,8 +29,10 @@ class OpusVoiceNoteTest < ActiveSupport::TestCase
     audio = attachment_for("test/fixtures/files/sample.mp3", "audio/ogg", identify: false)
 
     OpusVoiceNote.new(audio).open do |path|
-      # Content type says ogg, so it is handed over untouched — no temp file.
-      assert_match(/\.mp3\z/, path)
+      # Content type says ogg, so Active Storage's own download is handed over
+      # untouched — no transcoded voice_note temp file.
+      assert_match(/\AActiveStorage-/, File.basename(path))
+      refute_match(/voice_note/, path)
     end
   end
 end
