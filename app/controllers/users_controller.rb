@@ -176,6 +176,8 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :role, :dialect, :voice, :lat_lang, :address, :ability, :about)
+    permitted = %i[name email dialect voice lat_lang address ability about]
+    permitted << :role if current_user&.admin?
+    params.require(:user).permit(*permitted)
   end
 end

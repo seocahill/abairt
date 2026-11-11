@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class DiarizationService
+  def self.webhook_secret
+    ENV["DIARIZATION_WEBHOOK_SECRET"]
+  end
+
   def initialize(voice_recording)
     @voice_recording = voice_recording
     @api_key = Rails.env.test? ? "test_key" : Rails.application.credentials.dig(:pyannote, :api_key)
@@ -24,7 +28,8 @@ class DiarizationService
 
     webhook_url = Rails.application.routes.url_helpers.api_voice_recording_diarization_webhook_url(
       @voice_recording,
-      **url_options
+      **url_options,
+      **webhook_token_params
     )
 
     # Make the API request with converted audio URL
@@ -53,6 +58,11 @@ class DiarizationService
   rescue => e
     Rails.logger.error("Diarization service error: #{e.message}")
     false
+  end
+
+  def webhook_token_params
+    secret = self.class.webhook_secret
+    secret.present? ? {token: secret} : {}
   end
 
   def handle_webhook(payload)

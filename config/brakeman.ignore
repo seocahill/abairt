@@ -21,25 +21,6 @@
     },
     {
       "warning_type": "Mass Assignment",
-      "warning_code": 105,
-      "fingerprint": "133eb645d6592d931f83b11475bafdcd9bbc3b4b895d198399a49898d98840c0",
-      "check_name": "PermitAttributes",
-      "message": "Potentially dangerous key allowed for mass assignment",
-      "file": "app/controllers/users_controller.rb",
-      "line": 179,
-      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:user).permit(:name, :email, :role, :dialect, :voice, :lat_lang, :address, :ability, :about)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "UsersController",
-        "method": "user_params"
-      },
-      "confidence": "Medium",
-      "note": "UNREVIEWED, possible privilege escalation: UserPolicy#update? lets a user edit their own record and user_params permits :role. Needs an owner decision (see #73)."
-    },
-    {
-      "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "3b6f8d9dcfe98d7ebd9cd5200f2a0dc4c442d0169fc10214541f98ac2057fedc",
       "check_name": "MassAssignment",
@@ -77,25 +58,6 @@
       "note": "Admin-only controller; :role/:confirmed are intended admin fields."
     },
     {
-      "warning_type": "Mass Assignment",
-      "warning_code": 70,
-      "fingerprint": "b99d086c7ce71c538a0780e2c63814ae3acbed1e131e1458e6f2455156af30dc",
-      "check_name": "MassAssignment",
-      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
-      "file": "app/controllers/api/voice_recordings/diarization_webhooks_controller.rb",
-      "line": 11,
-      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.permit!",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Api::VoiceRecordings::DiarizationWebhooksController",
-        "method": "create"
-      },
-      "confidence": "Medium",
-      "note": "UNREVIEWED: webhook has no secret check, unlike the Telegram one. Needs an owner decision (see #73)."
-    },
-    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
       "fingerprint": "e8e3bca81c4e3235f36d269059db6ffffbc61236d99c1fe85f1b1266774aee96",
@@ -124,6 +86,25 @@
       },
       "confidence": "Weak",
       "note": "Admin-only controller; :role/:confirmed are intended admin fields."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "e89b6a0bfb12a628df55f1804418856cef6624cd0415381aedcfa0f4f89f30f8",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/users_controller.rb",
+      "line": 181,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:user).permit(:name, :email, :dialect, :voice, :lat_lang, :address, :ability, :about, :role)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UsersController",
+        "method": "user_params"
+      },
+      "confidence": "Medium",
+      "note": "Reviewed: :role is only permitted for admins (see UsersController#user_params); the field is flagged by name."
     }
   ],
   "brakeman_version": "8.1.0"

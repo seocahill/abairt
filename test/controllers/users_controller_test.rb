@@ -33,6 +33,22 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "non-admins cannot change their own role" do
+    @user.update_columns(role: User.roles[:student])
+    patch user_url(@user), params: { user: { name: "Renamed", role: "speaker" } }
+
+    assert_equal "Renamed", @user.reload.name
+    assert_equal "student", @user.role
+  end
+
+  test "admins can change a role" do
+    other = users(:two)
+    @user.update_columns(role: User.roles[:admin])
+    patch user_url(other), params: { user: { role: "speaker" } }
+
+    assert_equal "speaker", other.reload.role
+  end
+
   test "should show user" do
     get user_url(@user)
     assert_response :success
