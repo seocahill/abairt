@@ -25,7 +25,7 @@ gem 'httparty'
 gem 'importmap-rails', '~> 0.8.2'
 gem 'trailblazer-operation', '~> 0.10.0'
 gem 'trailblazer-developer', group: :development
-gem 'solid_queue', '~> 1.0'
+gem 'solid_queue', '~> 1.7'
 gem 'mission_control-jobs', '~> 0.1'
 gem 'mailjet', '~> 1.7'
 gem 'alba', '~> 2.4'
