@@ -269,7 +269,7 @@ GEM
     oj (3.16.13)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
-    ostruct (0.6.1)
+    ostruct (0.6.3)
     pagy (5.2.3)
     paper_trail (17.0.0)
       activerecord (>= 7.1)
