@@ -241,7 +241,6 @@ module Api
               summary: "List recordings to play",
               description: "Recordings that have audio and a transcript, newest first or in random order. Transcripts are fetched per recording. Use shuffle with exclude_ids to run a radio that does not repeat itself.",
               operationId: "listVoiceRecordings",
-              security: [],
               tags: ["Recordings"],
               parameters: [
                 { name: "shuffle", in: "query", required: false, description: "Random order instead of newest first", schema: { type: "boolean", default: false } },
@@ -263,7 +262,6 @@ module Api
               summary: "Get a recording with its transcript",
               description: "Returns a whole recording to listen to, with its confirmed transcript line by line, each line timed in seconds from the start. For playing a recording to learners with the words following along.",
               operationId: "getVoiceRecording",
-              security: [],
               tags: ["Recordings"],
               parameters: [
                 { name: "id", in: "path", required: true, description: "Recording ID", schema: { type: "integer" } },
@@ -276,6 +274,44 @@ module Api
                 },
                 "401": { "$ref": "#/components/responses/Unauthorized" },
                 "404": { description: "No such recording, or it has no audio" },
+                "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+              }
+            }
+          },
+          "/api/login_requests": {
+            post: {
+              summary: "Ask for a sign-in link by email",
+              description: "For apps that sign a person in (the Android listening app). Emails a link, valid once for fifteen minutes, to an approved account. It answers 202 whether or not the address has an account. The link opens the app (Android App Links) with a token to give to POST /api/sessions.",
+              operationId: "createLoginRequest",
+              security: [],
+              tags: ["Sign-in"],
+              requestBody: {
+                required: true,
+                content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email" } } } } }
+              },
+              responses: {
+                "202": { description: "Accepted" },
+                "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+              }
+            }
+          },
+          "/api/sessions": {
+            post: {
+              summary: "Swap a sign-in link's token for an API token",
+              description: "Send the token from the emailed link. The link works once, for fifteen minutes. Use the returned api_token as a Bearer token.",
+              operationId: "createSession",
+              security: [],
+              tags: ["Sign-in"],
+              requestBody: {
+                required: true,
+                content: { "application/json": { schema: { type: "object", required: ["token"], properties: { token: { type: "string" } } } } }
+              },
+              responses: {
+                "200": {
+                  description: "Signed in",
+                  content: { "application/json": { schema: { type: "object", properties: { api_token: { type: "string" }, name: { type: "string", nullable: true } } } } }
+                },
+                "401": { description: "The link has expired, was already used, or is not valid" },
                 "429": { "$ref": "#/components/responses/RateLimitExceeded" }
               }
             }

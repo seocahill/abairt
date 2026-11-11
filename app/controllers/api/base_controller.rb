@@ -17,14 +17,6 @@ module Api
       end
     end
 
-    # For endpoints open to anyone: a token, when sent, still says who is asking
-    # (so each app gets its own rate limit rather than sharing its server's IP).
-    def identify_api_user
-      authenticate_with_http_token do |token, _options|
-        @current_api_user = User.find_by(api_token: token)
-      end
-    end
-
     attr_reader :current_api_user
   end
 end

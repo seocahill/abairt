@@ -9,6 +9,25 @@
 # Doorkeeper mounts the authorization/token/registration endpoints but does not ship these
 # discovery documents, so we build them here from the running Doorkeeper configuration.
 class WellKnownController < ActionController::API
+  ANDROID_PACKAGE = "com.abairt.listen"
+  # SHA-256 of the key the app is released with (see .github/workflows/android-release.yml).
+  ANDROID_RELEASE_CERT_SHA256 = "9C:2B:F6:1F:D9:E6:5F:2E:2C:62:43:25:16:DE:93:5C:38:4D:2C:64:1C:5C:D1:93:35:3D:A2:8F:6B:65:5E:E2"
+
+  # GET /.well-known/assetlinks.json
+  #
+  # Tells Android that the Abairt listening app, signed with the release key,
+  # may open links to this site (the app sign-in link in the email).
+  def assetlinks
+    render json: [{
+      relation: %w[delegate_permission/common.handle_all_urls],
+      target: {
+        namespace: "android_app",
+        package_name: ANDROID_PACKAGE,
+        sha256_cert_fingerprints: [ANDROID_RELEASE_CERT_SHA256]
+      }
+    }]
+  end
+
   # GET /.well-known/oauth-protected-resource
   def oauth_protected_resource
     render json: {
