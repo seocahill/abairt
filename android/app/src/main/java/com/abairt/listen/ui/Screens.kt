@@ -41,6 +41,12 @@ fun AbairtRoot(viewModel: PlayerViewModel) {
         if (shown == Screen.STUDY) showTranscript(false) else screen = Screen.LISTEN
     }
 
+    // The API needs a token, so until there is one the app asks to sign in (settings stay reachable).
+    if (!restored || (!settings.isSignedIn && shown != Screen.SETTINGS)) {
+        if (restored) SignInScreen(viewModel = viewModel, onSettings = { screen = Screen.SETTINGS })
+        return
+    }
+
     when (shown) {
         Screen.LISTEN -> ListenScreen(
             viewModel = viewModel,

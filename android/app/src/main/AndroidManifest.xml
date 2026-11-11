@@ -25,6 +25,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- The sign-in link in the email (https://abairt.com/app_login/<token>). Verified by
+                 https://abairt.com/.well-known/assetlinks.json, which names the release key, so
+                 debug builds open it by asking which app to use. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="abairt.com" android:pathPrefix="/app_login/" />
+            </intent-filter>
         </activity>
 
         <!-- Opened by tapping the media card. showWhenLocked is declared here because the

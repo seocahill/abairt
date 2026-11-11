@@ -60,14 +60,28 @@ same names translates it; it is deliberately left to native speakers.
 
 ## Setup
 
-Install the app and tap "Start radio". There is no sign-in: listening is open to anyone, like
-the recordings on abairt.com. The server defaults to `https://abairt.com`; Settings can point it
-at another (e.g. a Rails server on your machine, see below).
+Install the app, enter the email address of your Abairt account, and open the link Abairt emails
+you on this phone. There is no password, like the website. Then tap "Start radio". The website is
+open to read, but the API the app uses is for signed-in accounts, so a caller can be limited or
+revoked (an account needs approving first, as on the website). The server defaults to
+`https://abairt.com`; Settings can point it at another (e.g. a Rails server on your machine, see
+below), and signs you out.
+
+The emailed link is an Android App Link (`https://abairt.com/app_login/<token>`), verified by
+`/.well-known/assetlinks.json` for the release signing key. A debug build, signed with another key,
+is not verified, so Android asks which app should open the link, or you can open it with
+`adb shell am start -a android.intent.action.VIEW -d <link> com.abairt.listen`.
 
 ## API
 
-It uses two endpoints, open to anyone with no token (see `/api/openapi` on the server, and
-`AbairtApi.kt`):
+It uses two endpoints with a Bearer token, and two to sign in (see `/api/openapi` on the server,
+and `AbairtApi.kt`):
+
+- `POST /api/login_requests` (`email`) emails a sign-in link to an approved account. It answers 202
+  whether or not the address has an account.
+- `POST /api/sessions` (`token`, from the link) swaps the link's token for the account's API token.
+  A link works once, for fifteen minutes. The app keeps the token on the phone and forgets it when
+  Abairt answers 401.
 
 - `GET /api/voice_recordings?shuffle=true&limit=5&exclude_ids[]=…` lists recordings that have audio
   and a transcript, as summaries.
@@ -75,8 +89,7 @@ It uses two endpoints, open to anyone with no token (see `/api/openapi` on the s
   each line says whether a person has checked it. Without `unchecked`, only checked lines come
   back, which is what the Mayo Irish course uses, so that stays as it was.
 
-They are rate limited to 300 requests an hour per IP (or per token, for apps that send one, so
-a server calling for all its users is not limited as one IP). A radio makes roughly one request
+They are rate limited to 300 requests an hour per account. A radio makes roughly one request
 per recording played, so this is plenty even on short recordings.
 
 ## Build
