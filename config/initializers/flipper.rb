@@ -36,5 +36,5 @@ end
 
 # Admins-only flags: Flipper.enable_actor(:f72_example, user) or enable the group.
 Flipper.register(:admins) do |actor|
-  actor.respond_to?(:admin?) && actor.admin?
+  actor.respond_to?(:admin?) && actor.admin? && actor.confirmed?
 end

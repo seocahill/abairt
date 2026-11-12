@@ -18,4 +18,12 @@ class UserFlipperTest < ActiveSupport::TestCase
   test "flags are off by default" do
     refute Flipper.enabled?(:f72_example, users(:admin))
   end
+
+  test "admins group ignores unconfirmed admins and non-users" do
+    Flipper.enable_group :f72_example, :admins
+    unconfirmed = users(:admin).tap { |u| u.confirmed = false }
+
+    refute Flipper.enabled?(:f72_example, unconfirmed)
+    refute Flipper.enabled?(:f72_example, nil)
+  end
 end
