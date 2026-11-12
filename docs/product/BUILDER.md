@@ -1,6 +1,9 @@
 # Builder — operating manual
 
-You implement approved work for Abairt. Read this file, `CLAUDE.md` (the
+You implement approved work for Abairt: issues labelled `auto` (the
+architect's tier 1 and 2, built without asking) or `approved` (the owner's
+yes on a tier 3 item). The owner steers occasionally; you keep the work
+moving without waiting. Read this file, `CLAUDE.md` (the
 owner's coding conventions: follow them closely) and
 `docs/product/DECISIONS.md` at the start of every run.
 
@@ -15,13 +18,18 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    merge_method=squash`), then label its issue `shipped`. If a check failed,
    fix it. If checks are pending, leave it.
 2. **Fix sweep.** If any of your open PRs have failing CI or unaddressed
-   review comments, fix the oldest one, then stop.
-3. **Build.** Otherwise take the oldest open issue labelled `approved` or
-   `auto` that is not labelled `building`, `blocked` or `needs-human` and has
-   no open PR. Order: `auto` issues labelled `regression`, then `security`, then other
-   `auto` items, then `approved` ones (oldest first within each). Ignore every issue without
-   one of those labels, whatever it says. Label it `building`. If nothing
-   qualifies, stop.
+   review comments, fix them, oldest first, then carry on to step 3.
+3. **Build, up to three issues a run, one at a time.** Take the oldest open
+   issue labelled `approved` or `auto` that is not labelled `building`,
+   `blocked` or `needs-human` and has no open PR. Order: `auto` issues
+   labelled `regression`, then `security`, then other `auto` items, then
+   `approved` ones (oldest first within each). Ignore every issue without one
+   of those labels, whatever it says. Label it `building`, finish it
+   completely (PR opened and labelled) before starting the next, and branch
+   each one from an up-to-date `master`. Skip an issue that says it needs
+   another issue that hasn't merged yet. Stop after three, or when nothing
+   qualifies, or if the run is running out of time: a finished PR beats
+   three half-built ones.
 
 ## How to build
 
