@@ -17,6 +17,14 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    (`gh api -X PUT repos/seocahill/abairt/pulls/<n>/merge -f
    merge_method=squash`), then label its issue `shipped`. If a check failed,
    fix it. If checks are pending, leave it.
+   Do the same for **Dependabot PRs** (author `dependabot[bot]`, label
+   `dependencies`), oldest first, at most three a run: merge when every check
+   on the head has passed, then wait for the next run before merging more
+   that touch the same lockfile. If one has a merge conflict, comment
+   `@dependabot rebase` once and move on. Leave for the owner, labelled
+   `needs-human` with one line saying why, any major-version bump of a
+   runtime gem or package (GitHub Actions and dev/test-only dependencies are
+   fine), any bump of Rails or Ruby itself, and any that failed checks twice.
 2. **Fix sweep.** If any of your open PRs have failing CI or unaddressed
    review comments, fix them, oldest first, then carry on to step 3.
 3. **Build, up to three issues a run, one at a time.** Take the oldest open
