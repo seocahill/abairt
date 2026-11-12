@@ -509,7 +509,7 @@ DEPENDENCIES
   importmap-rails (~> 0.8.2)
   listen (~> 3.10)
   mailjet (~> 1.7)
-  mcp (~> 1.2)
+  mcp (~> 1.10)
   mini_portile2 (~> 2.8.5)
   minitest (~> 5.25)
   mission_control-jobs (~> 0.1)

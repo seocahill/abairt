@@ -31,7 +31,7 @@ gem 'mailjet', '~> 1.7'
 gem 'alba', '~> 2.4'
 gem 'oj', '~> 3.17', '>= 3.17.3'
 gem 'doorkeeper', '~> 5.9' # OAuth 2 provider for MCP authorization
-gem 'mcp', '~> 1.2' # Model Context Protocol server for Claude web
+gem 'mcp', '~> 1.10' # Model Context Protocol server for Claude web
 gem 'has_scope', '~> 0.9'
 gem 'mini_portile2', '~> 2.8.5'
 gem 'multi_json', '~> 1.15'
