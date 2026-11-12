@@ -48,7 +48,10 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    services/adapters, Pundit policies, RESTful controllers, Hotwire).
 3. **Every listener-, contributor- or speaker-visible change goes behind a
    Flipper flag** named `f<issue-number>_<slug>`, off by default, enabled for
-   admins. The code must work with the flag on and off. (Until Flipper is
+   admins. The code must work with the flag on and off. Register each new
+   flag with a migration in the same PR (`Flipper.add(:f<issue>_<slug>)`),
+   so it appears, switched off, in the owner's `/flipper` list: Flipper only
+   lists features it knows about, not ones that are merely checked in code. (Until Flipper is
    installed, the only buildable visible feature is the foundations issue
    that installs it.)
 4. Tests for behaviour, and for each flagged path both on and off. Run
