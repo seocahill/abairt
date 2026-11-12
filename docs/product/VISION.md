@@ -10,22 +10,68 @@ labelled `owner-note` instead.
 
 ## What this is for
 
-What abairt is to today is a platform for transcribing and translating, audio and video of native speakers of the Mayo / North Connacht dialects of Irish.
+Today Abairt is a platform for transcribing, translating and listening to
+audio and video of native speakers of the Mayo / North Connacht dialects of
+Irish. What lasts is the corpus it builds: accurate, credited recordings and
+transcriptions that people can listen to now and that models can be trained
+on later (see "Where it's going").
 
 ## Who it serves, and what great looks like for them
 
-It serves both transcribers and passive listeners well. "Great" I'm happy to delegate to best in class peers in this space. It should meet the peer standard of audio / video streaming UI and UX on all screens. It should be accessible (many transcribers may be elderly). Information graphs should be delightful to use, accurate and up to date (places, speaker names, map coordinates).  First class api / mcp.
+- **Transcribers**: native speakers, volunteers and editors who transcribe,
+  translate and correct. Many may be elderly, so accessibility is a
+  requirement, not a nice-to-have: readable text, large targets, few steps,
+  WCAG 2.2 AA.
+- **Listeners**: people who come to hear native speech, often passively.
+- **Other software**: the course app, researchers and the models below, all
+  through a first-class API and MCP server.
+
+I'm happy to let the best-in-class peers define "great" rather than spell it
+out here. The architect should name the peers it compares against in each
+proposal and say where we fall short. In practice:
+
+- **Listening and watching** meets the standard of mainstream audio and video
+  streaming apps on every screen, phone first.
+- **Transcribing** meets the standard of the best transcription and subtitle
+  editors.
+- **Reference data** (places, speaker names, map coordinates) is accurate,
+  up to date and a pleasure to browse.
+- **The API and MCP** are products in their own right: complete, documented
+  and stable.
 
 ## Where it's going
 
-A dialectically accurate ASR, TTS (e.g. pap ó murchú) and fine tuned LLM (either standalone or as 'fixer' for abair.ie). The goal is to get to the point where we can expose an agentic speaker with native level accuracy.
+A dialectally accurate speech stack for Mayo Irish, trained on this corpus:
+
+- **ASR** that transcribes Mayo speech accurately.
+- **TTS** in native voices, starting with Pap Ó Murchú.
+- **A fine-tuned LLM**, either standalone or as a "fixer" that corrects
+  abair.ie's output toward Mayo forms.
+
+The goal is to reach the point where we can expose an agentic speaker: an
+agent that understands and speaks Mayo Irish with native-level accuracy.
+
+Abairt's job on the way is to produce the training and evaluation data for
+each of these, and to measure each model against it. Choosing or changing a
+provider or model is still my call (see `DECISIONS.md`).
 
 ## What it should never become
 
-A learning platform per se. I've decided it's better to separate that into a dedicated application that consumes the data in this app as needed.
+A learning platform. I've decided teaching belongs in a dedicated application
+that consumes Abairt's data as needed (see #70). Abairt makes its data easy to
+consume; it doesn't build quizzes, lessons, word lists or progress tracking.
 
 ## Current priorities
-- Finish the core function. The main function (transcription / listening / search) should be competitive relative to peer apps.
-- Bin crap stuff and build anew. The admin backend for example. Retire superflous features
-- Good training data is obviously going to be key. I want you to identify it, highlight when human intervention is required and give us targets to fulfil. For example for TTS pap voice, you need to flag which segments are suitable, which need to be reviewed etc. 
 
+- **Finish the core.** Transcription, listening and search should be
+  competitive with peer apps.
+- **Bin what's poor and build it anew.** Where something is bad (the admin
+  backend, for example), replace it rather than patch it, and retire
+  superfluous features. Removing code and features is fine; deleting data
+  still needs me.
+- **Training data.** Good training data is key to everything in "Where it's
+  going". Identify what we have, flag where human work is needed, and set
+  targets we can work towards. For a Pap Ó Murchú TTS voice, for example:
+  which segments are suitable (e.g. one speaker, clean audio, checked
+  transcription), which need review, and how much we have against how much a
+  voice needs. Report progress against the targets in the weekly digest.
