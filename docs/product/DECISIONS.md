@@ -14,6 +14,9 @@ directly to state standing preferences.
   brilliantly.
 - Ship behind feature flags; merge on green CI; destructive data changes
   always need the owner.
+- Dependencies (owner, 2026-11-12): patch bumps merge on green, minor bumps
+  are checked and merged, major bumps get a PR from the builder with every
+  change the upgrade needs, and wait for the owner's review.
 - Autopilot (owner, 2026-11-12): the architect proposes, the builder builds
   and merges, and the owner only intervenes occasionally. Visible changes
   are built without approval and ship dark behind a flag; the owner

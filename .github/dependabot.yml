@@ -1,10 +1,37 @@
 version: 2
 updates:
+  # Patch and minor bumps arrive as one grouped PR per ecosystem per week (the
+  # builder merges it on green). Major bumps stay separate, one PR each.
   - package-ecosystem: bundler
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+  # Production builds install with npm (Dockerfile); CI installs with yarn.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+  - package-ecosystem: gradle
+    directory: "/android"
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]

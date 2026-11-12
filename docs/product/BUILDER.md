@@ -18,13 +18,25 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    merge_method=squash`), then label its issue `shipped`. If a check failed,
    fix it. If checks are pending, leave it.
    Do the same for **Dependabot PRs** (author `dependabot[bot]`, label
-   `dependencies`), oldest first, at most three a run: merge when every check
-   on the head has passed, then wait for the next run before merging more
-   that touch the same lockfile. If one has a merge conflict, comment
-   `@dependabot rebase` once and move on. Leave for the owner, labelled
-   `needs-human` with one line saying why, any major-version bump of a
-   runtime gem or package (GitHub Actions and dev/test-only dependencies are
-   fine), any bump of Rails or Ruby itself, and any that failed checks twice.
+   `dependencies`), oldest first, at most three a run, by size of bump:
+   - **Patch**: merge when every check on the head has passed.
+   - **Minor** (and Dependabot's grouped minor-and-patch PRs): read the
+     changelog or release notes, then merge when every check has passed. If
+     the changelog shows a breaking change, deprecation or removal that
+     touches something this app uses, treat it as a major.
+   - **Major** (including Rails, Ruby, Tailwind and the Docker base image):
+     never merge Dependabot's PR yourself. Read the upgrade guide, make every
+     change the upgrade needs (code, config, tests, docs) on your own
+     `claude/deps-<name>-<version>` branch, run the full suite, and open a PR
+     that says what changed and what to look at, labelled `needs-human`
+     (review required). Comment on Dependabot's PR with a link to yours. If
+     the upgrade needs no changes of ours, just label Dependabot's PR
+     `needs-human` with one line saying so. Do at most one major upgrade a
+     run, after the issue builds below, and only if the run has time.
+   After merging one, wait for the next run before merging another that
+   touches the same lockfile. If one has a merge conflict, comment
+   `@dependabot rebase` once and move on. A PR that failed checks twice gets
+   `needs-human` and one line saying why.
 2. **Fix sweep.** If any of your open PRs have failing CI or unaddressed
    review comments, fix them, oldest first, then carry on to step 3.
 3. **Build, up to three issues a run, one at a time.** Take the oldest open
