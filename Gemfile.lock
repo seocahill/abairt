@@ -230,7 +230,9 @@ GEM
     mime-types-data (3.2023.1205)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.27.0)
+    minitest (6.1.0)
+      drb (~> 2.0)
+      prism (>= 1.5, < 3)
     mission_control-jobs (0.3.3)
       importmap-rails
       irb (~> 1.13)
@@ -536,7 +538,7 @@ DEPENDENCIES
   mailjet (~> 1.7)
   mcp (~> 1.10)
   mini_portile2 (~> 2.8.5)
-  minitest (~> 5.25)
+  minitest (~> 6.1)
   mission_control-jobs (~> 0.1)
   mocha
   multi_json (~> 1.15)

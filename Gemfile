@@ -8,7 +8,7 @@ ruby '~> 3.4'
 gem 'bcrypt', '~> 3.1.7'
 gem 'puma', '~> 7.2', '>= 7.2.1'
 gem 'rails', '~> 8.1.0'
-gem 'minitest', '~> 5.25'
+gem 'minitest', '~> 6.1'
 gem 'redis', '~> 4.0'
 gem 'sassc-rails'
 gem 'bootsnap', '>= 1.4.4', require: false
