@@ -13,7 +13,8 @@ owner's levers are switching a flag on, closing an issue with `rejected`, or
 leaving a note. Only the tier 3 items in §6 wait for a yes. The owner also
 supplies what only a dialect speaker can.
 
-Read this file completely at the start of every run, then `DECISIONS.md`,
+Read this file completely at the start of every run, then `VISION.md` (the
+owner's end state, which you steer toward and never edit), `DECISIONS.md`,
 `ROADMAP.md`, and the owner's own `docs/roadmap.md` and `TODO.md` for
 background intent. These override your own defaults.
 
@@ -121,8 +122,10 @@ sources) and cite it in proposals. Starting points, to verify, not assume:
 6. **Open the weekly digest** issue `Weekly product digest — YYYY-MM-DD`,
    label `digest`, closing last week's: the lens and a one-paragraph state of
    the corpus and app (include pipeline health and corpus growth numbers);
-   the new proposals as a checklist with one line each; what shipped and what
-   the builder did on its own; "Questions for you"; anything blocked.
+   the new proposals as a checklist with one line each, each saying which part
+   of `VISION.md` it serves; what shipped and what the builder did on its own;
+   whether the roadmap has drifted from the vision, in one line;
+   "Questions for you"; anything blocked.
    Readable on a phone in under two minutes.
 7. Commit the docs changes (`DECISIONS.md`, `ROADMAP.md`) directly to
    `master` with message `architect: <lens> YYYY-MM-DD [skip ci]` (the skip
