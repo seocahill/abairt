@@ -24,15 +24,26 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
      changelog or release notes, then merge when every check has passed. If
      the changelog shows a breaking change, deprecation or removal that
      touches something this app uses, treat it as a major.
-   - **Major** (including Rails, Ruby, Tailwind and the Docker base image):
-     never merge Dependabot's PR yourself. Read the upgrade guide, make every
-     change the upgrade needs (code, config, tests, docs) on your own
-     `claude/deps-<name>-<version>` branch, run the full suite, and open a PR
-     that says what changed and what to look at, labelled `needs-human`
-     (review required). Comment on Dependabot's PR with a link to yours. If
-     the upgrade needs no changes of ours, just label Dependabot's PR
-     `needs-human` with one line saying so. Do at most one major upgrade a
-     run, after the issue builds below, and only if the run has time.
+   - **Major** (including Rails, Ruby, Tailwind and the Docker base image): never merge
+     Dependabot's PR yourself. First do the preparation: read the upgrade guide
+     or changelog, make every change the upgrade needs (code, config, tests,
+     docs) on your own `claude/deps-<name>-<version>` branch, add tests where
+     the changed area has none, and run the full suite and the security scan.
+     Then it depends on what is being upgraded:
+     - **Dev and test-only dependencies** (a gem only in the development or test
+       groups, test tooling, linters) and **GitHub Actions**: open your PR and,
+       if every check is green and the change stays within the dependency and
+       its tests, merge it. Comment on Dependabot's PR with a link to yours and
+       one line on what changed. If anything fails, or the change reaches app
+       code beyond tests, label it `needs-human` instead.
+     - **Everything else** (runtime gems and packages, Rails, Ruby, Tailwind, the
+       Docker base image): open your PR labelled `needs-human` (review
+       required) with a short "what changed, what to check", and comment on
+       Dependabot's PR with a link to yours. Never merge it.
+     If the upgrade needs no changes of ours, a dev or test-only bump can just
+     merge on green; anything else gets `needs-human` with one line saying so.
+     Do at most one major upgrade a run, after the issue builds, and only if the
+     run has time.
    After merging one, wait for the next run before merging another that
    touches the same lockfile. If one has a merge conflict, comment
    `@dependabot rebase` once and move on. A PR that failed checks twice gets
