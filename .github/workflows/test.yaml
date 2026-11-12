@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Pinned: ruby/setup-ruby has no prebuilt Ruby 3.4.2 on ubuntu-26.04 (latest)
     steps:
       - uses: actions/checkout@v7
       - name: Set up Ruby
@@ -20,7 +20,7 @@ jobs:
         run: bin/bundler-audit check --update
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Pinned: ruby/setup-ruby has no prebuilt Ruby 3.4.2 on ubuntu-26.04 (latest)
 
     # If you need DB like PostgreSQL, Redis then define service below.
     # https://github.com/actions/example-services/tree/master/.github/workflows
