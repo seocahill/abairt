@@ -60,6 +60,11 @@ group :development do
   gem 'web-console', '>= 4.1.0'
 end
 
+# Feature flags (see docs/feature_flags.md)
+gem "flipper", "~> 1.4"
+gem "flipper-active_record", "~> 1.4"
+gem "flipper-ui", "~> 1.4"
+
 group :test do
   gem 'mocha'
   gem 'rails-controller-testing'

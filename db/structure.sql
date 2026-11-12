@@ -247,7 +247,12 @@ CREATE INDEX "index_segment_prompts_on_dictionary_entry_id" ON "segment_prompts"
 CREATE INDEX "index_segment_prompts_on_speaker_id" ON "segment_prompts" ("speaker_id");
 CREATE INDEX "index_segment_prompts_on_speaker_id_and_status" ON "segment_prompts" ("speaker_id", "status");
 CREATE UNIQUE INDEX "index_segment_prompts_on_message_id" ON "segment_prompts" ("message_id");
+CREATE TABLE IF NOT EXISTS "flipper_features" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "key" varchar NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_flipper_features_on_key" ON "flipper_features" ("key");
+CREATE TABLE IF NOT EXISTS "flipper_gates" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "feature_key" varchar NOT NULL, "key" varchar NOT NULL, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_flipper_gates_on_feature_key_and_key_and_value" ON "flipper_gates" ("feature_key", "key", "value");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261112145040'),
 ('20261030120000'),
 ('20261026120000'),
 ('20261022000000'),
