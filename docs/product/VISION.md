@@ -61,14 +61,21 @@ A learning platform. I've decided teaching belongs in a dedicated application
 that consumes Abairt's data as needed (see #70). Abairt makes its data easy to
 consume; it doesn't build quizzes, lessons, word lists or progress tracking.
 
+Released without consent. Nothing made from a speaker's recordings (a TTS
+voice, a model, a dataset) is made publicly available without that speaker's
+express consent. Building and testing privately is fine; releasing is not.
+
 ## Current priorities
 
 - **Finish the core.** Transcription, listening and search should be
   competitive with peer apps.
 - **Bin what's poor and build it anew.** Where something is bad (the admin
   backend, for example), replace it rather than patch it, and retire
-  superfluous features. Removing code and features is fine; deleting data
-  still needs me.
+  superfluous features. Removing dead code with no visible effect is fine.
+  Retiring a feature people can see needs my yes first: propose it, say what
+  would be lost, and wait. Deleting data still needs me. Big rebuilds, the
+  admin backend included, are broken into a sequence of small issues that each
+  ship on their own.
 - **Training data.** Good training data is key to everything in "Where it's
   going". Identify what we have, flag where human work is needed, and set
   targets we can work towards. For a Pap Ó Murchú TTS voice, for example:
