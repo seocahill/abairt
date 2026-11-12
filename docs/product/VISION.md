@@ -10,23 +10,22 @@ labelled `owner-note` instead.
 
 ## What this is for
 
-<!-- One or two sentences: what Abairt is, in your words. -->
+What abairt is to today is a platform for transcribing and translating, audio and video of native speakers of the Mayo / North Connacht dialects of Irish.
 
 ## Who it serves, and what great looks like for them
 
-<!-- One short paragraph per audience. What can they do a year from now that
-     they can't today? -->
+It serves both transcribers and passive listeners well. "Great" I'm happy to delegate to best in class peers in this space. It should meet the peer standard of audio / video streaming UI and UX on all screens. It should be accessible (many transcribers may be elderly). Information graphs should be delightful to use, accurate and up to date (places, speaker names, map coordinates).  First class api / mcp.
 
 ## Where it's going
 
-<!-- The big moves, in the order you'd like them to happen. Not a task list:
-     the architect turns these into proposals. -->
+A dialectically accurate ASR, TTS (e.g. pap ó murchú) and fine tuned LLM (either standalone or as 'fixer' for abair.ie). The goal is to get to the point where we can expose an agentic speaker with native level accuracy.
 
 ## What it should never become
 
-<!-- Hard limits and things you'd regret: scope, tone, data, cost, complexity. -->
+A learning platform per se. I've decided it's better to separate that into a dedicated application that consumes the data in this app as needed.
 
 ## Current priorities
+- Finish the core function. The main function (transcription / listening / search) should be competitive relative to peer apps.
+- Bin crap stuff and build anew. The admin backend for example. Retire superflous features
+- Good training data is obviously going to be key. I want you to identify it, highlight when human intervention is required and give us targets to fulfil. For example for TTS pap voice, you need to flag which segments are suitable, which need to be reviewed etc. 
 
-<!-- The two or three things that matter most right now. Update this one most
-     often. -->
