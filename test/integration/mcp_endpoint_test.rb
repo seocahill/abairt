@@ -142,6 +142,23 @@ class McpEndpointTest < ActionDispatch::IntegrationTest
     assert_equal entry.translation, payload["translation"]
   end
 
+  test "subscriptions/listen is answered as unimplemented instead of a 500 stream body" do
+    version = "2026-07-28"
+    meta = {
+      "io.modelcontextprotocol/protocolVersion" => version,
+      "io.modelcontextprotocol/clientInfo" => {name: "test", version: "1"},
+      "io.modelcontextprotocol/clientCapabilities" => {}
+    }
+
+    post "/mcp",
+      params: rpc("subscriptions/listen", _meta: meta, notifications: {toolsListChanged: true}),
+      headers: json_headers("Bearer #{@token.token}")
+        .merge("MCP-Protocol-Version" => version, "Mcp-Method" => "subscriptions/listen")
+
+    assert_response :not_found
+    assert_equal(-32_601, JSON.parse(response.body).dig("error", "code"))
+  end
+
   private
 
   def rpc(method, params = {})
