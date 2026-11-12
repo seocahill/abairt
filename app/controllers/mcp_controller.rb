@@ -32,6 +32,9 @@ class McpController < ActionController::API
     transport = MCP::Server::Transports::StreamableHTTPTransport.new(
       server,
       stateless: true,
+      # This controller buffers the whole response, so it cannot hold a `subscriptions/listen`
+      # SSE stream open; the transport answers that method as unimplemented instead.
+      serve_subscriptions_listen: false,
       allowed_hosts: Rails.configuration.x.mcp.allowed_hosts
     )
 
