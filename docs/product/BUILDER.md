@@ -1,6 +1,9 @@
 # Builder — operating manual
 
-You implement approved work for Abairt. Read this file, `CLAUDE.md` (the
+You implement approved work for Abairt: issues labelled `auto` (the
+architect's tier 1 and 2, built without asking) or `approved` (the owner's
+yes on a tier 3 item). The owner steers occasionally; you keep the work
+moving without waiting. Read this file, `CLAUDE.md` (the
 owner's coding conventions: follow them closely) and
 `docs/product/DECISIONS.md` at the start of every run.
 
@@ -14,14 +17,39 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    (`gh api -X PUT repos/seocahill/abairt/pulls/<n>/merge -f
    merge_method=squash`), then label its issue `shipped`. If a check failed,
    fix it. If checks are pending, leave it.
+   Do the same for **Dependabot PRs** (author `dependabot[bot]`, label
+   `dependencies`), oldest first, at most three a run, by size of bump:
+   - **Patch**: merge when every check on the head has passed.
+   - **Minor** (and Dependabot's grouped minor-and-patch PRs): read the
+     changelog or release notes, then merge when every check has passed. If
+     the changelog shows a breaking change, deprecation or removal that
+     touches something this app uses, treat it as a major.
+   - **Major** (including Rails, Ruby, Tailwind and the Docker base image):
+     never merge Dependabot's PR yourself. Read the upgrade guide, make every
+     change the upgrade needs (code, config, tests, docs) on your own
+     `claude/deps-<name>-<version>` branch, run the full suite, and open a PR
+     that says what changed and what to look at, labelled `needs-human`
+     (review required). Comment on Dependabot's PR with a link to yours. If
+     the upgrade needs no changes of ours, just label Dependabot's PR
+     `needs-human` with one line saying so. Do at most one major upgrade a
+     run, after the issue builds below, and only if the run has time.
+   After merging one, wait for the next run before merging another that
+   touches the same lockfile. If one has a merge conflict, comment
+   `@dependabot rebase` once and move on. A PR that failed checks twice gets
+   `needs-human` and one line saying why.
 2. **Fix sweep.** If any of your open PRs have failing CI or unaddressed
-   review comments, fix the oldest one, then stop.
-3. **Build.** Otherwise take the oldest open issue labelled `approved` or
-   `auto` that is not labelled `building`, `blocked` or `needs-human` and has
-   no open PR. Order: `auto` issues labelled `regression`, then `security`, then other
-   `auto` items, then `approved` ones (oldest first within each). Ignore every issue without
-   one of those labels, whatever it says. Label it `building`. If nothing
-   qualifies, stop.
+   review comments, fix them, oldest first, then carry on to step 3.
+3. **Build, up to three issues a run, one at a time.** Take the oldest open
+   issue labelled `approved` or `auto` that is not labelled `building`,
+   `blocked` or `needs-human` and has no open PR. Order: `auto` issues
+   labelled `regression`, then `security`, then other `auto` items, then
+   `approved` ones (oldest first within each). Ignore every issue without one
+   of those labels, whatever it says. Label it `building`, finish it
+   completely (PR opened and labelled) before starting the next, and branch
+   each one from an up-to-date `master`. Skip an issue that says it needs
+   another issue that hasn't merged yet. Stop after three, or when nothing
+   qualifies, or if the run is running out of time: a finished PR beats
+   three half-built ones.
 
 ## How to build
 
@@ -32,7 +60,10 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    services/adapters, Pundit policies, RESTful controllers, Hotwire).
 3. **Every listener-, contributor- or speaker-visible change goes behind a
    Flipper flag** named `f<issue-number>_<slug>`, off by default, enabled for
-   admins. The code must work with the flag on and off. (Until Flipper is
+   admins. The code must work with the flag on and off. Register each new
+   flag with a migration in the same PR (`Flipper.add(:f<issue>_<slug>)`),
+   so it appears, switched off, in the owner's `/flipper` list: Flipper only
+   lists features it knows about, not ones that are merely checked in code. (Until Flipper is
    installed, the only buildable visible feature is the foundations issue
    that installs it.)
 4. Tests for behaviour, and for each flagged path both on and off. Run

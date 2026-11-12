@@ -6,9 +6,12 @@ transcriptions with Irish and English subtitles, a dictionary of words and
 phrases, a speaker map, and the pipeline (diarization, ASR, translation, TTS)
 that turns raw audio into all of that. Your job is to make it the best
 dialect speech corpus and listening resource there is, and keep it that way,
-without the owner having to think about what to build. The owner's only job
-is to say yes or no to your proposals, and to supply what only a dialect
-speaker can.
+without the owner having to think about what to build. This runs on
+autopilot: you propose, the builder builds and ships, and the owner
+steers occasionally. Visible changes ship dark behind feature flags, so the
+owner's levers are switching a flag on, closing an issue with `rejected`, or
+leaving a note. Only the tier 3 items in §6 wait for a yes. The owner also
+supplies what only a dialect speaker can.
 
 Read this file completely at the start of every run, then `DECISIONS.md`,
 `ROADMAP.md`, and the owner's own `docs/roadmap.md` and `TODO.md` for
@@ -102,10 +105,12 @@ sources) and cite it in proposals. Starting points, to verify, not assume:
    comparison with the best (Mozilla Common Voice, ELAN/oTranscribe-style
    tools, YouTube/Descript transcript UX, abair.ie, Teanglann, Dúchas,
    Forvo, Language Reactor).
-3. **Write proposals** as GitHub issues using the `proposal` template, label
-   `proposal` (plus `auto` for tier 1). At most **4 per run**, ranked. Don't
-   open new ones if more than **6** are awaiting a decision; say so in the
-   digest. Never re-propose something `DECISIONS.md` records as rejected
+3. **Write proposals** as GitHub issues using the `proposal` template. Label
+   tier 1 and tier 2 items `auto` (tier 2 also `proposal`, so the owner can
+   scan them); label tier 3 items `proposal` only. At most **4 per run**,
+   ranked. Don't open new ones if more than **6** tier 3 items are awaiting a
+   decision, or if more than **6** `auto` issues are still unbuilt (the
+   builder takes up to 3 a run); say so in the digest. Never re-propose something `DECISIONS.md` records as rejected
    unless the evidence materially changed, and say what changed. Existing
    open issues without labels are the owner's backlog: you may fold them into
    a proposal (link them) but don't relabel them.
@@ -130,14 +135,21 @@ sources) and cite it in proposals. Starting points, to verify, not assume:
   dependency and security patches, Brakeman findings, failing or missing
   tests, performance fixes with no visible change, flag cleanup, CI fixes,
   pipeline retry/robustness fixes with no visible change.
-- **Tier 2 — needs the owner's approval** (`proposal`): anything a
-  listener, contributor or speaker can see or feel; changes to which ASR,
-  translation or TTS provider or model is used; new free third-party
-  services.
-- **Tier 3 — always stops for the owner at merge**: destructive or
-  data-rewriting migrations, deleting content or media, anything costing
-  money, changes to auth/OAuth/MCP permissions or roles, bulk changes to
-  content records, anything touching speaker personal data.
+- **Tier 2 — builds without asking, ships dark** (`auto` + `proposal`):
+  anything a listener, contributor or speaker can see or feel. It goes
+  behind a Flipper flag, off by default and on for admins, and the builder
+  merges it on green CI. The owner switches the flag on for everyone (list
+  the flags waiting for that in the digest, with a one-line recommendation
+  each) or closes the issue with `rejected` before it is built.
+- **Tier 3 — waits for the owner's yes** (`proposal` only, built only after
+  the owner adds `approved`, and the PR still stops for the owner at
+  merge): changes to which ASR, translation or TTS provider or model is
+  used; new third-party services, free or paid; anything costing money;
+  collecting new data about listeners or speakers; destructive or
+  data-rewriting migrations, deleting content or media, changes to
+  auth/OAuth/MCP permissions or roles, bulk changes to content records,
+  anything touching speaker personal data; anything that needs an answer
+  only the owner can give.
 
 ## 7. Week-one foundations
 
