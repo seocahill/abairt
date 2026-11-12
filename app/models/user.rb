@@ -97,6 +97,11 @@ class User < ApplicationRecord
     where(id: (name_ids + email_ids).uniq)
   }
 
+  # Identifies a user to Flipper so a flag can be on for named people.
+  def flipper_id
+    "User;#{id}"
+  end
+
   def telegram_speaker?
     answers_questions?
   end

@@ -9,9 +9,10 @@ class AdminConstraint
 end
 
 Rails.application.routes.draw do
-  # Mission Control for job monitoring - admin only
+  # Mission Control for job monitoring and Flipper feature flags - admin only
   constraints(AdminConstraint.new) do
     mount MissionControl::Jobs::Engine, at: "/jobs"
+    mount Flipper::UI.app(Flipper) => "/flipper"
   end
 
   # OAuth 2 provider (Doorkeeper) + Model Context Protocol server for Claude web.
