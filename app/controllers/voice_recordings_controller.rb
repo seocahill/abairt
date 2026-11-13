@@ -291,6 +291,16 @@ class VoiceRecordingsController < ApplicationController
     render json: regions
   end
 
+  def peaks
+    @recording = VoiceRecording.find(params[:id])
+    authorize @recording, :show?
+
+    return head :not_found unless @recording.peaks_ready?
+
+    expires_in 1.hour, public: false
+    render json: @recording.peaks
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.

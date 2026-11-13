@@ -9,6 +9,7 @@ export default class extends Controller {
   static values = {
     url: String,
     regionsUrl: String,
+    peaksUrl: String,
     lazy: Boolean,
     editMode: Boolean,
     entryUpdateUrlTemplate: String
@@ -129,15 +130,11 @@ export default class extends Controller {
 
       this.setupWaveformEventListeners();
 
-      if (this.hasVideoTarget) {
-        await this.waveSurfer.load(this.videoTarget);
-      } else {
-        const audio = document.createElement('audio');
-        audio.preload = 'metadata';
-        audio.crossOrigin = 'anonymous';
-        audio.src = this.urlValue;
-        await this.waveSurfer.load(audio);
-      }
+      // With stored peaks wavesurfer draws straight away and only reads the
+      // media's metadata; without them it downloads and decodes the whole file.
+      const peaks = await this.fetchPeaks();
+      const media = this.hasVideoTarget ? this.videoTarget : this.buildAudioElement();
+      await this.waveSurfer.load(media, peaks, 'metadata');
 
       if (this.hasRegionsUrlValue) {
         await this.fetchAndAddRegions();
@@ -147,6 +144,28 @@ export default class extends Controller {
     } catch (error) {
       console.error('Error initializing waveform:', error);
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = true;
+    }
+  }
+
+  buildAudioElement() {
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous';
+    audio.src = this.urlValue;
+    return audio;
+  }
+
+  async fetchPeaks() {
+    if (!this.hasPeaksUrlValue || !this.peaksUrlValue) return undefined;
+
+    try {
+      const response = await fetch(this.peaksUrlValue, { headers: { Accept: 'application/json' } });
+      if (!response.ok) return undefined;
+      const { data } = await response.json();
+      return Array.isArray(data) && data.length > 0 ? data : undefined;
+    } catch (error) {
+      console.warn('Could not load waveform peaks, decoding audio instead:', error);
+      return undefined;
     }
   }
 

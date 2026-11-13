@@ -8,17 +8,20 @@ export default class extends Controller {
     translation: String
   }
 
-  connect() {
-    if (this.urlValue) {
-      this.audio = new Audio();
-      this.audio.preload = "auto";
-      this.audio.src = this.urlValue;
-      
-      // Set preservesPitch for audio playback with cross-browser support
-      this.audio.preservesPitch = true;
-      this.audio.mozPreservesPitch = true;
-      this.audio.webkitPreservesPitch = true;
-    }
+  // The clip is only created, and so only downloaded, on the first tap.
+  ensureAudio() {
+    if (this.audio || !this.urlValue) return this.audio;
+
+    this.audio = new Audio();
+    this.audio.preload = "none";
+    this.audio.src = this.urlValue;
+
+    // Set preservesPitch for audio playback with cross-browser support
+    this.audio.preservesPitch = true;
+    this.audio.mozPreservesPitch = true;
+    this.audio.webkitPreservesPitch = true;
+    if (this.playbackRate) this.audio.playbackRate = this.playbackRate;
+    return this.audio;
   }
 
   disconnect() {
@@ -32,7 +35,7 @@ export default class extends Controller {
     event.preventDefault();
     const button = event.currentTarget;
 
-    if (!this.audio) {
+    if (!this.ensureAudio()) {
       console.warn('No audio URL provided');
       return;
     }
@@ -56,9 +59,8 @@ export default class extends Controller {
 
   changeSpeed(event) {
     event.preventDefault();
-    if (!this.audio) return;
-
     const speed = parseFloat(event.currentTarget.value);
-    this.audio.playbackRate = speed;
+    this.playbackRate = speed;
+    if (this.audio) this.audio.playbackRate = speed;
   }
 }

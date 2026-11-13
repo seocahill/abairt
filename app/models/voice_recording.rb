@@ -132,6 +132,19 @@ class VoiceRecording < ApplicationRecord
     nil
   end
 
+  # Stores the waveform peaks the player draws from, so listeners don't have
+  # to download and decode the whole recording just to see it.
+  def peaks_ready?
+    peaks.is_a?(Hash) && peaks["data"].present?
+  end
+
+  def generate_peaks
+    source = listening_audio || media
+    return unless source&.attached?
+
+    source.open { |file| update!(peaks: AudioPeaks.call(file.path)) }
+  end
+
   def percentage_transcribed
     return 0 if duration_seconds.zero?
     return 0 if dictionary_entries_count.zero?
