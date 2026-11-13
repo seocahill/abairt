@@ -28,7 +28,7 @@ gem 'trailblazer-developer', group: :development
 gem 'solid_queue', '~> 1.7'
 gem 'mission_control-jobs', '~> 0.1'
 gem 'mailjet', '~> 1.7'
-gem 'alba', '~> 2.4'
+gem 'alba', '~> 4.0'
 gem 'oj', '~> 3.17', '>= 3.17.3'
 gem 'doorkeeper', '~> 5.9' # OAuth 2 provider for MCP authorization
 gem 'mcp', '~> 1.10' # Model Context Protocol server for Claude web
