@@ -29,6 +29,23 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "peaks are served as json once generated" do
+    @voice_recording.update!(peaks: {"samples_per_second" => 8, "data" => [-0.5, 0.5]})
+
+    get peaks_voice_recording_url(@voice_recording), as: :json
+
+    assert_response :success
+    assert_equal [-0.5, 0.5], response.parsed_body["data"]
+  end
+
+  test "peaks are not found before they are generated" do
+    @voice_recording.update!(peaks: nil)
+
+    get peaks_voice_recording_url(@voice_recording), as: :json
+
+    assert_response :not_found
+  end
+
   test "should get edit" do
     get edit_voice_recording_url(@voice_recording)
     assert_response :success

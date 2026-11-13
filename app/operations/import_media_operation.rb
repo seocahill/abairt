@@ -160,6 +160,7 @@ class ImportMediaOperation < Trailblazer::Operation
       return false
     end
     calculate_duration(voice_recording, temp_path)
+    GeneratePeaksJob.perform_later(voice_recording.id)
 
     Rails.logger.info "Media attached successfully"
     true
