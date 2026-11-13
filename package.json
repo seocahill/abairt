@@ -11,7 +11,7 @@
     "tailwindcss:build": "tailwindcss-cli build ./app/assets/tailwind/tailwind_custom_base.css -o ./app/assets/stylesheets/tailwind_custom.css"
   },
   "dependencies": {
-    "@rails/actiontext": "^7.1.3",
+    "@rails/actiontext": "^8.1.401",
     "csso-cli": "^4.0.2",
     "flowbite": "^1.6.5",
     "trix": "^2.1.19",
