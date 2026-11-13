@@ -39,6 +39,24 @@ proposal and say where we fall short. In practice:
 - **The API and MCP** are products in their own right: complete, documented
   and stable.
 
+## Users: simple, and clearly separated
+
+There are really two kinds of people here, and they hardly overlap. The main
+exception is me.
+
+- **Listeners and learners** just want to listen, or to learn a bit. Signing up
+  should be quick and ask for very little. They can optionally say what level
+  of Irish they have, and that should be clear and optional at signup. Their
+  profile stays minimal.
+- **Speakers** are the people who are recorded and who answer questions. They
+  carry the richer data (dialect, voice, place, how to reach them).
+- **Admin** is a small, separate thing for the people who run the corpus.
+
+The data, the screens and the admin tools should reflect that split clearly,
+instead of one tangled user type that tries to be all three. Much of what
+accumulated on users came from when Abairt was also trying to be a learning
+platform. Learning belongs in the course app, so that leftover should go.
+
 ## Where it's going
 
 A dialectally accurate speech stack for Mayo Irish, trained on this corpus:
@@ -82,3 +100,8 @@ express consent. Building and testing privately is fine; releasing is not.
   which segments are suitable (e.g. one speaker, clean audio, checked
   transcription), which need review, and how much we have against how much a
   voice needs. Report progress against the targets in the weekly digest.
+- **Simpler users.** Make signup minimal for people who just want to listen or
+  learn, with an optional level of Irish. Separate learners, speakers and admin
+  more clearly in the data and the interface. Strip out the learning-era
+  leftovers. Do it in small steps; dropping tables or columns still needs my
+  yes.
