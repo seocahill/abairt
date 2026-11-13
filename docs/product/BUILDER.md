@@ -101,10 +101,21 @@ labels and comments. Open the PR with `Closes #<n>`, a plain-language
 summary a non-developer can read, how to try it (which flag), screenshots,
 and the review summary.
 
+**Open every PR ready for review, never as a draft.** Create it through the
+REST API with `draft` set to false (`gh api repos/seocahill/abairt/pulls -f
+title=... -f head=... -f base=master -f body=... -F draft=false`), even if your
+session's defaults say to open drafts. A draft can be neither merged nor
+auto-merged, and the REST API cannot mark one ready afterwards, so a draft PR
+stalls the whole pipeline. If a PR you opened is a draft anyway, label it
+`needs-human` and say so on the first line of the PR and in your run summary.
+
 Then decide:
 
 - Label the PR **`ready-to-merge`** (merged on a later run's sweep once
-  green) when the issue is `auto` or `approved` AND the diff has no
+  green; and if the repo allows auto-merge, also enable it right away with
+  `gh api -X PUT repos/seocahill/abairt/pulls/<n>/ccr/auto_merge -f
+  merge_method=squash` so it merges the moment checks pass, leaving it for the
+  sweep if that call fails) when the issue is `auto` or `approved` AND the diff has no
   migration that removes, renames or rewrites tables, columns or data, no
   change to auth/OAuth/MCP scopes, roles or Pundit policies loosening
   access, no change to `.github/workflows`, Docker or deploy files, and no
