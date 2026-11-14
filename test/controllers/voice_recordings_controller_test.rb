@@ -29,6 +29,54 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "moment links are inert while the flag is off" do
+    add_timed_entries(20)
+    Flipper.disable(:f82_moment_links)
+
+    get voice_recording_url(@voice_recording, t: 170)
+
+    assert_response :success
+    assert_select "#dictionary_entry_#{@late_entry.id}", false
+    assert_select "[data-waveform-start-at-value]", false
+    assert_select "#recording-phone-header", false
+    assert_select "meta[property='og:title']", false
+    assert_select "[data-controller='share-link']", false
+  end
+
+  test "moment links open on the page holding the moment when the flag is on" do
+    add_timed_entries(20)
+    Flipper.enable(:f82_moment_links)
+
+    get voice_recording_url(@voice_recording, t: 170)
+
+    assert_response :success
+    assert_select "#dictionary_entry_#{@late_entry.id}"
+    assert_select "[data-waveform-start-at-value='170.0']"
+    assert_select "[data-waveform-start-entry-id-value='#{@late_entry.id}']"
+    assert_select "#recording-phone-header", text: /#{@voice_recording.title}/
+    assert_select "meta[property='og:title'][content='#{@voice_recording.title}']"
+    assert_select "[data-share-link-url-value*='t=']"
+  end
+
+  test "the per-line copy link only appears with the flag on" do
+    add_timed_entries(3)
+    Flipper.enable(:f82_moment_links)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_select "[data-controller='share-link'][data-share-link-url-value*='t=10.0']"
+  end
+
+  test "an unreadable t is ignored when the flag is on" do
+    add_timed_entries(3)
+    Flipper.enable(:f82_moment_links)
+
+    get voice_recording_url(@voice_recording, t: "soon")
+
+    assert_response :success
+    assert_select "[data-waveform-start-at-value]", false
+  end
+
   test "peaks are served as json once generated" do
     @voice_recording.update!(peaks: {"samples_per_second" => 8, "data" => [-0.5, 0.5]})
 
@@ -160,5 +208,16 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
 
     get tags_voice_recordings_url(order: "name")
     assert_response :success
+  end
+
+  private
+
+  def add_timed_entries(count)
+    speaker = users(:one)
+    entries = (0...count).map do |i|
+      DictionaryEntry.create!(voice_recording: @voice_recording, speaker: speaker, owner: speaker,
+        word_or_phrase: "line #{i}", region_start: i * 10, region_end: i * 10 + 9)
+    end
+    @late_entry = entries[17]
   end
 end

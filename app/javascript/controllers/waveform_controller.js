@@ -5,14 +5,16 @@ import TimelinePlugin from 'wavesurfertimelinejs';
 
 export default class extends Controller {
   static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation",
-                    "gaeSubs", "engSubs", "speed", "video", "editButton", "zoom", "timelineContainer"]
+                    "gaeSubs", "engSubs", "speed", "video", "editButton", "zoom", "timelineContainer", "startButton"]
   static values = {
     url: String,
     regionsUrl: String,
     peaksUrl: String,
     lazy: Boolean,
     editMode: Boolean,
-    entryUpdateUrlTemplate: String
+    entryUpdateUrlTemplate: String,
+    startAt: Number,
+    startEntryId: Number
   }
 
   connect() {
@@ -147,6 +149,33 @@ export default class extends Controller {
     }
   }
 
+  // A shared moment link: park the player on that moment and offer a button,
+  // since browsers will not start audio on their own.
+  applyStartAt() {
+    if (!this.hasStartAtValue || !this.hasStartButtonTarget) return;
+
+    this.startButtonTarget.classList.remove('hidden');
+
+    const duration = this.waveSurfer.getDuration();
+    if (duration) this.waveSurfer.seekTo(Math.min(this.startAtValue / duration, 1));
+
+    if (this.hasStartEntryIdValue) {
+      const el = document.getElementById(`dictionary_entry_${this.startEntryIdValue}`);
+      if (el) this.highlightAndScrollToEntry(el);
+    }
+  }
+
+  playFromStart() {
+    this.startButtonTarget.classList.add('hidden');
+    const duration = this.waveSurfer?.getDuration();
+    if (duration) this.waveSurfer.seekTo(Math.min(this.startAtValue / duration, 1));
+    this.waveSurfer?.play();
+  }
+
+  currentTime() {
+    return this.waveSurfer?.getCurrentTime() || 0;
+  }
+
   buildAudioElement() {
     const audio = document.createElement('audio');
     audio.preload = 'metadata';
@@ -176,6 +205,7 @@ export default class extends Controller {
       this.setupPitchPreservation();
       setTimeout(() => this.removePlaceholder(), 100);
       this._initZoom();
+      this.applyStartAt();
       if (this.shouldAutoPlay) {
         this.shouldAutoPlay = false;
         this.waveSurfer.play();

@@ -103,6 +103,12 @@
             <span class="text-gray-400">No speaker</span>
           <% end %>
         </div>
+        <% if local_assigns[:moment_links] && local_assigns[:recording] && entry.region_start %>
+          <%= render "voice_recordings/share_link",
+                label: "Copy link to this line",
+                url: voice_recording_url(recording, t: entry.region_start.to_f.round(1)),
+                title: recording.title %>
+        <% end %>
         <% if entry.versions.any? %>
           <%= link_to dictionary_entry_path(entry), class: "flex items-center text-gray-500 hover:text-gray-700", data: { turbo_frame: "_top" } do %>
             <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

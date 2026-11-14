@@ -252,6 +252,7 @@ CREATE UNIQUE INDEX "index_flipper_features_on_key" ON "flipper_features" ("key"
 CREATE TABLE IF NOT EXISTS "flipper_gates" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "feature_key" varchar NOT NULL, "key" varchar NOT NULL, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_flipper_gates_on_feature_key_and_key_and_value" ON "flipper_gates" ("feature_key", "key", "value");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261114090000'),
 ('20261112145040'),
 ('20261030120000'),
 ('20261026120000'),
