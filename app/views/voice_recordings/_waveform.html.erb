@@ -5,6 +5,11 @@
      data-waveform-peaks-url-value="<%= peaks_voice_recording_path(@recording) if @recording&.peaks_ready? %>"
      data-waveform-regions-url-value="<%= regions_voice_recording_path(@recording) if @recording %>"
      data-waveform-edit-mode-value="false"
+     <% if @listening_controls %>
+       data-waveform-listening-value="true"
+       data-waveform-title-value="<%= @recording.title %>"
+       data-waveform-artist-value="<%= @recording.users.filter_map(&:name).to_sentence %>"
+     <% end %>
      <% if @moment %>
        data-waveform-start-at-value="<%= @moment.seconds %>"
        <% if @moment.entry %>data-waveform-start-entry-id-value="<%= @moment.entry.id %>"<% end %>
@@ -73,6 +78,10 @@
                 class="hidden bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-sm">
           Play from <%= format_duration(@moment.seconds) %>
         </button>
+      <% end %>
+
+      <% if @listening_controls %>
+        <%= render "voice_recordings/listening_controls" %>
       <% end %>
 
       <!-- Time Display -->

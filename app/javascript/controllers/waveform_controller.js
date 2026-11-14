@@ -5,7 +5,7 @@ import TimelinePlugin from 'wavesurfertimelinejs';
 
 export default class extends Controller {
   static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation",
-                    "gaeSubs", "engSubs", "speed", "video", "editButton", "zoom", "timelineContainer", "startButton"]
+                    "gaeSubs", "engSubs", "speed", "video", "editButton", "zoom", "timelineContainer", "startButton", "loopButton", "shortcuts"]
   static values = {
     url: String,
     regionsUrl: String,
@@ -14,11 +14,16 @@ export default class extends Controller {
     editMode: Boolean,
     entryUpdateUrlTemplate: String,
     startAt: Number,
-    startEntryId: Number
+    startEntryId: Number,
+    listening: Boolean,
+    title: String,
+    artist: String
   }
 
   connect() {
     if (!this.hasWaveformTarget) return;
+
+    if (this.listeningValue) this.bindListeningControls();
 
     if (!this.lazyValue) {
       this.initializeWaveform();
@@ -28,7 +33,179 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.unbindListeningControls();
     this.waveSurfer?.destroy();
+  }
+
+  // ─── Listening controls (f81_listening_controls) ──────────────────────────
+
+  bindListeningControls() {
+    this._onLineSeek = (event) => this.seekToLine(event.detail.start, event.detail.end);
+    this._onKeydown = (event) => this.handleKey(event);
+    window.addEventListener('line:seek', this._onLineSeek);
+    document.addEventListener('keydown', this._onKeydown);
+    this.looping = false;
+    this.loopLine = null;
+  }
+
+  unbindListeningControls() {
+    if (this._onLineSeek) window.removeEventListener('line:seek', this._onLineSeek);
+    if (this._onKeydown) document.removeEventListener('keydown', this._onKeydown);
+    if (this.listeningValue && 'mediaSession' in navigator) this.clearMediaSession();
+  }
+
+  // Lines with a start and end, in playing order.
+  lines() {
+    return (this._regionsData || [])
+      .filter(r => r.region_start != null && r.region_end != null)
+      .map(r => ({ start: parseFloat(r.region_start), end: parseFloat(r.region_end) }))
+      .sort((a, b) => a.start - b.start);
+  }
+
+  async seekToLine(start, end) {
+    if (!this.isReady) {
+      this.pendingLine = { start, end };
+      if (!this.waveSurfer) await this.initializeWaveform();
+      return;
+    }
+    if (this.looping) this.loopLine = { start, end };
+    this.seekSeconds(start);
+    this.waveSurfer.play();
+  }
+
+  seekSeconds(seconds) {
+    const duration = this.waveSurfer.getDuration();
+    if (duration) this.waveSurfer.seekTo(Math.min(Math.max(seconds / duration, 0), 1));
+  }
+
+  // Repeats the looped line; called as the player moves.
+  loopTick() {
+    if (!this.looping || !this.loopLine || !this.waveSurfer.isPlaying()) return;
+    if (this.waveSurfer.getCurrentTime() >= this.loopLine.end) this.seekSeconds(this.loopLine.start);
+  }
+
+  // If the listener moves the playhead out of the looped line, loop where they went.
+  followSeek() {
+    if (!this.looping) return;
+    const t = this.currentTime();
+    if (!this.loopLine || t < this.loopLine.start - 0.05 || t > this.loopLine.end + 0.05) {
+      this.loopLine = this.lineAt(t) || this.loopLine;
+    }
+  }
+
+  lineAt(time) {
+    const inside = this.lines().filter(l => time >= l.start && time <= l.end);
+    return inside.length ? inside[inside.length - 1] : null;
+  }
+
+  // The line under the playhead, or the last one that began before it.
+  activeLine() {
+    const t = this.currentTime();
+    const before = this.lines().filter(l => l.start <= t);
+    return this.lineAt(t) || (before.length ? before[before.length - 1] : this.lines()[0] || null);
+  }
+
+  replayLine() {
+    const line = this.activeLine();
+    if (line) this.seekToLine(line.start, line.end);
+  }
+
+  toggleLoop() {
+    this.looping = !this.looping;
+    if (this.hasLoopButtonTarget) {
+      this.loopButtonTarget.setAttribute('aria-pressed', String(this.looping));
+      this.loopButtonTarget.classList.toggle('bg-indigo-600', this.looping);
+      this.loopButtonTarget.classList.toggle('text-white', this.looping);
+    }
+    this.loopLine = this.looping ? this.activeLine() : null;
+  }
+
+  previousLine() { this.stepLine(-1); }
+  nextLine() { this.stepLine(1); }
+
+  stepLine(direction) {
+    const lines = this.lines();
+    if (!lines.length) return;
+    const t = this.currentTime();
+    const current = this.activeLine();
+    let index = current ? lines.indexOf(this.lines().find(l => l.start === current.start && l.end === current.end)) : -1;
+    // A few seconds in, "previous" first returns to the start of this line.
+    if (direction < 0 && current && t - current.start > 2) {
+      return this.seekToLine(current.start, current.end);
+    }
+    index = Math.min(Math.max(index + direction, 0), lines.length - 1);
+    this.seekToLine(lines[index].start, lines[index].end);
+  }
+
+  skip(seconds) {
+    if (!this.waveSurfer || !this.isReady) return;
+    this.seekSeconds(this.currentTime() + seconds);
+  }
+
+  changeSpeedBy(step) {
+    if (!this.hasSpeedTarget) return;
+    const options = Array.from(this.speedTarget.options);
+    const index = Math.min(Math.max(this.speedTarget.selectedIndex + step, 0), options.length - 1);
+    this.speedTarget.selectedIndex = index;
+    this.speedTarget.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  handleKey(event) {
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || event.repeat || event.defaultPrevented) return;
+    if (this.editModeValue) return;
+    const target = event.target;
+    if (target.isContentEditable || target.closest?.('input, textarea, select, button, a, summary, [role=button], [role=slider], [role=tab], [role=menuitem], dialog')) return;
+
+    const actions = {
+      ' ': () => this.play(),
+      ArrowLeft: () => this.previousLine(),
+      ArrowRight: () => this.nextLine(),
+      r: () => this.replayLine(),
+      l: () => this.toggleLoop(),
+      ',': () => this.changeSpeedBy(-1),
+      '.': () => this.changeSpeedBy(1)
+    };
+    const action = actions[event.key.toLowerCase()];
+    if (!action) return;
+    event.preventDefault();
+    action();
+  }
+
+  toggleShortcuts() {
+    if (this.hasShortcutsTarget) this.shortcutsTarget.classList.toggle('hidden');
+  }
+
+  // Lock-screen and notification controls, crediting the speaker.
+  setupMediaSession() {
+    if (!this.listeningValue || !('mediaSession' in navigator)) return;
+
+    if (typeof MediaMetadata !== 'undefined') {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: this.titleValue,
+        artist: this.artistValue,
+        album: 'Abairt'
+      });
+    }
+
+    const handlers = {
+      play: () => this.waveSurfer.play(),
+      pause: () => this.waveSurfer.pause(),
+      previoustrack: () => this.previousLine(),
+      nexttrack: () => this.nextLine(),
+      seekbackward: (details) => this.skip(-(details?.seekOffset || 10)),
+      seekforward: (details) => this.skip(details?.seekOffset || 10),
+      seekto: (details) => { if (details?.seekTime != null) this.seekSeconds(details.seekTime); }
+    };
+    Object.entries(handlers).forEach(([name, handler]) => {
+      try { navigator.mediaSession.setActionHandler(name, handler); } catch (_) { /* unsupported action */ }
+    });
+  }
+
+  clearMediaSession() {
+    navigator.mediaSession.metadata = null;
+    ['play', 'pause', 'previoustrack', 'nexttrack', 'seekbackward', 'seekforward', 'seekto'].forEach(name => {
+      try { navigator.mediaSession.setActionHandler(name, null); } catch (_) { /* unsupported action */ }
+    });
   }
 
   // ─── Dummy waveform (shown while loading) ─────────────────────────────────
@@ -143,7 +320,9 @@ export default class extends Controller {
       }
 
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false;
+
     } catch (error) {
+      this.pendingLine = null;
       console.error('Error initializing waveform:', error);
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = true;
     }
@@ -206,7 +385,12 @@ export default class extends Controller {
       setTimeout(() => this.removePlaceholder(), 100);
       this._initZoom();
       this.applyStartAt();
-      if (this.shouldAutoPlay) {
+      this.setupMediaSession();
+      if (this.pendingLine) {
+        const { start, end } = this.pendingLine;
+        this.pendingLine = null;
+        this.seekToLine(start, end);
+      } else if (this.shouldAutoPlay) {
         this.shouldAutoPlay = false;
         this.waveSurfer.play();
       }
@@ -217,6 +401,7 @@ export default class extends Controller {
     this.waveSurfer.on('finish', () => this.updatePlayButtonState(false));
 
     this.waveSurfer.on('audioprocess', () => {
+      if (this.listeningValue) this.loopTick();
       if (!this.waveSurfer.isPlaying()) return;
       const t = this.waveSurfer.getCurrentTime();
       if (this.hasTimeDisplayTarget) this.timeDisplayTarget.textContent = this.formatTime(t);
@@ -224,6 +409,7 @@ export default class extends Controller {
     });
 
     this.waveSurfer.on('seek', () => {
+      if (this.listeningValue) this.followSeek();
       const t = this.waveSurfer.getCurrentTime();
       if (this.hasTimeDisplayTarget) this.timeDisplayTarget.textContent = this.formatTime(t);
       this.highlightCurrentEntry(t);

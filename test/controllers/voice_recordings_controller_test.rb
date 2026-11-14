@@ -77,6 +77,41 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-waveform-start-at-value]", false
   end
 
+  test "listening controls are inert while the flag is off" do
+    add_timed_entries(3)
+    Flipper.disable(:f81_listening_controls)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_response :success
+    assert_select "[data-waveform-listening-value]", false
+    assert_select "[data-controller~='line-seek']", false
+    assert_select "[data-waveform-target='loopButton']", false
+    assert_select "[data-controller='audio-player']"
+  end
+
+  test "listening controls appear with the flag on" do
+    add_timed_entries(3)
+    Flipper.enable(:f81_listening_controls)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_response :success
+    assert_select "[data-waveform-listening-value='true'][data-waveform-title-value='#{@voice_recording.title}']"
+    assert_select "[data-waveform-target='loopButton']"
+    assert_select "[data-controller~='line-seek'][data-line-seek-start-value='10.0']"
+    assert_select "[data-action='line-seek#play']"
+  end
+
+  test "an untimed line keeps its own clip button with the flag on" do
+    DictionaryEntry.create!(voice_recording: @voice_recording, speaker: users(:one), owner: users(:one), word_or_phrase: "untimed")
+    Flipper.enable(:f81_listening_controls)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_select "[data-controller='audio-player']"
+  end
+
   test "peaks are served as json once generated" do
     @voice_recording.update!(peaks: {"samples_per_second" => 8, "data" => [-0.5, 0.5]})
 

@@ -1,0 +1,23 @@
+<%# Line-by-line listening controls, shown behind f81_listening_controls. %>
+<% button = "inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 text-lg" %>
+<div class="relative flex items-center gap-1" role="group" aria-label="Listening controls">
+  <button type="button" class="<%= button %>" aria-label="Previous line" title="Previous line (←)"
+          data-action="click->waveform#previousLine">⏮</button>
+  <button type="button" class="<%= button %>" aria-label="Replay line" title="Replay line (R)"
+          data-action="click->waveform#replayLine">↺</button>
+  <button type="button" class="<%= button %>" aria-label="Loop line" aria-pressed="false" title="Loop line (L)"
+          data-waveform-target="loopButton" data-action="click->waveform#toggleLoop">🔁</button>
+  <button type="button" class="<%= button %>" aria-label="Next line" title="Next line (→)"
+          data-action="click->waveform#nextLine">⏭</button>
+  <button type="button" class="<%= button %>" aria-label="Keyboard shortcuts" title="Keyboard shortcuts"
+          data-action="click->waveform#toggleShortcuts">?</button>
+  <div data-waveform-target="shortcuts" class="hidden absolute left-0 top-full mt-1 z-20 w-56 rounded-lg border border-gray-200 bg-white p-3 text-xs text-gray-700 shadow-lg">
+    <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+      <dt class="font-mono">Space</dt><dd>Play / pause</dd>
+      <dt class="font-mono">← →</dt><dd>Previous / next line</dd>
+      <dt class="font-mono">R</dt><dd>Replay line</dd>
+      <dt class="font-mono">L</dt><dd>Loop line</dd>
+      <dt class="font-mono">, .</dt><dd>Slower / faster</dd>
+    </dl>
+  </div>
+</div>

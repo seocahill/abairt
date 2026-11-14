@@ -126,6 +126,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @moment_links = moment_links?
+    @listening_controls = listening_controls?
     @moment = moment_link if @moment_links && params[:page].blank? && request.format.html?
 
     # Improve pagination query to be more efficient
@@ -145,7 +146,7 @@ class VoiceRecordingsController < ApplicationController
           turbo_stream.append("entries-container",
             partial: "voice_recordings/dictionary_entries/entry",
             collection: @entries,
-            locals: {moment_links: @moment_links, recording: @recording}),
+            locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording}),
           turbo_stream.replace("pagination",
             partial: "shared/pagination",
             locals: {pagy: @pagy})
@@ -307,6 +308,10 @@ class VoiceRecordingsController < ApplicationController
   end
 
   private
+
+  def listening_controls?
+    Flipper.enabled?(:f81_listening_controls, current_user)
+  end
 
   def moment_links?
     Flipper.enabled?(:f82_moment_links, current_user)

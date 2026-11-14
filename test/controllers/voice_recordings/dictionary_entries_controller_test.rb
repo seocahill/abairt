@@ -7,6 +7,20 @@ class VoiceRecordings::DictionaryEntriesControllerTest < ActionDispatch::Integra
     DictionaryEntry.any_instance.stubs(:create_audio_snippet).returns(true)
   end
 
+  test "an updated entry keeps tap-to-seek when the listening flag is on" do
+    recording = voice_recordings(:one)
+    entry = DictionaryEntry.create!(voice_recording: recording, speaker: users(:one), owner: users(:one),
+      word_or_phrase: "x", region_start: 1, region_end: 2)
+
+    Flipper.enable(:f81_listening_controls)
+    patch voice_recording_dictionary_entry_url(recording, entry), params: {dictionary_entry: {translation: "y"}}, as: :turbo_stream
+    assert_select "#dictionary_entry_#{entry.id}[data-controller~='line-seek']"
+
+    Flipper.disable(:f81_listening_controls)
+    patch voice_recording_dictionary_entry_url(recording, entry), params: {dictionary_entry: {translation: "z"}}, as: :turbo_stream
+    assert_select "#dictionary_entry_#{entry.id}[data-controller~='line-seek']", false
+  end
+
   test "should create dictionary_entry" do
     assert_difference('DictionaryEntry.count') do
       @voice_recording = voice_recordings(:one)
