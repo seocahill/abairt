@@ -256,7 +256,7 @@
     <div class="flex-1 overflow-y-auto p-3 md:p-6" data-controller="infinite-scroll">
       <div id="entries-container" class="space-y-3 md:space-y-4" data-infinite-scroll-target="container">
         <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries,
-                  locals: {moment_links: @moment_links, recording: @recording} %>
+                  locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording} %>
       </div>
 
       <!-- Pagination -->

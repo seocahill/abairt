@@ -16,7 +16,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
         format.json { render json: { id: @dictionary_entry.id, message: 'Dictionary entry created successfully' }, status: :created }
         format.turbo_stream do
           render turbo_stream: turbo_stream.append(:transcriptions, partial: "voice_recordings/dictionary_entries/dictionary_entry",
-          locals: { entry: @dictionary_entry })
+          locals: { entry: @dictionary_entry, listening_controls: listening_controls? })
         end
       else
         format.html { redirect_back fallback_location: root_path, status: :unprocessable_entity }
@@ -47,7 +47,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             "dictionary_entry_#{@dictionary_entry.id}",
             partial: "voice_recordings/dictionary_entries/entry",
-            locals: { entry: @dictionary_entry }
+            locals: { entry: @dictionary_entry, listening_controls: listening_controls? }
           ), status: :unprocessable_entity
         end
         format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), alert: 'Cannot edit confirmed entries. Please deconfirm first.' }
@@ -61,7 +61,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             "dictionary_entry_#{@dictionary_entry.id}",
             partial: "voice_recordings/dictionary_entries/entry",
-            locals: { entry: @dictionary_entry }
+            locals: { entry: @dictionary_entry, listening_controls: listening_controls? }
           )
         end
         format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry was successfully updated.' }
@@ -87,7 +87,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             "dictionary_entry_#{@dictionary_entry.id}",
             partial: "voice_recordings/dictionary_entries/entry",
-            locals: { entry: @dictionary_entry }
+            locals: { entry: @dictionary_entry, listening_controls: listening_controls? }
           )
         end
         format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry confirmed.' }
@@ -110,7 +110,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             "dictionary_entry_#{@dictionary_entry.id}",
             partial: "voice_recordings/dictionary_entries/entry",
-            locals: { entry: @dictionary_entry }
+            locals: { entry: @dictionary_entry, listening_controls: listening_controls? }
           )
         end
         format.html { redirect_to voice_recording_dictionary_entries_path(@dictionary_entry.voice_recording), notice: 'Entry deconfirmed.' }
@@ -129,5 +129,9 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
   # Only allow a list of trusted parameters through.
   def dictionary_entry_params
     params.require(:dictionary_entry).permit(:word_or_phrase, :translation, :notes, :media, :search, :voice_recording_id, :status, :tag_list, :region_start, :region_end, :region_id, :speaker_id, :quality, :translator_id, :accuracy_status, rang_ids: [])
+  end
+
+  def listening_controls?
+    Flipper.enabled?(:f81_listening_controls, current_user)
   end
 end

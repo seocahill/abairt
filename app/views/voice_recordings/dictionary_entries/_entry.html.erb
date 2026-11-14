@@ -1,6 +1,13 @@
+<% listening_controls = local_assigns[:listening_controls] && entry.region_start && entry.region_end %>
 <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-all duration-300 scroll-mt-20" id="dictionary_entry_<%= entry.id %>"
-     data-controller="inline-edit"
-     data-action="turbo:submit-end->inline-edit#submitEnd">
+     data-controller="inline-edit<%= " line-seek" if listening_controls %>"
+     <% if listening_controls %>
+       data-line-seek-start-value="<%= entry.region_start.to_f %>"
+       data-line-seek-end-value="<%= entry.region_end.to_f %>"
+       data-action="turbo:submit-end->inline-edit#submitEnd click->line-seek#seek"
+     <% else %>
+       data-action="turbo:submit-end->inline-edit#submitEnd"
+     <% end %>>
   <div class="flex items-start justify-between">
     <div class="flex-1">
       <!-- Display Mode -->
@@ -121,9 +128,14 @@
     </div>
 
     <!-- Play Button -->
-    <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200"
-            data-controller="audio-player"
-            data-action="audio-player#play"
+    <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200<%= " min-w-[44px] min-h-[44px] flex items-center justify-center" if listening_controls %>"
+            <% if listening_controls %>
+              aria-label="Play this line"
+              data-action="line-seek#play"
+            <% else %>
+              data-controller="audio-player"
+              data-action="audio-player#play"
+            <% end %>
             data-audio-player-url-value="<%= url_for(entry.media) if entry.media.attached? %>"
             data-audio-player-transcription-value="<%= entry.word_or_phrase %>"
             data-audio-player-translation-value="<%= entry.translation %>">
