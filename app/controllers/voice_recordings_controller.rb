@@ -125,13 +125,16 @@ class VoiceRecordingsController < ApplicationController
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
 
+    @moment = moment_link if moment_links?
+
     # Improve pagination query to be more efficient
     @pagy, @entries = pagy(
       @recording.dictionary_entries
         .includes(:speaker, :versions, media_attachment: :blob)
         .where.not(id: nil)
         .reorder(:region_start),
-      items: PAGE_SIZE
+      items: PAGE_SIZE,
+      page: moment_page
     )
 
     respond_to do |format|
@@ -302,6 +305,23 @@ class VoiceRecordingsController < ApplicationController
   end
 
   private
+
+  def moment_links?
+    Flipper.enabled?(:f82_moment_links, current_user)
+  end
+
+  # The moment a shared link points at, if the flag is on and `t` makes sense.
+  def moment_link
+    seconds = MomentLink.parse(params[:t])
+    MomentLink.new(@recording, seconds) if seconds
+  end
+
+  # Open on the page of lines holding the shared moment; later pages are
+  # fetched by infinite scroll with an explicit page, which wins.
+  def moment_page
+    return unless @moment && params[:page].blank? && request.format.html?
+    @moment.page(PAGE_SIZE)
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_voice_recording

@@ -1,0 +1,11 @@
+<%# Phones hide the info boxes, so say what is playing and who is speaking. %>
+<% speakers = recording.users.map(&:name).compact_blank %>
+<% places = recording.locations.map(&:full_name) %>
+<header id="recording-phone-header" class="md:hidden sticky top-0 z-20 bg-white px-3 py-2 border-b border-gray-200">
+  <h1 class="text-base font-semibold text-gray-900 truncate"><%= recording.title %></h1>
+  <% if speakers.any? || places.any? %>
+    <p class="text-sm text-gray-600 truncate">
+      <%= safe_join([speakers.to_sentence.presence, places.first].compact, " · ") %>
+    </p>
+  <% end %>
+</header>

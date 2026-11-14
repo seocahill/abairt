@@ -1,0 +1,11 @@
+<%# Link previews (WhatsApp, Facebook): fields already public on the page. %>
+<% speakers = recording.users.map(&:name).compact_blank.to_sentence %>
+<% place = recording.locations.first&.full_name %>
+<% description = [speakers.presence, place].compact.join(" · ").presence || recording.description.to_s.truncate(160) %>
+<meta property="og:type" content="website">
+<meta property="og:title" content="<%= recording.title %>">
+<meta property="og:description" content="<%= description %>">
+<meta property="og:url" content="<%= voice_recording_url(recording) %>">
+<% if recording.media.attached? && recording.media.audio? %>
+  <meta property="og:audio" content="<%= url_for(recording.media) %>">
+<% end %>

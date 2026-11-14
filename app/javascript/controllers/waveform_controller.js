@@ -5,14 +5,16 @@ import TimelinePlugin from 'wavesurfertimelinejs';
 
 export default class extends Controller {
   static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation",
-                    "gaeSubs", "engSubs", "speed", "video", "editButton", "zoom", "timelineContainer"]
+                    "gaeSubs", "engSubs", "speed", "video", "editButton", "zoom", "timelineContainer", "startButton"]
   static values = {
     url: String,
     regionsUrl: String,
     peaksUrl: String,
     lazy: Boolean,
     editMode: Boolean,
-    entryUpdateUrlTemplate: String
+    entryUpdateUrlTemplate: String,
+    startAt: Number,
+    startEntryId: Number
   }
 
   connect() {
@@ -140,11 +142,39 @@ export default class extends Controller {
         await this.fetchAndAddRegions();
       }
 
+      this.applyStartAt();
+
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false;
     } catch (error) {
       console.error('Error initializing waveform:', error);
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = true;
     }
+  }
+
+  // A shared moment link: park the player on that moment and offer a button,
+  // since browsers will not start audio on their own.
+  applyStartAt() {
+    if (!this.hasStartAtValue || !this.hasStartButtonTarget) return;
+
+    const duration = this.waveSurfer.getDuration();
+    if (!duration) return;
+
+    this.waveSurfer.seekTo(Math.min(this.startAtValue / duration, 1));
+    this.startButtonTarget.classList.remove('hidden');
+
+    if (this.hasStartEntryIdValue) {
+      const el = document.getElementById(`dictionary_entry_${this.startEntryIdValue}`);
+      if (el) this.highlightAndScrollToEntry(el);
+    }
+  }
+
+  playFromStart() {
+    this.startButtonTarget.classList.add('hidden');
+    this.waveSurfer?.play();
+  }
+
+  currentTime() {
+    return this.waveSurfer?.getCurrentTime() || 0;
   }
 
   buildAudioElement() {

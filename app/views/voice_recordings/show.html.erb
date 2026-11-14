@@ -1,3 +1,8 @@
+<% if Flipper.enabled?(:f82_moment_links, current_user) %>
+  <% content_for :head do %>
+    <%= render "voice_recordings/moment_meta", recording: @recording %>
+  <% end %>
+<% end %>
 <!-- Main Container -->
 <div id="recording-layout" class="flex flex-col md:flex-row h-screen overflow-hidden"
       <% if @recording.import_status&.in?(['pending', 'processing']) %>
@@ -8,6 +13,9 @@
   <!-- Left Side - Media Player and Controls -->
   <div id="recording-left-panel" class="w-full md:w-1/2 flex-shrink-0 flex flex-col bg-white border-r overflow-y-auto">
     <div class="p-1 md:p-6">
+      <% if Flipper.enabled?(:f82_moment_links, current_user) %>
+        <%= render "voice_recordings/phone_header", recording: @recording %>
+      <% end %>
       <!-- Media Player -->
       <%= render "waveform" %>
 

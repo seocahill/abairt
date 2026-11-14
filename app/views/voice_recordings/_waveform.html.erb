@@ -5,6 +5,10 @@
      data-waveform-peaks-url-value="<%= peaks_voice_recording_path(@recording) if @recording&.peaks_ready? %>"
      data-waveform-regions-url-value="<%= regions_voice_recording_path(@recording) if @recording %>"
      data-waveform-edit-mode-value="false"
+     <% if @moment %>
+       data-waveform-start-at-value="<%= @moment.seconds %>"
+       <% if @moment.entry %>data-waveform-start-entry-id-value="<%= @moment.entry.id %>"<% end %>
+     <% end %>
      data-waveform-entry-update-url-template-value="<%= @recording ? voice_recording_dictionary_entry_path(@recording, 'ENTRY_ID') : '' %>">
 
   <!-- Video Display (if video) -->
@@ -64,8 +68,23 @@
         <span>Play</span>
       </button>
 
+      <% if @moment %>
+        <button type="button" data-waveform-target="startButton" data-action="click->waveform#playFromStart"
+                class="hidden bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-sm">
+          Play from <%= format_duration(@moment.seconds) %>
+        </button>
+      <% end %>
+
       <!-- Time Display -->
       <span data-waveform-target="timeDisplay" class="font-mono text-sm text-gray-600 min-w-[48px]">0:00</span>
+
+      <% if @recording && controller.action_name == "show" && Flipper.enabled?(:f82_moment_links, current_user) %>
+        <%= render "voice_recordings/share_link",
+              label: "Share at current time",
+              url: voice_recording_url(@recording),
+              title: @recording.title,
+              use_current_time: true %>
+      <% end %>
 
       <!-- Speed -->
       <div class="flex items-center gap-1.5">
