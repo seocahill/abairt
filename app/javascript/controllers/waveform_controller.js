@@ -142,8 +142,6 @@ export default class extends Controller {
         await this.fetchAndAddRegions();
       }
 
-      this.applyStartAt();
-
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false;
     } catch (error) {
       console.error('Error initializing waveform:', error);
@@ -156,11 +154,10 @@ export default class extends Controller {
   applyStartAt() {
     if (!this.hasStartAtValue || !this.hasStartButtonTarget) return;
 
-    const duration = this.waveSurfer.getDuration();
-    if (!duration) return;
-
-    this.waveSurfer.seekTo(Math.min(this.startAtValue / duration, 1));
     this.startButtonTarget.classList.remove('hidden');
+
+    const duration = this.waveSurfer.getDuration();
+    if (duration) this.waveSurfer.seekTo(Math.min(this.startAtValue / duration, 1));
 
     if (this.hasStartEntryIdValue) {
       const el = document.getElementById(`dictionary_entry_${this.startEntryIdValue}`);
@@ -170,6 +167,8 @@ export default class extends Controller {
 
   playFromStart() {
     this.startButtonTarget.classList.add('hidden');
+    const duration = this.waveSurfer?.getDuration();
+    if (duration) this.waveSurfer.seekTo(Math.min(this.startAtValue / duration, 1));
     this.waveSurfer?.play();
   }
 
@@ -206,6 +205,7 @@ export default class extends Controller {
       this.setupPitchPreservation();
       setTimeout(() => this.removePlaceholder(), 100);
       this._initZoom();
+      this.applyStartAt();
       if (this.shouldAutoPlay) {
         this.shouldAutoPlay = false;
         this.waveSurfer.play();

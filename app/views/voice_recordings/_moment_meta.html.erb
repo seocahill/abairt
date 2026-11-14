@@ -1,6 +1,6 @@
 <%# Link previews (WhatsApp, Facebook): fields already public on the page. %>
 <% speakers = recording.users.map(&:name).compact_blank.to_sentence %>
-<% place = recording.locations.first&.full_name %>
+<% place = recording.locations.map(&:full_name).first %>
 <% description = [speakers.presence, place].compact.join(" · ").presence || recording.description.to_s.truncate(160) %>
 <meta property="og:type" content="website">
 <meta property="og:title" content="<%= recording.title %>">

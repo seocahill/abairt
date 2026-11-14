@@ -1,4 +1,4 @@
-<% if Flipper.enabled?(:f82_moment_links, current_user) %>
+<% if @moment_links %>
   <% content_for :head do %>
     <%= render "voice_recordings/moment_meta", recording: @recording %>
   <% end %>
@@ -13,7 +13,7 @@
   <!-- Left Side - Media Player and Controls -->
   <div id="recording-left-panel" class="w-full md:w-1/2 flex-shrink-0 flex flex-col bg-white border-r overflow-y-auto">
     <div class="p-1 md:p-6">
-      <% if Flipper.enabled?(:f82_moment_links, current_user) %>
+      <% if @moment_links %>
         <%= render "voice_recordings/phone_header", recording: @recording %>
       <% end %>
       <!-- Media Player -->
@@ -255,7 +255,8 @@
     <!-- Dictionary Entries List - Scrollable -->
     <div class="flex-1 overflow-y-auto p-3 md:p-6" data-controller="infinite-scroll">
       <div id="entries-container" class="space-y-3 md:space-y-4" data-infinite-scroll-target="container">
-        <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries %>
+        <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries,
+                  locals: {moment_links: @moment_links, recording: @recording} %>
       </div>
 
       <!-- Pagination -->

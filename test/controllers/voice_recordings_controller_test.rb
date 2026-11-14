@@ -40,6 +40,7 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-waveform-start-at-value]", false
     assert_select "#recording-phone-header", false
     assert_select "meta[property='og:title']", false
+    assert_select "[data-controller='share-link']", false
   end
 
   test "moment links open on the page holding the moment when the flag is on" do
@@ -55,6 +56,15 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#recording-phone-header", text: /#{@voice_recording.title}/
     assert_select "meta[property='og:title'][content='#{@voice_recording.title}']"
     assert_select "[data-share-link-url-value*='t=']"
+  end
+
+  test "the per-line copy link only appears with the flag on" do
+    add_timed_entries(3)
+    Flipper.enable(:f82_moment_links)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_select "[data-controller='share-link'][data-share-link-url-value*='t=10.0']"
   end
 
   test "an unreadable t is ignored when the flag is on" do

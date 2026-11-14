@@ -125,7 +125,8 @@ class VoiceRecordingsController < ApplicationController
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
 
-    @moment = moment_link if moment_links?
+    @moment_links = moment_links?
+    @moment = moment_link if @moment_links && params[:page].blank? && request.format.html?
 
     # Improve pagination query to be more efficient
     @pagy, @entries = pagy(
@@ -143,7 +144,8 @@ class VoiceRecordingsController < ApplicationController
         render turbo_stream: [
           turbo_stream.append("entries-container",
             partial: "voice_recordings/dictionary_entries/entry",
-            collection: @entries),
+            collection: @entries,
+            locals: {moment_links: @moment_links, recording: @recording}),
           turbo_stream.replace("pagination",
             partial: "shared/pagination",
             locals: {pagy: @pagy})
@@ -319,8 +321,7 @@ class VoiceRecordingsController < ApplicationController
   # Open on the page of lines holding the shared moment; later pages are
   # fetched by infinite scroll with an explicit page, which wins.
   def moment_page
-    return unless @moment && params[:page].blank? && request.format.html?
-    @moment.page(PAGE_SIZE)
+    @moment&.page(PAGE_SIZE)
   end
 
   # Use callbacks to share common setup or constraints between actions.

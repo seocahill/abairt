@@ -42,7 +42,9 @@ class MomentLink
   # 1-based page of `per_page` lines that contains the moment.
   def page(per_page)
     return 1 unless entry
-    (lines.where("region_start < ?", entry.region_start).count / per_page) + 1
+    # Lines without a start time sort first on the page, so they count too.
+    before = @recording.dictionary_entries.where("region_start IS NULL OR region_start < ?", entry.region_start)
+    (before.count / per_page) + 1
   end
 
   private

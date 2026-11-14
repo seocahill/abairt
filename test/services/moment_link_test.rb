@@ -30,6 +30,18 @@ class MomentLinkTest < ActiveSupport::TestCase
     assert_equal 1, MomentLink.new(recording, 0).page(2)
   end
 
+  test "lines without a start time are counted so the page matches the list" do
+    recording = voice_recordings(:one)
+    speaker = users(:one)
+    2.times { |i| DictionaryEntry.create!(voice_recording: recording, speaker: speaker, owner: speaker, word_or_phrase: "untimed #{i}") }
+    (0...3).each { |i| DictionaryEntry.create!(voice_recording: recording, speaker: speaker, owner: speaker, word_or_phrase: "l#{i}", region_start: i * 10, region_end: i * 10 + 9) }
+
+    ordered = recording.dictionary_entries.reorder(:region_start).to_a
+    target = ordered.find { |e| e.region_start == 10 }
+
+    assert_equal (ordered.index(target) / 2) + 1, MomentLink.new(recording, 10.0).page(2)
+  end
+
   test "falls back to page one when no line matches" do
     assert_equal 1, MomentLink.new(voice_recordings(:one), 50).page(15)
   end

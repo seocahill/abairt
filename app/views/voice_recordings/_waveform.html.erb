@@ -78,7 +78,7 @@
       <!-- Time Display -->
       <span data-waveform-target="timeDisplay" class="font-mono text-sm text-gray-600 min-w-[48px]">0:00</span>
 
-      <% if @recording && controller.action_name == "show" && Flipper.enabled?(:f82_moment_links, current_user) %>
+      <% if @recording && controller.action_name == "show" && @moment_links %>
         <%= render "voice_recordings/share_link",
               label: "Share at current time",
               url: voice_recording_url(@recording),
