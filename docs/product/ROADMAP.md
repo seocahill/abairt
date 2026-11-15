@@ -9,13 +9,19 @@ Maintained by the architect (see `ARCHITECT.md`). Owner edits welcome.
 - #78 Dependency security updates (2 critical: activestorage, rack-session)
 - #80 Fast-start playback on phones: stored waveform peaks, segment clips load on tap (tier 1 `auto`)
 
+- #140 Check mode: step through unchecked lines, confirm-and-next (tier 2, flag `f140_check_mode`)
+- #141 Keep every version of a segment, including original ASR text (tier 1 `auto`)
+- #142 Training-data progress report per speaker (tier 2, flag `f142_training_progress`)
+- #123 Asset caching (PR #135 in review; vendoring CDN JS still needs `bin/importmap pin --download` run outside the sandbox)
+
 ## Next (proposed, awaiting decision)
 
-1. #72 Feature flags: Flipper with an admin-only UI (blocks every visible change)
-2. #75 ASR evaluation set and WER/CER report by speaker and dialect (needs the owner to say what counts as ground truth; folds in #36)
-3. #74 Privacy-first usage analytics in our own DB (Ahoy, cookieless)
-4. #81 Listening controls: tap a line to jump, replay/loop a line, keyboard and lock-screen (Media Session) controls (needs #72)
-5. #82 Share a link to a moment (`?t=`), compact phone header that credits the speaker, Open Graph previews (needs #72)
+1. #133 Re-transcribe safely: candidates compared with current entries (owner decisions recorded on the issue)
+2. #124 Waveform peaks out of the recording row, cached file (waiting for the owner's test on the longest recordings)
+3. #121 Simplify users: listener signup, listener/speaker/admin split (tier 3, needs the owner)
+4. #130 Remove flowbite (blocked on the owner's answer about form styling)
+
+Shipped since last update: #72 flags, #73 security scans, #75 ASR eval, #80 fast start, #81 listening controls, #82 moment links, #125 early play, #126 Android version. Rejected: #74 analytics (owner: no tracking).
 
 ## Later (ideas not yet worth a proposal)
 
@@ -35,3 +41,4 @@ Maintained by the architect (see `ARCHITECT.md`). Owner edits welcome.
 |---|---|---|
 | 2026-11-07 | 1. Transcription pipeline (plus week-one foundations) | #72 Flipper, #73 security scans (auto), #74 analytics, #75 ASR eval/WER |
 | 2026-11-08 | 2. Listening experience and mobile UX | #80 fast-start playback (auto), #81 listening controls, #82 moment links + phone header |
+| 2026-11-15 | 3. Contributor and editor workflows | #140 check mode, #141 full segment history (auto), #142 training-data progress |

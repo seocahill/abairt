@@ -30,6 +30,11 @@ directly to state standing preferences.
   teaching (see #70). Learning features (quizzes, spaced repetition, word
   lists, progress tracking) belong in the course, not here.
 
+- No analytics or tracking of listeners, of any kind, including first-party and cookieless (owner, 2026-11-14, #74). Do not re-propose; use the corpus, Sentry and the code as evidence instead.
+
 ## Log
 
 <!-- - YYYY-MM-DD #<issue> <title> — approved | rejected: <reason> -->
+- 2026-11-15 #74 Privacy-first usage analytics, in our own database (Ahoy, cookieless) — rejected: "no tracking please" (owner, 2026-11-14)
+- 2026-11-15 #75 ASR evaluation set and WER/CER report by speaker and dialect — approved (shipped, PR #139)
+- 2026-11-15 #130 Remove flowbite lib — approved (blocked on the owner's answer about form and accordion styling)
