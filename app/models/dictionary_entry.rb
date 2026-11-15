@@ -5,8 +5,9 @@ require "csv"
 class DictionaryEntry < ApplicationRecord
   include CsvExportable
 
-  # only save new version if different user
-  has_paper_trail only: [:word_or_phrase, :translation, :accuracy_status], limit: 10, on: %i[update destroy]
+  # Every change is kept, with who made it, and none is ever pruned: the first
+  # edit's version holds the original (machine) text, which is training data.
+  has_paper_trail only: [:word_or_phrase, :translation, :accuracy_status], on: %i[create update destroy]
 
   has_one_attached :media
 
@@ -23,6 +24,12 @@ class DictionaryEntry < ApplicationRecord
   acts_as_taggable_on :tags
 
   MAYO_DIALECTS = %w[tuaisceart_mhaigh_eo connacht_ó_thuaidh acaill lár_chonnachta].freeze
+
+  # Versions that hold earlier text. The creation version only records who
+  # made the entry and when, so it has nothing to show or restore.
+  def edits
+    versions.reject { |version| version.event == "create" }
+  end
 
   scope :has_recording, -> { joins(:media_attachment) }
   scope :mayo_dialect, -> { joins(:speaker).where(users: { dialect: MAYO_DIALECTS }) }
