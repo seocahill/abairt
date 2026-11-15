@@ -5,6 +5,9 @@
      data-waveform-peaks-url-value="<%= peaks_voice_recording_path(@recording) if @recording&.peaks_ready? %>"
      data-waveform-regions-url-value="<%= regions_voice_recording_path(@recording) if @recording %>"
      data-waveform-edit-mode-value="false"
+     <% if @early_play %>
+       data-waveform-early-play-value="true"
+     <% end %>
      <% if @listening_controls %>
        data-waveform-listening-value="true"
        data-waveform-title-value="<%= @recording.title %>"

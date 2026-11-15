@@ -16,6 +16,7 @@ export default class extends Controller {
     startAt: Number,
     startEntryId: Number,
     listening: Boolean,
+    earlyPlay: Boolean,
     title: String,
     artist: String
   }
@@ -259,6 +260,7 @@ export default class extends Controller {
       this.shouldAutoPlay = true;
       await this.initializeWaveform();
     } else {
+      this.shouldAutoPlay = false;
       this.waveSurfer.playPause();
     }
   }
@@ -313,11 +315,13 @@ export default class extends Controller {
       // media's metadata; without them it downloads and decodes the whole file.
       const peaks = await this.fetchPeaks();
       const media = this.hasVideoTarget ? this.videoTarget : this.buildAudioElement();
+      if (this.earlyPlayValue) this.enablePlayWhenPlayable(media);
       await this.waveSurfer.load(media, peaks, 'metadata');
 
-      if (this.hasRegionsUrlValue) {
-        await this.fetchAndAddRegions();
-      }
+      // With early play the regions fill in behind playback and never hold the button.
+      const regions = this.hasRegionsUrlValue ? this.fetchAndAddRegions() : null;
+      if (this.earlyPlayValue) return;
+      await regions;
 
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false;
 
@@ -328,10 +332,22 @@ export default class extends Controller {
     }
   }
 
+  // Early play (f125_early_play): the button works as soon as the browser
+  // can play the audio, without waiting for the waveform or the regions.
+  enablePlayWhenPlayable(media) {
+    const enable = () => { if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false; };
+    if (media.readyState >= 1) return enable();
+    media.addEventListener('loadedmetadata', enable, { once: true });
+    media.addEventListener('canplay', enable, { once: true });
+  }
+
   // A shared moment link: park the player on that moment and offer a button,
   // since browsers will not start audio on their own.
   applyStartAt() {
     if (!this.hasStartAtValue || !this.hasStartButtonTarget) return;
+
+    // Early play: the listener may already be playing; don't yank the playhead.
+    if (this.waveSurfer.isPlaying()) return;
 
     this.startButtonTarget.classList.remove('hidden');
 
@@ -392,7 +408,7 @@ export default class extends Controller {
         this.seekToLine(start, end);
       } else if (this.shouldAutoPlay) {
         this.shouldAutoPlay = false;
-        this.waveSurfer.play();
+        if (!this.waveSurfer.isPlaying()) this.waveSurfer.play();
       }
     });
 

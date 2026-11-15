@@ -112,6 +112,25 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller='audio-player']"
   end
 
+  test "play does not wait for the waveform while the early play flag is off" do
+    Flipper.disable(:f125_early_play)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_response :success
+    assert_select "[data-controller='waveform']"
+    assert_select "[data-waveform-early-play-value]", false
+  end
+
+  test "early play is switched on for the waveform with the flag on" do
+    Flipper.enable(:f125_early_play)
+
+    get voice_recording_url(@voice_recording)
+
+    assert_response :success
+    assert_select "[data-controller='waveform'][data-waveform-early-play-value='true']"
+  end
+
   test "peaks are served as json once generated" do
     @voice_recording.update!(peaks: {"samples_per_second" => 8, "data" => [-0.5, 0.5]})
 
