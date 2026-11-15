@@ -260,6 +260,7 @@ export default class extends Controller {
       this.shouldAutoPlay = true;
       await this.initializeWaveform();
     } else {
+      this.shouldAutoPlay = false;
       this.waveSurfer.playPause();
     }
   }
@@ -317,15 +318,10 @@ export default class extends Controller {
       if (this.earlyPlayValue) this.enablePlayWhenPlayable(media);
       await this.waveSurfer.load(media, peaks, 'metadata');
 
-      if (this.earlyPlayValue) {
-        // Regions fill in behind playback; they never hold the play button.
-        if (this.hasRegionsUrlValue) this.fetchAndAddRegions();
-        return;
-      }
-
-      if (this.hasRegionsUrlValue) {
-        await this.fetchAndAddRegions();
-      }
+      // With early play the regions fill in behind playback and never hold the button.
+      const regions = this.hasRegionsUrlValue ? this.fetchAndAddRegions() : null;
+      if (this.earlyPlayValue) return;
+      await regions;
 
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false;
 
@@ -349,6 +345,9 @@ export default class extends Controller {
   // since browsers will not start audio on their own.
   applyStartAt() {
     if (!this.hasStartAtValue || !this.hasStartButtonTarget) return;
+
+    // Early play: the listener may already be playing; don't yank the playhead.
+    if (this.waveSurfer.isPlaying()) return;
 
     this.startButtonTarget.classList.remove('hidden');
 
@@ -409,7 +408,7 @@ export default class extends Controller {
         this.seekToLine(start, end);
       } else if (this.shouldAutoPlay) {
         this.shouldAutoPlay = false;
-        this.waveSurfer.play();
+        if (!this.waveSurfer.isPlaying()) this.waveSurfer.play();
       }
     });
 
