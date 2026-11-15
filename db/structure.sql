@@ -251,7 +251,32 @@ CREATE TABLE IF NOT EXISTS "flipper_features" ("id" integer PRIMARY KEY AUTOINCR
 CREATE UNIQUE INDEX "index_flipper_features_on_key" ON "flipper_features" ("key");
 CREATE TABLE IF NOT EXISTS "flipper_gates" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "feature_key" varchar NOT NULL, "key" varchar NOT NULL, "value" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE UNIQUE INDEX "index_flipper_gates_on_feature_key_and_key_and_value" ON "flipper_gates" ("feature_key", "key", "value");
+CREATE TABLE IF NOT EXISTS "asr_hypotheses" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "dictionary_entry_id" integer NOT NULL, "provider" varchar NOT NULL, "model" varchar, "text" text NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_12f3122cfe"
+FOREIGN KEY ("dictionary_entry_id")
+  REFERENCES "dictionary_entries" ("id")
+);
+CREATE INDEX "index_asr_hypotheses_on_dictionary_entry_id" ON "asr_hypotheses" ("dictionary_entry_id");
+CREATE INDEX "index_asr_hypotheses_on_dictionary_entry_id_and_provider" ON "asr_hypotheses" ("dictionary_entry_id", "provider");
+CREATE TABLE IF NOT EXISTS "asr_eval_sets" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "version" integer DEFAULT 1 NOT NULL, "frozen_at" datetime(6) NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
+CREATE UNIQUE INDEX "index_asr_eval_sets_on_name_and_version" ON "asr_eval_sets" ("name", "version");
+CREATE TABLE IF NOT EXISTS "asr_eval_set_entries" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asr_eval_set_id" integer NOT NULL, "dictionary_entry_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_5c83f67443"
+FOREIGN KEY ("asr_eval_set_id")
+  REFERENCES "asr_eval_sets" ("id")
+, CONSTRAINT "fk_rails_77562970e4"
+FOREIGN KEY ("dictionary_entry_id")
+  REFERENCES "dictionary_entries" ("id")
+);
+CREATE INDEX "index_asr_eval_set_entries_on_asr_eval_set_id" ON "asr_eval_set_entries" ("asr_eval_set_id");
+CREATE INDEX "index_asr_eval_set_entries_on_dictionary_entry_id" ON "asr_eval_set_entries" ("dictionary_entry_id");
+CREATE UNIQUE INDEX "index_asr_eval_set_entries_uniqueness" ON "asr_eval_set_entries" ("asr_eval_set_id", "dictionary_entry_id");
+CREATE TABLE IF NOT EXISTS "asr_eval_runs" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "asr_eval_set_id" integer NOT NULL, "provider" varchar NOT NULL, "entries_scored" integer DEFAULT 0 NOT NULL, "results" json DEFAULT '{}' NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_059946163c"
+FOREIGN KEY ("asr_eval_set_id")
+  REFERENCES "asr_eval_sets" ("id")
+);
+CREATE INDEX "index_asr_eval_runs_on_asr_eval_set_id" ON "asr_eval_runs" ("asr_eval_set_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261115150100'),
+('20261115150000'),
 ('20261115120000'),
 ('20261115090000'),
 ('20261114120000'),
