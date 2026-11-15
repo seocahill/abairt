@@ -117,6 +117,8 @@ Rails.application.routes.draw do
   namespace :admin do
     get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
 
+    resources :asr, only: [:index]
+
     get "island_context_playground", to: "island_context_playground#index", as: :island_context_playground
 
     resources :api, only: [:index] do

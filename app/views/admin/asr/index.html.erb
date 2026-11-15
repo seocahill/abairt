@@ -1,0 +1,81 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900">ASR quality</h1>
+  <p class="mt-1 text-sm text-gray-500">Word and character error rates (lower is better) on human-checked segments.</p>
+
+  <% if @eval_set.nil? %>
+    <p class="mt-8 text-gray-700">No evaluation set yet. Freeze one from the console: <code>AsrEvalSet.freeze_from(name: "mayo")</code></p>
+  <% else %>
+    <p class="mt-6 text-sm text-gray-600">
+      Set <strong><%= @eval_set.name %> v<%= @eval_set.version %></strong>,
+      frozen <%= l @eval_set.frozen_at.to_date %>,
+      <%= @eval_set.asr_eval_set_entries.count %> segments.
+    </p>
+
+    <% if @runs.empty? %>
+      <p class="mt-4 text-gray-700">No runs yet. Score one from the console: <code>AsrEvaluation.new(AsrEvalSet.last, provider: "fotheidil").call</code></p>
+    <% else %>
+      <section class="mt-6 overflow-x-auto">
+        <h2 class="text-lg font-semibold text-gray-700 mb-2">Latest run per provider</h2>
+        <table class="min-w-full bg-white shadow rounded-lg text-sm">
+          <thead class="text-left text-gray-500">
+            <tr><th class="p-3">Provider</th><th class="p-3">Segments</th><th class="p-3">WER %</th><th class="p-3">CER %</th><th class="p-3">Run</th></tr>
+          </thead>
+          <tbody>
+            <% @runs.each do |run| %>
+              <tr class="border-t">
+                <td class="p-3 font-medium"><%= run.provider %></td>
+                <td class="p-3"><%= run.results.dig("overall", "segments") %></td>
+                <td class="p-3"><%= run.results.dig("overall", "wer") || "–" %></td>
+                <td class="p-3"><%= run.results.dig("overall", "cer") || "–" %></td>
+                <td class="p-3 text-gray-500"><%= l run.created_at.to_date %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </section>
+
+      <% %w[by_dialect by_speaker].each do |breakdown| %>
+        <section class="mt-8 overflow-x-auto">
+          <h2 class="text-lg font-semibold text-gray-700 mb-2"><%= breakdown == "by_dialect" ? "By dialect" : "By speaker" %></h2>
+          <table class="min-w-full bg-white shadow rounded-lg text-sm">
+            <thead class="text-left text-gray-500">
+              <tr><th class="p-3"><%= breakdown == "by_dialect" ? "Dialect" : "Speaker" %></th><th class="p-3">Provider</th><th class="p-3">Segments</th><th class="p-3">WER %</th><th class="p-3">CER %</th></tr>
+            </thead>
+            <tbody>
+              <% @runs.each do |run| %>
+                <% run.results[breakdown].to_h.each do |name, row| %>
+                  <tr class="border-t">
+                    <td class="p-3"><%= breakdown == "by_dialect" ? name.to_s.humanize : name %></td>
+                    <td class="p-3"><%= run.provider %></td>
+                    <td class="p-3"><%= row["segments"] %></td>
+                    <td class="p-3"><%= row["wer"] || "–" %></td>
+                    <td class="p-3"><%= row["cer"] || "–" %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </tbody>
+          </table>
+        </section>
+      <% end %>
+
+      <section class="mt-8">
+        <h2 class="text-lg font-semibold text-gray-700 mb-2">Trend</h2>
+        <ul class="text-sm text-gray-700">
+          <% @trend.each do |run| %>
+            <li><%= l run.created_at.to_date %> · <%= run.provider %> · WER <%= run.results.dig("overall", "wer") || "–" %>% · CER <%= run.results.dig("overall", "cer") || "–" %>%</li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  <% end %>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-2">Segments that qualify as ground truth now</h2>
+    <p class="text-sm text-gray-500 mb-2">Confirmed by a human, with audio. Total <%= @candidates.values.sum %>.</p>
+    <ul class="text-sm text-gray-700">
+      <% @candidates.each do |speaker, count| %>
+        <li><%= speaker.presence || "Unnamed" %>: <%= count %></li>
+      <% end %>
+    </ul>
+  </section>
+</div>

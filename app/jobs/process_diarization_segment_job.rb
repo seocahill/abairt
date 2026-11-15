@@ -59,6 +59,9 @@ class ProcessDiarizationSegmentJob < ApplicationJob
       word_or_phrase: transcription # If provided (e.g., from Fotheidil), skip transcription
     )
 
+    # Keep Fotheidil's raw output; a later human correction replaces word_or_phrase
+    AsrHypothesis.record(entry, provider: "fotheidil", text: transcription)
+
     # Create audio snippet and transcribe if needed
     # (create_audio_snippet skips transcription if word_or_phrase is already present)
     entry.create_audio_snippet

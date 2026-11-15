@@ -28,38 +28,8 @@ class AudioTranscriptionService
   private
 
   def transcribe_audio
-    # Additional rate limiting before hitting abair.ie API
-    Rails.logger.info("Starting transcription request to abair.ie API")
-    
-    audio_blob = AudioBlob.wav_base64(@file_path)
-    uri = URI.parse('https://phoneticsrv3.lcs.tcd.ie/asr_api/recognise')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.read_timeout = 30
-    http.open_timeout = 30
-    request = Net::HTTP::Post.new(uri.path)
-
-    payload = {
-      recogniseBlob: audio_blob,
-      developer: true,
-      method: 'online2bin'
-    }
-
-    request.body = payload.to_json
-    request['Content-Type'] = 'application/json'
-
-    response = http.request(request)
-    Rails.logger.info("Transcription API response: #{response.code}")
-    
-    if response.code == '429' || response.code == '503'
-      Rails.logger.warn("API rate limited, sleeping before retry")
-      sleep(5)
-      raise "Rate limited by abair.ie API"
-    end
-    
-    JSON.parse(response.body).dig("transcriptions", 0, "utterance")
-  rescue => e
-    Rails.logger.error("Transcription failed: #{e.message}")
-    nil
+    text = Asr::AbairClient.transcribe(@file_path)
+    AsrHypothesis.record(@dictionary_entry, provider: Asr::AbairClient::PROVIDER, model: Asr::AbairClient::MODEL, text: text)
+    text
   end
 end

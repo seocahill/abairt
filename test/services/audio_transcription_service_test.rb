@@ -56,4 +56,12 @@ class AudioTranscriptionServiceTest < ActiveSupport::TestCase
     
     assert_equal 'Already translated', @entry.translation
   end
-end 
+
+  test "keeps the raw abair output as a hypothesis" do
+    Asr::AbairClient.stubs(:transcribe).returns("Dia duit")
+    assert_difference "AsrHypothesis.count", 1 do
+      @service.send(:transcribe_audio)
+    end
+    assert_equal "abair", AsrHypothesis.last.provider
+  end
+end
