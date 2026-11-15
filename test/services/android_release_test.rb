@@ -49,4 +49,14 @@ class AndroidReleaseTest < ActiveSupport::TestCase
 
     assert_equal [], AndroidRelease.fetch_releases
   end
+
+  test "newest ignores a non-list answer" do
+    assert_nil AndroidRelease.newest({"message" => "rate limited"})
+  end
+
+  test "latest is nil when the cache fails" do
+    Rails.cache.stubs(:read).raises(StandardError)
+
+    assert_nil AndroidRelease.latest
+  end
 end
