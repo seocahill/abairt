@@ -51,4 +51,26 @@ class DictionaryEntryTest < ActiveSupport::TestCase
     assert_includes confirmed_ids, entry_two.id
     refute_includes confirmed_ids, entry_one.id
   end
+
+  test "keeps every version, however many edits, with the original text first" do
+    entry = DictionaryEntry.create!(word_or_phrase: "original", translation: "t", user_id: users(:one).id)
+    12.times { |i| entry.update!(word_or_phrase: "edit #{i}") }
+
+    assert_equal 12, entry.edits.size
+    assert_equal "original", entry.edits.first.reify.word_or_phrase
+    assert_equal "create", entry.versions.first.event
+  end
+
+  test "records who made the entry" do
+    PaperTrail.request.whodunnit = users(:one).id.to_s
+    entry = DictionaryEntry.create!(word_or_phrase: "orig", user_id: users(:one).id)
+    assert_equal users(:one).id.to_s, entry.versions.first.whodunnit
+  ensure
+    PaperTrail.request.whodunnit = nil
+  end
+
+  test "an entry never edited has no edits to show" do
+    entry = DictionaryEntry.create!(word_or_phrase: "fresh", user_id: users(:one).id)
+    assert_empty entry.edits
+  end
 end

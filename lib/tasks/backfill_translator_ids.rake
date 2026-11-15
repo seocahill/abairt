@@ -10,7 +10,7 @@ namespace :backfill do
       total_count += 1
       
       # Use the existing translator method logic to determine the translator
-      translator_user = User.find_by(id: entry.versions.last&.whodunnit)
+      translator_user = User.find_by(id: entry.edits.last&.whodunnit)
       
       if translator_user
         entry.update_column(:translator_id, translator_user.id)

@@ -40,6 +40,15 @@ class DictionaryEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "history lists only edits, numbered from 0, even with a creation version" do
+    entry = DictionaryEntry.create!(word_or_phrase: "orig", user_id: users(:one).id)
+    entry.update!(word_or_phrase: "second")
+    get dictionary_entry_url(entry)
+    assert_response :success
+    assert_select "tbody tr", 1
+    assert_select "tbody tr td:first-child", "0"
+  end
+
   test "should get edit" do
     users(:one).update_columns(role: User.roles[:teacher])
     get edit_dictionary_entry_url(@dictionary_entry)
