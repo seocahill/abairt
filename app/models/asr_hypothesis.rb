@@ -13,5 +13,8 @@ class AsrHypothesis < ApplicationRecord
     return if text.blank? || entry.blank? || !entry.persisted?
 
     create(dictionary_entry: entry, provider: provider, model: model, text: text)
+  rescue => e
+    Rails.logger.error("Could not keep #{provider} hypothesis: #{e.message}")
+    nil
   end
 end

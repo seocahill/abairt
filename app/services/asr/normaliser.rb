@@ -13,8 +13,8 @@ module Asr
         .unicode_normalize(:nfc)
         .downcase
         .gsub(APOSTROPHES, "'")
-        .gsub(/[^\p{L}\p{N}'\-\s]/u, " ")
-        .squish
+        .gsub(/[^\p{L}\p{M}\p{N}'\-\s]/u, " ")
+        .split.map { |w| w.gsub(/\A[-']+|[-']+\z/, "") }.reject(&:empty?).join(" ")
     end
   end
 end

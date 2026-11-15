@@ -8,7 +8,7 @@ module Admin
     skip_after_action :verify_authorized
 
     def index
-      @eval_set = AsrEvalSet.order(:name, :version).last
+      @eval_set = AsrEvalSet.order(:created_at).last
       @runs = @eval_set ? latest_runs_by_provider(@eval_set) : []
       @trend = @eval_set ? @eval_set.asr_eval_runs.order(:created_at).last(20) : []
       @candidates = candidate_counts
@@ -21,7 +21,7 @@ module Admin
     end
 
     def latest_runs_by_provider(eval_set)
-      eval_set.asr_eval_runs.order(created_at: :desc).group_by(&:provider).values.map(&:first)
+      eval_set.asr_eval_runs.order(created_at: :desc).limit(50).group_by(&:provider).values.map(&:first)
     end
 
     # How many segments currently qualify as ground truth, by speaker.

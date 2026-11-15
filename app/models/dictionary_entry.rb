@@ -18,6 +18,7 @@ class DictionaryEntry < ApplicationRecord
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
   has_many :segment_prompts, dependent: :destroy
   has_many :asr_hypotheses, dependent: :destroy
+  has_many :asr_eval_set_entries, dependent: :restrict_with_error
 
   acts_as_taggable_on :tags
 
@@ -46,7 +47,7 @@ class DictionaryEntry < ApplicationRecord
   end
   # Ground truth for ASR evaluation: checked by a human, has audio and text.
   # The criteria live here only, so they can change without touching the rest.
-  scope :asr_eval_candidates, -> { confirmed_accuracy.has_recording.where.not(word_or_phrase: [nil, ""]).where.not(speaker_id: nil) }
+  scope :asr_eval_candidates, -> { confirmed_accuracy.has_recording.where.not(word_or_phrase: [nil, ""]).joins(:speaker).where.not(users: {role: :temporary}) }
   scope :updated_since, ->(timestamp) { where("updated_at > ?", timestamp) }
 
   # Entries whose Irish contains the given words, best match first. Searched as

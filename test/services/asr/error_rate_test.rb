@@ -25,4 +25,8 @@ class Asr::ErrorRateTest < ActiveSupport::TestCase
   test "empty hypothesis is all deletions" do
     assert_equal 2, Asr::ErrorRate.call("a b", "").word_errors
   end
+
+  test "stray hyphens and quotes do not become words" do
+    assert_equal 0, Asr::ErrorRate.call("a b", "'a - b-").word_errors
+  end
 end

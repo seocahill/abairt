@@ -22,4 +22,21 @@ class AsrEvalSetTest < ActiveSupport::TestCase
       AsrHypothesis.record(dictionary_entries(:one), provider: "abair", text: "x")
     end
   end
+
+  test "an entry in a frozen set cannot be deleted" do
+    entry = dictionary_entries(:two)
+    AsrEvalSet.freeze_from(name: "mayo", scope: DictionaryEntry.where(id: entry.id))
+    assert_not entry.destroy
+    assert DictionaryEntry.exists?(entry.id)
+  end
+
+  test "temporary speakers are not candidates" do
+    entry = dictionary_entries(:two)
+    entry.speaker.update_columns(role: User.roles[:temporary])
+    assert_not_includes DictionaryEntry.asr_eval_candidates, entry
+  end
+
+  test "freeze_from with an empty scope makes an empty set" do
+    assert_equal 0, AsrEvalSet.freeze_from(name: "x", scope: DictionaryEntry.none).dictionary_entries.count
+  end
 end
