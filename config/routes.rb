@@ -84,6 +84,7 @@ Rails.application.routes.draw do
       end
     end
     resource :claim, module: :voice_recordings, only: [:create, :destroy]
+    resource :check, module: :voice_recordings, only: [:show, :update]
     resources :speakers, module: :voice_recordings, only: [:index, :update] do
       collection do
         get :search

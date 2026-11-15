@@ -254,6 +254,10 @@
   <div id="recording-right-panel" class="w-full md:w-1/2 flex-1 flex flex-col min-h-0 overflow-hidden">
     <!-- Dictionary Entries List - Scrollable -->
     <div class="flex-1 overflow-y-auto p-3 md:p-6" data-controller="infinite-scroll">
+      <% if @check_mode && policy(@recording).check? %>
+        <%= link_to "Check this recording", voice_recording_check_path(@recording),
+            class: "mb-3 md:mb-4 w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center" %>
+      <% end %>
       <div id="entries-container" class="space-y-3 md:space-y-4" data-infinite-scroll-target="container">
         <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries,
                   locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording} %>

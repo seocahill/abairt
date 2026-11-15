@@ -40,6 +40,11 @@ class VoiceRecordingPolicy < ApplicationPolicy
     user && !user.student?
   end
 
+  # Check mode confirms lines, so it is for whoever may confirm.
+  def check?
+    user && !user.student?
+  end
+
   # Your own claim, or an admin freeing one somebody never got back to.
   def release_claim?
     user && (user.admin? || user == record.claimed_by)
