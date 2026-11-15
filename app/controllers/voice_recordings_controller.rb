@@ -128,6 +128,7 @@ class VoiceRecordingsController < ApplicationController
     @moment_links = moment_links?
     @listening_controls = listening_controls?
     @early_play = early_play?
+    @check_mode = Flipper.enabled?(:f140_check_mode, current_user)
     @moment = moment_link if @moment_links && params[:page].blank? && request.format.html?
 
     # Improve pagination query to be more efficient
