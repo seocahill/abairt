@@ -64,8 +64,13 @@ Rails.application.configure do
   # want to log everything, set the level to "debug".
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
-  # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store
+  # Redis (the abairt_redis swarm service, which ActionCable already uses) keeps the cache across
+  # deploys. The default file store lives inside the Rails container, so every deploy emptied it.
+  # A Redis error is logged and read as a cache miss, never raised into the request.
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL", "redis://localhost:6379"),
+    namespace: "abairt-cache"
+  }
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   config.active_job.queue_adapter = :solid_queue

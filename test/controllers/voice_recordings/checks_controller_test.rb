@@ -81,6 +81,6 @@ class VoiceRecordings::ChecksControllerTest < ActionDispatch::IntegrationTest
     assert_difference -> { @first.versions.count }, 2 do
       patch voice_recording_check_url(@recording, entry_id: @first.id), params: {dictionary_entry: {word_or_phrase: "fixed"}}
     end
-    assert_equal "line 1", @first.versions.first.reify.word_or_phrase
+    assert_equal "line 1", @first.edits.first.reify.word_or_phrase
   end
 end

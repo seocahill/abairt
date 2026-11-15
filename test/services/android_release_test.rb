@@ -1,6 +1,8 @@
 require "test_helper"
 
 class AndroidReleaseTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   RELEASES = [
     {"tag_name" => "v9.9.9", "published_at" => "2026-11-10T10:00:00Z"},
     {"tag_name" => "android-v0.5.0-rc1", "prerelease" => true, "published_at" => "2026-11-09T10:00:00Z"},
@@ -52,6 +54,23 @@ class AndroidReleaseTest < ActiveSupport::TestCase
 
   test "newest ignores a non-list answer" do
     assert_nil AndroidRelease.newest({"message" => "rate limited"})
+  end
+
+  test "an empty cache enqueues one refresh, however many times latest is read" do
+    Rails.stubs(:cache).returns(ActiveSupport::Cache::MemoryStore.new)
+
+    assert_enqueued_jobs 1, only: RefreshAndroidReleaseJob do
+      3.times { assert_nil AndroidRelease.latest }
+    end
+  end
+
+  test "a cached version enqueues no refresh" do
+    Rails.stubs(:cache).returns(ActiveSupport::Cache::MemoryStore.new)
+    AndroidRelease.refresh(RELEASES)
+
+    assert_no_enqueued_jobs only: RefreshAndroidReleaseJob do
+      assert_equal "0.4.1", AndroidRelease.latest.number
+    end
   end
 
   test "latest is nil when the cache fails" do

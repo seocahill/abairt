@@ -15,13 +15,25 @@ class AndroidRelease
   TAG_PREFIX = "android-v"
   CACHE_KEY = "android_release/latest"
   CACHE_TTL = 1.day
+  REFRESH_LOCK_KEY = "android_release/refresh_requested"
+  REFRESH_LOCK_TTL = 5.minutes
   TIMEOUT = 5
 
   def self.latest
-    Rails.cache.read(CACHE_KEY)
+    version = Rails.cache.read(CACHE_KEY)
+    request_refresh if version.nil?
+    version
   rescue => e
     Rails.logger.warn "AndroidRelease: cache unavailable (#{e.class})"
     nil
+  end
+
+  # An empty cache (a new cache store, an eviction) is refilled now rather than at the next hourly
+  # run. The lock stops a burst of page views from enqueuing a burst of jobs.
+  def self.request_refresh
+    return unless Rails.cache.write(REFRESH_LOCK_KEY, true, expires_in: REFRESH_LOCK_TTL, unless_exist: true)
+
+    RefreshAndroidReleaseJob.perform_later
   end
 
   def self.refresh(releases = fetch_releases)

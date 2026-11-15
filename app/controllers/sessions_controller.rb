@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
   layout "centered_layout"
 
   # Guesses against a password are cheap without this. Backed by Rails.cache,
-  # which is a file store in production and a null store in development and
+  # which is Redis in production and a null store in development and
   # test — so this protects the deployed app and is inert locally.
   rate_limit to: 10, within: 3.minutes, only: :create,
     with: -> { redirect_to login_path, alert: "An iomarca iarrachtaí. Fan nóiméad." }
