@@ -127,6 +127,7 @@ class VoiceRecordingsController < ApplicationController
 
     @moment_links = moment_links?
     @listening_controls = listening_controls?
+    @early_play = early_play?
     @moment = moment_link if @moment_links && params[:page].blank? && request.format.html?
 
     # Improve pagination query to be more efficient
@@ -311,6 +312,10 @@ class VoiceRecordingsController < ApplicationController
 
   def listening_controls?
     Flipper.enabled?(:f81_listening_controls, current_user)
+  end
+
+  def early_play?
+    Flipper.enabled?(:f125_early_play, current_user)
   end
 
   def moment_links?
