@@ -83,7 +83,19 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
 5. For UI changes, take phone (390×844) and desktop screenshots with the
    flag on, and attach them to the PR or commit them under
    `docs/screenshots/pr-<n>/`.
-6. Never change production content (transcriptions, translations,
+6. **Visual consistency check (UI changes).** New UI must look like it
+   belongs next to what is already there. Before writing markup, find the
+   existing component that does the nearest job (the current play button,
+   buttons, icons, cards, spacing, dark mode) and reuse its partial, helper
+   or Tailwind classes exactly; don't invent new sizes, colours, radii or icon
+   styles. If no component exists, copy the closest one and say so in the PR.
+   In the screenshots, show the new control **beside** the existing one it
+   sits next to, with the flag on, in light and dark, on phone and desktop,
+   and compare them: size, shape, colour, icon weight, alignment, hit area.
+   The PR must say what was reused and note any deliberate difference. A
+   mismatch you can't resolve is `needs-human`, not `ready-to-merge`. The
+   independent reviewer is also asked to check this (see Review).
+7. Never change production content (transcriptions, translations,
    dictionary entries, recordings, speaker data) and never write Irish text
    yourself. Use the Abairt connector read-only, if at all.
 
@@ -91,8 +103,9 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
 
 Before opening the PR, start a subagent that has not seen your work, give it
 the issue and the diff, and ask it for bugs, security and authorization
-gaps (Pundit), missing tests, flag leaks, n+1s and departures from
-`CLAUDE.md`. Fix what it finds and summarise the review in the PR.
+gaps (Pundit), missing tests, flag leaks, n+1s, departures from
+`CLAUDE.md`, and, for UI, anything that looks or behaves differently from
+the neighbouring existing controls (give it the screenshots). Fix what it finds and summarise the review in the PR.
 
 ## Opening and merging
 
