@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
@@ -125,6 +126,14 @@ fun SettingsScreen(viewModel: PlayerViewModel, settings: AppSettings, onBack: ()
             Text(stringResource(R.string.translations), style = MaterialTheme.typography.titleSmall)
             TranslationOption(R.string.translations_tap, TranslationMode.TAP, settings.translations, viewModel)
             TranslationOption(R.string.translations_always, TranslationMode.ALWAYS, settings.translations, viewModel)
+
+            val context = LocalContext.current
+            val version = remember { context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty() }
+            Text(
+                stringResource(R.string.app_version, version),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

@@ -19,6 +19,11 @@ production:
     queue: default
     schedule: every hour
 
+  refresh_android_release:
+    class: RefreshAndroidReleaseJob
+    queue: default
+    schedule: every hour at minute 20
+
   nightly_transcribe:
     class: NightlyTranscribeJob
     queue: default
