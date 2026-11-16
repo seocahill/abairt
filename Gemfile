@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Essential gems
 ruby '~> 3.4'
 gem 'bcrypt', '~> 3.1.7'
-gem 'puma', '~> 7.2', '>= 7.2.1'
+gem 'puma', '~> 7.2', '>= 7.2.2'
 gem 'rails', '~> 8.1.0'
 gem 'minitest', '~> 6.1'
 gem 'redis', '~> 4.0'
