@@ -69,7 +69,12 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    (`apt-get install -y ffmpeg redis-server`, start redis).
 2. Follow `CLAUDE.md` and existing patterns (Trailblazer operations,
    services/adapters, Pundit policies, RESTful controllers, Hotwire).
-3. **Every listener-, contributor- or speaker-visible change goes behind a
+3. **Admin-only changes (admin pages, admin tools, anything only an admin can
+   see) never get a flag**: ship them directly. Every admin-facing page must be
+   reachable from the admin navigation in the same PR that adds it (no page that
+   is only reachable by typing its URL), and any admin docs that describe the
+   area are updated in that PR.
+   **Every listener-, contributor- or speaker-visible change goes behind a
    Flipper flag** named `f<issue-number>_<slug>`, off by default, enabled for
    admins. The code must work with the flag on and off. Register each new
    flag with a migration in the same PR (`Flipper.add(:f<issue>_<slug>)`),

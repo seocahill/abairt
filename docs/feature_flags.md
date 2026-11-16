@@ -1,6 +1,7 @@
 # Feature flags (Flipper)
 
 Anything a listener, contributor or speaker can see ships behind a flag, off by default.
+Admin-only changes (admin pages and tools) do not use flags: ship them directly.
 
 - **Naming:** `f<issue-number>_<slug>`, e.g. `f72_example`.
 - **Check in code:** `Flipper.enabled?(:f72_example, current_user)` in a controller, view or helper. Always make the code work with the flag on and off.
