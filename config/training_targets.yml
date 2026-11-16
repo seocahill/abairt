@@ -1,0 +1,6 @@
+# Placeholder targets for the training-data progress report (hours of checked
+# audio per speaker). The owner overrides these; nothing reads them but
+# TrainingData::Progress.
+shared:
+  tts_hours_per_speaker: 10
+  asr_hours_per_speaker: 5

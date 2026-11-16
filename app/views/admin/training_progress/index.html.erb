@@ -1,0 +1,44 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900">Training data progress</h1>
+  <p class="mt-1 text-sm text-gray-500">Hours of human-checked audio per speaker against placeholder targets (TTS <%= @progress[:targets][:tts_hours_per_speaker] %> h, ASR <%= @progress[:targets][:asr_hours_per_speaker] %> h per speaker).</p>
+
+  <section class="mt-6 overflow-x-auto">
+    <table class="min-w-full bg-white shadow rounded-lg text-sm">
+      <thead class="text-left text-gray-500">
+        <tr><th class="p-3">Speaker</th><th class="p-3">Total h</th><th class="p-3">Checked h</th><th class="p-3">Lines to check</th><th class="p-3">TTS target</th><th class="p-3">ASR target</th></tr>
+      </thead>
+      <tbody>
+        <% @progress[:speakers].each do |row| %>
+          <tr class="border-t">
+            <td class="p-3 font-medium"><%= row[:name] %></td>
+            <td class="p-3"><%= row[:total_hours] %></td>
+            <td class="p-3"><%= row[:checked_hours] %></td>
+            <td class="p-3"><%= row[:lines_to_check] %> of <%= row[:lines_total] %></td>
+            <% %i[tts_progress_percent asr_progress_percent].each do |key| %>
+              <td class="p-3 w-40">
+                <div class="h-2 rounded bg-gray-200"><div class="h-2 rounded bg-blue-600" style="width: <%= row[key] %>%"></div></div>
+                <span class="text-xs text-gray-500"><%= row[key] %>%</span>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @progress[:speakers].empty? %><p class="mt-4 text-gray-700">No lines with a speaker yet.</p><% end %>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-2">Needs human work</h2>
+    <p class="text-sm text-gray-500 mb-2">Recordings with the most unchecked lines.</p>
+    <% if @progress[:needs_work].empty? %><p class="text-sm text-gray-700">Nothing waiting to be checked.</p><% end %>
+    <ul class="text-sm text-gray-700">
+      <% @progress[:needs_work].each do |item| %>
+        <% recording = @recordings[item[:voice_recording_id]] %>
+        <li>
+          <%= link_to(recording&.title.presence || "Recording ##{item[:voice_recording_id]}", voice_recording_path(item[:voice_recording_id]), class: "text-blue-700 underline") %>:
+          <%= item[:lines_to_check] %> lines
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</div>
