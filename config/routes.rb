@@ -119,6 +119,7 @@ Rails.application.routes.draw do
     get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
 
     resources :asr, only: [:index]
+    resources :training_progress, only: [:index]
 
     get "island_context_playground", to: "island_context_playground#index", as: :island_context_playground
 
