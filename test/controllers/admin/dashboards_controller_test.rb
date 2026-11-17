@@ -42,6 +42,17 @@ module Admin
       assert_select "nav[aria-label=Admin]", false
     end
 
+    test "the main menu has an Admin link for admins only" do
+      get home_path
+      assert_select "a[href=?]", "/admin", false
+      sign_in_as(users(:two))
+      get home_path
+      assert_select "a[href=?]", "/admin", false
+      sign_in_as(@admin)
+      get home_path
+      assert_select "nav a[href=?]", "/admin"
+    end
+
     private
 
     def sign_in_as(user)
