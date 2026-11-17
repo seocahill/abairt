@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   PAGE_SIZE = 15
 
-  helper_method :current_user, :admin_user?
+  helper_method :current_user, :admin_user?, :admin_page?
   before_action :set_paper_trail_whodunnit
   after_action :verify_authorized, except: [:index, :show], unless: :rails_engine_controller?
 
@@ -29,6 +29,10 @@ class ApplicationController < ActionController::Base
   def admin_user?
     user = User.find_by(id: session[:user_id])
     user&.admin?
+  end
+
+  def admin_page?
+    controller_path.start_with?("admin/") || controller_path == "admin_emails"
   end
 
   def root_redirect
