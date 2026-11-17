@@ -1,0 +1,20 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900">Admin</h1>
+  <p class="mt-1 text-sm text-gray-500">Every admin page in one place.</p>
+
+  <% @sections.each do |section| %>
+    <section class="mt-8">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase"><%= section.title %></h2>
+      <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <% section.items.each do |item| %>
+          <li>
+            <%= link_to item.path, class: "block min-h-12 p-4 bg-white shadow rounded-lg hover:bg-gray-50" do %>
+              <span class="block font-medium text-gray-900"><%= item.title %></span>
+              <span class="block mt-1 text-sm text-gray-500"><%= item.description %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+</div>

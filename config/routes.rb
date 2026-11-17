@@ -116,6 +116,8 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    root to: "dashboards#show"
+
     get "data_dashboard", to: "data_dashboard#index", as: :data_dashboard
 
     resources :asr, only: [:index]
