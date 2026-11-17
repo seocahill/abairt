@@ -327,6 +327,7 @@ export default class extends Controller {
 
     } catch (error) {
       this.pendingLine = null;
+      this.removePlaceholder();
       console.error('Error initializing waveform:', error);
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = true;
     }
@@ -394,6 +395,10 @@ export default class extends Controller {
   }
 
   setupWaveformEventListeners() {
+    // Stored peaks draw before the media is playable, and phones never report
+    // "ready" with metadata-only preload, so the placeholder must not wait for it.
+    this.waveSurfer.on('waveform-ready', () => this.removePlaceholder());
+
     this.waveSurfer.on('ready', () => {
       this.isReady = true;
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = false;
