@@ -73,7 +73,8 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    Flipper flag** named `f<issue-number>_<slug>`, off by default, enabled for
    admins. The code must work with the flag on and off. Register each new
    flag with a migration in the same PR (`Flipper.add(:f<issue>_<slug>)`),
-   so it appears, switched off, in the owner's `/flipper` list: Flipper only
+   and add its one-line description to `config/flipper_descriptions.yml` (a test fails
+   without it; `/flipper` links the issue). Registering makes it appear, switched off, in the owner's `/flipper` list: Flipper only
    lists features it knows about, not ones that are merely checked in code. (Until Flipper is
    installed, the only buildable visible feature is the foundations issue
    that installs it.)
