@@ -22,4 +22,22 @@ class FlipperDescriptionsTest < ActiveSupport::TestCase
     assert_empty FlipperDescriptions.new.for_ui(["nope"])
     assert_nil FlipperDescriptions.new.issue_url("plain_flag")
   end
+
+  test "escapes HTML in descriptions" do
+    file = Tempfile.new(["descriptions", ".yml"])
+    file.write({"f1_x" => "<script>x</script>"}.to_yaml)
+    file.flush
+    html = FlipperDescriptions.new(file.path).for_ui(["f1_x"])["f1_x"]
+    assert_includes html, "&lt;script&gt;"
+    refute_includes html, "<script>"
+  ensure
+    file&.close!
+  end
+
+  test "an empty file gives no descriptions" do
+    file = Tempfile.new(["descriptions", ".yml"])
+    assert_empty FlipperDescriptions.new(file.path).for_ui(["f1_x"])
+  ensure
+    file&.close!
+  end
 end

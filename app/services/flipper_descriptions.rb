@@ -11,7 +11,7 @@ class FlipperDescriptions
   end
 
   def descriptions
-    YAML.safe_load_file(@path)
+    YAML.safe_load_file(@path) || {}
   end
 
   def issue_url(flag)
@@ -20,10 +20,13 @@ class FlipperDescriptions
   end
 
   # Shape expected by Flipper::UI's descriptions_source: {"flag" => "html"}.
+  # The list page strips links, so the URL is also shown as plain text there.
   def for_ui(keys)
     descriptions.slice(*keys.map(&:to_s)).to_h do |flag, text|
       url = issue_url(flag)
-      [flag, url ? "#{ERB::Util.html_escape(text)} <a href=\"#{url}\">Issue ##{url.split("/").last}</a>" : ERB::Util.html_escape(text)]
+      html = ERB::Util.html_escape(text)
+      html = "#{html} <a href=\"#{url}\">#{url}</a>".html_safe if url
+      [flag, html.to_str]
     end
   end
 end

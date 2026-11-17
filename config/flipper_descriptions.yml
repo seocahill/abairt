@@ -1,6 +1,6 @@
 # One plain-English line per Flipper flag: what you'd see change and where to
 # try it. The issue link is built from the number in the flag name.
-# Every flag registered with Flipper.add must have an entry (see test/flipper_descriptions_test.rb).
+# Every flag registered with Flipper.add must have an entry (see test/services/flipper_descriptions_test.rb).
 f75_asr_eval: "Admin page /admin/asr: word and character error rates for speech recognition on the frozen evaluation set."
 f81_listening_controls: "Extra player controls on recording pages: tap a line to jump to it, replay or loop a line, keyboard and lock-screen controls."
 f82_moment_links: "Share a link to a moment in a recording, and show the speaker's credit on phones. Try it on a recording page."

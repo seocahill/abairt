@@ -33,7 +33,7 @@ class FlipperUiTest < ActionDispatch::IntegrationTest
     get "/flipper/features"
     assert_response :success
     assert_match "tap a line to jump", response.body
-    assert_match "Issue #81", response.body
+    assert_match "github.com/seocahill/abairt/issues/81", response.body
 
     get "/flipper/features/f81_listening_controls"
     assert_response :success
