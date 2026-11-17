@@ -90,6 +90,20 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller='audio-player']"
   end
 
+  test "listening controls match the player: svg icons, labels, pressed state, 44px hit areas" do
+    Flipper.enable(:f81_listening_controls)
+    get voice_recording_path(@voice_recording)
+    assert_select "[aria-label='Listening controls'] button svg", 4
+    assert_select "[aria-label='Loop line'][aria-pressed='false'].min-h-\\[44px\\]"
+    assert_select "[data-waveform-target='playButton'].min-h-\\[44px\\]"
+  end
+
+  test "play button is unchanged with the flag off" do
+    Flipper.disable(:f81_listening_controls)
+    get voice_recording_path(@voice_recording)
+    assert_select "[data-waveform-target='playButton'].min-h-\\[44px\\]", false
+  end
+
   test "listening controls appear with the flag on" do
     add_timed_entries(3)
     Flipper.enable(:f81_listening_controls)
