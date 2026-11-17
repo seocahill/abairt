@@ -24,6 +24,22 @@ class FlipperUiTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "admin sees each flag's description and issue link" do
+    admin = users(:admin)
+    admin.regenerate_login_token
+    post login_path, params: {token: admin.login_token}
+    Flipper.add(:f81_listening_controls)
+
+    get "/flipper/features"
+    assert_response :success
+    assert_match "tap a line to jump", response.body
+    assert_match "github.com/seocahill/abairt/issues/81", response.body
+
+    get "/flipper/features/f81_listening_controls"
+    assert_response :success
+    assert_match "github.com/seocahill/abairt/issues/81", response.body
+  end
+
   test "unconfirmed admin gets a 404 at /flipper" do
     admin = users(:admin)
     admin.update_columns(confirmed: false)

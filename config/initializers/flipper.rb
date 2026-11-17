@@ -38,3 +38,9 @@ end
 Flipper.register(:admins) do |actor|
   actor.respond_to?(:admin?) && actor.admin? && actor.confirmed?
 end
+
+# Show what each flag does, and a link to its issue, in /flipper.
+Flipper::UI.configure do |config|
+  config.show_feature_description_in_list = true
+  config.descriptions_source = ->(keys) { FlipperDescriptions.new.for_ui(keys) }
+end
