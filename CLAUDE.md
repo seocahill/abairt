@@ -41,7 +41,9 @@ Repeat until code is clean, performant and maintainable
 - **Architect** (weekly): `docs/product/ARCHITECT.md`. Proposes, never codes.
 - **Builder** (nightly): `docs/product/BUILDER.md`. Builds approved issues.
 - The owner's decisions and preferences: `docs/product/DECISIONS.md`.
-- Learner/contributor-visible changes go behind a Flipper flag.
+- Listener/contributor/speaker-visible changes go behind a Flipper flag.
+  Admin-only changes (admin pages, admin tools, anything only an admin can
+  see) do NOT use a flag: ship them directly.
 - Never write or "correct" dialect content (Irish forms, transcriptions,
   translations, glosses). That is the owner's and native speakers' domain.
 - Default branch is `master`; it deploys to production once the `Test`

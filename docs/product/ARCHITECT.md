@@ -139,7 +139,8 @@ sources) and cite it in proposals. Starting points, to verify, not assume:
   tests, performance fixes with no visible change, flag cleanup, CI fixes,
   pipeline retry/robustness fixes with no visible change.
 - **Tier 2 — builds without asking, ships dark** (`auto` + `proposal`):
-  anything a listener, contributor or speaker can see or feel. It goes
+  anything a listener, contributor or speaker can see or feel (not
+  admin-only changes: those are tier 1 and never get a flag). It goes
   behind a Flipper flag, off by default and on for admins, and the builder
   merges it on green CI. The owner switches the flag on for everyone (list
   the flags waiting for that in the digest, with a one-line recommendation

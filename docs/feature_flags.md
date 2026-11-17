@@ -1,6 +1,7 @@
 # Feature flags (Flipper)
 
 Anything a listener, contributor or speaker can see ships behind a flag, off by default.
+Admin-only changes (admin pages and tools) do not use flags: ship them directly.
 
 - **Naming:** `f<issue-number>_<slug>`, e.g. `f72_example`.
 - **Describe it:** add one plain-English line (what changes, where to try it) to `config/flipper_descriptions.yml` in the same PR. `/flipper` shows it with a link to the issue (built from the number in the name); a test fails if a flag has no description.
