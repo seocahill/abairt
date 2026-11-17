@@ -327,6 +327,7 @@ export default class extends Controller {
 
     } catch (error) {
       this.pendingLine = null;
+      this.removePlaceholder();
       console.error('Error initializing waveform:', error);
       if (this.hasPlayButtonTarget) this.playButtonTarget.disabled = true;
     }
