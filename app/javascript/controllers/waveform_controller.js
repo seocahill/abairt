@@ -115,10 +115,6 @@ export default class extends Controller {
     this.looping = !this.looping;
     if (this.hasLoopButtonTarget) {
       this.loopButtonTarget.setAttribute('aria-pressed', String(this.looping));
-      this.loopButtonTarget.classList.toggle('bg-blue-600', this.looping);
-      this.loopButtonTarget.classList.toggle('bg-gray-100', !this.looping);
-      this.loopButtonTarget.classList.toggle('text-gray-700', !this.looping);
-      this.loopButtonTarget.classList.toggle('text-white', this.looping);
     }
     this.loopLine = this.looping ? this.activeLine() : null;
   }
