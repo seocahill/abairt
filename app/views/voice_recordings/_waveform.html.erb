@@ -68,7 +68,7 @@
       <!-- Play/Pause Button -->
       <button data-waveform-target="playButton"
               data-action="click->waveform#play"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg flex items-center gap-2 min-w-[90px] justify-center disabled:opacity-50 text-sm"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg flex items-center gap-2 min-w-[90px] justify-center disabled:opacity-50 text-sm<%= " min-h-[44px]" if @listening_controls %>"
               disabled>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
