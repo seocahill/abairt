@@ -82,4 +82,34 @@ class SearchToMomentTest < ActionDispatch::IntegrationTest
     get voice_recordings_url(search: "kettle?", view: "list")
     assert_response :success
   end
+
+  test "flag on: links use the exact start so a line starting at 42.449 resolves to itself" do
+    Flipper.enable(:f170_search_to_moment)
+    speaker = users(:one)
+    precise = DictionaryEntry.create!(voice_recording: @recording, speaker: speaker, owner: speaker,
+      word_or_phrase: "teapot ready", region_start: 42.449, region_end: 43.0)
+    DictionaryEntry.connection.execute("INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase) VALUES (#{precise.id}, '', 'teapot ready')")
+    get voice_recordings_url(search: "teapot", view: "list")
+    assert_select "a[href='#{voice_recording_path(@recording, t: 42.449)}']"
+    assert_equal precise, MomentLink.new(@recording, 42.449).entry
+  end
+
+  test "flag on: only three lines are listed per recording" do
+    Flipper.enable(:f170_search_to_moment)
+    speaker = users(:one)
+    5.times do |i|
+      e = DictionaryEntry.create!(voice_recording: @recording, speaker: speaker, owner: speaker,
+        word_or_phrase: "spoon #{i}", region_start: 100 + i, region_end: 101 + i)
+      DictionaryEntry.connection.execute("INSERT INTO fts_dictionary_entries(rowid, translation, word_or_phrase) VALUES (#{e.id}, '', 'spoon #{i}')")
+    end
+    get voice_recordings_url(search: "spoon", view: "list")
+    assert_select "ul li a[href*='t=']", 3
+  end
+
+  test "flag on: an entry without a start time links to the plain recording" do
+    Flipper.enable(:f170_search_to_moment)
+    @kettle.update_columns(region_start: nil)
+    get dictionary_entries_url(search: "kettle", show_all: "1")
+    assert_select "a[href='#{voice_recording_path(@recording)}']"
+  end
 end

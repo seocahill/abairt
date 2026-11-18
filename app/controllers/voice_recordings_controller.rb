@@ -2,6 +2,7 @@ class VoiceRecordingsController < ApplicationController
   before_action :set_voice_recording, only: %i[show edit update destroy add_region import_status retranscribe autocorrect]
   skip_after_action :verify_authorized, only: [:tags]
   PAGE_SIZE = 15 # Define the constant at the top of the controller
+  LINES_PER_RECORDING = 3
 
   def index
     @new_voice_recording = VoiceRecording.new
@@ -330,8 +331,6 @@ class VoiceRecordingsController < ApplicationController
     Flipper.enabled?(:f82_moment_links, current_user)
   end
 
-  LINES_PER_RECORDING = 3
-
   # The first few lines that match the search, per recording on this page.
   def matching_lines(recordings)
     DictionaryEntry.search(params[:search])
@@ -339,7 +338,7 @@ class VoiceRecordingsController < ApplicationController
       .where.not(region_start: nil)
       .limit(200)
       .group_by(&:voice_recording_id)
-      .transform_values { |lines| lines.first(LINES_PER_RECORDING) }
+      .transform_values { |lines| lines.sort_by(&:region_start).first(LINES_PER_RECORDING) }
   end
 
   # The moment a shared link points at, if the flag is on and `t` makes sense.
