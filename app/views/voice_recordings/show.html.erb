@@ -258,6 +258,19 @@
         <%= link_to "Check this recording", voice_recording_check_path(@recording),
             class: "mb-3 md:mb-4 w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center" %>
       <% end %>
+      <% if search_to_moment? %>
+        <%= form_with url: voice_recording_path(@recording), method: :get, class: "mb-3 md:mb-4 flex gap-2" do %>
+          <%= search_field_tag :q, params[:q], placeholder: "Search this recording", "aria-label": "Search this recording",
+              class: "flex-1 min-h-[44px] rounded border border-gray-300 px-3 py-2 text-sm" %>
+          <%= submit_tag "Search", name: nil, class: "bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px]" %>
+        <% end %>
+        <% if params[:q].present? %>
+          <p class="mb-3 text-sm text-gray-600">
+            <%= pluralize(@pagy.count, "line") %> match.
+            <%= link_to "Show all lines", voice_recording_path(@recording), class: "text-blue-600 hover:text-blue-800" %>
+          </p>
+        <% end %>
+      <% end %>
       <div id="entries-container" class="space-y-3 md:space-y-4" data-infinite-scroll-target="container">
         <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries,
                   locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording} %>

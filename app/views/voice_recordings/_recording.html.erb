@@ -82,6 +82,21 @@
         </div>
       </div>
 
+      <% if (lines = @line_matches&.dig(recording.id)).present? %>
+        <ul class="mt-3 space-y-1 text-sm">
+          <% lines.each do |line| %>
+            <li>
+              <%= link_to voice_recording_path(recording, t: line.region_start.to_f.round(1)),
+                  class: "text-indigo-700 hover:text-indigo-900",
+                  data: { turbo_frame: "_top" } do %>
+                <span class="font-mono text-xs text-gray-500"><%= format_duration(line.region_start) %></span>
+                <%= line.word_or_phrase %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
       <!-- Topics -->
       <% if recording.tag_list.any? %>
         <div class="mt-3 flex flex-wrap gap-1">

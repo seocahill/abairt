@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   PAGE_SIZE = 15
 
-  helper_method :current_user, :admin_user?, :admin_page?
+  helper_method :current_user, :admin_user?, :admin_page?, :search_to_moment?
   before_action :set_paper_trail_whodunnit
   after_action :verify_authorized, except: [:index, :show], unless: :rails_engine_controller?
 
@@ -49,6 +49,12 @@ class ApplicationController < ActionController::Base
     unless user&.admin?
       redirect_to root_path, alert: 'Ní féidir leat an leathanach sin a rochtain.'
     end
+  end
+
+  # Search results open recordings at the matching line (flag f170).
+  def search_to_moment?
+    return @search_to_moment if defined?(@search_to_moment)
+    @search_to_moment = Flipper.enabled?(:f170_search_to_moment, current_user)
   end
 
   private
