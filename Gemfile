@@ -26,7 +26,7 @@ gem 'importmap-rails', '~> 2.2.3'
 gem 'trailblazer-operation', '~> 0.11.1'
 gem 'trailblazer-developer', group: :development
 gem 'solid_queue', '~> 1.7'
-gem 'mission_control-jobs', '~> 0.1'
+gem 'mission_control-jobs', '~> 1.3'
 gem 'mailjet', '~> 1.9'
 gem 'alba', '~> 4.0'
 gem 'oj', '~> 3.17', '>= 3.17.3'
