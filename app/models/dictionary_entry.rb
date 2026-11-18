@@ -60,10 +60,23 @@ class DictionaryEntry < ApplicationRecord
   # Entries whose Irish contains the given words, best match first. Searched as
   # a phrase in the full-text index, so accents and case don't matter.
   scope :matching_irish, ->(text) {
-    phrase = text.to_s.delete('"').squish
+    search = DictionarySearch.new(text)
+    next none if search.blank?
+
     joins(:fts_dictionary_entries)
-      .where("fts_dictionary_entries MATCH ?", %(word_or_phrase : "#{phrase}"))
+      .where("fts_dictionary_entries MATCH ?", search.phrase_expression(column: :word_or_phrase))
       .reorder("rank")
+  }
+
+  # Full-text search of Irish and English, best match first. Safe for any typed text.
+  scope :search, ->(text) {
+    search = DictionarySearch.new(text)
+    next none if search.blank?
+
+    joins(:fts_dictionary_entries)
+      .where("fts_dictionary_entries MATCH ?", search.expression)
+      .distinct
+      .order("rank")
   }
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }

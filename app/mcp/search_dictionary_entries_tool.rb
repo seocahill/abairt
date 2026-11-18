@@ -24,11 +24,8 @@ class SearchDictionaryEntriesTool < ApplicationTool
     accuracy_status: nil, has_audio: nil, limit: 20)
     guard do
       records = DictionaryEntry
-        .joins(:fts_dictionary_entries)
-        .where("fts_dictionary_entries match ?", query)
+        .search(query)
         .includes(:speaker, :translator, :tags, :voice_recording, media_attachment: :blob)
-        .distinct
-        .order("rank")
         .limit(limit.to_i.clamp(1, 50))
 
       records = records.joins(:speaker).where(users: {dialect: dialect}) if dialect.present?
