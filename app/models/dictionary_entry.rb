@@ -76,7 +76,7 @@ class DictionaryEntry < ApplicationRecord
     joins(:fts_dictionary_entries)
       .where("fts_dictionary_entries MATCH ?", search.expression)
       .distinct
-      .order("rank")
+      .reorder("rank")
   }
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }

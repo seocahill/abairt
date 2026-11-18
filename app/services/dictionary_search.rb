@@ -9,7 +9,7 @@
 #   # => "word_or_phrase : \"a bhean\""
 class DictionarySearch
   def initialize(text)
-    @terms = text.to_s.scan(/[\p{L}\p{N}]+/)
+    @terms = text.to_s.scan(/[\p{L}\p{M}\p{N}]+/)
   end
 
   def blank?

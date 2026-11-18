@@ -20,6 +20,10 @@ class DictionarySearchTest < ActiveSupport::TestCase
     assert_equal '"fáilte"', DictionarySearch.new("fáilte!").expression
   end
 
+  test "decomposed accents stay in one term" do
+    assert_equal %("fa\u0301ilte"), DictionarySearch.new("fa\u0301ilte").expression
+  end
+
   test "blank for empty or punctuation-only text" do
     assert DictionarySearch.new(nil).blank?
     assert DictionarySearch.new("  ?! ").blank?
