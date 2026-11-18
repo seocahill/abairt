@@ -264,7 +264,10 @@ GEM
     oj (3.17.8)
       bigdecimal (>= 3.0)
     ostruct (0.6.3)
-    pagy (5.2.3)
+    pagy (43.8.2)
+      json
+      uri
+      yaml
     paper_trail (17.0.0)
       activerecord (>= 7.1)
       request_store (~> 1.4)
@@ -502,6 +505,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yajl-ruby (1.4.3)
+    yaml (0.4.0)
     zeitwerk (2.8.3)
 
 PLATFORMS
@@ -539,7 +543,7 @@ DEPENDENCIES
   multi_json (~> 1.21)
   oj (~> 3.17, >= 3.17.3)
   ostruct
-  pagy (~> 5.2.1)
+  pagy (~> 43.8.2)
   paper_trail (~> 17.0)
   pdf-reader (~> 2.16)
   pry-byebug (~> 3.8)
