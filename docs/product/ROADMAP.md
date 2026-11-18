@@ -12,6 +12,10 @@ Maintained by the architect (see `ARCHITECT.md`). Owner edits welcome.
 - #140 Check mode: step through unchecked lines, confirm-and-next (tier 2, flag `f140_check_mode`)
 - #141 Keep every version of a segment, including original ASR text (tier 1 `auto`)
 - #142 Training-data progress report per speaker (tier 2, flag `f142_training_progress`)
+- #169 Dictionary search must never error: shared query sanitiser (tier 1 `auto`)
+- #170 Search results open the recording at the matching line, plus search inside a transcript (tier 2, flag `f170_search_to_moment`)
+- #171 Mutation-aware Irish search: root forms find lenited/eclipsed forms (tier 2, flag `f171_mutation_search`)
+- #172 Place pages: browse recordings and speakers by place (tier 2, flag `f172_place_pages`)
 - #123 Asset caching (PR #135 in review; vendoring CDN JS still needs `bin/importmap pin --download` run outside the sandbox)
 
 ## Next (proposed, awaiting decision)
@@ -42,3 +46,4 @@ Shipped since last update: #72 flags, #73 security scans, #75 ASR eval, #80 fast
 | 2026-11-07 | 1. Transcription pipeline (plus week-one foundations) | #72 Flipper, #73 security scans (auto), #74 analytics, #75 ASR eval/WER |
 | 2026-11-08 | 2. Listening experience and mobile UX | #80 fast-start playback (auto), #81 listening controls, #82 moment links + phone header |
 | 2026-11-15 | 3. Contributor and editor workflows | #140 check mode, #141 full segment history (auto), #142 training-data progress |
+| 2026-11-18 | 4. Search, dictionary and discovery | #169 search never errors (auto), #170 search to moment, #171 mutation-aware search, #172 place pages |
