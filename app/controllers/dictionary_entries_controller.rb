@@ -16,7 +16,7 @@ class DictionaryEntriesController < ApplicationController
     end
 
     if params[:search].present?
-      records = records.joins(:fts_dictionary_entries).where("fts_dictionary_entries match ?", params[:search]).distinct.order('rank')
+      records = records.search(params[:search])
     end
 
     if params[:tag].present?
