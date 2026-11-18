@@ -19,7 +19,7 @@
     <!-- Play button + Audio -->
     <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 p-5 flex items-center gap-4"
          data-controller="card-player"
-         data-card-player-url-value="<%= url_for(recording.media) %>">
+         data-card-player-url-value="<%= recording.media.url %>">
       <button data-action="click->card-player#toggle"
               data-card-player-target="button"
               class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors flex-shrink-0">

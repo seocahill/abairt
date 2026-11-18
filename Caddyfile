@@ -7,6 +7,9 @@
 }
 abairt.com {
     # Simple reverse proxy for everything
+    # Compress HTML, JSON, CSS and JS (also the peaks JSON)
+    encode zstd gzip
+
     reverse_proxy rails:3000
 
     # Add caching for static assets
