@@ -2,6 +2,7 @@ class VoiceRecordingsController < ApplicationController
   before_action :set_voice_recording, only: %i[show edit update destroy add_region import_status retranscribe autocorrect]
   skip_after_action :verify_authorized, only: [:tags]
   PAGE_SIZE = 15 # Define the constant at the top of the controller
+  LINES_PER_RECORDING = 3
 
   def index
     @new_voice_recording = VoiceRecording.new
@@ -17,6 +18,10 @@ class VoiceRecordingsController < ApplicationController
         .joins(:users)
         .where("title LIKE ?", "%#{params[:search]}%")
         .or(VoiceRecording.joins(:users).where("users.name LIKE ?", "%#{params[:search]}%"))
+      if search_to_moment?
+        spoken = DictionaryEntry.search(params[:search]).reorder(nil).select(:voice_recording_id)
+        records = records.or(VoiceRecording.joins(:users).where(id: spoken))
+      end
     end
 
     if params[:tag].present?
@@ -45,6 +50,7 @@ class VoiceRecordingsController < ApplicationController
 
     @total_count = records.distinct.count
     @pagy, @recordings = pagy(records.distinct.includes(:tags, :users), items: PAGE_SIZE)
+    @line_matches = matching_lines(@recordings) if search_to_moment? && params[:search].present?
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 
@@ -129,11 +135,13 @@ class VoiceRecordingsController < ApplicationController
     @listening_controls = listening_controls?
     @early_play = early_play?
     @check_mode = Flipper.enabled?(:f140_check_mode, current_user)
-    @moment = moment_link if @moment_links && params[:page].blank? && request.format.html?
+    @moment = moment_link if (@moment_links || search_to_moment?) && params[:q].blank? && params[:page].blank? && request.format.html?
 
     # Improve pagination query to be more efficient
+    lines = @recording.dictionary_entries
+    lines = lines.search(params[:q]) if search_to_moment? && params[:q].present?
     @pagy, @entries = pagy(
-      @recording.dictionary_entries
+      lines
         .includes(:speaker, :versions, media_attachment: :blob)
         .where.not(id: nil)
         .reorder(:region_start),
@@ -321,6 +329,16 @@ class VoiceRecordingsController < ApplicationController
 
   def moment_links?
     Flipper.enabled?(:f82_moment_links, current_user)
+  end
+
+  # The first few lines that match the search, per recording on this page.
+  def matching_lines(recordings)
+    DictionaryEntry.search(params[:search])
+      .where(voice_recording_id: recordings.map(&:id))
+      .where.not(region_start: nil)
+      .limit(200)
+      .group_by(&:voice_recording_id)
+      .transform_values { |lines| lines.sort_by(&:region_start).first(LINES_PER_RECORDING) }
   end
 
   # The moment a shared link points at, if the flag is on and `t` makes sense.

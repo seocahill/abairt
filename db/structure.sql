@@ -275,6 +275,7 @@ FOREIGN KEY ("asr_eval_set_id")
 );
 CREATE INDEX "index_asr_eval_runs_on_asr_eval_set_id" ON "asr_eval_runs" ("asr_eval_set_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118230000'),
 ('20261116090000'),
 ('20261115180000'),
 ('20261115150100'),
