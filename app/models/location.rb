@@ -66,7 +66,7 @@ class Location < ApplicationRecord
   # Named speakers heard in this place's recordings.
   def speakers
     User.where(id: DictionaryEntry.where(voice_recording_id: all_voice_recordings.select(:id)).select(:speaker_id))
-      .where.not(role: [:temporary, :ai]).order(:name).to_a
+      .where.not(role: [:temporary, :ai, :place]).where.not(name: [nil, ""]).order(:name).to_a
   end
 
   def coordinates

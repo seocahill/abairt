@@ -11,7 +11,7 @@
       speaker_names = recording.users.reject(&:temporary?).map(&:name)
     end
 
-    dialects = recording.users.pluck(:dialect).uniq.compact.reject(&:blank?)
+    dialects = recording.users.map(&:dialect).uniq.compact.reject(&:blank?)
     duration = recording.dictionary_entries.maximum(:region_end)
   %>
 

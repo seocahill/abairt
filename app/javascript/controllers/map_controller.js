@@ -106,7 +106,7 @@ export default class extends Controller {
         marker = L.marker([pin.lat, pin.lng]);
         content = `
           <div class="text-center">
-            <strong>${pin.location_id ? `<a href="/locations/${pin.location_id}">${pin.location_name}</a>` : (pin.location_name || '')}</strong><br>
+            <strong>${pin.location_id ? `<a href="/locations/${pin.location_id}">${this.escape(pin.location_name)}</a>` : this.escape(pin.location_name || '')}</strong><br>
             <a href="/voice_recordings/${pin.recording_id}">${pin.recording_title}</a>
           </div>
         `;
@@ -147,6 +147,12 @@ export default class extends Controller {
 
     // Fix map display issues
     this.map.invalidateSize()
+  }
+
+  escape(text) {
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
   }
 
   addMarker(latlng) {
