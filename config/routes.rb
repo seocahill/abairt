@@ -107,6 +107,8 @@ Rails.application.routes.draw do
 
   resources :tags
 
+  resources :locations, only: [:show]
+
   resources :users do
     member do
       post :generate_api_token

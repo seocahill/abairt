@@ -1,0 +1,35 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8 flex items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900"><%= @location.name %></h1>
+        <% if @location.irish_name.present? && @location.irish_name != @location.name %>
+          <p class="mt-2 text-sm text-gray-600"><%= @location.irish_name %></p>
+        <% end %>
+      </div>
+      <%= link_to "Back to Recordings", voice_recordings_path,
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+    </div>
+
+    <% if @pins.any? %>
+      <div class="mb-8 rounded-lg border border-gray-200 overflow-hidden">
+        <div id="map" data-controller="map" data-map-pins-value="<%= @pins.to_json %>" class="h-64"></div>
+      </div>
+    <% end %>
+
+    <% if @speakers.any? %>
+      <h2 class="text-lg font-semibold text-gray-900 mb-3">Speakers</h2>
+      <div class="mb-8 flex flex-wrap gap-2" id="place-speakers">
+        <% @speakers.each do |speaker| %>
+          <span class="px-3 py-1 rounded-full text-sm bg-indigo-50 text-indigo-700"><%= speaker.name %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <h2 class="text-lg font-semibold text-gray-900 mb-3">Recordings</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="recordings-container">
+      <%= render partial: "voice_recordings/recording", collection: @recordings, as: :recording %>
+    </div>
+    <%= render "shared/pagination", pagy: @pagy, infinite_scroll: false if @pagy.next %>
+  </div>
+</div>

@@ -234,7 +234,11 @@
                   <div class="space-y-1">
                     <% @recording.voice_recording_locations.by_confidence.each do |vrl| %>
                       <div class="flex items-center justify-between py-1">
-                        <span class="text-sm text-gray-900"><%= vrl.location.full_name %></span>
+                        <% if Flipper.enabled?(:f172_place_pages, current_user) %>
+                          <%= link_to vrl.location.full_name, location_path(vrl.location), class: "text-sm text-indigo-700 hover:text-indigo-900" %>
+                        <% else %>
+                          <span class="text-sm text-gray-900"><%= vrl.location.full_name %></span>
+                        <% end %>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                           <%= vrl.confidence %>
                         </span>
