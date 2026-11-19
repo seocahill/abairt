@@ -32,6 +32,10 @@ module Abairt
     config.active_job.queue_adapter = :solid_queue
     config.solid_queue.connects_to = { database: { writing: :queue } }
 
+    # /jobs is already restricted to admins by AdminConstraint in routes; Mission Control's own
+    # HTTP basic auth (on by default since 1.0) would answer 401 to them.
+    config.mission_control.jobs.http_basic_auth_enabled = false
+
     # Host headers the MCP transport accepts besides loopback (DNS rebinding protection, mcp >= 1.x).
     config.x.mcp.allowed_hosts = %w[abairt.com www.abairt.com]
 
