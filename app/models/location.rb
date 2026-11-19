@@ -57,6 +57,18 @@ class Location < ApplicationRecord
     }
   }.freeze
 
+  # Recordings tagged to this place, either directly or through a recording location.
+  def all_voice_recordings
+    VoiceRecording.where(id: voice_recordings.select(:id))
+      .or(VoiceRecording.where(id: voice_recording_locations.select(:voice_recording_id)))
+  end
+
+  # Named speakers heard in this place's recordings.
+  def speakers
+    User.where(id: DictionaryEntry.where(voice_recording_id: all_voice_recordings.select(:id)).select(:speaker_id))
+      .where.not(role: [:temporary, :ai, :place]).where.not(name: [nil, ""]).order(:name).to_a
+  end
+
   def coordinates
     return nil unless latitude && longitude
     {lat: latitude.to_f, lng: longitude.to_f}

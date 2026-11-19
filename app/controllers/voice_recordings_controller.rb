@@ -58,8 +58,12 @@ class VoiceRecordingsController < ApplicationController
     location_pins = VoiceRecording
       .joins(:location)
       .where.not(locations: {latitude: nil, longitude: nil})
-      .pluck("voice_recordings.id", "voice_recordings.title", "locations.name", "locations.latitude", "locations.longitude")
-      .map { |id, title, name, lat, lng| {recording_id: id, recording_title: title, location_name: name, lat: lat.to_f, lng: lng.to_f} }
+      .pluck("voice_recordings.id", "voice_recordings.title", "locations.name", "locations.latitude", "locations.longitude", "locations.id")
+      .map { |id, title, name, lat, lng, location_id|
+        pin = {recording_id: id, recording_title: title, location_name: name, lat: lat.to_f, lng: lng.to_f}
+        pin[:location_id] = location_id if place_pages?
+        pin
+      }
 
     location_recording_ids = location_pins.pluck(:recording_id)
 
@@ -325,6 +329,10 @@ class VoiceRecordingsController < ApplicationController
 
   def early_play?
     Flipper.enabled?(:f125_early_play, current_user)
+  end
+
+  def place_pages?
+    Flipper.enabled?(:f172_place_pages, current_user)
   end
 
   def moment_links?
