@@ -49,7 +49,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @total_count = records.distinct.count
-    @pagy, @recordings = pagy(records.distinct.includes(:tags, :users), items: PAGE_SIZE)
+    @pagy, @recordings = pagy(:offset, records.distinct.includes(:tags, :users), limit: PAGE_SIZE)
     @line_matches = matching_lines(@recordings) if search_to_moment? && params[:search].present?
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
@@ -123,7 +123,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     # Paginate the array
-    @pagy, @tags = pagy_array(all_tags, items: 50)
+    @pagy, @tags = pagy(:offset, all_tags, limit: 50)
   end
 
   def show
@@ -149,7 +149,7 @@ class VoiceRecordingsController < ApplicationController
         .includes(:speaker, :versions, media_attachment: :blob)
         .where.not(id: nil)
         .reorder(:region_start),
-      items: PAGE_SIZE,
+      limit: PAGE_SIZE,
       page: moment_page
     )
 

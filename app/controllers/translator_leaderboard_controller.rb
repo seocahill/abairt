@@ -16,7 +16,7 @@ class TranslatorLeaderboardController < ApplicationController
     @translator = User.find(params[:id])
     @pagy, @entries = pagy(
       DictionaryEntry.where(translator: @translator).includes(:voice_recording, :speaker, :owner).order(created_at: :desc),
-      items: PAGE_SIZE
+      limit: PAGE_SIZE
     )
   end
 end

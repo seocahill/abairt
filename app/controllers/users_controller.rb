@@ -31,7 +31,7 @@ class UsersController < ApplicationController
       end
     end
 
-    @pagy, @users = pagy(records, items: 5)
+    @pagy, @users = pagy(:offset, records, limit: 5)
 
     respond_to do |format|
       format.html
@@ -55,10 +55,10 @@ class UsersController < ApplicationController
   # GET /users/1 or /users/1.json
   def show
     authorize @user
-    @pagy, @entries = pagy(@user.all_entries, items: PAGE_SIZE)
+    @pagy, @entries = pagy(:offset, @user.all_entries, limit: PAGE_SIZE)
     @new_speaker = User.new
     @template_name = "profile"
-    @pagy_users, @pending_users = pagy(User.student.where.not(confirmed: true), items: 5)
+    @pagy_users, @pending_users = pagy(:offset, User.student.where.not(confirmed: true), limit: 5)
 
     respond_to do |format|
       format.html

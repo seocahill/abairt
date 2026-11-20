@@ -16,7 +16,7 @@ module Admin
       # Authorization handled by ensure_admin
       base = params[:role] == "temporary" ? User.all : User.active
       @users = apply_scopes(base.order(created_at: :desc))
-      @pagy, @users = pagy(@users, items: params[:per_page] || 50)
+      @pagy, @users = pagy(:offset, @users, limit: (params[:per_page] || 50).to_i)
       session[:admin_users_filter] = filter_params.to_h
     end
 

@@ -39,7 +39,7 @@ class ChatBotJob < ApplicationJob
 
     # add to rang and broadcast
     rang.dictionary_entries << new_entry
-    current_page_number = Pagy.new(count: rang.dictionary_entries.size, items: 20).last
+    current_page_number = Pagy::Offset.new(count: rang.dictionary_entries.size, limit: 20).last
     Turbo::StreamsChannel.broadcast_append_to("rangs/#{rang.id}",
       target: "paginate_page_#{current_page_number}",
       partial: "rangs/message",

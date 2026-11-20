@@ -3,7 +3,7 @@
 module Admin
   # The backlog, for the founder. The speaker never sees any of this.
   class QuestionsController < ApplicationController
-    include Pagy::Backend
+    include Pagy::Method
 
     before_action :ensure_admin
     skip_after_action :verify_authorized
@@ -12,7 +12,7 @@ module Admin
       scope = Question.includes(:asker, :speaker).order(created_at: :desc)
       scope = scope.where(status: params[:status]) if params[:status].present?
 
-      @pagy, @questions = pagy(scope, items: 25)
+      @pagy, @questions = pagy(:offset, scope, limit: 25)
       @stats = Question.group(:status).count.symbolize_keys
       @speakers = User.answering
     end

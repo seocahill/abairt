@@ -2,7 +2,7 @@
 
 module Admin
   class MediaImportsController < ApplicationController
-    include Pagy::Backend
+    include Pagy::Method
 
     before_action :ensure_admin
     before_action :set_media_import, only: [:show, :edit, :update, :destroy, :process_now, :retry]
@@ -13,7 +13,7 @@ module Admin
       scope = scope.where(status: params[:status]) if params[:status].present?
       scope = scope.where("title ILIKE ? OR url ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
 
-      @pagy, @media_imports = pagy(scope, items: 25)
+      @pagy, @media_imports = pagy(:offset, scope, limit: 25)
 
       @stats = {
         total: MediaImport.count,

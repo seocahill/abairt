@@ -19,6 +19,21 @@ module Admin
       assert_redirected_to root_path
     end
 
+    test "paginates with per_page and shows Next and Previous links" do
+      get admin_users_path(per_page: 1)
+      assert_response :success
+      assert_select "a", text: "Next"
+
+      get admin_users_path(per_page: 1, page: 2)
+      assert_response :success
+      assert_select "a", text: "Previous"
+    end
+
+    test "a page past the end renders instead of raising" do
+      get admin_users_path(per_page: 1, page: 9999)
+      assert_response :success
+    end
+
     test "should list users" do
       get admin_users_path
       assert_response :success

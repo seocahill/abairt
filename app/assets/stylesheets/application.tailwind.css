@@ -4,51 +4,29 @@
 @tailwind forms;
 
 /* You can use apply here!*/
-.pagy-nav,
-.pagy-nav-js,
-.pagy-combo-nav-js {
-  @apply inline-flex shadow-md;
+/* Pagy 43 series_nav: <nav class="pagy series-nav"><a>1</a><a aria-current="page">2</a>... */
+nav.pagy {
+  @apply inline-flex shadow-md border border-gray-600 rounded-sm;
 }
 
-.pagy-nav.pagination,
-.pagy-nav-js.pagination,
-.pagy-combo-nav-js.pagination {
-  @apply border border-gray-600 rounded-sm;
-}
-
-.pagy-nav .page,
-.pagy-nav-js .page,
-.pagy-combo-nav-js .page,
-.pagy-combo-nav-js .pagy-combo-input {
+nav.pagy a {
   @apply text-gray-700 border-r border-gray-600 px-3 py-2 text-sm leading-tight font-medium;
 }
 
-.pagy-nav .page:hover,
-.pagy-nav-js .page:hover {
+nav.pagy a:last-child {
+  @apply border-r-0;
+}
+
+nav.pagy a[href]:hover {
   @apply text-gray-900;
 }
 
-.pagy-nav .disabled,
-.pagy-nav-js .disabled,
-.pagy-combo-nav-js .disabled {
+nav.pagy a[aria-disabled="true"] {
   @apply cursor-not-allowed;
 }
 
-.pagy-nav .active,
-.pagy-nav-js .active {
+nav.pagy a[aria-current="page"] {
   @apply text-blue-500;
-}
-
-.pagy-nav .prev,
-.pagy-nav-js .prev,
-.pagy-combo-nav-js .prev {
-  @apply text-gray-900;
-}
-
-.pagy-nav .next,
-.pagy-nav-js .next,
-.pagy-combo-nav-js .next {
-  @apply text-gray-900 border-r border-transparent;
 }
 
 /* Installed to the home screen, the app is only the asking half: tap the icon,

@@ -29,7 +29,7 @@ class VoiceRecordings::DictionaryEntriesController < ApplicationController
     @recording = VoiceRecording.find(params[:voice_recording_id])
     authorize @recording
 
-    @pagy, @entries = pagy(@recording.dictionary_entries.includes(:speaker, :owner).order(region_start: :asc), items: 3)
+    @pagy, @entries = pagy(:offset, @recording.dictionary_entries.includes(:speaker, :owner).order(region_start: :asc), limit: 3)
     
     respond_to do |format|
       format.html
