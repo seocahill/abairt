@@ -96,8 +96,8 @@
         <span class="font-medium"><%= @pagy.count %></span> users
       </div>
       <div class="flex space-x-2">
-        <% if @pagy.prev %>
-          <%= link_to "Previous", admin_api_index_path(page: @pagy.prev, search: params[:search]),
+        <% if @pagy.previous %>
+          <%= link_to "Previous", admin_api_index_path(page: @pagy.previous, search: params[:search]),
               class: "px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
         <% end %>
         <% if @pagy.next %>

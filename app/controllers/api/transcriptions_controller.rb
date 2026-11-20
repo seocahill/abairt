@@ -3,7 +3,7 @@
 module Api
   class TranscriptionsController < BaseController
     include HasScope
-    include Pagy::Backend
+    include Pagy::Method
 
     rate_limit to: 100, within: 1.hour, by: -> { current_api_user&.id || request.remote_ip }
 
@@ -25,13 +25,13 @@ module Api
         .includes(:speaker, :voice_recording)
         .order(updated_at: :desc)
 
-      @pagy, @entries = pagy(entries, items: params[:per_page] || 50)
+      @pagy, @entries = pagy(:offset, entries, limit: (params[:per_page] || 50).to_i)
 
       render json: {
         entries: @entries.map { |entry| Api::TranscriptionSerializer.new(entry, params: { url_helper: method(:url_for), host: request.host_with_port }).serializable_hash },
         pagination: {
           page: @pagy.page,
-          per_page: @pagy.items,
+          per_page: @pagy.limit,
           total: @pagy.count
         }
       }

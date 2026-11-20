@@ -2,7 +2,7 @@
 
 module Admin
   class ApiController < ApplicationController
-    include Pagy::Backend
+    include Pagy::Method
 
     before_action :ensure_admin
     skip_after_action :verify_authorized
@@ -11,7 +11,7 @@ module Admin
       scope = User.where.not(api_token: nil).order(updated_at: :desc)
       scope = scope.where("name ILIKE ? OR email ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
 
-      @pagy, @api_users = pagy(scope, items: 25)
+      @pagy, @api_users = pagy(:offset, scope, limit: 25)
 
       @stats = {
         total_tokens: User.where.not(api_token: nil).count,

@@ -10,7 +10,7 @@ class LocationsController < ApplicationController
     records = @location.all_voice_recordings.joins(:media_attachment).order(created_at: :desc, id: :desc)
     raise ActiveRecord::RecordNotFound if records.none?
 
-    @pagy, @recordings = pagy(records.includes(:tags, :users).with_attached_media, items: PAGE_SIZE)
+    @pagy, @recordings = pagy(:offset, records.includes(:tags, :users).with_attached_media, limit: PAGE_SIZE)
     @speakers = @location.speakers
     @pins = pins_for(@location, records.first)
   end

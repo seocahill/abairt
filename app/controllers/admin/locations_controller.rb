@@ -20,7 +20,7 @@ module Admin
         by_region: Location.group(:dialect_region).count
       }
 
-      @pagy, @locations = pagy(@locations, items: 50)
+      @pagy, @locations = pagy(:offset, @locations, limit: 50)
     end
 
     def edit

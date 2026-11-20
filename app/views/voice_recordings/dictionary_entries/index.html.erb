@@ -105,6 +105,6 @@
     <div id="entries-list" class="space-y-3 mt-8">
       <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries %>
     </div>
-    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    <%== @pagy.series_nav if @pagy.pages > 1 %>
   </div>
 </div>

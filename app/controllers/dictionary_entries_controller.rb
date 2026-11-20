@@ -35,7 +35,7 @@ class DictionaryEntriesController < ApplicationController
       @speaker_names = User.where(role: [:speaker, :teacher]).pluck(:name)
     end
 
-    @pagy, @dictionary_entries = pagy(records, items: 15)
+    @pagy, @dictionary_entries = pagy(:offset, records, limit: 15)
 
     respond_to do |format|
       format.html
