@@ -106,12 +106,21 @@ sources) and cite it in proposals. Starting points, to verify, not assume:
    comparison with the best (Mozilla Common Voice, ELAN/oTranscribe-style
    tools, YouTube/Descript transcript UX, abair.ie, Teanglann, Dúchas,
    Forvo, Language Reactor).
-3. **Write proposals** as GitHub issues using the `proposal` template. Label
+3. **Write proposals** as GitHub issues using the `proposal` template. Each
+   one must be specified well enough for the builder to build it without
+   guessing, and for anyone to check it afterwards: **exact acceptance
+   criteria** written as observable behaviours ("clicking a map pin opens that
+   speaker's place page"), the **edge cases** (missing or empty data, flag
+   off, phone width, dark mode), and a **mockup** for anything visible: an
+   HTML or Tailwind snippet built from the existing components, committed
+   under `docs/mockups/` and linked from the issue, or an ASCII layout where
+   nothing similar exists. Name the existing component each new control should
+   match. A proposal without these is not ready to open. Label
    tier 1 and tier 2 items `auto` (tier 2 also `proposal`, so the owner can
    scan them); label tier 3 items `proposal` only. At most **4 per run**,
    ranked. Don't open new ones if more than **6** tier 3 items are awaiting a
    decision, or if more than **6** `auto` issues are still unbuilt (the
-   builder takes up to 3 a run); say so in the digest. Never re-propose something `DECISIONS.md` records as rejected
+   builder takes one a run); say so in the digest. Never re-propose something `DECISIONS.md` records as rejected
    unless the evidence materially changed, and say what changed. Existing
    open issues without labels are the owner's backlog: you may fold them into
    a proposal (link them) but don't relabel them.

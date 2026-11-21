@@ -50,17 +50,20 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    `needs-human` and one line saying why.
 2. **Fix sweep.** If any of your open PRs have failing CI or unaddressed
    review comments, fix them, oldest first, then carry on to step 3.
-3. **Build, up to three issues a run, one at a time.** Take the oldest open
+3. **Build one issue a run.** Quality over throughput: one issue, finished
+   properly, beats three rushed ones. Take the oldest open
    issue labelled `approved` or `auto` that is not labelled `building`,
    `blocked` or `needs-human` and has no open PR. Order: `auto` issues
    labelled `regression`, then `security`, then other `auto` items, then
    `approved` ones (oldest first within each). Ignore every issue without one
    of those labels, whatever it says. Label it `building`, finish it
-   completely (PR opened and labelled) before starting the next, and branch
-   each one from an up-to-date `master`. Skip an issue that says it needs
-   another issue that hasn't merged yet. Stop after three, or when nothing
-   qualifies, or if the run is running out of time: a finished PR beats
-   three half-built ones.
+   completely (PR opened and labelled), and branch it from an up-to-date
+   `master`. Skip an issue that says it needs another issue that hasn't
+   merged yet. If the issue has no explicit acceptance criteria (older
+   issues won't), write them from the issue text and post them as a comment
+   on the issue before you build, so the owner and the reviewer can see what
+   "done" meant. If you can't do that without guessing, comment the specific
+   question, label it `blocked` and take the next one.
 
 ## How to build
 
@@ -89,7 +92,16 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
 5. For UI changes, take phone (390×844) and desktop screenshots with the
    flag on, and attach them to the PR or commit them under
    `docs/screenshots/pr-<n>/`.
-6. **Visual consistency check (UI changes).** New UI must look like it
+6. **Use the feature before you open the PR (visible changes).** Tests and
+   screenshots are not enough: run the app with the flag on, seeded with
+   realistic data, drive it in a real browser (Playwright), and walk through
+   **every acceptance criterion in the issue**, clicking every link, pin,
+   button and control the feature adds, and trying each edge case the issue
+   lists (empty states, missing data, flag off). The PR body carries a
+   checklist: one line per criterion, with the evidence (screenshot, test, or
+   what you clicked and where it went). A criterion you could not demonstrate
+   means the PR is `needs-human`, never `ready-to-merge`.
+7. **Visual consistency check (UI changes).** New UI must look like it
    belongs next to what is already there. Before writing markup, find the
    existing component that does the nearest job (the current play button,
    buttons, icons, cards, spacing, dark mode) and reuse its partial, helper
@@ -101,17 +113,21 @@ the `Test` workflow passes on it, so a merged PR is a shipped PR.
    The PR must say what was reused and note any deliberate difference. A
    mismatch you can't resolve is `needs-human`, not `ready-to-merge`. The
    independent reviewer is also asked to check this (see Review).
-7. Never change production content (transcriptions, translations,
+8. Never change production content (transcriptions, translations,
    dictionary entries, recordings, speaker data) and never write Irish text
    yourself. Use the Abairt connector read-only, if at all.
 
 ## Review
 
-Before opening the PR, start a subagent that has not seen your work, give it
-the issue and the diff, and ask it for bugs, security and authorization
-gaps (Pundit), missing tests, flag leaks, n+1s, departures from
-`CLAUDE.md`, and, for UI, anything that looks or behaves differently from
-the neighbouring existing controls (give it the screenshots). Fix what it finds and summarise the review in the PR.
+Before opening the PR, start a subagent that has not seen your work. Give
+it the issue (not your summary of it) and the diff, and have it **run the
+app itself with the flag on and drive the feature in a browser against each
+acceptance criterion**, rather than only reading the diff and your
+screenshots, which share your blind spots. Ask it for bugs, dead or missing
+links and controls, security and authorization gaps (Pundit), missing tests,
+flag leaks, n+1s, departures from `CLAUDE.md`, and, for UI, anything that
+looks or behaves differently from the neighbouring existing controls. Fix
+what it finds and summarise the review in the PR.
 
 ## Opening and merging
 

@@ -13,6 +13,20 @@ references, research links).
 ### What we'd build
 Plain-language description. What a learner/contributor would see.
 
+### Acceptance criteria
+Observable behaviours, one per line, each checkable by clicking through the
+feature. For example: "Clicking a map pin opens that speaker's place page."
+
+- [ ]
+
+### Edge cases
+Missing or empty data, flag off, phone width (390×844), dark mode, and
+anything else that could break it.
+
+### Mockup
+Link to an HTML or Tailwind snippet under `docs/mockups/`, or an ASCII
+layout. Name the existing component each new control should match.
+
 ### How we'll know it worked
 One measurable signal, checked ~2 weeks after the flag is turned on.
 
