@@ -11,13 +11,21 @@
 # - users.token, users.master_id, users.grupa_id: sign-in tokens live in
 #   login_token, remember_token, api_token and telegram_invite_token now
 #
-# `conversations`, `settings`, `rangs` and `rang_entries` are left alone.
+# `conversations`, `settings`, `rangs` and `rang_entries` are left alone
+# (`rangs.grupa_id` is an old plain column with no foreign key, so it simply
+# points nowhere now).
 #
 # The triggers are the catch. `remove_column` on SQLite rebuilds `users`, and
 # a rebuild silently drops the three triggers that keep user name search
 # current, so they are recreated here, verbatim from
 # 20260331213148_recreate_fts_with_virtual_tables (as DropWhatsappFromUsers
 # does).
+#
+# The rebuild also resets the AUTOINCREMENT counter for `users` to the highest
+# id still present, so if the newest accounts were deleted their ids would be
+# handed out again, and anything still pointing at them by id (versions,
+# taggings) would attach to the new person. `keeping_user_ids_unique` puts the
+# counter back.
 #
 # `down` restores the structure, empty. The rows are not coming back, so take
 # a backup before running this.
@@ -34,9 +42,9 @@ class DropLearnerEraSchema < ActiveRecord::Migration[8.1]
     remove_index :users, :token
     remove_index :users, :master_id
     remove_index :users, :grupa_id
-    remove_column :users, :token
-    remove_column :users, :master_id
-    remove_column :users, :grupa_id
+    keeping_user_ids_unique do
+      remove_columns :users, :token, :master_id, :grupa_id
+    end
 
     recreate_user_search_triggers
   end
@@ -54,6 +62,16 @@ class DropLearnerEraSchema < ActiveRecord::Migration[8.1]
   end
 
   private
+
+  # Rails rebuilds through a temporary copy, which creates a temporary
+  # sqlite_sequence that shadows the real one, hence `main.`.
+  def keeping_user_ids_unique
+    last_id = select_value("SELECT seq FROM main.sqlite_sequence WHERE name = 'users'").to_i
+    yield
+    last_id = [last_id, select_value("SELECT MAX(id) FROM users").to_i].max
+    execute "DELETE FROM main.sqlite_sequence WHERE name = 'users'"
+    execute "INSERT INTO main.sqlite_sequence (name, seq) VALUES ('users', #{last_id})"
+  end
 
   def create_learner_tables
     create_table :grupas do |t|
