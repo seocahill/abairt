@@ -234,6 +234,18 @@ module Admin
       assert_select "a", text: "New member"
     end
 
+    # The tick boxes sit in the table, outside the bulk form, so they must name
+    # it; without that the bulk buttons posted no ids and did nothing.
+    test "the tick boxes belong to the bulk form, which posts to approve or reject" do
+      get admin_users_path(kind: "members", pending: true)
+
+      assert_select "input.user-checkbox[form=bulk-users-form][name='user_ids[]'][value='#{@pending_user.id}']"
+      assert_select "form#bulk-users-form[action='#{bulk_approve_admin_users_path}']" do
+        assert_select "input[type=submit][value='Bulk Approve Selected']"
+        assert_select "input[type=submit][value='Bulk Reject Selected'][formaction='#{bulk_reject_admin_users_path}']"
+      end
+    end
+
     test "the speakers tab lists speakers with their own columns and no bulk actions" do
       get admin_users_path(kind: "speakers")
 

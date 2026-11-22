@@ -1,5 +1,7 @@
 <%# People who signed up. Approving and rejecting sign-ups happens here, one at
-    a time or ticked in bulk. %>
+    a time or ticked in bulk. The tick boxes belong to the bulk form through
+    their form attribute: the rows hold their own Approve/Reject forms, and
+    forms can't nest. %>
 <div class="admin-table-wrap mb-4">
   <table class="admin-table">
     <thead>
@@ -17,7 +19,7 @@
       <% users.each do |user| %>
         <tr>
           <td class="whitespace-nowrap">
-            <input type="checkbox" name="user_ids[]" value="<%= user.id %>" class="user-checkbox rounded" aria-label="Select <%= user.name %>">
+            <%= check_box_tag "user_ids[]", user.id, false, id: "user_ids_#{user.id}", form: "bulk-users-form", class: "user-checkbox rounded", aria: {label: "Select #{user.name}"} %>
           </td>
           <td class="whitespace-nowrap font-medium text-gray-900">
             <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
@@ -41,14 +43,11 @@
   </table>
 </div>
 
-<div class="mb-4 flex flex-wrap gap-2">
-  <%= form_with url: bulk_approve_admin_users_path, method: :post, id: "bulk-actions-form", onsubmit: "return collectCheckboxes(this)" do |form| %>
-    <%= form.submit "Bulk Approve Selected", class: admin_button_class(:positive) %>
-  <% end %>
-  <%= form_with url: bulk_reject_admin_users_path, method: :post, id: "bulk-reject-form", onsubmit: "return collectCheckboxes(this)" do |form| %>
-    <%= form.submit "Bulk Reject Selected", class: admin_button_class(:danger), data: { turbo_confirm: "Are you sure? This will delete selected users." } %>
-  <% end %>
-</div>
+<%= form_with url: bulk_approve_admin_users_path, method: :post, id: "bulk-users-form", class: "mb-4 flex flex-wrap gap-2" do |form| %>
+  <%= form.submit "Bulk Approve Selected", class: admin_button_class(:positive) %>
+  <%= form.submit "Bulk Reject Selected", formaction: bulk_reject_admin_users_path, class: admin_button_class(:danger),
+        data: { turbo_confirm: "Are you sure? This will delete selected users." } %>
+<% end %>
 
 <script>
   document.getElementById('select-all')?.addEventListener('change', function(e) {
@@ -56,17 +55,4 @@
       checkbox.checked = e.target.checked;
     });
   });
-
-  function collectCheckboxes(form) {
-    const checkboxes = document.querySelectorAll('.user-checkbox:checked');
-    const values = Array.from(checkboxes).map(cb => cb.value);
-    values.forEach(value => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'user_ids[]';
-      input.value = value;
-      form.appendChild(input);
-    });
-    return true;
-  }
 </script>
