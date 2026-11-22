@@ -109,4 +109,30 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_no_match temp_user.name, @response.body
   end
+
+  test "flag off: no password link on your own profile" do
+    get user_url(@user)
+    assert_select "#password_setting", count: 0
+  end
+
+  test "flag on: your own profile links to setting a password" do
+    Flipper.enable(:f121_simple_signup)
+    @user.update_columns(password_digest: nil)
+    get user_url(@user)
+    assert_select "#password_setting a[href=?]", edit_password_path, text: "Set a password"
+  end
+
+  test "flag on: with a password already set the link says change" do
+    Flipper.enable(:f121_simple_signup)
+    @user.update!(password: "a-long-password")
+    get user_url(@user)
+    assert_select "#password_setting a[href=?]", edit_password_path, text: "Change password"
+  end
+
+  test "flag on: someone else's profile has no password link" do
+    Flipper.enable(:f121_simple_signup)
+    get user_url(users(:two))
+    assert_response :success
+    assert_select "#password_setting", count: 0
+  end
 end

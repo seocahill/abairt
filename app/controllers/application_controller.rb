@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   PAGE_SIZE = 15
 
-  helper_method :current_user, :admin_user?, :admin_page?, :search_to_moment?
+  helper_method :current_user, :admin_user?, :admin_page?, :search_to_moment?, :simple_signup?
   before_action :set_paper_trail_whodunnit
   after_action :verify_authorized, except: [:index, :show], unless: :rails_engine_controller?
 
@@ -55,6 +55,12 @@ class ApplicationController < ActionController::Base
   def search_to_moment?
     return @search_to_moment if defined?(@search_to_moment)
     @search_to_moment = Flipper.enabled?(:f170_search_to_moment, current_user)
+  end
+
+  # Simpler sign-up and a password link on your own profile (flag f121).
+  def simple_signup?
+    return @simple_signup if defined?(@simple_signup)
+    @simple_signup = Flipper.enabled?(:f121_simple_signup, current_user)
   end
 
   private

@@ -8,3 +8,4 @@ f126_android_version: "The Android download button shows the latest app version,
 f140_check_mode: "Check mode on recordings: step through unchecked lines with audio, edit, and confirm and move on."
 f170_search_to_moment: "Search results open the recording at the matching line; search inside one recording; the recordings search also lists matching lines."
 f172_place_pages: "Place pages: tapping a place on the map or in a recording opens a page with its recordings, speakers and a small map."
+f121_simple_signup: "Sign-up asks for name and email only (no About, no Google reCAPTCHA box), shows what went wrong if it fails, and your own profile page links to setting a password."

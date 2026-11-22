@@ -33,6 +33,16 @@
                 <% end %>
               </div>
             </div>
+
+            <% if simple_signup? %>
+              <div id="password_setting">
+                <h3 class="text-sm font-medium text-gray-500">Password</h3>
+                <div class="mt-1">
+                  <%= link_to (@user.password_digest? ? "Change password" : "Set a password"), edit_password_path,
+                        class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+                </div>
+              </div>
+            <% end %>
           <% end %>
 
           <div>
