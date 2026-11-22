@@ -13,9 +13,7 @@ class AdminPagesTest < ActionDispatch::IntegrationTest
   end
 
   test "every admin page has exactly one title, from the shared header" do
-    Flipper.enable(:f75_asr_eval)
-    Flipper.enable(:f142_training_progress)
-    (admin_paths + [admin_asr_index_path, admin_training_progress_index_path]).each do |path|
+    admin_paths.each do |path|
       get path
       assert_response :success, path
       assert_select "main h1", {count: 1}, "#{path} should have one h1"
@@ -119,8 +117,8 @@ class AdminPagesTest < ActionDispatch::IntegrationTest
       admin_emails_path, new_admin_email_path, admin_email_path(email), edit_admin_email_path(email),
       admin_locations_path, edit_admin_location_path(location), admin_questions_path,
       admin_media_imports_path, new_admin_media_import_path, admin_media_import_path(media_import),
-      edit_admin_media_import_path(media_import), admin_data_dashboard_path,
-      admin_island_context_playground_path, admin_api_index_path
+      edit_admin_media_import_path(media_import), admin_data_dashboard_path, admin_asr_index_path,
+      admin_training_progress_index_path, admin_island_context_playground_path, admin_api_index_path
     ]
   end
 end

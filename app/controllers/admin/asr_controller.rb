@@ -4,7 +4,6 @@ module Admin
   # Read-only report of ASR quality (WER/CER) on the frozen evaluation set.
   class AsrController < ApplicationController
     before_action :ensure_admin
-    before_action :ensure_flag_enabled
     skip_after_action :verify_authorized
 
     def index
@@ -15,10 +14,6 @@ module Admin
     end
 
     private
-
-    def ensure_flag_enabled
-      raise ActionController::RoutingError, "Not Found" unless Flipper.enabled?(:f75_asr_eval, current_user)
-    end
 
     def latest_runs_by_provider(eval_set)
       eval_set.asr_eval_runs.order(created_at: :desc).limit(50).group_by(&:provider).values.map(&:first)

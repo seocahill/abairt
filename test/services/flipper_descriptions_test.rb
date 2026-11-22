@@ -2,13 +2,17 @@ require "test_helper"
 
 class FlipperDescriptionsTest < ActiveSupport::TestCase
   test "every flag registered with Flipper.add has a description" do
-    registered = Dir[Rails.root.join("db/migrate/*.rb")].flat_map { |f| File.read(f).scan(/Flipper\.add\(:(\w+)\)/).flatten }.uniq
-    missing = registered - FlipperDescriptions.new.descriptions.keys
+    missing = registered_flags - FlipperDescriptions.new.descriptions.keys
     assert_empty missing, "Add these to config/flipper_descriptions.yml: #{missing.join(", ")}"
   end
 
+  test "flags removed by a later migration are no longer registered" do
+    refute_includes registered_flags, "f75_asr_eval"
+    refute_includes registered_flags, "f142_training_progress"
+  end
+
   test "every flag checked in code has a description" do
-    checked = Dir[Rails.root.join("app/**/*.{rb,erb}")].flat_map { |f| File.read(f).scan(/Flipper\.enabled\?\(:(f\d+_\w+)/).flatten }.uniq
+    checked = Rails.root.glob("app/**/*.{rb,erb}").flat_map { |f| File.read(f).scan(/Flipper\.enabled\?\(:(f\d+_\w+)/).flatten }.uniq
     missing = checked - FlipperDescriptions.new.descriptions.keys
     assert_empty missing, "Add these to config/flipper_descriptions.yml: #{missing.join(", ")}"
   end
@@ -39,5 +43,16 @@ class FlipperDescriptionsTest < ActiveSupport::TestCase
     assert_empty FlipperDescriptions.new(file.path).for_ui(["f1_x"])
   ensure
     file&.close!
+  end
+
+  private
+
+  # Flags added, minus those a later migration removed, reading each
+  # migration's `up` in order.
+  def registered_flags
+    Rails.root.glob("db/migrate/*.rb").sort.each_with_object(Set.new) do |file, flags|
+      up = File.read(file)[/def up\b(.*?)^  end/m, 1].to_s
+      up.scan(/Flipper\.(add|remove)\(:(\w+)\)/).each { |action, flag| (action == "add") ? flags.add(flag) : flags.delete(flag) }
+    end.to_a
   end
 end

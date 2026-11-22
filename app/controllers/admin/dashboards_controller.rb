@@ -7,7 +7,7 @@ module Admin
     skip_after_action :verify_authorized
 
     def show
-      @sections = AdminNavigation.new(current_user).sections
+      @sections = AdminNavigation.new.sections
     end
   end
 end

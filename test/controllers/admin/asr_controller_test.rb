@@ -8,13 +8,7 @@ module Admin
       sign_in_as(@admin)
     end
 
-    test "not found with the flag off" do
-      get admin_asr_index_path
-      assert_response :not_found
-    end
-
-    test "shows the report with the flag on" do
-      Flipper.enable_actor(:f75_asr_eval, @admin)
+    test "shows an admin the report with no flag set" do
       entry = dictionary_entries(:two)
       set = AsrEvalSet.create!(name: "mayo", version: 1, frozen_at: Time.current)
       set.asr_eval_set_entries.create!(dictionary_entry: entry)
@@ -27,8 +21,20 @@ module Admin
       assert_match "abair", response.body
     end
 
+    test "shows an empty report when there is no evaluation set" do
+      get admin_asr_index_path
+      assert_response :success
+      assert_select "h1", "ASR quality"
+    end
+
     test "non-admins are redirected" do
       sign_in_as(users(:two))
+      get admin_asr_index_path
+      assert_redirected_to root_path
+    end
+
+    test "signed-out visitors can't see it" do
+      delete logout_path
       get admin_asr_index_path
       assert_redirected_to root_path
     end

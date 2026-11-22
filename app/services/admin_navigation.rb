@@ -1,22 +1,14 @@
 # frozen_string_literal: true
 
 # The admin pages, grouped, for the admin sidebar, the phone menu and the
-# /admin overview.
-# Pages behind a Flipper flag are only listed when the flag is on for the
-# given user, so no link leads to a 404.
+# /admin overview. Admin pages never sit behind a Flipper flag, so every
+# admin sees every page.
 class AdminNavigation
-  Item = Data.define(:title, :description, :path, :flag, :turbo)
+  Item = Data.define(:title, :description, :path, :turbo)
   Section = Data.define(:title, :items)
 
-  def initialize(user)
-    @user = user
-  end
-
   def sections
-    definitions.filter_map do |title, items|
-      visible = items.select { |item| item.flag.nil? || Flipper.enabled?(item.flag, @user) }
-      Section.new(title, visible) if visible.any?
-    end
+    definitions.map { |title, items| Section.new(title, items) }
   end
 
   private
@@ -37,8 +29,8 @@ class AdminNavigation
       ],
       "Data and ASR" => [
         item("Data dashboard", "Corpus, quality and training-readiness numbers.", routes.admin_data_dashboard_path),
-        item("ASR quality", "Word and character error rates on the evaluation set.", routes.admin_asr_index_path, flag: :f75_asr_eval),
-        item("Training progress", "Checked hours per speaker against targets.", routes.admin_training_progress_index_path, flag: :f142_training_progress),
+        item("ASR quality", "Word and character error rates on the evaluation set.", routes.admin_asr_index_path),
+        item("Training progress", "Checked hours per speaker against targets.", routes.admin_training_progress_index_path),
         item("Island context playground", "Try the island context used to help transcription.", routes.admin_island_context_playground_path)
       ],
       "System" => [
@@ -51,7 +43,7 @@ class AdminNavigation
 
   # turbo: false for the mounted engines (Flipper, Mission Control), which are
   # separate apps that Turbo Drive can't swap in.
-  def item(title, description, path, flag: nil, turbo: true)
-    Item.new(title, description, path, flag, turbo)
+  def item(title, description, path, turbo: true)
+    Item.new(title, description, path, turbo)
   end
 end

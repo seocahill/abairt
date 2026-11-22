@@ -1,12 +1,10 @@
 # One plain-English line per Flipper flag: what you'd see change and where to
 # try it. The issue link is built from the number in the flag name.
 # Every flag registered with Flipper.add must have an entry (see test/services/flipper_descriptions_test.rb).
-f75_asr_eval: "Admin page /admin/asr: word and character error rates for speech recognition on the frozen evaluation set."
 f81_listening_controls: "Extra player controls on recording pages: tap a line to jump to it, replay or loop a line, keyboard and lock-screen controls."
 f82_moment_links: "Share a link to a moment in a recording, and show the speaker's credit on phones. Try it on a recording page."
 f125_early_play: "Recording pages let you press play as soon as the audio can play, without waiting for the waveform or regions."
 f126_android_version: "The Android download button shows the latest app version, and the installed app shows its own version."
 f140_check_mode: "Check mode on recordings: step through unchecked lines with audio, edit, and confirm and move on."
-f142_training_progress: "Admin page /admin/training_progress: checked hours of audio per speaker against training targets."
 f170_search_to_moment: "Search results open the recording at the matching line; search inside one recording; the recordings search also lists matching lines."
 f172_place_pages: "Place pages: tapping a place on the map or in a recording opens a page with its recordings, speakers and a small map."
