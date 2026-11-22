@@ -34,4 +34,26 @@ class DictionarySearchTest < ActiveSupport::TestCase
     assert_equal 'word_or_phrase : "a bhean"', DictionarySearch.new("a bhean.").phrase_expression(column: :word_or_phrase)
     assert_equal '"a bhean"', DictionarySearch.new("a bhean").phrase_expression
   end
+
+  test "with forms, each term matches its mutated spellings in the Irish and itself in the English" do
+    assert_equal '(word_or_phrase : ("mo" OR "mho") OR translation : "mo") AND ' \
+      '(word_or_phrase : ("bean"* OR "bhean"* OR "mbean"*) OR translation : "bean"*)',
+      DictionarySearch.new("mo bean").expression(forms: true)
+  end
+
+  test "with forms, only the last term matches the start of a word" do
+    expression = DictionarySearch.new("bean fear").expression(forms: true)
+
+    assert_includes expression, '"bean" OR'
+    assert_includes expression, '"fear"*'
+  end
+
+  test "with forms, a one-letter last term is not a prefix" do
+    assert_equal '(word_or_phrase : ("a") OR translation : "a")', DictionarySearch.new("a").expression(forms: true)
+  end
+
+  test "with forms, punctuation is still literal" do
+    assert_equal DictionarySearch.new("bhean").expression(forms: true), DictionarySearch.new("bhean?!").expression(forms: true)
+    assert_not_includes DictionarySearch.new('"AND').expression(forms: true), '""'
+  end
 end

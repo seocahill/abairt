@@ -16,7 +16,7 @@ class DictionaryEntriesController < ApplicationController
     end
 
     if params[:search].present?
-      records = records.search(params[:search])
+      records = records.search(params[:search], forms: mutation_search?)
     end
 
     if params[:tag].present?

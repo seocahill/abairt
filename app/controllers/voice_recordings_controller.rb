@@ -19,7 +19,7 @@ class VoiceRecordingsController < ApplicationController
         .where("title LIKE ?", "%#{params[:search]}%")
         .or(VoiceRecording.joins(:users).where("users.name LIKE ?", "%#{params[:search]}%"))
       if search_to_moment?
-        spoken = DictionaryEntry.search(params[:search]).reorder(nil).select(:voice_recording_id)
+        spoken = DictionaryEntry.search(params[:search], forms: mutation_search?).reorder(nil).select(:voice_recording_id)
         records = records.or(VoiceRecording.joins(:users).where(id: spoken))
       end
     end
@@ -119,7 +119,7 @@ class VoiceRecordingsController < ApplicationController
 
     # Improve pagination query to be more efficient
     lines = @recording.dictionary_entries
-    lines = lines.search(params[:q]) if search_to_moment? && params[:q].present?
+    lines = lines.search(params[:q], forms: mutation_search?) if search_to_moment? && params[:q].present?
     @pagy, @entries = pagy(
       lines
         .includes(:speaker, :versions, media_attachment: :blob)
@@ -340,7 +340,7 @@ class VoiceRecordingsController < ApplicationController
 
   # The first few lines that match the search, per recording on this page.
   def matching_lines(recordings)
-    DictionaryEntry.search(params[:search])
+    DictionaryEntry.search(params[:search], forms: mutation_search?)
       .where(voice_recording_id: recordings.map(&:id))
       .where.not(region_start: nil)
       .limit(200)

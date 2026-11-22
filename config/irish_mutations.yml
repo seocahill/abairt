@@ -1,0 +1,23 @@
+# How the start of an Irish word is spelled when it is mutated. Search uses this
+# to find a word in any of these forms (flag f171_mutation_search, issue #171).
+# Nothing stored is changed. The owner reviews and edits this table: it is the
+# only place the rules live.
+#
+# consonants: the first letter of the plain word, and the spellings that can
+#   replace it. Lenition adds an h; eclipsis puts a letter in front. For
+#   example b: [bh, mb] means a word starting with b can also start with bh
+#   or mb.
+# vowel_prefixes: letters that can go in front of a word starting with a vowel.
+#   Written with a hyphen (n-, t-) the search already finds the word, because
+#   the hyphen splits it. These cover the joined spellings.
+consonants:
+  b: [bh, mb]
+  c: [ch, gc]
+  d: [dh, nd]
+  f: [fh, bhf]
+  g: [gh, ng]
+  m: [mh]
+  p: [ph, bp]
+  s: [sh, ts]
+  t: [th, dt]
+vowel_prefixes: [n, h, t]

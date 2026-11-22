@@ -230,6 +230,7 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
   INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
 END;
 INSERT INTO "schema_migrations" (version) VALUES
+('20261122230000'),
 ('20261122200000'),
 ('20261122150000'),
 ('20261122120000'),
