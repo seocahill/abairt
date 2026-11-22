@@ -12,8 +12,10 @@
 class DictionarySearch
   IRISH = :word_or_phrase
   ENGLISH = :translation
-  # The last term is matched as the start of a word once it is this long.
+  # A form is matched as the start of a word once it is this long.
   MIN_PREFIX = 2
+  # Each term becomes several forms, so only this many terms are expanded.
+  MAX_FORM_TERMS = 10
 
   def initialize(text)
     @terms = text.to_s.scan(/[\p{L}\p{M}\p{N}]+/)
@@ -29,7 +31,8 @@ class DictionarySearch
   def expression(forms: false)
     return terms.map { |term| %("#{term}") }.join(" ") unless forms
 
-    terms.map.with_index { |term, index| any_form(term, prefix: index == terms.size - 1) }.join(" AND ")
+    expanded = terms.first(MAX_FORM_TERMS)
+    expanded.map.with_index { |term, index| any_form(term, prefix: index == expanded.size - 1) }.join(" AND ")
   end
 
   # The terms must appear together, in order, optionally within one column.
@@ -47,8 +50,13 @@ class DictionarySearch
   end
 
   def any_form(term, prefix:)
-    star = (prefix && term.length >= MIN_PREFIX) ? "*" : ""
-    irish = mutations.forms(term).map { |form| %("#{form}"#{star}) }.join(" OR ")
-    %[(#{IRISH} : (#{irish}) OR #{ENGLISH} : "#{term}"#{star})]
+    irish = mutations.forms(term).map { |form| quoted(form, prefix:) }.join(" OR ")
+    %[(#{IRISH} : (#{irish}) OR #{ENGLISH} : #{quoted(term, prefix:)})]
+  end
+
+  # A one-letter prefix would match almost every line, so it stays a whole word.
+  def quoted(text, prefix:)
+    star = (prefix && text.unicode_normalize(:nfc).length >= MIN_PREFIX) ? "*" : ""
+    %("#{text}"#{star})
   end
 end

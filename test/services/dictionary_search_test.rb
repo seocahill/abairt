@@ -56,4 +56,16 @@ class DictionarySearchTest < ActiveSupport::TestCase
     assert_equal DictionarySearch.new("bhean").expression(forms: true), DictionarySearch.new("bhean?!").expression(forms: true)
     assert_not_includes DictionarySearch.new('"AND').expression(forms: true), '""'
   end
+
+  test "with forms, a short word does not turn into a one-letter prefix" do
+    assert_equal '(word_or_phrase : ("tá"* OR "thá"* OR "dtá"*) OR translation : "tá"*)',
+      DictionarySearch.new("tá").expression(forms: true)
+    assert_not_includes DictionarySearch.new("nó").expression(forms: true), '"ó"'
+  end
+
+  test "with forms, only the first ten words are expanded" do
+    expression = DictionarySearch.new((%w[bean] * 15).join(" ")).expression(forms: true)
+
+    assert_equal DictionarySearch::MAX_FORM_TERMS, expression.scan("word_or_phrase :").size
+  end
 end

@@ -59,4 +59,15 @@ class IrishMutationsTest < ActiveSupport::TestCase
 
     assert spellings.all? { |spelling| spelling.match?(/\A[a-z]+\z/) }, spellings.inspect
   end
+
+  test "a short word is not read as mutated, so it keeps its own spelling" do
+    assert_equal %w[tá thá dtá], @mutations.forms("tá")
+    assert_equal %w[nó], @mutations.forms("nó")
+    assert_equal %w[ní], @mutations.forms("ní")
+    assert_not_includes @mutations.forms("tar"), "ar"
+  end
+
+  test "a decomposed accent is the same word as a composed one" do
+    assert_equal @mutations.forms("tá"), @mutations.forms("ta\u0301")
+  end
 end

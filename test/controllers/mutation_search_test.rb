@@ -107,4 +107,32 @@ class MutationSearchTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{voice_recording_path(@recording, t: 30.0)}']"
     assert_select "a[href='#{voice_recording_path(@recording, t: 10.0)}']", false
   end
+
+  test "flag on: a short word only finds itself, not every word sharing its vowel" do
+    Flipper.enable(:f171_mutation_search)
+    speaker = users(:one)
+    short = DictionaryEntry.create!(voice_recording: @recording, speaker: speaker, owner: speaker,
+      word_or_phrase: "tá sé", region_start: 60.0, region_end: 61.0)
+    ActiveRecord::Base.connection.execute("INSERT INTO fts_dictionary_entries(fts_dictionary_entries) VALUES('rebuild')")
+
+    get dictionary_entries_url(search: "tá", show_all: "1")
+    assert_select "#dictionary_entry_#{short.id}"
+    assert_select "#dictionary_entry_#{@prefixed.id}", false
+    assert_select "#dictionary_entry_#{@eclipsed.id}", false
+  end
+
+  test "flag on: the recordings search matches a half-typed word" do
+    Flipper.enable(:f170_search_to_moment)
+    Flipper.enable(:f171_mutation_search)
+    get voice_recordings_url(search: "bhea", view: "list")
+    assert_select "a[href='#{voice_recording_path(@recording, t: 10.0)}']"
+  end
+
+  test "f171 on without f170: the recordings search does not look inside lines" do
+    Flipper.disable(:f170_search_to_moment)
+    Flipper.enable(:f171_mutation_search)
+    get voice_recordings_url(search: "bean", view: "list")
+    assert_response :success
+    assert_select "a[href*='t=']", false
+  end
 end

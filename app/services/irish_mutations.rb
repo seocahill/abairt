@@ -11,6 +11,9 @@ class IrishMutations
   VOWELS = "aeiouáéíóú"
   # Single letters are particles or initials; their forms would match almost anything.
   MIN_LENGTH = 2
+  # A word is only read as mutated if what is left is at least this long, so tá
+  # is not read as á with a t- in front, nor tar as ar.
+  MIN_ROOT = 3
 
   def initialize(rules = RULES)
     @consonants = rules.fetch("consonants")
@@ -19,7 +22,7 @@ class IrishMutations
 
   # The word as typed first, then its other spellings.
   def forms(word)
-    word = word.downcase
+    word = word.unicode_normalize(:nfc).downcase
     return [word] if word.length < MIN_LENGTH
 
     ([word, *own_mutations(word)] + roots(word).flat_map { |root| [root, *mutations(root)] }).uniq
@@ -36,7 +39,7 @@ class IrishMutations
 
   # What the word would be with its mutation taken off.
   def roots(word)
-    [without_consonant_mutation(word), *without_vowel_prefix(word)].compact
+    [without_consonant_mutation(word), *without_vowel_prefix(word)].compact.select { |root| root.length >= MIN_ROOT }
   end
 
   # The longest mutated spelling the word starts with, as [letter, spelling]:
@@ -49,7 +52,7 @@ class IrishMutations
 
   def without_consonant_mutation(word)
     letter, spelling = consonant_mutation(word)
-    letter + word.delete_prefix(spelling) if spelling && word.length > spelling.length
+    letter + word.delete_prefix(spelling) if spelling
   end
 
   def without_vowel_prefix(word)
