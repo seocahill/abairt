@@ -3,8 +3,8 @@ require "test_helper"
 module Admin
   class DashboardsControllerTest < ActionDispatch::IntegrationTest
     ALWAYS_LISTED = %w[/admin/users /admin_emails /admin/locations /admin/questions
-      /admin/media_imports /admin/data_dashboard /admin/island_context_playground
-      /flipper /jobs /admin/api].freeze
+      /admin/media_imports /admin/data_dashboard /admin/asr /admin/training_progress
+      /admin/island_context_playground /flipper /jobs /admin/api].freeze
 
     setup do
       @admin = users(:one)
@@ -16,15 +16,6 @@ module Admin
       get admin_root_path
       assert_response :success
       ALWAYS_LISTED.each { |path| assert_select "main a[href=?]", path, true, "missing #{path}" }
-    end
-
-    test "flagged pages are linked only when their flag is on" do
-      sign_in_as(@admin)
-      get admin_root_path
-      assert_select "main a[href=?]", "/admin/asr", false
-      Flipper.enable(:f75_asr_eval)
-      get admin_root_path
-      assert_select "main a[href=?]", "/admin/asr"
     end
 
     test "the admin sidebar on other admin pages links every admin page" do
@@ -40,15 +31,6 @@ module Admin
       assert_select "a[href=?]", "/tags", false
       assert_select "nav[aria-label=Admin] a[href=?]", "/users", false
       assert_select "[data-admin-menu] a[href=?]", "/users", false
-    end
-
-    test "flagged admin pages appear in the sidebar only when their flag is on" do
-      sign_in_as(@admin)
-      get admin_locations_path
-      assert_select "nav[aria-label=Admin] a[href=?]", "/admin/training_progress", false
-      Flipper.enable(:f142_training_progress)
-      get admin_locations_path
-      assert_select "nav[aria-label=Admin] a[href=?]", "/admin/training_progress"
     end
 
     test "the learner's question screen is not an admin page" do

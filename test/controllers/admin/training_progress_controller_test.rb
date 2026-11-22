@@ -8,13 +8,7 @@ module Admin
       sign_in_as(@admin)
     end
 
-    test "not found with the flag off" do
-      get admin_training_progress_index_path
-      assert_response :not_found
-    end
-
-    test "shows the report with the flag on" do
-      Flipper.enable_actor(:f142_training_progress, @admin)
+    test "shows an admin the report with no flag set" do
       get admin_training_progress_index_path
       assert_response :success
       assert_select "h1", "Training progress"
@@ -22,6 +16,12 @@ module Admin
 
     test "non-admins are redirected" do
       sign_in_as(users(:two))
+      get admin_training_progress_index_path
+      assert_redirected_to root_path
+    end
+
+    test "signed-out visitors can't see it" do
+      delete logout_path
       get admin_training_progress_index_path
       assert_redirected_to root_path
     end
