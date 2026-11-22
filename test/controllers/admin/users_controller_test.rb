@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 module Admin
   class UsersControllerTest < ActionDispatch::IntegrationTest
@@ -58,13 +58,13 @@ module Admin
     end
 
     test "should update user" do
-      patch admin_user_path(@pending_user), params: { user: { name: "Updated Name", email: @pending_user.email } }
+      patch admin_user_path(@pending_user), params: {user: {name: "Updated Name", email: @pending_user.email}}
       assert_redirected_to admin_user_path(@pending_user)
       assert_equal "Updated Name", @pending_user.reload.name
     end
 
     test "should not update user with invalid data" do
-      patch admin_user_path(@pending_user), params: { user: { name: "", email: @pending_user.email } }
+      patch admin_user_path(@pending_user), params: {user: {name: "", email: @pending_user.email}}
       assert_response :unprocessable_entity
     end
 
@@ -76,18 +76,18 @@ module Admin
 
     test "should reject user" do
       get admin_users_path(pending: true)
-      assert_difference 'User.count', -1 do
+      assert_difference "User.count", -1 do
         post reject_admin_user_path(@pending_user)
       end
-      assert_redirected_to admin_users_path(pending: true)
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
     end
 
     test "should bulk approve users" do
       get admin_users_path(pending: true)
       user2 = users(:john)
       user2.update(confirmed: false)
-      post bulk_approve_admin_users_path, params: { user_ids: [@pending_user.id, user2.id] }
-      assert_redirected_to admin_users_path(pending: true)
+      post bulk_approve_admin_users_path, params: {user_ids: [@pending_user.id, user2.id]}
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
       assert @pending_user.reload.confirmed?
       assert user2.reload.confirmed?
     end
@@ -96,10 +96,10 @@ module Admin
       get admin_users_path(pending: true)
       user2 = users(:john)
       user2.update(confirmed: false)
-      assert_difference 'User.count', -2 do
-        post bulk_reject_admin_users_path, params: { user_ids: [@pending_user.id, user2.id] }
+      assert_difference "User.count", -2 do
+        post bulk_reject_admin_users_path, params: {user_ids: [@pending_user.id, user2.id]}
       end
-      assert_redirected_to admin_users_path(pending: true)
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
     end
 
     test "should generate API token for user" do
@@ -222,15 +222,218 @@ module Admin
       assert_response :success
     end
 
+    test "opens on the members tab" do
+      users(:john).update!(role: :student)
+      get admin_users_path
+
+      assert_response :success
+      assert_select "nav[aria-label='Kinds of user'] a[aria-current='true']", text: "Members"
+      assert_select "td a", text: users(:john).name
+      assert_select "td a", text: users(:speaker).name, count: 0
+      assert_select "input[value='Bulk Approve Selected']"
+      assert_select "a", text: "New member"
+    end
+
+    # The tick boxes sit in the table, outside the bulk form, so they must name
+    # it; without that the bulk buttons posted no ids and did nothing.
+    test "the tick boxes belong to the bulk form, which posts to approve or reject" do
+      get admin_users_path(kind: "members", pending: true)
+
+      assert_select "input.user-checkbox[form=bulk-users-form][name='user_ids[]'][value='#{@pending_user.id}']"
+      assert_select "form#bulk-users-form[action='#{bulk_approve_admin_users_path}']" do
+        assert_select "input[type=submit][value='Bulk Approve Selected']"
+        assert_select "input[type=submit][value='Bulk Reject Selected'][formaction='#{bulk_reject_admin_users_path}']"
+      end
+    end
+
+    test "the speakers tab lists speakers with their own columns and no bulk actions" do
+      get admin_users_path(kind: "speakers")
+
+      assert_response :success
+      assert_select "td a", text: users(:speaker).name
+      assert_select "td a", text: users(:john).name, count: 0
+      assert_select "th", text: "Dialect"
+      assert_select "th", text: "Email", count: 0
+      assert_select "input[value='Bulk Approve Selected']", count: 0
+      assert_select "a[href='#{new_admin_user_path(kind: "speakers")}']", text: "New speaker"
+    end
+
+    test "shows whether a speaker's Telegram is connected" do
+      users(:speaker).update!(answers_questions: true, telegram_chat_id: "4242")
+      users(:second_speaker).update!(answers_questions: true, telegram_chat_id: nil)
+
+      get admin_users_path(kind: "speakers")
+
+      assert_select "span", text: "Connected"
+      assert_select "span", text: "Not connected"
+    end
+
+    test "the staff tab lists admins with their token actions" do
+      get admin_users_path(kind: "staff")
+
+      assert_response :success
+      assert_select "td a", text: users(:admin).name
+      assert_select "td a", text: users(:speaker).name, count: 0
+      assert_select "th", text: "API Token"
+      assert_select "a", text: "New staff or API user"
+    end
+
+    test "the unnamed speakers diarisation leaves are listed under Other and All only" do
+      get admin_users_path(kind: "other")
+      assert_select "td a", text: users(:temporary).name
+
+      get admin_users_path(kind: "all")
+      assert_select "td a", text: users(:temporary).name
+      assert_select "td a", text: users(:speaker).name
+
+      get admin_users_path(kind: "speakers")
+      assert_select "td a", text: users(:temporary).name, count: 0
+    end
+
+    test "an old role link opens on that role's tab" do
+      get admin_users_path(role: "temporary")
+
+      assert_select "nav[aria-label='Kinds of user'] a[aria-current='true']", text: "Other"
+      assert_select "td a", text: users(:temporary).name
+    end
+
+    test "a teacher or a member taking questions keeps the speaker and Telegram fields" do
+      teacher = users(:john)
+      teacher.update!(role: :teacher)
+      get edit_admin_user_path(teacher)
+      assert_select "select[name='user[dialect]']"
+      assert_select "input[name='user[answers_questions]']"
+
+      member = users(:john)
+      member.update!(role: :student, answers_questions: true)
+      get edit_admin_user_path(member)
+      assert_select "input[name='user[answers_questions]']"
+      assert_select "input[name='user[telegram_chat_id]']"
+    end
+
+    test "pagination keeps the tab" do
+      get admin_users_path(kind: "all", per_page: 1)
+
+      assert_select "a[href*='kind=all'][href*='page=2']", text: "Next"
+    end
+
+    test "search stays within the tab" do
+      get admin_users_path(kind: "speakers", search: users(:john).email)
+
+      assert_response :success
+      assert_select "td a", text: users(:john).name, count: 0
+      assert_select "input[type=hidden][name=kind][value=speakers]"
+    end
+
+    test "an unknown tab falls back to members" do
+      get admin_users_path(kind: "nonsense")
+
+      assert_select "nav[aria-label='Kinds of user'] a[aria-current='true']", text: "Members"
+    end
+
+    test "rejecting from the pending members tab returns to it" do
+      get admin_users_path(kind: "members", pending: true)
+      post reject_admin_user_path(@pending_user)
+
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
+    end
+
+    test "deleting from a tab reached by an old role link returns to that tab" do
+      get admin_users_path(role: "speaker")
+      delete admin_user_path(users(:second_speaker))
+
+      assert_redirected_to admin_users_path(kind: "speakers")
+    end
+
+    test "the new form starts with the role of the kind asked for" do
+      get new_admin_user_path(kind: "staff")
+      assert_select "select[name='user[role]'] option[selected][value=api_user]"
+      assert_select "input[name='user[answers_questions]']", count: 0
+
+      get new_admin_user_path(kind: "members")
+      assert_select "select[name='user[role]'] option[selected][value=student]"
+
+      get new_admin_user_path
+      assert_select "select[name='user[role]'] option[selected][value=speaker]"
+      assert_select "input[name='user[answers_questions]']"
+    end
+
+    test "the role list still offers every role, grouped by kind" do
+      get edit_admin_user_path(users(:john))
+
+      assert_select "select[name='user[role]'] optgroup", count: User::KINDS.size
+      assert_select "select[name='user[role]'] option", count: User.roles.size
+    end
+
+    test "a member's form and page leave out speaker fields" do
+      member = users(:john)
+      member.update!(role: :student)
+
+      get edit_admin_user_path(member)
+      assert_select "select[name='user[dialect]']", count: 0
+      assert_select "input[name='user[answers_questions]']", count: 0
+      assert_select "label", text: "Level of Irish"
+
+      get admin_user_path(member)
+      assert_select "h3", text: "Dialect", count: 0
+      assert_select "h3", text: "API Token"
+    end
+
+    test "a speaker's form and page carry the speaker fields" do
+      get edit_admin_user_path(users(:speaker))
+      assert_select "select[name='user[dialect]']"
+      assert_select "input[name='user[answers_questions]']"
+
+      get admin_user_path(users(:speaker))
+      assert_select "h3", text: "Dialect"
+    end
+
+    test "a speaker with no token has no token section, one with a token keeps it" do
+      speaker = users(:speaker)
+      speaker.update_column(:api_token, nil)
+      get admin_user_path(speaker)
+      assert_select "h3", text: "API Token", count: 0
+
+      speaker.update_column(:api_token, "speakertoken123")
+      get admin_user_path(speaker)
+      assert_select "h3", text: "API Token"
+      assert_select "button", text: "Revoke Token"
+    end
+
+    test "a staff member's form has neither speaker nor member fields" do
+      get edit_admin_user_path(users(:admin))
+
+      assert_select "select[name='user[dialect]']", count: 0
+      assert_select "textarea[name='user[about]']", count: 0
+      assert_select "select[name='user[role]']"
+    end
+
+    test "editing a member leaves the fields their form does not show alone" do
+      member = users(:john)
+      member.update!(role: :student, dialect: :acaill)
+
+      patch admin_user_path(member), params: {user: {name: "John", email: member.email, role: "student"}}
+
+      assert_equal "acaill", member.reload.dialect
+    end
+
+    test "a member can still be moved to another kind" do
+      member = users(:john)
+      member.update!(role: :student)
+
+      patch admin_user_path(member), params: {user: {name: member.name, email: member.email, role: "admin"}}
+
+      assert member.reload.admin?
+    end
+
     private
 
     def sign_in_as(user)
-      unless user.login_token.present?
+      if user.login_token.blank?
         user.regenerate_login_token
         user.save!
       end
-      post login_path, params: { token: user.login_token }
+      post login_path, params: {token: user.login_token}
     end
   end
 end
-

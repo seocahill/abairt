@@ -80,7 +80,7 @@ that webhook may be production's. **Use a second bot for development.**
 
 ### 4. The speaker
 
-Created in admin: **Users → New User**. A name, *Takes questions* checked, and
+Created in admin: **Users → Speakers → New speaker**. A name, *Takes questions* checked, and
 the channel set to Telegram. That is all that is required — no email, no
 password, and **no phone number**: on Telegram the identity is a chat id, and
 an invite link supplies it.

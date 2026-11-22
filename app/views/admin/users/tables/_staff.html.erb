@@ -1,0 +1,45 @@
+<%# Admins and API accounts: what matters is the role and the API token. %>
+<div class="admin-table-wrap mb-4">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>API Token</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.each do |user| %>
+        <tr>
+          <td class="whitespace-nowrap font-medium text-gray-900">
+            <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
+          </td>
+          <td class="whitespace-nowrap text-gray-500"><%= user.email %></td>
+          <td class="whitespace-nowrap text-gray-500"><%= render "admin/users/role_badge", user: %></td>
+          <td class="whitespace-nowrap text-gray-500">
+            <% if user.api_token.present? %>
+              <code class="bg-gray-100 px-2 py-1 rounded text-xs"><%= user.api_token.first(8) %>...</code>
+            <% else %>
+              <span class="text-gray-400 text-xs">No token</span>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap text-gray-500"><%= user.created_at.strftime("%Y-%m-%d") %></td>
+          <td class="font-medium">
+            <div class="flex flex-col gap-1">
+              <% if user.api_token.present? %>
+                <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(user), method: :post, class: "text-indigo-600 hover:text-indigo-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
+                <%= button_to "Revoke Token", revoke_api_token_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", form: { data: { turbo_confirm: "Are you sure?" } } %>
+              <% else %>
+                <%= button_to "Generate Token", generate_api_token_admin_user_path(user), method: :post, class: "text-green-600 hover:text-green-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
+              <% end %>
+              <%= render "admin/users/delete_button", user: %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

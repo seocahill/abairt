@@ -1,0 +1,58 @@
+<%# People who signed up. Approving and rejecting sign-ups happens here, one at
+    a time or ticked in bulk. The tick boxes belong to the bulk form through
+    their form attribute: the rows hold their own Approve/Reject forms, and
+    forms can't nest. %>
+<div class="admin-table-wrap mb-4">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="select-all" class="rounded" aria-label="Select all"></th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.each do |user| %>
+        <tr>
+          <td class="whitespace-nowrap">
+            <%= check_box_tag "user_ids[]", user.id, false, id: "user_ids_#{user.id}", form: "bulk-users-form", class: "user-checkbox rounded", aria: {label: "Select #{user.name}"} %>
+          </td>
+          <td class="whitespace-nowrap font-medium text-gray-900">
+            <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
+          </td>
+          <td class="whitespace-nowrap text-gray-500"><%= user.email %></td>
+          <td class="whitespace-nowrap text-gray-500"><%= render "admin/users/role_badge", user: %></td>
+          <td class="whitespace-nowrap"><%= render "admin/users/status_badge", user: %></td>
+          <td class="whitespace-nowrap text-gray-500"><%= user.created_at.strftime("%Y-%m-%d") %></td>
+          <td class="font-medium">
+            <div class="flex flex-col gap-1">
+              <% unless user.confirmed? %>
+                <%= button_to "Approve", approve_admin_user_path(user), method: :post, class: "text-green-600 hover:text-green-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
+                <%= button_to "Reject", reject_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", form: { data: { turbo_confirm: "Are you sure? This will delete the user." } } %>
+              <% end %>
+              <%= render "admin/users/delete_button", user: %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= form_with url: bulk_approve_admin_users_path, method: :post, id: "bulk-users-form", class: "mb-4 flex flex-wrap gap-2" do |form| %>
+  <%= form.submit "Bulk Approve Selected", class: admin_button_class(:positive) %>
+  <%= form.submit "Bulk Reject Selected", formaction: bulk_reject_admin_users_path, class: admin_button_class(:danger),
+        data: { turbo_confirm: "Are you sure? This will delete selected users." } %>
+<% end %>
+
+<script>
+  document.getElementById('select-all')?.addEventListener('change', function(e) {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+      checkbox.checked = e.target.checked;
+    });
+  });
+</script>

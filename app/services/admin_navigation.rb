@@ -17,7 +17,7 @@ class AdminNavigation
     routes = Rails.application.routes.url_helpers
     {
       "People" => [
-        item("Users", "Approve sign-ups, edit people and roles.", routes.admin_users_path),
+        item("Users", "Members and sign-ups, speakers, and staff and API access.", routes.admin_users_path),
         item("Email users", "Write to and email users.", routes.admin_emails_path),
         item("Locations", "Check and geocode where speakers are from.", routes.admin_locations_path)
       ],

@@ -32,10 +32,10 @@ class AdminPagesTest < ActionDispatch::IntegrationTest
   end
 
   test "filters share one style and mark the current one" do
-    get admin_users_path(pending: true, role: "speaker")
+    get admin_users_path(kind: "members", pending: true)
     assert_select "a[aria-current=true]", text: "Pending sign-ups"
-    assert_select "a[aria-current=true]", text: "Speaker"
-    assert_select "a[aria-current=true]", text: "All users", count: 0
+    assert_select "a[aria-current=true]", text: "Members"
+    assert_select "a[aria-current=true]", text: "All members", count: 0
 
     get admin_locations_path(dialect_region: "erris")
     assert_select "a[aria-current=true]", text: "Erris"
@@ -45,10 +45,10 @@ class AdminPagesTest < ActionDispatch::IntegrationTest
   end
 
   test "user filters carry each other and the search" do
-    get admin_users_path(role: "speaker", search: "ann")
-    assert_select "a[href=?]", admin_users_path(pending: true, role: "speaker", search: "ann"), text: "Pending sign-ups"
-    assert_select "form[action=?] input[type=hidden][name=role][value=speaker]", admin_users_path
-    assert_select "a[href=?]", admin_users_path(role: "speaker"), text: "Clear"
+    get admin_users_path(kind: "members", search: "ann")
+    assert_select "a[href=?]", admin_users_path(kind: "members", pending: true, search: "ann"), text: "Pending sign-ups"
+    assert_select "form[action=?] input[type=hidden][name=kind][value=members]", admin_users_path
+    assert_select "a[href=?]", admin_users_path(kind: "members"), text: "Clear"
   end
 
   test "the shared search box keeps the region filter" do

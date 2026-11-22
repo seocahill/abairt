@@ -106,7 +106,7 @@ Set one at `/password/edit` after signing in by magic link once.
 
 ## The founder's side
 
-Speakers are created at **Users → New User**, which is the only place one can
+Speakers are created at **Users → Speakers → New speaker**, which is the only place one can
 come from: they have no email, no password and never see a web page. An
 existing user can be promoted to a speaker by editing them. Their page carries
 the invite link that connects them — see `telegram_setup.md`.
