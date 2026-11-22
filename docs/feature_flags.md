@@ -12,4 +12,4 @@ Admin-only changes (admin pages and tools) do not use flags: ship them directly.
 
 ## Admin-only changes
 
-Admin pages and tools ship without a flag. `/admin` lists every admin page (including Feature flags and Jobs); add a new admin page to `AdminNavigation` (`app/services/admin_navigation.rb`) so it appears in the admin menu on every admin page.
+Admin pages and tools ship without a flag. `/admin` lists every admin page (including Feature flags and Jobs). Add a new admin page to `AdminNavigation` (`app/services/admin_navigation.rb`) so it appears in the admin sidebar on every admin page (and in the phone menu); a controller outside the `admin/` namespace also needs adding to `admin_page?` in `ApplicationController` to get the sidebar. Feature flags and Jobs link back to `/admin`.

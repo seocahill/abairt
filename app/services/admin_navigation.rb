@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-# The admin pages, grouped, for the admin menu and the /admin overview.
+# The admin pages, grouped, for the admin sidebar, the phone menu and the
+# /admin overview.
 # Pages behind a Flipper flag are only listed when the flag is on for the
 # given user, so no link leads to a 404.
 class AdminNavigation
-  Item = Data.define(:title, :description, :path, :flag)
+  Item = Data.define(:title, :description, :path, :flag, :turbo)
   Section = Data.define(:title, :items)
 
   def initialize(user)
@@ -25,12 +26,10 @@ class AdminNavigation
     {
       "People" => [
         item("Users", "Approve sign-ups, edit people and roles.", routes.admin_users_path),
-        item("Speakers", "Browse the speakers whose Irish is recorded.", routes.users_path),
         item("Email users", "Write to and email users.", routes.admin_emails_path),
         item("Locations", "Check and geocode where speakers are from.", routes.admin_locations_path)
       ],
       "Content" => [
-        item("Tags", "The tags used on dictionary entries.", routes.tags_path),
         item("Questions", "The question backlog and who is holding what.", routes.admin_questions_path)
       ],
       "Imports" => [
@@ -43,14 +42,16 @@ class AdminNavigation
         item("Island context playground", "Try the island context used to help transcription.", routes.admin_island_context_playground_path)
       ],
       "System" => [
-        item("Feature flags", "Switch features on and off (Flipper).", "/flipper"),
-        item("Jobs", "Background jobs and failures (Mission Control).", "/jobs"),
+        item("Feature flags", "Switch features on and off (Flipper).", "/flipper", turbo: false),
+        item("Jobs", "Background jobs and failures (Mission Control).", "/jobs", turbo: false),
         item("API tokens", "Your personal API tokens.", routes.admin_api_index_path)
       ]
     }
   end
 
-  def item(title, description, path, flag: nil)
-    Item.new(title, description, path, flag)
+  # turbo: false for the mounted engines (Flipper, Mission Control), which are
+  # separate apps that Turbo Drive can't swap in.
+  def item(title, description, path, flag: nil, turbo: true)
+    Item.new(title, description, path, flag, turbo)
   end
 end

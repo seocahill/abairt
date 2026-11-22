@@ -23,21 +23,30 @@
     <%= javascript_importmap_tags %>
   </head>
   <body>
-    <div class="min-h-screen">
+    <% admin_shell = admin_user? && admin_page? %>
+    <div class="min-h-screen<%= " flex flex-col" if admin_shell %>">
       <!-- Navbar -->
       <%= render "nav" %>
 
-      <% if admin_user? && admin_page? %>
-        <%= render "admin_navigation" %>
+      <% if admin_shell %>
+        <div class="md:flex flex-1">
+          <%= render "admin_navigation" %>
+          <div class="flex-1 min-w-0 md:px-2 lg:px-4">
+            <%= render "flash" %>
+            <main class="w-full">
+              <%= yield %>
+            </main>
+          </div>
+        </div>
+      <% else %>
+        <!-- Flash Messages -->
+        <%= render "flash" %>
+
+        <!-- Main Content Area -->
+        <main class="w-full">
+          <%= yield %>
+        </main>
       <% end %>
-
-      <!-- Flash Messages -->
-      <%= render "flash" %>
-
-      <!-- Main Content Area -->
-      <main class="w-full">
-        <%= yield %>
-      </main>
 
       <%= yield :footer %>
     </div>

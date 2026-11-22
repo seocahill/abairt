@@ -43,4 +43,6 @@ end
 Flipper::UI.configure do |config|
   config.show_feature_description_in_list = true
   config.descriptions_source = ->(keys) { FlipperDescriptions.new.for_ui(keys) }
+  # A "‹ App" link back to the admin overview.
+  config.application_href = "/admin"
 end
