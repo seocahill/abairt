@@ -1,7 +1,7 @@
 <div class="max-w-4xl">
   <%= admin_page_header @email.subject,
-        subtitle: "Cruthaithe ag #{@email.sent_by.name} ar #{@email.created_at.strftime("%d/%m/%Y ag %H:%M")}" do %>
-    <%= link_to "Siar", admin_emails_path, class: admin_button_class(:secondary) %>
+        subtitle: "Cruthaithe ag #{@email.sent_by.name} ar #{@email.created_at.strftime("%d/%m/%Y ag %H:%M")}",
+        back: ["Siar", admin_emails_path] do %>
     <% unless @email.sent? %>
       <%= link_to "Cuir in Eagar", edit_admin_email_path(@email), class: admin_button_class(:secondary) %>
     <% end %>
@@ -68,7 +68,7 @@
           <%= button_to "Seol Ríomhphost Anois", send_email_admin_email_path(@email),
                 method: :post,
                 class: admin_button_class(:danger),
-                data: { confirm: "An bhfuil tú cinnte? Ní féidir é seo a chealú." } %>
+                form: { data: { turbo_confirm: "An bhfuil tú cinnte? Ní féidir é seo a chealú." } } %>
         </div>
       </div>
     <% end %>

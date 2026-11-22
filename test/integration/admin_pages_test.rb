@@ -59,6 +59,54 @@ class AdminPagesTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "Clear", count: 0
   end
 
+  test "media imports filter by status in the shared style, keeping the search" do
+    get admin_media_imports_path(status: "pending", search: "Recording")
+    assert_response :success
+    assert_select "a[aria-current=true]", text: /\APending \(/
+    assert_select "a[href=?]", admin_media_imports_path(status: "failed", search: "Recording"), text: /\AFailed/
+    assert_select "a[href=?]", admin_media_imports_path(search: "Recording"), text: /\AAll/
+  end
+
+  test "searching media imports and API tokens works (no Postgres-only SQL)" do
+    get admin_media_imports_path(search: "test1")
+    assert_response :success
+    assert_select "td a", text: media_imports(:one).title
+    assert_select "td a", text: media_imports(:two).title, count: 0
+
+    @admin.update!(api_token: "token-for-search")
+    get admin_api_index_path(search: @admin.email)
+    assert_response :success
+    assert_select "td", text: @admin.email
+  end
+
+  test "destructive admin buttons ask Turbo to confirm first" do
+    pending_user = users(:two)
+    pending_user.update!(confirmed: false)
+    get admin_user_path(pending_user)
+    assert_select "form[action=?][data-turbo-confirm]", reject_admin_user_path(pending_user)
+    assert_select "form[action=?][data-turbo-confirm]", admin_user_path(pending_user)
+
+    get admin_users_path
+    assert_select "input[type=submit][value=?][data-turbo-confirm]", "Bulk Reject Selected"
+
+    get admin_media_import_path(media_imports(:one))
+    assert_select "form[action=?][data-turbo-confirm]", admin_media_import_path(media_imports(:one))
+
+    email = emails(:one)
+    email.update_column(:sent_at, nil)
+    get admin_email_path(email)
+    assert_select "form[action=?][data-turbo-confirm]", send_email_admin_email_path(email)
+    assert_select "[data-confirm]", count: 0
+  end
+
+  test "the data dashboard loads when entries have no region times" do
+    @admin.update!(dialect: :acaill, voice: :female)
+    assert DictionaryEntry.where(speaker: @admin, region_start: nil).exists?
+
+    get admin_data_dashboard_path
+    assert_response :success
+  end
+
   private
 
   def admin_paths

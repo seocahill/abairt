@@ -1,5 +1,17 @@
 <div class="max-w-2xl">
-  <%= admin_page_header @media_import.title, back: ["Media imports", admin_media_imports_path] %>
+  <%= admin_page_header @media_import.title, back: ["Media imports", admin_media_imports_path] do %>
+    <% if @media_import.pending? %>
+      <%= button_to "Process now", process_now_admin_media_import_path(@media_import),
+          method: :post, class: admin_button_class(:positive) %>
+    <% elsif @media_import.failed? %>
+      <%= button_to "Retry", retry_admin_media_import_path(@media_import),
+          method: :post, class: admin_button_class(:primary) %>
+    <% end %>
+    <%= link_to "Edit", edit_admin_media_import_path(@media_import), class: admin_button_class(:secondary) %>
+    <%= button_to "Delete", admin_media_import_path(@media_import),
+        method: :delete, class: admin_button_class(:danger),
+        form: { data: { turbo_confirm: "Delete this import?" } } %>
+  <% end %>
 
   <div class="bg-white shadow rounded-lg p-6">
     <div class="mb-6">
@@ -51,20 +63,6 @@
         <% end %>
       </div>
     </dl>
-
-    <div class="mt-6 pt-6 border-t border-gray-100 flex flex-wrap gap-2">
-      <% if @media_import.pending? %>
-        <%= button_to "Process Now", process_now_admin_media_import_path(@media_import),
-            method: :post, class: admin_button_class(:positive) %>
-      <% elsif @media_import.failed? %>
-        <%= button_to "Retry", retry_admin_media_import_path(@media_import),
-            method: :post, class: admin_button_class(:primary) %>
-      <% end %>
-      <%= link_to "Edit", edit_admin_media_import_path(@media_import), class: admin_button_class(:secondary) %>
-      <%= button_to "Delete", admin_media_import_path(@media_import),
-          method: :delete, class: admin_button_class(:danger),
-          data: { confirm: "Delete this import?" } %>
-    </div>
   </div>
 
 </div>

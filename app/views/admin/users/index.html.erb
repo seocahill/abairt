@@ -1,6 +1,6 @@
 <div>
   <%= admin_page_header "Users", subtitle: "Approve sign-ups, edit people and roles." do %>
-    <%= link_to "New User", new_admin_user_path, class: admin_button_class(:primary) %>
+    <%= link_to "New user", new_admin_user_path, class: admin_button_class(:primary) %>
   <% end %>
 
   <%= render "admin/search_form", url: admin_users_path, placeholder: "Search by name or email...",
@@ -9,6 +9,7 @@
 
   <%# One row of filters: sign-up status, then role. Each keeps the others. %>
   <div class="mb-4 flex flex-wrap items-center gap-2">
+    <span class="text-sm text-gray-700 font-medium">Sign-up:</span>
     <%= admin_filter_link "All users", admin_users_path(role: params[:role], search: params[:search]),
           current: params[:pending].blank? %>
     <%= admin_filter_link "Pending sign-ups", admin_users_path(pending: true, role: params[:role], search: params[:search]),
@@ -66,18 +67,18 @@
             </td>
             <td class="whitespace-nowrap text-gray-500"><%= user.created_at.strftime("%Y-%m-%d") %></td>
             <td class="font-medium">
-              <div class="flex flex-wrap gap-1 w-64">
+              <div class="flex flex-col gap-1">
                 <% unless user.confirmed? %>
                   <%= button_to "Approve", approve_admin_user_path(user), method: :post, class: "text-green-600 hover:text-green-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
-                  <%= button_to "Reject", reject_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", data: { confirm: "Are you sure? This will delete the user." } %>
+                  <%= button_to "Reject", reject_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", form: { data: { turbo_confirm: "Are you sure? This will delete the user." } } %>
                 <% end %>
                 <% if user.api_token.present? %>
                   <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(user), method: :post, class: "text-indigo-600 hover:text-indigo-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
-                  <%= button_to "Revoke Token", revoke_api_token_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", data: { confirm: "Are you sure?" } %>
+                  <%= button_to "Revoke Token", revoke_api_token_admin_user_path(user), method: :post, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", form: { data: { turbo_confirm: "Are you sure?" } } %>
                 <% else %>
                   <%= button_to "Generate Token", generate_api_token_admin_user_path(user), method: :post, class: "text-green-600 hover:text-green-900 text-xs px-2 py-1 text-left whitespace-nowrap" %>
                 <% end %>
-                <%= button_to "Delete", admin_user_path(user), method: :delete, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", data: { confirm: "Are you sure?" } %>
+                <%= button_to "Delete", admin_user_path(user), method: :delete, class: "text-red-600 hover:text-red-900 text-xs px-2 py-1 text-left whitespace-nowrap", form: { data: { turbo_confirm: "Are you sure?" } } %>
               </div>
             </td>
           </tr>
@@ -91,7 +92,7 @@
       <%= form.submit "Bulk Approve Selected", class: admin_button_class(:positive) %>
     <% end %>
     <%= form_with url: bulk_reject_admin_users_path, method: :post, id: "bulk-reject-form", onsubmit: "return collectCheckboxes(this)" do |form| %>
-      <%= form.submit "Bulk Reject Selected", class: admin_button_class(:danger), data: { confirm: "Are you sure? This will delete selected users." } %>
+      <%= form.submit "Bulk Reject Selected", class: admin_button_class(:danger), data: { turbo_confirm: "Are you sure? This will delete selected users." } %>
     <% end %>
   </div>
 

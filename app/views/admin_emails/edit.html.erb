@@ -1,6 +1,7 @@
 <div class="max-w-2xl">
   <%= admin_page_header "Cuir Ríomhphost in Eagar",
-        subtitle: "Cruthaithe ar #{@email.created_at.strftime("%d/%m/%Y ag %H:%M")}" %>
+        subtitle: "Cruthaithe ar #{@email.created_at.strftime("%d/%m/%Y ag %H:%M")}",
+        back: ["Siar", admin_email_path(@email)] %>
 
   <div class="bg-white shadow rounded-lg p-6">
     <%= form_with model: @email, url: admin_email_path(@email), local: true, class: "space-y-6" do |form| %>

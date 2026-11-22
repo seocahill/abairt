@@ -11,7 +11,7 @@ module Admin
     def index
       scope = MediaImport.order(updated_at: :desc)
       scope = scope.where(status: params[:status]) if params[:status].present?
-      scope = scope.where("title ILIKE ? OR url ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
+      scope = scope.search(params[:search]) if params[:search].present?
 
       @pagy, @media_imports = pagy(scope, items: 25)
 

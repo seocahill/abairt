@@ -3,9 +3,9 @@
     <%= link_to "Edit", edit_admin_user_path(@user), class: admin_button_class(:primary) %>
     <% unless @user.confirmed? %>
       <%= button_to "Approve", approve_admin_user_path(@user), method: :post, class: admin_button_class(:positive) %>
-      <%= button_to "Reject", reject_admin_user_path(@user), method: :post, class: admin_button_class(:danger), data: { confirm: "Are you sure? This will delete the user." } %>
+      <%= button_to "Reject", reject_admin_user_path(@user), method: :post, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure? This will delete the user." } } %>
     <% end %>
-    <%= button_to "Delete", admin_user_path(@user), method: :delete, class: admin_button_class(:danger), data: { confirm: "Are you sure?" } %>
+    <%= button_to "Delete", admin_user_path(@user), method: :delete, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure?" } } %>
   <% end %>
 
   <div class="bg-white shadow rounded-lg overflow-hidden">
@@ -103,7 +103,7 @@
           <div class="flex flex-wrap gap-2">
             <% if @user.api_token.present? %>
               <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:secondary) %>
-              <%= button_to "Revoke Token", revoke_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:danger), data: { confirm: "Are you sure?" } %>
+              <%= button_to "Revoke Token", revoke_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure?" } } %>
             <% else %>
               <%= button_to "Generate Token", generate_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:positive) %>
             <% end %>

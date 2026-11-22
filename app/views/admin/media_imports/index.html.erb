@@ -1,25 +1,26 @@
 <div>
   <%= admin_page_header "Media imports", subtitle: "Manage import queue for voice recordings" do %>
-    <%= link_to "New Import", new_admin_media_import_path, class: admin_button_class(:primary) %>
+    <%= link_to "New import", new_admin_media_import_path, class: admin_button_class(:primary) %>
     <% if @stats[:pending] > 0 %>
-      <%= button_to "Process All Pending (#{@stats[:pending]})", process_all_pending_admin_media_imports_path,
+      <%= button_to "Process all pending (#{@stats[:pending]})", process_all_pending_admin_media_imports_path,
           method: :post,
           class: admin_button_class(:positive),
-          data: { confirm: "Queue all #{@stats[:pending]} pending imports?" } %>
+          form: { data: { turbo_confirm: "Queue all #{@stats[:pending]} pending imports?" } } %>
     <% end %>
   <% end %>
 
-  <%# Stats %>
-  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <%= render "stat_badge", label: "Total", value: @stats[:total], active: params[:status].blank? %>
-    <%= render "stat_badge", label: "Pending", value: @stats[:pending], status: "pending", color: "yellow" %>
-    <%= render "stat_badge", label: "Imported", value: @stats[:imported], status: "imported", color: "green" %>
-    <%= render "stat_badge", label: "Skipped", value: @stats[:skipped], status: "skipped", color: "gray" %>
-    <%= render "stat_badge", label: "Failed", value: @stats[:failed], status: "failed", color: "red" %>
-  </div>
-
   <%= render "admin/search_form", url: admin_media_imports_path, placeholder: "Search by title or URL...",
         keep: {status: params[:status]}, clear_path: admin_media_imports_path(status: params[:status]) %>
+
+  <%# Status filter, with the count in each %>
+  <div class="mb-4 flex flex-wrap items-center gap-2">
+    <%= admin_filter_link "All (#{@stats[:total]})", admin_media_imports_path(search: params[:search]),
+          current: params[:status].blank? %>
+    <% MediaImport.statuses.each_key do |status| %>
+      <%= admin_filter_link "#{status.humanize} (#{@stats[status.to_sym]})", admin_media_imports_path(status: status, search: params[:search]),
+            current: params[:status] == status %>
+    <% end %>
+  </div>
 
   <%# Table %>
   <div class="admin-table-wrap">
@@ -36,7 +37,7 @@
       <tbody>
         <% @media_imports.each do |mi| %>
           <tr class="hover:bg-gray-50">
-            <td class="font-medium text-gray-900 min-w-[12rem]">
+            <td class="font-medium text-gray-900">
               <%= link_to mi.title.truncate(50), admin_media_import_path(mi), class: "text-blue-600 hover:underline" %>
             </td>
             <td class="text-gray-500">
@@ -53,11 +54,11 @@
                 </div>
               <% end %>
             </td>
-            <td class="text-gray-500 whitespace-nowrap">
+            <td class="text-gray-500">
               <%= mi.updated_at.strftime("%Y-%m-%d %H:%M") %>
             </td>
             <td>
-              <div class="flex gap-2 whitespace-nowrap">
+              <div class="flex gap-2">
                 <% if mi.pending? %>
                   <%= button_to "Process", process_now_admin_media_import_path(mi),
                       method: :post,
@@ -71,7 +72,7 @@
                 <%= button_to "Delete", admin_media_import_path(mi),
                     method: :delete,
                     class: "text-red-600 hover:text-red-900 text-xs",
-                    data: { confirm: "Delete this import?" } %>
+                    form: { data: { turbo_confirm: "Delete this import?" } } %>
               </div>
             </td>
           </tr>

@@ -1,5 +1,5 @@
 <div class="max-w-2xl">
-  <%= admin_page_header "Seol Ríomhphost chuig na hÚsáideoirí" %>
+  <%= admin_page_header "Seol Ríomhphost chuig na hÚsáideoirí", back: ["Siar", admin_emails_path] %>
 
   <div class="bg-white shadow rounded-lg p-6">
     <%= form_with model: @email, url: admin_emails_path, method: :post, local: true, class: "space-y-6" do |form| %>

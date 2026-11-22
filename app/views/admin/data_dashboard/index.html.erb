@@ -1,7 +1,5 @@
 <div>
   <%= admin_page_header "Data dashboard", subtitle: "Mayo Irish speech AI — corpus overview and readiness" do %>
-    <%= link_to "Analyze Unprocessed", "#", class: admin_button_class(:primary),
-        data: { confirm: "This will queue analysis jobs for all unanalyzed recordings. Continue?" } %>
     <%= link_to "Users", admin_users_path, class: admin_button_class(:secondary) %>
   <% end %>
 
