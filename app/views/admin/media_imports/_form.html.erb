@@ -44,8 +44,8 @@
   <% end %>
 
   <div class="flex gap-3">
-    <%= form.submit class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer" %>
-    <%= link_to "Cancel", admin_media_imports_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+    <%= form.submit class: admin_button_class(:primary) %>
+    <%= link_to "Cancel", admin_media_imports_path, class: admin_button_class(:secondary) %>
   </div>
 
 <% end %>

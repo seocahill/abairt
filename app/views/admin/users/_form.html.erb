@@ -115,7 +115,7 @@
   </div>
 
   <div class="mt-6 pt-6 border-t border-gray-200 flex justify-end gap-3">
-    <%= link_to "Cancel", (user.persisted? ? admin_user_path(user) : admin_users_path), class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
-    <%= form.submit submit_label, class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+    <%= link_to "Cancel", (user.persisted? ? admin_user_path(user) : admin_users_path), class: admin_button_class(:secondary) %>
+    <%= form.submit submit_label, class: admin_button_class(:primary) %>
   </div>
 <% end %>

@@ -1,12 +1,20 @@
-<div class="container mx-auto px-4 py-8 max-w-2xl">
-
-  <div class="mb-6">
-    <%= link_to "← Back to Media Imports", admin_media_imports_path, class: "text-gray-600 hover:text-gray-900 text-sm" %>
-  </div>
+<div class="max-w-2xl">
+  <%= admin_page_header @media_import.title, back: ["Media imports", admin_media_imports_path] do %>
+    <% if @media_import.pending? %>
+      <%= button_to "Process now", process_now_admin_media_import_path(@media_import),
+          method: :post, class: admin_button_class(:positive) %>
+    <% elsif @media_import.failed? %>
+      <%= button_to "Retry", retry_admin_media_import_path(@media_import),
+          method: :post, class: admin_button_class(:primary) %>
+    <% end %>
+    <%= link_to "Edit", edit_admin_media_import_path(@media_import), class: admin_button_class(:secondary) %>
+    <%= button_to "Delete", admin_media_import_path(@media_import),
+        method: :delete, class: admin_button_class(:danger),
+        form: { data: { turbo_confirm: "Delete this import?" } } %>
+  <% end %>
 
   <div class="bg-white shadow rounded-lg p-6">
-    <div class="flex justify-between items-start mb-6">
-      <h1 class="text-2xl font-bold"><%= @media_import.title %></h1>
+    <div class="mb-6">
       <% status_colors = { "pending" => "bg-yellow-100 text-yellow-800", "imported" => "bg-green-100 text-green-800", "skipped" => "bg-gray-100 text-gray-800", "failed" => "bg-red-100 text-red-800" } %>
       <span class="px-3 py-1 text-sm font-semibold rounded-full <%= status_colors[@media_import.status] %>">
         <%= @media_import.status.humanize %>
@@ -55,20 +63,6 @@
         <% end %>
       </div>
     </dl>
-
-    <div class="mt-6 pt-6 border-t border-gray-100 flex gap-3">
-      <% if @media_import.pending? %>
-        <%= button_to "Process Now", process_now_admin_media_import_path(@media_import),
-            method: :post, class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" %>
-      <% elsif @media_import.failed? %>
-        <%= button_to "Retry", retry_admin_media_import_path(@media_import),
-            method: :post, class: "px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700" %>
-      <% end %>
-      <%= link_to "Edit", edit_admin_media_import_path(@media_import), class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
-      <%= button_to "Delete", admin_media_import_path(@media_import),
-          method: :delete, class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700",
-          data: { confirm: "Delete this import?" } %>
-    </div>
   </div>
 
 </div>

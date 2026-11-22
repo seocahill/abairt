@@ -75,4 +75,10 @@ class MediaImportTest < ActiveSupport::TestCase
     assert_equal 1, MediaImport.imported.count
     assert_equal 1, MediaImport.skipped.count
   end
+
+  test "search matches title or URL, ignoring case, and treats % and _ as text" do
+    assert_equal [media_imports(:one)], MediaImport.search("TEST1").to_a
+    assert_includes MediaImport.search("test recording 2"), media_imports(:two)
+    assert_empty MediaImport.search("%")
+  end
 end

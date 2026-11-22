@@ -1,16 +1,7 @@
-<div class="container mx-auto px-4 py-8">
-
-  <div class="flex justify-between items-center mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">Training Data Dashboard</h1>
-      <p class="mt-1 text-sm text-gray-500">Mayo Irish speech AI — corpus overview and readiness</p>
-    </div>
-    <div class="flex gap-2">
-      <%= link_to "Analyze Unprocessed", "#", class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm",
-          data: { confirm: "This will queue analysis jobs for all unanalyzed recordings. Continue?" } %>
-      <%= link_to "Users", admin_users_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm" %>
-    </div>
-  </div>
+<div>
+  <%= admin_page_header "Data dashboard", subtitle: "Mayo Irish speech AI — corpus overview and readiness" do %>
+    <%= link_to "Users", admin_users_path, class: admin_button_class(:secondary) %>
+  <% end %>
 
   <%# ─── CORPUS OVERVIEW ─────────────────────────────────────────── %>
   <section class="mb-8">
@@ -238,39 +229,39 @@
       Top Speakers by Duration
       <span class="ml-2 text-green-600 font-normal normal-case text-xs">★ = TTS candidate (5+ hrs)</span>
     </h2>
-    <div class="bg-white shadow rounded-lg overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Speaker</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dialect</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ability</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entries</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Audio</th>
+            <th>Speaker</th>
+            <th>Dialect</th>
+            <th>Gender</th>
+            <th>Ability</th>
+            <th>Entries</th>
+            <th>Hours</th>
+            <th>Audio</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody>
           <% max_hours = @speakers.first&.dig(:hours).to_f.nonzero? || 1 %>
           <% @speakers.each do |s| %>
             <tr class="hover:bg-gray-50">
-              <td class="px-4 py-3 text-sm font-medium text-gray-900">
+              <td class="font-medium text-gray-900">
                 <%= link_to s[:name], admin_user_path(s[:id]), class: "text-blue-600 hover:underline" %>
                 <% if s[:tts_candidate] %>
                   <span class="ml-1 text-green-500 text-xs" title="TTS candidate">★</span>
                 <% end %>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-500"><%= s[:dialect] || "—" %></td>
-              <td class="px-4 py-3 text-sm text-gray-500"><%= s[:voice] || "—" %></td>
-              <td class="px-4 py-3 text-sm text-gray-500">
+              <td class="text-gray-500"><%= s[:dialect] || "—" %></td>
+              <td class="text-gray-500"><%= s[:voice] || "—" %></td>
+              <td class="text-gray-500">
                 <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
                   <%= s[:ability] || "—" %>
                 </span>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-500"><%= number_with_delimiter(s[:entries]) %></td>
-              <td class="px-4 py-3 text-sm font-semibold text-gray-800"><%= s[:hours] %></td>
-              <td class="px-4 py-3 w-32">
+              <td class="text-gray-500"><%= number_with_delimiter(s[:entries]) %></td>
+              <td class="font-semibold text-gray-800"><%= s[:hours] %></td>
+              <td class="w-32">
                 <div class="w-full bg-gray-100 rounded-full h-2">
                   <div class="h-2 rounded-full <%= s[:tts_candidate] ? 'bg-green-500' : 'bg-blue-400' %>"
                        style="width: <%= [(s[:hours] / max_hours * 100), 100].min.round %>%"></div>
@@ -287,24 +278,24 @@
   <% if @recent.any? %>
     <section class="mb-8">
       <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Recently Analyzed</h2>
-      <div class="bg-white shadow rounded-lg overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recording</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dialect</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Locations</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Topics</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Analyzed</th>
+              <th>Recording</th>
+              <th>Dialect</th>
+              <th>Locations</th>
+              <th>Topics</th>
+              <th>Analyzed</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody>
             <% @recent.each do |r| %>
               <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm font-medium">
+                <td class="font-medium">
                   <%= link_to r[:title]&.truncate(45), voice_recording_path(r[:id]), class: "text-blue-600 hover:underline" %>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500">
+                <td class="text-gray-500">
                   <% if r[:dialect].present? %>
                     <span class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">
                       <%= r[:dialect].humanize %>
@@ -313,9 +304,9 @@
                     <span class="text-gray-400">—</span>
                   <% end %>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500"><%= r[:locations].presence || "—" %></td>
-                <td class="px-4 py-3 text-sm text-gray-500"><%= r[:topics].presence || "—" %></td>
-                <td class="px-4 py-3 text-sm text-gray-400"><%= r[:analyzed_at] %></td>
+                <td class="text-gray-500"><%= r[:locations].presence || "—" %></td>
+                <td class="text-gray-500"><%= r[:topics].presence || "—" %></td>
+                <td class="text-gray-400"><%= r[:analyzed_at] %></td>
               </tr>
             <% end %>
           </tbody>

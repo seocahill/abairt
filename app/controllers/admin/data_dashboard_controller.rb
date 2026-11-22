@@ -118,7 +118,7 @@ module Admin
         .group("users.dialect")
         .select("users.dialect, COUNT(*) as entry_count, SUM(dictionary_entries.region_end - dictionary_entries.region_start) as seconds")
 
-      total_seconds = rows.sum(&:seconds).to_f
+      total_seconds = rows.sum { |r| r.seconds.to_f }
 
       rows.map do |r|
         {
@@ -164,7 +164,7 @@ module Admin
         .group(:voice)
         .select("voice, COUNT(DISTINCT users.id) as speaker_count, SUM(dictionary_entries.region_end - dictionary_entries.region_start) as seconds")
 
-      total = rows.sum(&:seconds).to_f
+      total = rows.sum { |r| r.seconds.to_f }
 
       rows.map do |r|
         {

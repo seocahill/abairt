@@ -1,14 +1,9 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="mb-6 flex items-center justify-between">
-    <%= link_to "← Back to Locations", admin_locations_path, class: "text-gray-600 hover:text-gray-900" %>
-  </div>
+<div>
+  <%= admin_page_header "Edit location", subtitle: @location.name, back: ["Locations", admin_locations_path] %>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Form -->
     <div class="bg-white shadow rounded-lg overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-        <h1 class="text-2xl font-bold text-gray-900">Edit Location</h1>
-      </div>
 
       <%= form_with model: [:admin, @location], local: true, class: "px-6 py-6", data: { controller: "location-edit" } do |form| %>
         <% if @location.errors.any? %>
@@ -88,12 +83,12 @@
           <div>
             <%= button_to "Geocode", geocode_admin_location_path(@location),
                 method: :post,
-                class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50",
+                class: admin_button_class(:secondary),
                 title: "Look up coordinates via Nominatim" %>
           </div>
           <div class="flex gap-3">
-            <%= link_to "Cancel", admin_locations_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
-            <%= form.submit "Save", class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+            <%= link_to "Cancel", admin_locations_path, class: admin_button_class(:secondary) %>
+            <%= form.submit "Save", class: admin_button_class(:primary) %>
           </div>
         </div>
       <% end %>

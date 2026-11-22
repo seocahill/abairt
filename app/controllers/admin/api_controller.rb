@@ -9,7 +9,7 @@ module Admin
 
     def index
       scope = User.where.not(api_token: nil).order(updated_at: :desc)
-      scope = scope.where("name ILIKE ? OR email ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
+      scope = scope.search(params[:search])
 
       @pagy, @api_users = pagy(scope, items: 25)
 

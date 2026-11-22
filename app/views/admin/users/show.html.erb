@@ -1,32 +1,21 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="mb-6 flex items-center justify-between">
-    <%= link_to "← Back to Users", admin_users_path, class: "text-gray-600 hover:text-gray-900" %>
-  </div>
+<div class="max-w-4xl">
+  <%= admin_page_header @user.name, back: ["Users", admin_users_path] do %>
+    <%= link_to "Edit", edit_admin_user_path(@user), class: admin_button_class(:primary) %>
+    <% unless @user.confirmed? %>
+      <%= button_to "Approve", approve_admin_user_path(@user), method: :post, class: admin_button_class(:positive) %>
+      <%= button_to "Reject", reject_admin_user_path(@user), method: :post, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure? This will delete the user." } } %>
+    <% end %>
+    <%= button_to "Delete", admin_user_path(@user), method: :delete, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure?" } } %>
+  <% end %>
 
   <div class="bg-white shadow rounded-lg overflow-hidden">
-    <!-- User Header -->
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-      <div class="flex items-start justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900"><%= @user.name %></h1>
-          <div class="mt-2 flex gap-2">
-            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"><%= @user.role.humanize %></span>
-            <% if @user.confirmed? %>
-              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
-            <% else %>
-              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-            <% end %>
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <%= link_to "Edit", edit_admin_user_path(@user), class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" %>
-          <% unless @user.confirmed? %>
-            <%= button_to "Approve", approve_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" %>
-            <%= button_to "Reject", reject_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure? This will delete the user." } %>
-          <% end %>
-          <%= button_to "Delete", admin_user_path(@user), method: :delete, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure?" } %>
-        </div>
-      </div>
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-wrap gap-2">
+      <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"><%= @user.role.humanize %></span>
+      <% if @user.confirmed? %>
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
+      <% else %>
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+      <% end %>
     </div>
 
     <%# How a Telegram speaker is connected to their chat: send them this, they
@@ -109,14 +98,14 @@
 
       <!-- API Token Section -->
       <div class="mt-8 pt-6 border-t border-gray-200">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
           <h3 class="text-lg font-medium text-gray-900">API Token</h3>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             <% if @user.api_token.present? %>
-              <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm" %>
-              <%= button_to "Revoke Token", revoke_api_token_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm", data: { confirm: "Are you sure?" } %>
+              <%= button_to "Regenerate Token", regenerate_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:secondary) %>
+              <%= button_to "Revoke Token", revoke_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure?" } } %>
             <% else %>
-              <%= button_to "Generate Token", generate_api_token_admin_user_path(@user), method: :post, class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" %>
+              <%= button_to "Generate Token", generate_api_token_admin_user_path(@user), method: :post, class: admin_button_class(:positive) %>
             <% end %>
           </div>
         </div>

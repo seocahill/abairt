@@ -8,6 +8,12 @@ class MediaImport < ApplicationRecord
   scope :pending, -> { where(status: :pending) }
   scope :imported, -> { where(status: :imported) }
   scope :skipped, -> { where(status: :skipped) }
+  # Title or URL contains the text. Arel's matches is ILIKE on Postgres and
+  # LIKE (case-insensitive for ASCII) on SQLite.
+  scope :search, ->(query) {
+    pattern = "%#{sanitize_sql_like(query)}%"
+    where(arel_table[:title].matches(pattern)).or(where(arel_table[:url].matches(pattern)))
+  }
 
   def mark_as_imported!
     update!(status: :imported, imported_at: Time.current, error_message: nil)
