@@ -2,7 +2,7 @@ require "test_helper"
 
 module Admin
   class DashboardsControllerTest < ActionDispatch::IntegrationTest
-    ALWAYS_LISTED = %w[/admin/users /users /admin_emails /admin/locations /admin/questions
+    ALWAYS_LISTED = %w[/admin/users /admin_emails /admin/locations /admin/questions
       /admin/media_imports /admin/data_dashboard /admin/island_context_playground
       /flipper /jobs /admin/api].freeze
 
@@ -34,10 +34,29 @@ module Admin
       assert_select "nav[aria-label=Admin] a[href=?]", admin_root_path
     end
 
-    test "there is no Tags link: /tags is a JSON endpoint, not a page" do
+    test "no admin link leaves the admin area: no Tags (a JSON endpoint) or public Speakers page" do
       sign_in_as(@admin)
       get admin_root_path
       assert_select "a[href=?]", "/tags", false
+      assert_select "nav[aria-label=Admin] a[href=?]", "/users", false
+      assert_select "[data-admin-menu] a[href=?]", "/users", false
+    end
+
+    test "flagged admin pages appear in the sidebar only when their flag is on" do
+      sign_in_as(@admin)
+      get admin_locations_path
+      assert_select "nav[aria-label=Admin] a[href=?]", "/admin/training_progress", false
+      Flipper.enable(:f142_training_progress)
+      get admin_locations_path
+      assert_select "nav[aria-label=Admin] a[href=?]", "/admin/training_progress"
+    end
+
+    test "the learner's question screen is not an admin page" do
+      sign_in_as(@admin)
+      get new_question_path
+      assert_response :success
+      assert_select "nav[aria-label=Admin]", false
+      assert_select "a[href=?][aria-current]", "/admin", false
     end
 
     test "the sidebar marks the current page, and pages under it" do
@@ -55,16 +74,16 @@ module Admin
     test "the top bar's Admin link is marked on admin pages only" do
       sign_in_as(@admin)
       get admin_questions_path
-      assert_select "a[href=?][aria-current=page]", "/admin", text: "Admin"
+      assert_select "a[href=?][aria-current=true]", "/admin", text: "Admin"
       get home_path
-      assert_select "a[href=?][aria-current=page]", "/admin", false
+      assert_select "a[href=?][aria-current]", "/admin", false
     end
 
     test "the phone menu lists the admin pages for admins, on any page" do
       sign_in_as(@admin)
       get home_path
-      assert_select "[data-admin-menu] a[href=?]", "/flipper"
-      assert_select "[data-admin-menu] a[href=?]", "/admin/users"
+      ALWAYS_LISTED.each { |path| assert_select "[data-admin-menu] a[href=?]", path, true, "missing #{path}" }
+      assert_select "[data-admin-menu] a[href=?]", admin_root_path
       assert_select "nav[aria-label=Admin]", false
     end
 

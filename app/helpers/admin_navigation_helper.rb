@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AdminNavigationHelper
-  LINK_CLASS = "flex items-center min-h-12 md:min-h-10 px-3 rounded-lg text-sm"
+  LINK_CLASS = "flex items-center min-h-12 md:min-h-9 px-2 md:px-3 rounded-lg text-base md:text-sm"
   CURRENT_CLASS = "bg-gray-900 text-white font-medium"
   OTHER_CLASS = "text-gray-300 hover:bg-gray-700 hover:text-white"
 

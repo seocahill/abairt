@@ -26,7 +26,6 @@ class AdminNavigation
     {
       "People" => [
         item("Users", "Approve sign-ups, edit people and roles.", routes.admin_users_path),
-        item("Speakers", "Browse the speakers whose Irish is recorded.", routes.users_path),
         item("Email users", "Write to and email users.", routes.admin_emails_path),
         item("Locations", "Check and geocode where speakers are from.", routes.admin_locations_path)
       ],

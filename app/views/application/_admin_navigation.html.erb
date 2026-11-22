@@ -1,5 +1,8 @@
-<%# Admin pages, tablet and desktop: a sidebar that stays in view while the
-    page scrolls. On phones these links are in the hamburger menu instead. %>
-<nav aria-label="Admin" class="site-chrome hidden md:block md:w-56 lg:w-64 md:shrink-0 md:sticky md:top-0 md:self-start md:h-screen md:overflow-y-auto bg-gray-800 px-3 py-6">
-  <%= render "admin_links" %>
+<%# Admin pages, tablet and desktop: a sidebar column as tall as the page,
+    whose links stay in view while the page scrolls. On phones these links
+    are in the hamburger menu instead. %>
+<nav aria-label="Admin" class="site-chrome hidden md:block md:w-56 lg:w-64 md:shrink-0 bg-gray-800">
+  <div class="md:sticky md:top-0 md:max-h-screen md:overflow-y-auto px-3 py-4">
+    <%= render "admin_links" %>
+  </div>
 </nav>

@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
   end
 
   def admin_page?
-    controller_path.start_with?("admin/") || %w[admin_emails questions].include?(controller_path)
+    controller_path.start_with?("admin/") || controller_path == "admin_emails"
   end
 
   def root_redirect
