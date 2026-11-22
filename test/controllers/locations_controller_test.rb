@@ -90,11 +90,29 @@ class LocationsControllerTest < ActionDispatch::IntegrationTest
     get location_url(@location)
     assert_select "#pagination a[rel=next][data-turbo-stream=true]"
 
+    first_page = css_select("#recordings-container a[href^='/voice_recordings/']").pluck("href").uniq
+
     get location_url(@location, page: 2), as: :turbo_stream
     assert_response :success
     assert_equal Mime[:turbo_stream], response.media_type
     assert_select "turbo-stream[action=append][target=recordings-container]"
-    assert_select "turbo-stream[action=replace][target=pagination]"
+    assert_select "turbo-stream[action=replace][target=pagination]", text: /No more recordings to load/
+    second_page = css_select("turbo-stream[action=append] a[href^='/voice_recordings/']").pluck("href").uniq
+    assert_equal 2, second_page.size
+    assert_empty first_page & second_page
+  end
+
+  test "flag off: Load More request is not found" do
+    Flipper.disable(:f172_place_pages)
+    get location_url(@location, page: 2), as: :turbo_stream
+    assert_response :not_found
+  end
+
+  test "flag on: a place without coordinates has a page but no map" do
+    Flipper.enable(:f172_place_pages)
+    get location_url(@location)
+    assert_response :success
+    assert_select "#map", false
   end
 
   test "flag on: the map opens on the place" do
@@ -110,6 +128,7 @@ class LocationsControllerTest < ActionDispatch::IntegrationTest
     @location.update!(latitude: 54.1, longitude: -9.8)
     @recording.update_columns(location_id: @location.id)
     voice_recordings(:two).update_columns(location_id: @location.id)
+    voice_recordings(:two).media.attach(io: StringIO.new("fake audio"), filename: "two.mp3", content_type: "audio/mpeg")
 
     Flipper.enable(:f172_place_pages)
     get voice_recordings_url

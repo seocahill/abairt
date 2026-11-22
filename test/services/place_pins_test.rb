@@ -46,17 +46,38 @@ class PlacePinsTest < ActiveSupport::TestCase
     assert_not_includes pin.to_s, "Pin Speaker"
   end
 
-  test "a place without coordinates gets no pin of its own" do
+  test "a place without coordinates gets no pin; its recording falls back to the speaker" do
     nowhere = locations(:achill)
-    record("Somewhere", location: nowhere)
+    recording = record("Somewhere", location: nowhere)
+    speaker = User.create!(name: "Fallback Speaker", email: "fallback@example.com", role: :speaker, lat_lang: "54.0,-9.5")
+    DictionaryEntry.create!(voice_recording: recording, speaker: speaker, owner: @owner, word_or_phrase: "x", region_start: 0, region_end: 1)
 
     assert_empty place_pins_for(nowhere)
+    assert(PlacePins.new.call.any? { |pin| pin[:location_id].nil? && pin[:recordings].pluck(:id).include?(recording.id) })
+  end
+
+  test "includes recordings linked through a recording location, as the place page does" do
+    linked = record("Linked")
+    VoiceRecordingLocation.create!(voice_recording: linked, location: @place, confidence: "low")
+
+    pin = place_pins_for(@place).first
+
+    assert_equal [linked.id], pin[:recordings].pluck(:id)
+    assert(PlacePins.new.call.none? { |p| p[:location_id].nil? && p[:recordings].pluck(:id).include?(linked.id) })
+  end
+
+  test "a place whose recordings have no audio gets no pin, so no dead link to its page" do
+    record("Silent", location: @place, audio: false)
+
+    assert_empty place_pins_for(@place)
   end
 
   private
 
-  def record(title, **attributes)
-    VoiceRecording.create!(title: title, owner: @owner, **attributes)
+  def record(title, audio: true, **attributes)
+    VoiceRecording.create!(title: title, owner: @owner, **attributes).tap do |recording|
+      recording.media.attach(io: StringIO.new("fake audio"), filename: "a.mp3", content_type: "audio/mpeg") if audio
+    end
   end
 
   def place_pins_for(location)

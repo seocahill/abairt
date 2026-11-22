@@ -113,18 +113,18 @@ export default class extends Controller {
         content = `
           <div class="text-center">
             <strong>${pin.location_id ? `<a href="/locations/${pin.location_id}">${this.escape(pin.location_name)}</a>` : this.escape(pin.location_name || '')}</strong><br>
-            <a href="/voice_recordings/${pin.recording_id}">${pin.recording_title}</a>
+            <a href="/voice_recordings/${pin.recording_id}">${this.escape(pin.recording_title || '')}</a>
           </div>
         `;
       } else if (pin.lat_lang && pin.lat_lang.trim() !== '') {
         // Legacy format support (users page)
         marker = L.marker(pin.lat_lang.split(','));
         if (pin.media_url) {
-          content = `<a href="/users/${pin.id}">${pin.name}</a><audio controls src="${pin.media_url}"></audio>`;
+          content = `<a href="/users/${pin.id}">${this.escape(pin.name || '')}</a><audio controls src="${pin.media_url}"></audio>`;
         } else if (pin.recording_id) {
-          content = `<a href="/voice_recordings/${pin.recording_id}">${pin.recording_title}</a>`;
+          content = `<a href="/voice_recordings/${pin.recording_id}">${this.escape(pin.recording_title || '')}</a>`;
         } else {
-          content = `<a href="/users/${pin.id}">${pin.name}</a>`;
+          content = `<a href="/users/${pin.id}">${this.escape(pin.name || '')}</a>`;
         }
       }
 
@@ -168,21 +168,24 @@ export default class extends Controller {
   }
 
   // A place's name, a button to its page, then its recordings spaced apart so
-  // a tap lands on the one meant. Pins with no place are drawn at a speaker's
+  // a tap lands on the one meant. Pins with no mapped place are drawn at a speaker's
   // location and say so rather than showing the speaker's name as the place.
   placePopup(pin) {
     const heading = pin.location_name
       ? `<div class="text-sm font-semibold text-gray-900">${this.escape(pin.location_name)}</div>`
-      : `<div class="text-sm font-semibold text-gray-500">No place set</div>
+      : `<div class="text-sm font-semibold text-gray-500">Place not on the map</div>
          <div class="text-xs text-gray-500">Shown at the speaker's location</div>`;
     const button = pin.location_id
-      ? `<a href="/locations/${pin.location_id}" class="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md !text-gray-700 bg-white hover:bg-gray-50">Open place page</a>`
+      ? `<a href="/locations/${pin.location_id}" class="mt-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md !text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Open place page</a>`
       : '';
     const items = pin.recordings.map((recording) =>
-      `<li><a href="/voice_recordings/${recording.id}" class="block py-2 text-sm">${this.escape(recording.title)}</a></li>`
+      `<li><a href="/voice_recordings/${recording.id}" class="block py-2 text-sm !text-indigo-700 hover:!text-indigo-900">${this.escape(recording.title)}</a></li>`
     ).join('');
     const list = items ? `<ul class="mt-3 border-t border-gray-100 divide-y divide-gray-100">${items}</ul>` : '';
-    const more = pin.more > 0 ? `<div class="pt-2 text-xs text-gray-500">and ${pin.more} more</div>` : '';
+    const moreText = `and ${pin.more} more`;
+    const more = pin.more > 0
+      ? `<div class="pt-2 text-xs text-gray-500">${pin.location_id ? `<a href="/locations/${pin.location_id}" class="!text-gray-500 underline">${moreText}</a>` : moreText}</div>`
+      : '';
     return `<div class="w-56">${heading}${button}${list}${more}</div>`;
   }
 
