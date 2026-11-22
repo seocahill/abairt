@@ -18,6 +18,14 @@ class DropLearnerEraSchemaTest < ActiveSupport::TestCase
     @entry = dictionary_entries(:one)
   end
 
+  # `down` brings the old user columns back and the fixtures above make User
+  # cache them. The transaction rolls the schema back after each test but not
+  # that cache, so without this the next test to save a user writes to columns
+  # that are gone (seed 28254).
+  teardown do
+    User.reset_column_information
+  end
+
   test "drops the learner-era tables and the unused user columns" do
     @migration.up
 
