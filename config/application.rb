@@ -35,6 +35,8 @@ module Abairt
     # /jobs is already restricted to admins by AdminConstraint in routes; Mission Control's own
     # HTTP basic auth (on by default since 1.0) would answer 401 to them.
     config.mission_control.jobs.http_basic_auth_enabled = false
+    # Its "Back to main app" link goes to the admin overview rather than the home page.
+    config.mission_control.jobs.back_to_main_app_path = "/admin"
 
     # Host headers the MCP transport accepts besides loopback (DNS rebinding protection, mcp >= 1.x).
     config.x.mcp.allowed_hosts = %w[abairt.com www.abairt.com]

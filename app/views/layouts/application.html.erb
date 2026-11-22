@@ -28,16 +28,24 @@
       <%= render "nav" %>
 
       <% if admin_user? && admin_page? %>
-        <%= render "admin_navigation" %>
+        <div class="md:flex">
+          <%= render "admin_navigation" %>
+          <div class="flex-1 min-w-0 md:px-2 lg:px-4">
+            <%= render "flash" %>
+            <main class="w-full">
+              <%= yield %>
+            </main>
+          </div>
+        </div>
+      <% else %>
+        <!-- Flash Messages -->
+        <%= render "flash" %>
+
+        <!-- Main Content Area -->
+        <main class="w-full">
+          <%= yield %>
+        </main>
       <% end %>
-
-      <!-- Flash Messages -->
-      <%= render "flash" %>
-
-      <!-- Main Content Area -->
-      <main class="w-full">
-        <%= yield %>
-      </main>
 
       <%= yield :footer %>
     </div>

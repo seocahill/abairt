@@ -1,0 +1,12 @@
+<%# The admin pages, grouped. Used by the desktop sidebar and the phone menu. %>
+<ul class="space-y-1">
+  <li><%= admin_nav_link "Overview", admin_root_path, exact: true %></li>
+</ul>
+<% AdminNavigation.new(current_user).sections.each do |section| %>
+  <p class="mt-5 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400"><%= section.title %></p>
+  <ul class="space-y-1">
+    <% section.items.each do |item| %>
+      <li><%= admin_nav_link item.title, item.path, turbo: item.turbo %></li>
+    <% end %>
+  </ul>
+<% end %>

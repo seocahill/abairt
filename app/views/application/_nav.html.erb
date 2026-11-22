@@ -24,7 +24,7 @@
       <div class="hidden md:block">
         <div class="ml-4 flex items-center md:ml-6">
           <% if admin_user? %>
-            <%= link_to "Admin", admin_root_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+            <%= link_to "Admin", admin_root_path, class: ["px-3 py-2 rounded-md text-sm font-medium", admin_page? ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"], aria: {current: (admin_page? ? "page" : nil)} %>
           <% end %>
           <div class="ml-3 relative flex items-center">
             <% if current_user.nil? %>
@@ -81,8 +81,9 @@
             <%= link_to current_user.name, current_user, class: "flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
           </li>
           <% if admin_user? %>
-            <li class="pt-4 mt-4 border-t border-gray-700">
-              <%= link_to 'Admin', admin_root_path, class: "flex items-center min-h-12 p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white" %>
+            <li class="pt-4 mt-4 border-t border-gray-700" data-admin-menu>
+              <p class="px-3 mb-1 text-sm font-semibold text-white uppercase">Admin</p>
+              <%= render "admin_links" %>
             </li>
           <% end %>
           <li>
