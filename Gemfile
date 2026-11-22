@@ -16,7 +16,7 @@ gem 'ostruct'
 
 # Other gems
 gem 'acts-as-taggable-on'
-gem 'aws-sdk-s3', '~> 1.242'
+gem 'aws-sdk-s3', '~> 1.245'
 gem 'dotenv', '~> 2.8'
 gem 'geocoder', '~> 1.8'
 gem 'groupdate', '~> 6.8'
@@ -31,7 +31,7 @@ gem 'mailjet', '~> 1.9'
 gem 'alba', '~> 4.0'
 gem 'oj', '~> 3.17', '>= 3.17.3'
 gem 'doorkeeper', '~> 5.9' # OAuth 2 provider for MCP authorization
-gem 'mcp', '~> 1.10' # Model Context Protocol server for Claude web
+gem 'mcp', '~> 1.11' # Model Context Protocol server for Claude web
 gem 'has_scope', '~> 0.9'
 gem 'mini_portile2', '~> 2.8.5'
 gem 'multi_json', '~> 1.21'
