@@ -9,7 +9,6 @@
       Cláraigh / Sign up
     </h2>
 
-    <% session[:form_start_time] = Time.current %>
     <%= form_with(model: @user, url: registrations_path, id: "claraigh") do |form| %>
       <% if simple_signup? %>
         <% if @user.errors.any? %>

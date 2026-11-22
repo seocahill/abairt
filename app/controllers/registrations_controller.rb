@@ -6,11 +6,11 @@ class RegistrationsController < ApplicationController
   rate_limit to: 10, within: 1.hour, only: :create,
     with: -> { redirect_to new_registration_path, alert: "Too many sign-ups from this connection. Please try again later." }
 
-  helper_method :simple_signup?
-
   def new
     @user = User.new
     authorize @user, policy_class: RegistrationPolicy
+    # Starts the bot timer once per form load; a failed create keeps it.
+    session[:form_start_time] = Time.current
   end
 
   def create
@@ -33,12 +33,6 @@ class RegistrationsController < ApplicationController
 
   private
 
-  # Name and email only, with errors shown (flag f121).
-  def simple_signup?
-    return @simple_signup if defined?(@simple_signup)
-    @simple_signup = Flipper.enabled?(:f121_simple_signup, current_user)
-  end
-
   def bot_detected?
     return true if params["bot-field"].present?
     return true if params["website"].present? || params["phone"].present? || params["company"].present?
@@ -59,6 +53,6 @@ class RegistrationsController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :password, :about)
+    params.require(:user).permit(:name, :email, :about)
   end
 end

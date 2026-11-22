@@ -100,4 +100,32 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#signup_errors", text: /Email has already been taken/
     assert_select "input[name=?][value=?]", "user[name]", "Again"
   end
+
+  test "a correction straight after a failed sign-up is not treated as a bot" do
+    Flipper.enable(:f121_simple_signup)
+    travel_to 1.minute.ago do
+      get new_registration_url
+    end
+    post registrations_url, params: {user: {name: "Again", email: users(:two).email}}
+    assert_response :unprocessable_content
+
+    assert_difference("User.count", 1) do
+      post registrations_url, params: {user: {name: "Again", email: "again@example.com"}}
+    end
+    assert_redirected_to root_path
+  end
+
+  test "sign-up ignores a password" do
+    post registrations_url, params: {user: {name: "Sneaky", email: "sneaky@example.com", password: "a-long-password"}}
+    assert_nil User.find_by(email: "sneaky@example.com").password_digest
+  end
+
+  test "flag on: a blank name is shown as the reason" do
+    Flipper.enable(:f121_simple_signup)
+    assert_no_difference("User.count") do
+      post registrations_url, params: {user: {name: "", email: "blank@example.com"}}
+    end
+    assert_response :unprocessable_content
+    assert_select "#signup_errors", text: /Name can't be blank/
+  end
 end
