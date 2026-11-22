@@ -7,6 +7,7 @@ class FlipperDescriptionsTest < ActiveSupport::TestCase
   end
 
   test "flags removed by a later migration are no longer registered" do
+    assert_includes registered_flags, "f172_place_pages"
     refute_includes registered_flags, "f75_asr_eval"
     refute_includes registered_flags, "f142_training_progress"
   end
@@ -48,10 +49,11 @@ class FlipperDescriptionsTest < ActiveSupport::TestCase
   private
 
   # Flags added, minus those a later migration removed, reading each
-  # migration's `up` in order.
+  # migration's `up` (or the whole file when it has none) in order.
   def registered_flags
     Rails.root.glob("db/migrate/*.rb").sort.each_with_object(Set.new) do |file, flags|
-      up = File.read(file)[/def up\b(.*?)^  end/m, 1].to_s
+      source = File.read(file)
+      up = source[/def up\b(.*?)^\s*end\s*\n\s*def down/m, 1] || source
       up.scan(/Flipper\.(add|remove)\(:(\w+)\)/).each { |action, flag| (action == "add") ? flags.add(flag) : flags.delete(flag) }
     end.to_a
   end
