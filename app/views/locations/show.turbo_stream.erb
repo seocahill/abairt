@@ -1,0 +1,2 @@
+<%= turbo_stream.append "recordings-container", partial: "voice_recordings/recording", collection: @recordings, as: :recording %>
+<%= turbo_stream.replace "pagination", partial: "shared/pagination", locals: {pagy: @pagy, turbo_stream: true} %>

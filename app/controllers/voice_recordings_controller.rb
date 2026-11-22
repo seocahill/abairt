@@ -54,31 +54,7 @@ class VoiceRecordingsController < ApplicationController
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
 
-    # Map pins: Location coordinates first, then fall back to speaker coordinates
-    location_pins = VoiceRecording
-      .joins(:location)
-      .where.not(locations: {latitude: nil, longitude: nil})
-      .pluck("voice_recordings.id", "voice_recordings.title", "locations.name", "locations.latitude", "locations.longitude", "locations.id")
-      .map { |id, title, name, lat, lng, location_id|
-        pin = {recording_id: id, recording_title: title, location_name: name, lat: lat.to_f, lng: lng.to_f}
-        pin[:location_id] = location_id if place_pages?
-        pin
-      }
-
-    location_recording_ids = location_pins.pluck(:recording_id)
-
-    speaker_pins = VoiceRecording
-      .joins(:users)
-      .where.not(users: {lat_lang: [nil, ""]})
-      .where.not(id: location_recording_ids)
-      .distinct
-      .pluck("voice_recordings.id", "voice_recordings.title", "users.name", "users.lat_lang")
-      .map { |id, title, speaker, lat_lang|
-        lat, lng = lat_lang.split(",").map(&:to_f)
-        {recording_id: id, recording_title: title, location_name: speaker, lat: lat, lng: lng}
-      }
-
-    @pins = location_pins + speaker_pins
+    @pins = place_pages? ? PlacePins.new.call : recording_pins
 
     respond_to do |format|
       format.html
@@ -333,6 +309,29 @@ class VoiceRecordingsController < ApplicationController
 
   def place_pages?
     Flipper.enabled?(:f172_place_pages, current_user)
+  end
+
+  # One pin per recording: the place's coordinates first, then the speakers'.
+  # With f172_place_pages on, PlacePins groups them into one pin per place.
+  def recording_pins
+    location_pins = VoiceRecording
+      .joins(:location)
+      .where.not(locations: {latitude: nil, longitude: nil})
+      .pluck("voice_recordings.id", "voice_recordings.title", "locations.name", "locations.latitude", "locations.longitude")
+      .map { |id, title, name, lat, lng| {recording_id: id, recording_title: title, location_name: name, lat: lat.to_f, lng: lng.to_f} }
+
+    speaker_pins = VoiceRecording
+      .joins(:users)
+      .where.not(users: {lat_lang: [nil, ""]})
+      .where.not(id: location_pins.pluck(:recording_id))
+      .distinct
+      .pluck("voice_recordings.id", "voice_recordings.title", "users.name", "users.lat_lang")
+      .map { |id, title, speaker, lat_lang|
+        lat, lng = lat_lang.split(",").map(&:to_f)
+        {recording_id: id, recording_title: title, location_name: speaker, lat: lat, lng: lng}
+      }
+
+    location_pins + speaker_pins
   end
 
   def moment_links?
