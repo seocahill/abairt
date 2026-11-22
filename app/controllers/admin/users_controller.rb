@@ -25,7 +25,8 @@ module Admin
       base = @kind.in?(%w[other all]) ? User.all : User.active
       @users = apply_scopes(base.of_kind(@kind).order(created_at: :desc))
       @pagy, @users = pagy(@users, items: params[:per_page] || 50)
-      session[:admin_users_filter] = filter_params.to_h
+      # Where approve, reject and delete come back to: this tab, as filtered.
+      session[:admin_users_filter] = filter_params.to_h.merge(kind: @kind)
     end
 
     def show
@@ -153,7 +154,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:kind, :pending, :role, :search, :per_page)
+      params.permit(:pending, :search, :per_page)
     end
 
     def saved_filter_params

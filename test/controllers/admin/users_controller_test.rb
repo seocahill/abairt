@@ -79,7 +79,7 @@ module Admin
       assert_difference "User.count", -1 do
         post reject_admin_user_path(@pending_user)
       end
-      assert_redirected_to admin_users_path(pending: true)
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
     end
 
     test "should bulk approve users" do
@@ -87,7 +87,7 @@ module Admin
       user2 = users(:john)
       user2.update(confirmed: false)
       post bulk_approve_admin_users_path, params: {user_ids: [@pending_user.id, user2.id]}
-      assert_redirected_to admin_users_path(pending: true)
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
       assert @pending_user.reload.confirmed?
       assert user2.reload.confirmed?
     end
@@ -99,7 +99,7 @@ module Admin
       assert_difference "User.count", -2 do
         post bulk_reject_admin_users_path, params: {user_ids: [@pending_user.id, user2.id]}
       end
-      assert_redirected_to admin_users_path(pending: true)
+      assert_redirected_to admin_users_path(kind: "members", pending: true)
     end
 
     test "should generate API token for user" do
@@ -336,6 +336,13 @@ module Admin
       post reject_admin_user_path(@pending_user)
 
       assert_redirected_to admin_users_path(kind: "members", pending: true)
+    end
+
+    test "deleting from a tab reached by an old role link returns to that tab" do
+      get admin_users_path(role: "speaker")
+      delete admin_user_path(users(:second_speaker))
+
+      assert_redirected_to admin_users_path(kind: "speakers")
     end
 
     test "the new form starts with the role of the kind asked for" do
