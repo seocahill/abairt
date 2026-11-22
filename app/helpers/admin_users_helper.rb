@@ -15,7 +15,7 @@ module AdminUsersHelper
     "speakers" => "The people who are recorded and who answer questions. They never sign in.",
     "staff" => "Admins, and accounts that reach the corpus through the API.",
     "other" => "Not people: AI voices, places, and the unnamed speakers diarisation creates.",
-    "all" => "Everyone except the unnamed speakers diarisation creates."
+    "all" => "Everyone, of every kind."
   }.freeze
 
   NEW_USER_LABELS = {

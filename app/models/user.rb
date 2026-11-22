@@ -117,6 +117,13 @@ class User < ApplicationRecord
     KINDS.find { |_kind, roles| roles.include?(role) }&.first || :other
   end
 
+  # Whether admin should show and edit speaker data (voice, dialect, place,
+  # answering questions). Teachers are still treated as speakers in places,
+  # and anyone taking questions needs their Telegram fields to stay reachable.
+  def carries_speaker_data?
+    kind.in?(%i[speakers other]) || teacher? || answers_questions?
+  end
+
   def telegram_speaker?
     answers_questions?
   end

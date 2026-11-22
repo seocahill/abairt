@@ -26,7 +26,7 @@
     </div>
   <% end %>
 
-  <% if @users.empty? %>
+  <% if @users.load.empty? %>
     <p class="mb-4 text-sm text-gray-500">No one here<%= " matching “#{params[:search]}”" if params[:search].present? %>.</p>
   <% else %>
     <%= render "admin/users/tables/#{@kind.in?(%w[members speakers staff]) ? @kind : "people"}", users: @users %>

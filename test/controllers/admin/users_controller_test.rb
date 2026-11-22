@@ -278,13 +278,43 @@ module Admin
       assert_select "a", text: "New staff or API user"
     end
 
-    test "only the other tab lists the unnamed speakers diarisation leaves" do
+    test "the unnamed speakers diarisation leaves are listed under Other and All only" do
       get admin_users_path(kind: "other")
       assert_select "td a", text: users(:temporary).name
 
       get admin_users_path(kind: "all")
-      assert_select "td a", text: users(:temporary).name, count: 0
+      assert_select "td a", text: users(:temporary).name
       assert_select "td a", text: users(:speaker).name
+
+      get admin_users_path(kind: "speakers")
+      assert_select "td a", text: users(:temporary).name, count: 0
+    end
+
+    test "an old role link opens on that role's tab" do
+      get admin_users_path(role: "temporary")
+
+      assert_select "nav[aria-label='Kinds of user'] a[aria-current='true']", text: "Other"
+      assert_select "td a", text: users(:temporary).name
+    end
+
+    test "a teacher or a member taking questions keeps the speaker and Telegram fields" do
+      teacher = users(:john)
+      teacher.update!(role: :teacher)
+      get edit_admin_user_path(teacher)
+      assert_select "select[name='user[dialect]']"
+      assert_select "input[name='user[answers_questions]']"
+
+      member = users(:john)
+      member.update!(role: :student, answers_questions: true)
+      get edit_admin_user_path(member)
+      assert_select "input[name='user[answers_questions]']"
+      assert_select "input[name='user[telegram_chat_id]']"
+    end
+
+    test "pagination keeps the tab" do
+      get admin_users_path(kind: "all", per_page: 1)
+
+      assert_select "a[href*='kind=all'][href*='page=2']", text: "Next"
     end
 
     test "search stays within the tab" do

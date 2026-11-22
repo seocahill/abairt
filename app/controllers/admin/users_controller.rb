@@ -19,9 +19,10 @@ module Admin
 
     def index
       # Authorization handled by ensure_admin
-      @kind = params[:kind].presence_in(KIND_TABS) || "members"
-      # Diarisation leaves many unnamed speakers behind; only Other lists them.
-      base = (@kind == "other" || params[:role] == "temporary") ? User.all : User.active
+      @kind = params[:kind].presence_in(KIND_TABS) || kind_of_role || "members"
+      # Diarisation leaves many unnamed speakers behind; only Other and All
+      # list them.
+      base = @kind.in?(%w[other all]) ? User.all : User.active
       @users = apply_scopes(base.of_kind(@kind).order(created_at: :desc))
       @pagy, @users = pagy(@users, items: params[:per_page] || 50)
       session[:admin_users_filter] = filter_params.to_h
@@ -144,6 +145,11 @@ module Admin
       end
 
       redirect_to root_path, alert: "Access denied. Admin privileges required." unless user.admin?
+    end
+
+    # An older link that filters by role opens on that role's tab.
+    def kind_of_role
+      User.new(role: params[:role]).kind.to_s if User.roles.key?(params[:role])
     end
 
     def filter_params

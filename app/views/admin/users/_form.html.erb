@@ -13,8 +13,9 @@
   <% end %>
 
   <%# Each kind of person gets only the fields that kind uses (User::KINDS).
-      Speakers and the "other" rows (AI, place, unnamed) carry speaker data. %>
-  <% speaker_like = user.kind.in?(%i[speakers other]) %>
+      Speakers, the "other" rows (AI, place, unnamed), teachers and anyone
+      taking questions carry speaker data. %>
+  <% speaker_like = user.carries_speaker_data? %>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Left Column -->
     <div class="space-y-6">
