@@ -1,29 +1,31 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold text-gray-900">Training data progress</h1>
-  <p class="mt-1 text-sm text-gray-500">Hours of human-checked audio per speaker against placeholder targets (TTS <%= @progress[:targets][:tts_hours_per_speaker] %> h, ASR <%= @progress[:targets][:asr_hours_per_speaker] %> h per speaker).</p>
+<div>
+  <%= admin_page_header "Training progress",
+        subtitle: "Hours of human-checked audio per speaker against placeholder targets (TTS #{@progress[:targets][:tts_hours_per_speaker]} h, ASR #{@progress[:targets][:asr_hours_per_speaker]} h per speaker)." %>
 
-  <section class="mt-6 overflow-x-auto">
-    <table class="min-w-full bg-white shadow rounded-lg text-sm">
-      <thead class="text-left text-gray-500">
-        <tr><th class="p-3">Speaker</th><th class="p-3">Total h</th><th class="p-3">Checked h</th><th class="p-3">Lines to check</th><th class="p-3">TTS target</th><th class="p-3">ASR target</th></tr>
-      </thead>
-      <tbody>
-        <% @progress[:speakers].each do |row| %>
-          <tr class="border-t">
-            <td class="p-3 font-medium"><%= row[:name] %></td>
-            <td class="p-3"><%= row[:total_hours] %></td>
-            <td class="p-3"><%= row[:checked_hours] %></td>
-            <td class="p-3"><%= row[:lines_to_check] %> of <%= row[:lines_total] %></td>
-            <% %i[tts_progress_percent asr_progress_percent].each do |key| %>
-              <td class="p-3 w-40">
-                <div class="h-2 rounded bg-gray-200"><div class="h-2 rounded bg-blue-600" style="width: <%= row[key] %>%"></div></div>
-                <span class="text-xs text-gray-500"><%= row[key] %>%</span>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <section>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr><th>Speaker</th><th>Total h</th><th>Checked h</th><th>Lines to check</th><th>TTS target</th><th>ASR target</th></tr>
+        </thead>
+        <tbody>
+          <% @progress[:speakers].each do |row| %>
+            <tr>
+              <td class="font-medium"><%= row[:name] %></td>
+              <td><%= row[:total_hours] %></td>
+              <td><%= row[:checked_hours] %></td>
+              <td><%= row[:lines_to_check] %> of <%= row[:lines_total] %></td>
+              <% %i[tts_progress_percent asr_progress_percent].each do |key| %>
+                <td class="w-40">
+                  <div class="h-2 rounded bg-gray-200"><div class="h-2 rounded bg-blue-600" style="width: <%= row[key] %>%"></div></div>
+                  <span class="text-xs text-gray-500"><%= row[key] %>%</span>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
     <% if @progress[:speakers].empty? %><p class="mt-4 text-gray-700">No lines with a speaker yet.</p><% end %>
   </section>
 

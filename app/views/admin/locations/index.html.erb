@@ -1,12 +1,6 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Locations</h1>
-    <div class="text-sm text-gray-500">
-      <%= @stats[:total] %> total,
-      <%= @stats[:with_coordinates] %> with coordinates,
-      <%= @stats[:precise] %> geocoded
-    </div>
-  </div>
+<div>
+  <%= admin_page_header "Locations",
+        subtitle: "#{@stats[:total]} total, #{@stats[:with_coordinates]} with coordinates, #{@stats[:precise]} geocoded" %>
 
   <!-- Stats by Region -->
   <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -18,63 +12,50 @@
     <% end %>
   </div>
 
-  <!-- Search and Filter -->
-  <div class="mb-4 flex flex-col md:flex-row gap-2">
-    <%= form_tag admin_locations_path, method: :get, class: "flex flex-1 gap-2" do %>
-      <%= hidden_field_tag :dialect_region, params[:dialect_region] if params[:dialect_region].present? %>
-      <%= text_field_tag :search, params[:search],
-          placeholder: "Search by name...",
-          class: "flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-      <%= submit_tag "Search", class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
-      <% if params[:search].present? %>
-        <%= link_to "Clear", admin_locations_path(dialect_region: params[:dialect_region]),
-            class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
-      <% end %>
-    <% end %>
-  </div>
+  <%= render "admin/search_form", url: admin_locations_path, placeholder: "Search by name...",
+        keep: {dialect_region: params[:dialect_region]}, clear_path: admin_locations_path(dialect_region: params[:dialect_region]) %>
 
   <!-- Dialect Region Filter -->
-  <div class="mb-4 flex gap-2 flex-wrap">
-    <span class="text-sm text-gray-700 font-medium py-2">Region:</span>
-    <%= link_to "All", admin_locations_path(search: params[:search]),
-        class: "px-3 py-1 text-sm #{params[:dialect_region].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+  <div class="mb-4 flex flex-wrap items-center gap-2">
+    <span class="text-sm text-gray-700 font-medium">Region:</span>
+    <%= admin_filter_link "All", admin_locations_path(search: params[:search]), current: params[:dialect_region].blank? %>
     <% Location.dialect_regions.each_key do |region| %>
-      <%= link_to region.humanize, admin_locations_path(dialect_region: region, search: params[:search]),
-          class: "px-3 py-1 text-sm #{params[:dialect_region] == region ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'} rounded" %>
+      <%= admin_filter_link region.humanize, admin_locations_path(dialect_region: region, search: params[:search]),
+            current: params[:dialect_region] == region %>
     <% end %>
   </div>
 
-  <div class="bg-white shadow rounded-lg overflow-x-auto mb-4">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+  <div class="admin-table-wrap mb-4">
+    <table class="admin-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Irish Name</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coordinates</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recordings</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          <th>Name</th>
+          <th>Irish Name</th>
+          <th>Region</th>
+          <th>Type</th>
+          <th>Coordinates</th>
+          <th>Recordings</th>
+          <th>Actions</th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
+      <tbody>
         <% @locations.each do |location| %>
           <tr>
-            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+            <td class="whitespace-nowrap font-medium text-gray-900">
               <%= location.name %>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="whitespace-nowrap text-gray-500">
               <%= location.irish_name %>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="whitespace-nowrap text-gray-500">
               <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
                 <%= location.dialect_region&.humanize %>
               </span>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="whitespace-nowrap text-gray-500">
               <%= location.location_type&.humanize %>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="whitespace-nowrap text-gray-500">
               <% if location.latitude && location.longitude %>
                 <% if location.has_precise_coordinates? %>
                   <span class="text-green-600" title="Geocoded"><%= "%.4f, %.4f" % [location.latitude, location.longitude] %></span>
@@ -85,10 +66,10 @@
                 <span class="text-red-400">None</span>
               <% end %>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="whitespace-nowrap text-gray-500">
               <%= location.recordings_count %>
             </td>
-            <td class="px-4 py-4 text-sm font-medium">
+            <td class="font-medium">
               <%= link_to "Edit", edit_admin_location_path(location), class: "text-blue-600 hover:text-blue-900" %>
             </td>
           </tr>

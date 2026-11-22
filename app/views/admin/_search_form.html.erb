@@ -1,0 +1,13 @@
+<%# A search box for an admin list. keep: the other filters to carry through a
+    search; clear_path: where Clear goes (shown only while searching). %>
+<%= form_with url: url, method: :get, local: true, class: "mb-4 flex gap-2" do |form| %>
+  <% local_assigns.fetch(:keep, {}).compact_blank.each do |name, value| %>
+    <%= form.hidden_field name, value: value %>
+  <% end %>
+  <%= form.text_field :search, value: params[:search], placeholder: placeholder, aria: {label: placeholder},
+        class: "flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+  <%= form.submit "Search", class: admin_button_class(:primary) %>
+  <% if params[:search].present? %>
+    <%= link_to "Clear", clear_path, class: admin_button_class(:secondary) %>
+  <% end %>
+<% end %>

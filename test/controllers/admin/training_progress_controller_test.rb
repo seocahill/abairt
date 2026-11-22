@@ -17,7 +17,7 @@ module Admin
       Flipper.enable_actor(:f142_training_progress, @admin)
       get admin_training_progress_index_path
       assert_response :success
-      assert_select "h1", "Training data progress"
+      assert_select "h1", "Training progress"
     end
 
     test "non-admins are redirected" do
