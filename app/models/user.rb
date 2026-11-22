@@ -41,6 +41,16 @@ class User < ApplicationRecord
   has_many :segment_prompts, foreign_key: :speaker_id
 
   enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
+  # The kinds of person the roles add up to, so admin can treat each on its
+  # own: members sign up, speakers are recorded, staff and API users run or
+  # reach the corpus, and the rest are not people at all (an AI voice, a
+  # place, a speaker diarisation could not name).
+  KINDS = {
+    members: %w[student teacher],
+    speakers: %w[speaker],
+    staff: %w[admin api_user],
+    other: %w[ai place temporary]
+  }.freeze
   # A speaker has no email, but the admin form still posts an empty string for
   # it. Stored as nothing rather than "" so "no email" is one value, not two.
   # Not downcased: existing rows were never normalised and rewriting them is a
@@ -81,6 +91,7 @@ class User < ApplicationRecord
   scope :with_api_token, -> { where.not(api_token: nil) }
   scope :pending, -> { where(confirmed: false) }
   scope :by_role, ->(role) { where(role: role) if role.present? && roles.key?(role) }
+  scope :of_kind, ->(kind) { where(role: KINDS[kind.to_s.to_sym]) if KINDS.key?(kind.to_s.to_sym) }
   scope :search, ->(query) {
     return all if query.blank?
     # Use FTS for name search (escape special characters), LIKE for email search
@@ -100,6 +111,10 @@ class User < ApplicationRecord
   # Identifies a user to Flipper so a flag can be on for named people.
   def flipper_id
     "User;#{id}"
+  end
+
+  def kind
+    KINDS.find { |_kind, roles| roles.include?(role) }&.first || :other
   end
 
   def telegram_speaker?

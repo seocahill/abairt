@@ -1,0 +1,35 @@
+<%# Other and All: a mix of kinds, so only what every kind has in common. %>
+<div class="admin-table-wrap mb-4">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Kind</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.each do |user| %>
+        <tr>
+          <td class="whitespace-nowrap font-medium text-gray-900">
+            <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
+          </td>
+          <td class="whitespace-nowrap text-gray-500"><%= user.email %></td>
+          <td class="whitespace-nowrap text-gray-500"><%= admin_user_kind_label(user.kind) %></td>
+          <td class="whitespace-nowrap text-gray-500"><%= render "admin/users/role_badge", user: %></td>
+          <td class="whitespace-nowrap"><%= render "admin/users/status_badge", user: %></td>
+          <td class="whitespace-nowrap text-gray-500"><%= user.created_at.strftime("%Y-%m-%d") %></td>
+          <td class="font-medium">
+            <div class="flex flex-col gap-1">
+              <%= render "admin/users/delete_button", user: %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

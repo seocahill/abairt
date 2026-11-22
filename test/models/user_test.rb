@@ -157,4 +157,27 @@ class UserTest < ActiveSupport::TestCase
 
     assert_not_includes User.answering, speaker
   end
+
+  test "every role belongs to exactly one kind" do
+    kinds = User::KINDS.values.flatten
+    assert_equal User.roles.keys.sort, kinds.sort
+    assert_equal kinds.uniq, kinds
+  end
+
+  test "kind groups roles into kinds of person" do
+    assert_equal :members, User.new(role: :student).kind
+    assert_equal :members, User.new(role: :teacher).kind
+    assert_equal :speakers, User.new(role: :speaker).kind
+    assert_equal :staff, User.new(role: :api_user).kind
+    assert_equal :staff, User.new(role: :admin).kind
+    assert_equal :other, User.new(role: :temporary).kind
+  end
+
+  test "of_kind narrows to that kind and ignores an unknown one" do
+    assert User.of_kind(:speakers).all?(&:speaker?)
+    assert_includes User.of_kind("staff"), users(:admin)
+    assert_not_includes User.of_kind("staff"), users(:speaker)
+    assert_equal User.count, User.of_kind("all").count
+    assert_equal User.count, User.of_kind(nil).count
+  end
 end
