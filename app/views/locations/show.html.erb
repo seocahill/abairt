@@ -13,7 +13,7 @@
 
     <% if @pins.any? %>
       <div class="mb-8 rounded-lg border border-gray-200 overflow-hidden">
-        <div id="map" data-controller="map" data-map-pins-value="<%= @pins.to_json %>" class="h-64"></div>
+        <div id="map" data-controller="map" data-map-pins-value="<%= @pins.to_json %>" data-map-focus-value="true" class="h-64"></div>
       </div>
     <% end %>
 
@@ -30,6 +30,6 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="recordings-container">
       <%= render partial: "voice_recordings/recording", collection: @recordings, as: :recording %>
     </div>
-    <%= render "shared/pagination", pagy: @pagy, infinite_scroll: false if @pagy.next %>
+    <%= render "shared/pagination", pagy: @pagy, turbo_stream: true if @pagy.next %>
   </div>
 </div>

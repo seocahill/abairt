@@ -11,16 +11,20 @@ class LocationsController < ApplicationController
     raise ActiveRecord::RecordNotFound if records.none?
 
     @pagy, @recordings = pagy(records.includes(:tags, :users).with_attached_media, items: PAGE_SIZE)
-    @speakers = @location.speakers
-    @pins = pins_for(@location, records.first)
+
+    respond_to do |format|
+      format.html do
+        @speakers = @location.speakers
+        @pins = [place_pin].compact
+      end
+      # "Load More" appends the next page below the cards already shown.
+      format.turbo_stream
+    end
   end
 
   private
 
-  def pins_for(location, recording)
-    return [] unless location.coordinates
-
-    [{recording_id: recording.id, recording_title: recording.title, location_name: location.name,
-      lat: location.latitude.to_f, lng: location.longitude.to_f}]
+  def place_pin
+    @location.coordinates&.merge(location_name: @location.name, recordings: [], more: 0)
   end
 end

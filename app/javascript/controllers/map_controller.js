@@ -23,7 +23,9 @@ export default class extends Controller {
   static values = {
     pins: Array,
     pubs: Array,
-    userId: { type: String, default: '' }
+    userId: { type: String, default: '' },
+    // Open centred on the pins (a place page) instead of the whole of Mayo.
+    focus: Boolean
   }
 
   connect() {
@@ -102,7 +104,11 @@ export default class extends Controller {
       let marker;
       let content;
 
-      if (pin.lat && pin.lng) {
+      if (pin.recordings && pin.lat && pin.lng) {
+        // One pin per place (f172_place_pages): see PlacePins.
+        marker = L.marker([pin.lat, pin.lng]);
+        content = this.placePopup(pin);
+      } else if (pin.lat && pin.lng) {
         marker = L.marker([pin.lat, pin.lng]);
         content = `
           <div class="text-center">
@@ -123,7 +129,8 @@ export default class extends Controller {
       }
 
       if (marker && content) {
-        marker.bindPopup(content);
+        // A place popup is tall; keep it clear of the zoom buttons when it opens.
+        marker.bindPopup(content, pin.recordings ? { autoPanPaddingTopLeft: [56, 16] } : {});
         if (clusterGroup) {
           clusterGroup.addLayer(marker);
         } else {
@@ -136,6 +143,8 @@ export default class extends Controller {
       this.map.addLayer(clusterGroup);
     }
 
+    if (this.focusValue) this.focusOnPins();
+
     if (this.hasPubsValue) {
       this.pubsValue.forEach((pub) => {
         let marker = L.marker(pub.lat_lang.split(','), { icon })
@@ -147,6 +156,34 @@ export default class extends Controller {
 
     // Fix map display issues
     this.map.invalidateSize()
+  }
+
+  focusOnPins() {
+    const points = this.pinsValue.filter((pin) => pin.lat && pin.lng).map((pin) => [pin.lat, pin.lng]);
+    if (points.length === 1) {
+      this.map.setView(points[0], 12);
+    } else if (points.length > 1) {
+      this.map.fitBounds(points, { padding: [24, 24], maxZoom: 12 });
+    }
+  }
+
+  // A place's name, a button to its page, then its recordings spaced apart so
+  // a tap lands on the one meant. Pins with no place are drawn at a speaker's
+  // location and say so rather than showing the speaker's name as the place.
+  placePopup(pin) {
+    const heading = pin.location_name
+      ? `<div class="text-sm font-semibold text-gray-900">${this.escape(pin.location_name)}</div>`
+      : `<div class="text-sm font-semibold text-gray-500">No place set</div>
+         <div class="text-xs text-gray-500">Shown at the speaker's location</div>`;
+    const button = pin.location_id
+      ? `<a href="/locations/${pin.location_id}" class="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md !text-gray-700 bg-white hover:bg-gray-50">Open place page</a>`
+      : '';
+    const items = pin.recordings.map((recording) =>
+      `<li><a href="/voice_recordings/${recording.id}" class="block py-2 text-sm">${this.escape(recording.title)}</a></li>`
+    ).join('');
+    const list = items ? `<ul class="mt-3 border-t border-gray-100 divide-y divide-gray-100">${items}</ul>` : '';
+    const more = pin.more > 0 ? `<div class="pt-2 text-xs text-gray-500">and ${pin.more} more</div>` : '';
+    return `<div class="w-56">${heading}${button}${list}${more}</div>`;
   }
 
   escape(text) {

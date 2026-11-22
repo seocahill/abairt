@@ -82,4 +82,56 @@ class LocationsControllerTest < ActionDispatch::IntegrationTest
     get voice_recordings_url
     assert_not_includes response.body, "location_id"
   end
+
+  test "flag on: Load More appends the next page instead of replacing the first" do
+    Flipper.enable(:f172_place_pages)
+    (ApplicationController::PAGE_SIZE + 1).times { |i| placed_recording("Extra #{i}") }
+
+    get location_url(@location)
+    assert_select "#pagination a[rel=next][data-turbo-stream=true]"
+
+    get location_url(@location, page: 2), as: :turbo_stream
+    assert_response :success
+    assert_equal Mime[:turbo_stream], response.media_type
+    assert_select "turbo-stream[action=append][target=recordings-container]"
+    assert_select "turbo-stream[action=replace][target=pagination]"
+  end
+
+  test "flag on: the map opens on the place" do
+    Flipper.enable(:f172_place_pages)
+    @location.update!(latitude: 54.225, longitude: -9.99)
+    get location_url(@location)
+    assert_select "#map[data-map-focus-value=true]"
+    pins = JSON.parse(css_select("#map").first["data-map-pins-value"])
+    assert_equal [{"lat" => 54.225, "lng" => -9.99, "location_name" => "Belmullet", "recordings" => [], "more" => 0}], pins
+  end
+
+  test "flag on: index map has one pin per place; flag off one per recording" do
+    @location.update!(latitude: 54.1, longitude: -9.8)
+    @recording.update_columns(location_id: @location.id)
+    voice_recordings(:two).update_columns(location_id: @location.id)
+
+    Flipper.enable(:f172_place_pages)
+    get voice_recordings_url
+    place_pins = index_pins.select { |pin| pin["location_id"] == @location.id }
+    assert_equal 1, place_pins.size
+    assert_equal 2, place_pins.first["recordings"].size
+
+    Flipper.disable(:f172_place_pages)
+    get voice_recordings_url
+    assert_equal 2, index_pins.count { |pin| pin["location_name"] == "Belmullet" }
+    assert_select "#pagination a[data-turbo-stream]", false
+  end
+
+  private
+
+  def placed_recording(title)
+    VoiceRecording.create!(title: title, owner: users(:one), location: @location).tap do |recording|
+      recording.media.attach(io: StringIO.new("fake audio"), filename: "a.mp3", content_type: "audio/mpeg")
+    end
+  end
+
+  def index_pins
+    JSON.parse(css_select("[data-map-pins-value]").first["data-map-pins-value"])
+  end
 end
