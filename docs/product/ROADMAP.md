@@ -18,7 +18,7 @@ Maintained by the architect (see `ARCHITECT.md`). Owner edits welcome.
 Nothing tier 3 is waiting. Owner-only actions:
 1. Switch off Cloudflare Web Analytics on abairt.com (its beacon is injected into every page; see the 2026-11-23 digest)
 2. Optional Cloudflare Cache Rule for `assets.abairt.com` (from #188)
-3. Flag rollouts: `f170_search_to_moment`, `f172_place_pages`, `f140_check_mode`, `f121_simple_signup`
+3. Flag rollouts: `f170_search_to_moment`, `f172_place_pages`, `f140_check_mode`
 4. Flag cleanup due from 2026-11-29 if they've been on for everyone since they shipped: `f81_listening_controls`, `f82_moment_links`, `f125_early_play`, `f126_android_version`
 
 Shipped since last update: #169 search never errors, #170 search to moment, #172 place pages, #152/#183/#184 admin navigation and pages, #121 steps 1, 2, 4, #201 rack-protection security update, #133 step 1. Rejected: #123 asset caching (owner: Cloudflare already does it).

@@ -1,0 +1,99 @@
+<%# The profile fields below the header, shared by the page and its inline-edit refresh. %>
+<div class="p-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="space-y-6">
+      <% if current_user == user %>
+        <div>
+          <h3 class="text-sm font-medium text-gray-500">Email</h3>
+          <div class="mt-1">
+            <%= render "users/inline_edit", model: user, method: :email, current_user: current_user do %>
+              <p class="text-base text-gray-900"><%= user.email %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div id="password_setting">
+          <h3 class="text-sm font-medium text-gray-500">Password</h3>
+          <div class="mt-1">
+            <%= link_to (user.password_digest? ? "Change password" : "Set a password"), edit_password_path,
+                  class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+          </div>
+        </div>
+      <% end %>
+
+      <% translation_count = user.translated_entries.count %>
+      <% if translation_count.positive? %>
+        <div id="translations_link">
+          <h3 class="text-sm font-medium text-gray-500">Translations</h3>
+          <div class="mt-1">
+            <%= link_to pluralize(translation_count, "translation"), translator_leaderboard_path(user),
+                  class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <% if user.carries_speaker_data? %>
+      <div class="space-y-6" id="speaker_details">
+        <div>
+          <h3 class="text-sm font-medium text-gray-500">Voice</h3>
+          <div class="mt-1">
+            <%= render "users/inline_edit", model: user, method: :voice, current_user: current_user do %>
+              <p class="text-base text-gray-900"><%= user.voice&.humanize || "Not specified" %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-gray-500">Dialect</h3>
+          <div class="mt-1">
+            <%= render "users/inline_edit", model: user, method: :dialect, current_user: current_user do %>
+              <p class="text-base text-gray-900"><%= user.dialect&.humanize || "Not specified" %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-gray-500">Location</h3>
+          <div class="mt-1 flex items-center">
+            <%= render "users/inline_edit", model: user, method: :address, current_user: current_user do %>
+              <p class="text-base text-gray-900"><%= user.address || "Not specified" %></p>
+            <% end %>
+            <% if policy(user).update? %>
+              <button type="button" class="ml-2" data-action="click->map#openModal">
+                <svg class="w-5 h-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if user.carries_speaker_data? %>
+  <div id="mapModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 999;" data-map-target="modal">
+    <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-md bg-white">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Select Location</h3>
+        <button class="text-gray-500 hover:text-gray-700" data-action="click->map#closeModal">
+          <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="map" class="h-[600px] md:min-h-[50%] lg:min-h-[75%] mt-4" data-map-target="modalContainer"></div>
+      <div class="mt-4 flex justify-end">
+        <button class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" data-action="click->map#saveLocation">
+          Save Location
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with model: user do |form| %>
+    <%= form.hidden_field :lat_lang, id: "user-lat-lang", value: user.lat_lang %>
+  <% end %>
+<% end %>

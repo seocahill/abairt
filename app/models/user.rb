@@ -34,6 +34,7 @@ class User < ApplicationRecord
 
   has_many :questions, foreign_key: :asker_id
   has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
+  has_many :translated_entries, class_name: "DictionaryEntry", foreign_key: :translator_id, inverse_of: :translator
   # Recordings this speaker has taken to check through. The claim decides
   # only whose Telegram the automatic prompts go to — anybody may still
   # translate any recording in the web app.
