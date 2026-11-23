@@ -6,7 +6,12 @@ plugins {
 
 android {
     namespace = "com.abairt.listen"
-    compileSdk = 37
+    // Compose 1.13 (BOM 2026.11) needs the 37.1 minor SDK to compile against.
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.abairt.listen"
