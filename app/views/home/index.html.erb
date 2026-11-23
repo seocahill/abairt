@@ -226,7 +226,7 @@
       <% end %>
       <%= render "home/faq_item", question: "Is the transcription always right?" do %>
         <p>Not always. Transcripts and translations start as machine drafts and are corrected by native speakers; entries marked as confirmed have been checked.</p>
-        <p>The speech services come from <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://abair.ie">ABAIR</a> and are not always available. <%= link_to "Check their status", status_path, class: "text-purple-600 dark:text-purple-500 hover:underline" %> if something isn't working.</p>
+        <p>The speech services come from <a class="text-purple-600 dark:text-purple-500 hover:underline" href="https://abair.ie">ABAIR</a> and are not always available. <%= link_to "Check their status", abair_status_url, target: "_blank", rel: "noopener", class: "text-purple-600 dark:text-purple-500 hover:underline" %> if something isn't working.</p>
       <% end %>
       <%= render "home/faq_item", question: "Found a problem?" do %>
         <p>Please <a href="https://github.com/seocahill/abairt/issues" class="text-purple-600 dark:text-purple-500 hover:underline">report it on GitHub</a>. Abairt runs on modest infrastructure, so it may occasionally be slow or briefly down.</p>
@@ -280,7 +280,7 @@
         <ul class="text-gray-500 dark:text-gray-400">
           <li class="mb-4"><a href="https://www.teanglann.ie/ga/" class="hover:underline">Legacy Dictionaries</a></li>
           <li class="mb-4"><a href="https://www.focloir.ie/ga/" class="hover:underline">New Dictionary</a></li>
-          <li class="mb-4"><%= link_to "Service status", status_path, class: "hover:underline" %></li>
+          <li class="mb-4"><%= link_to "Service status", abair_status_url, target: "_blank", rel: "noopener", class: "hover:underline" %></li>
         </ul>
       </div>
     </div>

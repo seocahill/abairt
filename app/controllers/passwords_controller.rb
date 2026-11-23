@@ -15,7 +15,7 @@ class PasswordsController < ApplicationController
   def update
     if current_user.update(password_params)
       remember(current_user)
-      redirect_to new_question_path, notice: "Focal faire socraithe."
+      redirect_to root_path, notice: "Focal faire socraithe."
     else
       @errors = current_user.errors.full_messages
       render :edit, status: :unprocessable_entity
