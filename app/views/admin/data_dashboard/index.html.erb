@@ -27,7 +27,7 @@
     <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Training Readiness</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <% @training.each do |phase, data| %>
-        <div class="bg-white shadow rounded-lg p-5">
+        <div class="bg-white shadow-sm rounded-lg p-5">
           <div class="flex justify-between items-start mb-2">
             <div>
               <h3 class="font-semibold text-gray-900"><%= data[:label] %></h3>
@@ -84,7 +84,7 @@
     <%# ─── DATA QUALITY ──────────────────────────────────────────── %>
     <section>
       <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Data Quality Breakdown</h2>
-      <div class="bg-white shadow rounded-lg p-5">
+      <div class="bg-white shadow-sm rounded-lg p-5">
         <% quality_colours = { "excellent" => "bg-green-500", "good" => "bg-blue-500", "fair" => "bg-amber-400", "low" => "bg-red-400" } %>
         <% quality_labels  = { "excellent" => "Excellent (Gold)", "good" => "Good (Silver)", "fair" => "Fair (Bronze)", "low" => "Low" } %>
         <% @quality.each do |quality, data| %>
@@ -109,7 +109,7 @@
     <%# ─── DIALECT DISTRIBUTION ─────────────────────────────────── %>
     <section>
       <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Dialect Distribution</h2>
-      <div class="bg-white shadow rounded-lg p-5">
+      <div class="bg-white shadow-sm rounded-lg p-5">
         <% dialect_colours = %w[bg-indigo-500 bg-blue-500 bg-violet-500 bg-cyan-500 bg-gray-400] %>
         <% @dialects.each_with_index do |d, i| %>
           <div class="mb-4">
@@ -134,7 +134,7 @@
     <%# ─── GENDER DISTRIBUTION ──────────────────────────────────── %>
     <section>
       <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Speaker Gender</h2>
-      <div class="bg-white shadow rounded-lg p-5">
+      <div class="bg-white shadow-sm rounded-lg p-5">
         <% gender_colours = { "Male" => "bg-blue-500", "Female" => "bg-pink-500", "Unknown" => "bg-gray-400" } %>
         <% @gender.each do |g| %>
           <div class="mb-4">
@@ -155,7 +155,7 @@
     <%# ─── LOCATION COVERAGE ─────────────────────────────────────── %>
     <section>
       <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Location Coverage</h2>
-      <div class="bg-white shadow rounded-lg p-5">
+      <div class="bg-white shadow-sm rounded-lg p-5">
         <div class="space-y-3">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600">Total locations</span>
@@ -193,7 +193,7 @@
     <%# ─── ANALYSIS STATUS ───────────────────────────────────────── %>
     <section>
       <h2 class="text-lg font-semibold text-gray-700 mb-3 uppercase tracking-wide text-xs">Analysis Status</h2>
-      <div class="bg-white shadow rounded-lg p-5">
+      <div class="bg-white shadow-sm rounded-lg p-5">
         <% bar_pct = @corpus[:analyzed_pct] %>
         <div class="flex items-center justify-center mb-4">
           <div class="relative w-28 h-28">

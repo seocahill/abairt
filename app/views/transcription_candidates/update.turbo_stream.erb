@@ -1,0 +1,5 @@
+<%= turbo_stream.replace dom_id(@candidate),
+      partial: "transcription_candidates/candidate",
+      locals: {candidate: @candidate.reload, audio_url: transcription_run_audio_url(@run.voice_recording), error: @error, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic,
+               stale_translation_ids: TranscriptionCandidate.stale_translation_entry_ids([@candidate.dictionary_entry].compact)} %>
+<%= turbo_stream.replace "transcription_run_summary", partial: "transcription_runs/summary", locals: {run: @run, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic} %>

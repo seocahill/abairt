@@ -14,7 +14,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create user" do
     assert_difference("User.count", 1) do
-      post registrations_url, params: {user: {name: "Test User", email: "test@example.com", about: "About Test User"}}
+      post registrations_url, params: {user: {name: "Test User", email: "test@example.com"}}
     end
     assert_equal "Thanks for signing up.", flash[:notice]
     refute User.find_by(email: "test@example.com").confirmed
@@ -36,7 +36,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should not create user with invalid params" do
     assert_no_difference("User.count") do
-      post registrations_url, params: {user: {name: "", email: "test@example.com", about: "About Test User"}}
+      post registrations_url, params: {user: {name: "", email: "test@example.com"}}
     end
     assert_response :unprocessable_content
     assert_template :new
@@ -51,21 +51,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Too many sign-ups", flash[:alert]
   end
 
-  test "flag off: the form asks for About and shows the reCAPTCHA box" do
-    get new_registration_url
-    assert_select "textarea[name=?][required]", "user[about]"
-    assert_select "div.g-recaptcha"
-    assert_includes response.body, "google.com/recaptcha"
-  end
-
-  test "flag off: a failed sign-up shows no error box" do
-    post registrations_url, params: {user: {name: "Again", email: users(:two).email}}
-    assert_response :unprocessable_content
-    assert_select "#signup_errors", count: 0
-  end
-
-  test "flag on: the form asks for name and email only" do
-    Flipper.enable(:f121_simple_signup)
+  test "the form asks for name and email only" do
     get new_registration_url
 
     assert_select "input[name=?][required]", "user[name]"
@@ -77,8 +63,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "website"
   end
 
-  test "flag on: name and email create an unconfirmed account and send both emails" do
-    Flipper.enable(:f121_simple_signup)
+  test "name and email create an unconfirmed account and send both emails" do
     assert_enqueued_emails 2 do
       assert_difference("User.count", 1) do
         post registrations_url, params: {user: {name: "New Editor", email: "editor@example.com"}}
@@ -91,8 +76,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
-  test "flag on: an email already in use is shown as the reason" do
-    Flipper.enable(:f121_simple_signup)
+  test "an email already in use is shown as the reason" do
     assert_no_difference("User.count") do
       post registrations_url, params: {user: {name: "Again", email: users(:two).email}}
     end
@@ -102,7 +86,6 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "a correction straight after a failed sign-up is not treated as a bot" do
-    Flipper.enable(:f121_simple_signup)
     travel_to 1.minute.ago do
       get new_registration_url
     end
@@ -120,8 +103,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_nil User.find_by(email: "sneaky@example.com").password_digest
   end
 
-  test "flag on: a blank name is shown as the reason" do
-    Flipper.enable(:f121_simple_signup)
+  test "a blank name is shown as the reason" do
     assert_no_difference("User.count") do
       post registrations_url, params: {user: {name: "", email: "blank@example.com"}}
     end

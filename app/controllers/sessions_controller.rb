@@ -39,7 +39,7 @@ class SessionsController < ApplicationController
 
     if user&.authenticate(params[:password])
       sign_in(user)
-      redirect_to(session.delete(:user_return_to) || new_question_path)
+      redirect_to(session.delete(:user_return_to) || root_path)
     else
       Rails.logger.warn("Failed password login")
       flash[:alert] = "Níorbh fhéidir tú a shíniú isteach. Seiceáil an ríomhphost agus an focal faire."

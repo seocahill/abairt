@@ -49,7 +49,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @total_count = records.distinct.count
-    @pagy, @recordings = pagy(records.distinct.includes(:tags, :users), items: PAGE_SIZE)
+    @pagy, @recordings = pagy(records.distinct.includes(:tags, :users).with_attached_media, items: PAGE_SIZE)
     @line_matches = matching_lines(@recordings) if search_to_moment? && params[:search].present?
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)
@@ -103,6 +103,10 @@ class VoiceRecordingsController < ApplicationController
   end
 
   def show
+    # Turbo follows a form's redirect here asking for a stream too; only the
+    # infinite scroll's next-page requests (which carry a page) want one.
+    request.format = :html if request.format.turbo_stream? && params[:page].blank?
+
     @recording = VoiceRecording.includes(voice_recording_locations: :location).find(params[:id])
     @regions = set_regions
     if current_user
@@ -115,6 +119,7 @@ class VoiceRecordingsController < ApplicationController
     @listening_controls = listening_controls?
     @early_play = early_play?
     @check_mode = Flipper.enabled?(:f140_check_mode, current_user)
+    @retranscribe = retranscribe?
     @moment = moment_link if (@moment_links || search_to_moment?) && params[:q].blank? && params[:page].blank? && request.format.html?
 
     # Improve pagination query to be more efficient
@@ -129,6 +134,8 @@ class VoiceRecordingsController < ApplicationController
       page: moment_page
     )
 
+    set_transcription_review if @retranscribe
+
     respond_to do |format|
       format.html
       format.turbo_stream do
@@ -136,7 +143,7 @@ class VoiceRecordingsController < ApplicationController
           turbo_stream.append("entries-container",
             partial: "voice_recordings/dictionary_entries/entry",
             collection: @entries,
-            locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording}),
+            locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording, stale_translation_ids: @stale_translation_ids}),
           turbo_stream.replace("pagination",
             partial: "shared/pagination",
             locals: {pagy: @pagy})
@@ -298,6 +305,19 @@ class VoiceRecordingsController < ApplicationController
   end
 
   private
+
+  # Re-transcribing without losing anyone's work (#133).
+  def retranscribe?
+    Flipper.enabled?(:f133_retranscribe, current_user)
+  end
+
+  # The latest re-transcription for the status strip, and which of the shown
+  # lines have new Irish beside an older translation.
+  def set_transcription_review
+    @transcription_run = @recording.transcription_runs.newest_first.first
+    @can_retranscribe = @recording.media.attached? && TranscriptionRunPolicy.new(current_user, @transcription_run || TranscriptionRun.new(voice_recording: @recording)).create?
+    @stale_translation_ids = TranscriptionCandidate.stale_translation_entry_ids(@entries.to_a)
+  end
 
   def listening_controls?
     Flipper.enabled?(:f81_listening_controls, current_user)

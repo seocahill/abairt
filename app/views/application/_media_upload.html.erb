@@ -1,7 +1,7 @@
 <div data-controller="direct-upload">
   <div class="flex flex-col">
     <label class="leading-loose">Media upload</label>
-    <%= form.file_field :media, class: "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600", placeholder: "optional", direct_upload: true, data: { target: "direct-upload.input", action: "direct-upload#upload" } %>
+    <%= form.file_field :media, class: "file:-ms-4 file:me-4 file:cursor-pointer file:border-0 file:bg-gray-800 file:py-2.5 file:ps-8 file:pe-4 file:text-sm file:font-medium file:text-white hover:file:bg-gray-700 px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-hidden text-gray-600", placeholder: "optional", direct_upload: true, data: { target: "direct-upload.input", action: "direct-upload#upload" } %>
   </div>
   <div class="relative pt-1 uploader">
     <div class="flex mb-2 items-center justify-between">
@@ -16,7 +16,7 @@
         </span>
       </div>
     </div>
-    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200 progress">
+    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded-sm bg-blue-200 progress">
       <div style="width:0%" class="progress-bar shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
     </div>
   </div>

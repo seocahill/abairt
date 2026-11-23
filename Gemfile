@@ -9,7 +9,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'puma', '~> 8.1'
 gem 'rails', '~> 8.1.0'
 gem 'minitest', '~> 6.1'
-gem 'redis', '~> 4.0'
+gem 'redis', '~> 6.0'
 gem 'sassc-rails'
 gem 'bootsnap', '>= 1.4.4', require: false
 gem 'ostruct'
@@ -17,7 +17,8 @@ gem 'ostruct'
 # Other gems
 gem 'acts-as-taggable-on'
 gem 'aws-sdk-s3', '~> 1.245'
-gem 'dotenv', '~> 2.8'
+gem 'diff-lcs', '~> 1.6'
+gem 'dotenv', '~> 3.2'
 gem 'geocoder', '~> 1.8'
 gem 'groupdate', '~> 6.8'
 gem 'hotwire-rails', '~> 0.1.3'
@@ -48,14 +49,14 @@ gem 'sentry-ruby', '~> 6.7'
 gem 'sequel', '~> 5.110'
 gem 'sprockets-rails'
 gem 'sqlite3', '~> 2.10'
-gem 'tailwindcss-rails'
+gem 'tailwindcss-rails', '~> 4.7'
 gem 'tiktoken_ruby', '~> 0.0.18'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # gem 'yui-compressor', '~> 0.12.0'
 
 # Development gems
 group :development do
-  gem 'dotenv-rails', '~> 2.7'
+  gem 'dotenv-rails', '~> 3.2'
   gem 'listen', '~> 3.10'
   gem 'web-console', '>= 4.1.0'
 end

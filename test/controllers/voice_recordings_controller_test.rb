@@ -11,6 +11,20 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "recording cards play straight from storage, not through the Rails redirect" do
+    @voice_recording.media.attach(io: StringIO.new("fake audio"), filename: "test.mp3", content_type: "audio/mpeg")
+    @voice_recording.update!(created_at: 1.minute.from_now)
+
+    get voice_recordings_url(view: "list")
+
+    assert_response :success
+    urls = css_select("[data-controller='card-player']").pluck("data-card-player-url-value")
+    assert_equal 1, urls.size
+    # The test service is Disk, so the storage URL is its signed disk URL.
+    assert_match %r{\Ahttp://localhost:3000/rails/active_storage/disk/.+/test\.mp3\z}, urls.first
+    assert_no_match %r{/blobs/redirect/}, urls.first
+  end
+
   test "should get new" do
     get new_voice_recording_url
     assert_response :success
@@ -205,6 +219,19 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_nil duplicate.import_status
     assert_equal 0, duplicate.dictionary_entries_count
     assert_redirected_to voice_recording_url(duplicate)
+  end
+
+  # Documents the old button (#133): the copy is processed with the original's
+  # Fotheidil job, so it re-fetches the old transcript instead of running the
+  # model again. Transcription::RerunOperation is the replacement.
+  test "retranscribe hands the copy the original's Fotheidil job instead of a new one" do
+    ApplicationController.any_instance.stubs(:current_user).returns(users(:admin))
+    @voice_recording.media.attach(io: StringIO.new("fake audio"), filename: "test.mp3", content_type: "audio/mpeg")
+    @voice_recording.update!(diarization_data: {"fotheidil_video_id" => "123"})
+
+    post retranscribe_voice_recording_url(@voice_recording)
+
+    assert_enqueued_with(job: ProcessFotheidilVideoJob, args: [VoiceRecording.last.id, "123"])
   end
 
   test "retranscribe denied for non-admin user" do

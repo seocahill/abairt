@@ -15,31 +15,31 @@
 
   <div>
     <%= form.label :url, class: "block text-sm font-medium text-gray-700" %>
-    <%= form.url_field :url, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+    <%= form.url_field :url, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue-500 focus:border-blue-500",
         placeholder: "https://..." %>
     <p class="mt-1 text-xs text-gray-500">Supported: rte.ie, canuint.ie, youtube.com</p>
   </div>
 
   <div>
     <%= form.label :title, class: "block text-sm font-medium text-gray-700" %>
-    <%= form.text_field :title, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+    <%= form.text_field :title, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue-500 focus:border-blue-500" %>
   </div>
 
   <div>
     <%= form.label :headline, class: "block text-sm font-medium text-gray-700" %>
-    <%= form.text_field :headline, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+    <%= form.text_field :headline, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue-500 focus:border-blue-500" %>
   </div>
 
   <div>
     <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
-    <%= form.text_area :description, rows: 3, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+    <%= form.text_area :description, rows: 3, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue-500 focus:border-blue-500" %>
   </div>
 
   <% if media_import.persisted? %>
     <div>
       <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
       <%= form.select :status, MediaImport.statuses.keys.map { |s| [s.humanize, s] },
-          {}, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+          {}, class: "mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue-500 focus:border-blue-500" %>
     </div>
   <% end %>
 

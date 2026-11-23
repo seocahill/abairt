@@ -5,18 +5,9 @@ import feather from "feather-icons"
 // Expose L globally so leaflet.markercluster plugin can extend it
 window.L = L
 
-// Load markercluster plugin once, returns a promise
-const markerClusterReady = new Promise((resolve) => {
-  if (typeof L.markerClusterGroup === 'function') {
-    resolve()
-    return
-  }
-  const script = document.createElement('script')
-  script.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
-  script.onload = () => resolve()
-  script.onerror = () => resolve() // graceful fallback without clustering
-  document.head.appendChild(script)
-})
+// Load the markercluster plugin once, after L is global (it extends window.L).
+// A failed load falls back to plain markers.
+const markerClusterReady = import("leaflet.markercluster").catch(() => {})
 
 export default class extends Controller {
   static targets = ["desktopContainer", "modalContainer", "modal"]
@@ -176,15 +167,15 @@ export default class extends Controller {
       : `<div class="text-sm font-semibold text-gray-500">Place not on the map</div>
          <div class="text-xs text-gray-500">Shown at the speaker's location</div>`;
     const button = pin.location_id
-      ? `<a href="/locations/${pin.location_id}" class="mt-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md !text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Open place page</a>`
+      ? `<a href="/locations/${pin.location_id}" class="mt-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-xs text-sm font-medium rounded-md text-gray-700! bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Open place page</a>`
       : '';
     const items = pin.recordings.map((recording) =>
-      `<li><a href="/voice_recordings/${recording.id}" class="block py-2 text-sm !text-indigo-700 hover:!text-indigo-900">${this.escape(recording.title)}</a></li>`
+      `<li><a href="/voice_recordings/${recording.id}" class="block py-2 text-sm text-indigo-700! hover:text-indigo-900!">${this.escape(recording.title)}</a></li>`
     ).join('');
     const list = items ? `<ul class="mt-3 border-t border-gray-100 divide-y divide-gray-100">${items}</ul>` : '';
     const moreText = `and ${pin.more} more`;
     const more = pin.more > 0
-      ? `<div class="pt-2 text-xs text-gray-500">${pin.location_id ? `<a href="/locations/${pin.location_id}" class="!text-gray-500 underline">${moreText}</a>` : moreText}</div>`
+      ? `<div class="pt-2 text-xs text-gray-500">${pin.location_id ? `<a href="/locations/${pin.location_id}" class="text-gray-500! underline">${moreText}</a>` : moreText}</div>`
       : '';
     return `<div class="w-56">${heading}${button}${list}${more}</div>`;
   }

@@ -110,29 +110,62 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_no_match temp_user.name, @response.body
   end
 
-  test "flag off: no password link on your own profile" do
-    get user_url(@user)
-    assert_select "#password_setting", count: 0
-  end
-
-  test "flag on: your own profile links to setting a password" do
-    Flipper.enable(:f121_simple_signup)
+  test "your own profile links to setting a password" do
     @user.update_columns(password_digest: nil)
     get user_url(@user)
     assert_select "#password_setting a[href=?]", edit_password_path, text: "Set a password"
   end
 
-  test "flag on: with a password already set the link says change" do
-    Flipper.enable(:f121_simple_signup)
+  test "with a password already set the link says change" do
     @user.update!(password: "a-long-password")
     get user_url(@user)
     assert_select "#password_setting a[href=?]", edit_password_path, text: "Change password"
   end
 
-  test "flag on: someone else's profile has no password link" do
-    Flipper.enable(:f121_simple_signup)
+  test "someone else's profile has no password link" do
     get user_url(users(:two))
     assert_response :success
     assert_select "#password_setting", count: 0
+  end
+
+  test "a member's profile leaves out speaker details and language level" do
+    get user_url(users(:two))
+    assert_response :success
+    assert_select "#speaker_details", count: 0
+    assert_select "#mapModal", count: 0
+    assert_no_match "Language Ability", response.body
+  end
+
+  test "a speaker's profile keeps voice, dialect and location" do
+    get user_url(users(:four))
+    assert_response :success
+    assert_select "#speaker_details h3", text: "Dialect"
+    assert_select "#speaker_details h3", text: "Location"
+    assert_no_match "Language Ability", response.body
+  end
+
+  test "a profile links to the person's translations" do
+    translator = users(:two)
+    2.times do |i|
+      DictionaryEntry.create!(word_or_phrase: "focal #{i}", translation: "word #{i}", owner: translator, translator: translator)
+    end
+
+    get user_url(translator)
+    assert_select "#translations_link a[href=?]", translator_leaderboard_path(translator), text: "2 translations"
+  end
+
+  test "a profile without translations has no translations link" do
+    get user_url(users(:two))
+    assert_select "#translations_link", count: 0
+  end
+
+  test "your own profile lets you edit your name" do
+    get user_url(@user)
+    assert_select "turbo-frame##{dom_id(@user, :name_turbo_frame)} h1#profile_name", text: @user.name
+  end
+
+  test "the name edit form has a name field" do
+    get edit_user_url(@user), headers: { "Turbo-Frame" => dom_id(@user, :name_turbo_frame) }
+    assert_select "turbo-frame##{dom_id(@user, :name_turbo_frame)} input[name='user[name]']"
   end
 end

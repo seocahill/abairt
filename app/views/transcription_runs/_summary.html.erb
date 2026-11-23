@@ -1,0 +1,43 @@
+<% hide_cosmetic = local_assigns.fetch(:hide_cosmetic, false) %>
+<div id="transcription_run_summary" class="mb-4">
+  <% counts = run.pending_counts %>
+  <p class="text-sm text-gray-600" data-testid="rerun-counts">
+    <% if counts.values.sum.zero? %>
+      Every line has been reviewed.
+    <% else %>
+      <%= pending_candidates_summary(run) %>, waiting for you. Lines where the new text is the same are not shown.
+    <% end %>
+  </p>
+  <p class="text-sm mt-1">
+    <% if hide_cosmetic %>
+      Hiding lines that differ only in case or punctuation.
+      <%= link_to "Show them", transcription_run_path(run), class: "text-blue-600 hover:text-blue-800" %>
+    <% else %>
+      <%= link_to "Hide lines that differ only in case or punctuation", transcription_run_path(run, hide_cosmetic: 1), class: "text-blue-600 hover:text-blue-800" %>
+    <% end %>
+  </p>
+  <% if counts.values.sum.positive? %>
+    <% bulk = run.transcription_candidates.acceptable_in_bulk.includes(:dictionary_entry).to_a.then { |all| hide_cosmetic ? all.reject(&:cosmetic?) : all }.size %>
+    <% timing = counts.fetch("timing", 0) %>
+    <div class="flex flex-col sm:flex-row gap-2 mt-3">
+      <% if bulk.positive? %>
+        <%= button_to "Accept all (#{bulk})", transcription_run_acceptance_path(run),
+            params: {seen_at: seen_at.to_r.to_s, hide_cosmetic: (1 if hide_cosmetic)}.compact,
+            class: "w-full bg-blue-600 text-white px-3 py-2 rounded-sm hover:bg-blue-700 transition-colors min-h-[44px]",
+            form_class: "flex-1",
+            form: {data: {turbo_confirm: "Use the new text on #{pluralize(bulk, "unconfirmed line")}? Confirmed lines and new lines are left for you. Each change can be undone from the line's versions."}} %>
+      <% end %>
+      <% if timing.positive? %>
+        <%= button_to "Set all times (#{timing})", transcription_run_timing_path(run),
+            params: {seen_at: seen_at.to_r.to_s, hide_cosmetic: (1 if hide_cosmetic)}.compact,
+            class: "w-full bg-blue-600 text-white px-3 py-2 rounded-sm hover:bg-blue-700 transition-colors min-h-[44px]",
+            form_class: "flex-1",
+            form: {data: {turbo_confirm: "Give times to #{pluralize(timing, "line")} that have none? The text of the lines is not changed."}} %>
+      <% end %>
+      <%= button_to "Dismiss run", transcription_run_dismissal_path(run),
+          class: "w-full bg-gray-300 text-gray-700 px-3 py-2 rounded-sm hover:bg-gray-400 transition-colors min-h-[44px]",
+          form_class: "flex-1",
+          form: {data: {turbo_confirm: "Dismiss every line still waiting? Nothing on the recording changes."}} %>
+    </div>
+  <% end %>
+</div>

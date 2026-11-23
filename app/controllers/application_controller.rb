@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   PAGE_SIZE = 15
 
-  helper_method :current_user, :admin_user?, :admin_page?, :search_to_moment?, :simple_signup?
+  helper_method :current_user, :admin_user?, :admin_page?, :search_to_moment?
   before_action :set_paper_trail_whodunnit
   after_action :verify_authorized, except: [:index, :show], unless: :rails_engine_controller?
 

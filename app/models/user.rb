@@ -34,11 +34,15 @@ class User < ApplicationRecord
 
   has_many :questions, foreign_key: :asker_id
   has_many :asked_questions, foreign_key: :speaker_id, class_name: "Question"
+  has_many :translated_entries, class_name: "DictionaryEntry", foreign_key: :translator_id, inverse_of: :translator
   # Recordings this speaker has taken to check through. The claim decides
   # only whose Telegram the automatic prompts go to — anybody may still
   # translate any recording in the web app.
   has_many :claimed_voice_recordings, foreign_key: :claimed_by_id, class_name: "VoiceRecording"
   has_many :segment_prompts, foreign_key: :speaker_id
+  # Kept for the record of who re-transcribed and who chose (#133).
+  has_many :requested_transcription_runs, class_name: "TranscriptionRun", foreign_key: :requested_by_id, dependent: :restrict_with_error
+  has_many :resolved_transcription_candidates, class_name: "TranscriptionCandidate", foreign_key: :resolved_by_id, dependent: :restrict_with_error
 
   enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
   # The kinds of person the roles add up to, so admin can treat each on its

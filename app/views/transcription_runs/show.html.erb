@@ -1,0 +1,27 @@
+<div class="container mx-auto px-4 py-6 max-w-2xl">
+  <div class="flex items-center justify-between mb-2">
+    <%= link_to "← #{@recording.title}", voice_recording_path(@recording), class: "text-blue-600 hover:text-blue-800 min-h-[44px] inline-flex items-center" %>
+  </div>
+  <h1 class="text-lg font-semibold text-gray-900 mb-1">New transcription</h1>
+
+  <% if @run.pending? %>
+    <p class="text-sm text-gray-600">Still re-transcribing. Come back when it has finished.</p>
+  <% elsif @run.failed? %>
+    <p class="mb-3 rounded-sm bg-red-100 text-red-800 px-3 py-2 text-sm">This re-transcription didn't finish: <%= @run.error %>. The recording was not changed.</p>
+  <% else %>
+    <%= render "transcription_runs/summary", run: @run, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic %>
+
+    <% if @candidates.empty? %>
+      <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+        <p class="text-lg font-medium text-gray-900"><%= @hide_cosmetic ? "Nothing here but case and punctuation." : "The new transcription says the same as the current lines." %></p>
+      </div>
+    <% else %>
+      <% audio_url = transcription_run_audio_url(@recording) %>
+      <div class="space-y-3 md:space-y-4">
+        <%= render partial: "transcription_candidates/candidate", collection: @candidates,
+              locals: {audio_url: audio_url, stale_translation_ids: @stale_translation_ids, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic} %>
+      </div>
+    <% end %>
+    <%= render "transcription_runs/unheard", entries: @unheard_entries, audio_url: transcription_run_audio_url(@recording) %>
+  <% end %>
+</div>

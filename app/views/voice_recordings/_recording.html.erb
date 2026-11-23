@@ -15,14 +15,14 @@
     duration = recording.dictionary_entries.maximum(:region_end)
   %>
 
-  <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+  <div class="bg-white rounded-lg border border-gray-200 shadow-xs hover:shadow-md transition-shadow overflow-hidden">
     <!-- Play button + Audio -->
-    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 p-5 flex items-center gap-4"
+    <div class="bg-linear-to-br from-indigo-600 to-indigo-800 p-5 flex items-center gap-4"
          data-controller="card-player"
-         data-card-player-url-value="<%= url_for(recording.media) %>">
+         data-card-player-url-value="<%= recording.media.url %>">
       <button data-action="click->card-player#toggle"
               data-card-player-target="button"
-              class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors flex-shrink-0">
+              class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xs text-white flex items-center justify-center hover:bg-white/30 transition-colors shrink-0">
         <svg data-card-player-target="playIcon" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
         </svg>
@@ -52,7 +52,7 @@
       <div class="space-y-1.5 text-sm text-gray-600">
         <% if speaker_names.any? %>
           <div class="flex items-start gap-2">
-            <svg class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
             <span><%= speaker_names.join(', ') %></span>
@@ -61,7 +61,7 @@
 
         <% if dialects.any? %>
           <div class="flex items-start gap-2">
-            <svg class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
@@ -70,7 +70,7 @@
         <% end %>
 
         <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           <div class="flex items-center gap-2">
@@ -103,7 +103,7 @@
           <% recording.tag_list.first(4).each do |tag_name| %>
             <%= link_to tag_name,
                 voice_recordings_path(view: @view_mode, tag: tag_name),
-                class: "px-2 py-0.5 rounded text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
+                class: "px-2 py-0.5 rounded-sm text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
                 data: { turbo_frame: "recordings" } %>
           <% end %>
           <% if recording.tag_list.size > 4 %>

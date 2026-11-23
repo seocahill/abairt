@@ -10,6 +10,7 @@ class FlipperDescriptionsTest < ActiveSupport::TestCase
     assert_includes registered_flags, "f172_place_pages"
     refute_includes registered_flags, "f75_asr_eval"
     refute_includes registered_flags, "f142_training_progress"
+    refute_includes registered_flags, "f121_simple_signup"
   end
 
   test "every flag checked in code has a description" do

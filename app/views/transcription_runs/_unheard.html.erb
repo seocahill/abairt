@@ -1,0 +1,37 @@
+<%# Current lines nothing in a re-transcription lined up with (#133). Informational: nothing here changes them. %>
+<% if entries.any? %>
+  <section class="mt-6" data-testid="unheard">
+    <h2 class="text-sm font-semibold text-gray-900">In your text, not heard in the new transcription (<%= entries.size %>)</h2>
+    <p class="text-sm text-gray-600 mb-2">These lines are left as they are. The new transcription may have missed them, or they may have been said differently.</p>
+    <ul class="space-y-2">
+      <% entries.each do |entry| %>
+        <li class="bg-white rounded-lg shadow-sm p-3 flex items-center gap-3" id="<%= dom_id(entry, :unheard) %>">
+          <% if entry.region_start.present? && entry.region_end.present? %>
+            <button type="button"
+                    class="shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    aria-label="Play this line"
+                    data-controller="audio-player"
+                    data-action="audio-player#play"
+                    data-audio-player-url-value="<%= entry.media.attached? ? url_for(entry.media) : audio_url %>"
+                    <% unless entry.media.attached? %>
+                      data-audio-player-start-value="<%= entry.region_start.to_f %>"
+                      data-audio-player-end-value="<%= entry.region_end.to_f %>"
+                    <% end %>>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          <% end %>
+          <div class="min-w-0">
+            <p class="text-gray-900"><%= link_to entry.word_or_phrase, dictionary_entry_path(entry), class: "hover:text-blue-800" %></p>
+            <% if entry.region_start.present? %>
+              <p class="text-xs text-gray-500"><%= format_duration(entry.region_start) %> - <%= format_duration(entry.region_end) %></p>
+            <% else %>
+              <p class="text-xs text-gray-500">No times</p>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

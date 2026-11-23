@@ -101,7 +101,14 @@ Rails.application.routes.draw do
       post :autocorrect
     end
     resource :diarization, only: [:create]
+    # Re-transcribing a recording and reviewing the result (#133, f133_retranscribe).
+    resources :transcription_runs, only: [:create, :show], shallow: true do
+      resource :acceptance, only: :create, module: :transcription_runs
+      resource :dismissal, only: :create, module: :transcription_runs
+      resource :timing, only: :create, module: :transcription_runs
+    end
   end
+  resources :transcription_candidates, only: :update
 
   resource :import, only: [:new, :create], module: :voice_recordings
 
@@ -224,8 +231,9 @@ Rails.application.routes.draw do
   # health
   get "up" => "health#show"
   
-  # Service status
-  get "status" => "status#index"
+  # Speech service status lives on ABAIR's own status page.
+  direct(:abair_status) { "https://status.abair.ie/status/main" }
+  get "status", to: redirect("https://status.abair.ie/status/main")
 
   root to: 'application#root_redirect'
 end

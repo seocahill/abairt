@@ -19,6 +19,7 @@ class DictionaryEntry < ApplicationRecord
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
   has_many :segment_prompts, dependent: :destroy
   has_many :asr_hypotheses, dependent: :destroy
+  has_many :transcription_candidates, dependent: :destroy
   has_many :asr_eval_set_entries, dependent: :restrict_with_error
 
   acts_as_taggable_on :tags
@@ -82,7 +83,12 @@ class DictionaryEntry < ApplicationRecord
 
   validates :word_or_phrase, uniqueness: { case_sensitive: false }, allow_blank: true, unless: -> { voice_recording_id || speaker&.ai? || speaker&.student? }
 
-  validate :dictionary_entries_cannot_exceed_segments_count, on: :create
+  # Set when a person adds a line from a re-transcription (#133): the segment
+  # limit comes from the import and is there to stop the pipeline over-creating
+  # entries, not to stop a reviewed line the import didn't have.
+  attr_accessor :added_in_review
+
+  validate :dictionary_entries_cannot_exceed_segments_count, on: :create, unless: :added_in_review
   validate :cannot_edit_when_confirmed, on: :update
 
   def cannot_edit_when_confirmed

@@ -1,0 +1,37 @@
+<%# Re-transcription (#133, f133_retranscribe): the latest run's state, and the way to start one. %>
+<div id="transcription_run_status" class="mb-3 md:mb-4 bg-white rounded-lg border border-gray-200 shadow-xs p-3 flex flex-wrap items-center justify-between gap-2">
+  <% if run&.pending? && !run.abandoned? %>
+    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+      <svg class="animate-spin -ml-1 mr-1 h-3 w-3 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Re-transcribing
+    </span>
+    <span class="text-sm text-gray-600 flex-1">Started <%= time_ago_in_words(run.created_at) %> ago. Nothing changes until you review it.</span>
+  <% elsif run&.awaiting_review? %>
+    <span class="text-sm text-gray-900 flex-1" data-testid="rerun-summary">
+      New transcription ready: <%= pending_candidates_summary(run) %>
+    </span>
+    <%= link_to "Review", transcription_run_path(run),
+        class: "bg-blue-600 text-white px-3 py-2 rounded-sm hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center" %>
+  <% else %>
+    <span class="text-sm text-gray-600 flex-1">
+      <% if run&.abandoned? %>
+        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-1">Failed</span>
+        The last re-transcription never finished. Nothing was changed.
+      <% elsif run&.failed? %>
+        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-1">Failed</span>
+        The last re-transcription didn't finish: <%= truncate(run.error, length: 120) %>
+      <% elsif run %>
+        Last re-transcribed <%= time_ago_in_words(run.finished_at || run.created_at) %> ago.
+        <%= link_to "See what changed", transcription_run_path(run), class: "text-blue-600 hover:text-blue-800" %>
+      <% else %>
+        Send the audio for a fresh transcription and compare it with these lines.
+      <% end %>
+    </span>
+    <%= button_to "Re-transcribe", voice_recording_transcription_runs_path(recording),
+        class: "bg-gray-300 text-gray-700 px-3 py-2 rounded-sm hover:bg-gray-400 transition-colors min-h-[44px] inline-flex items-center justify-center",
+        form: {data: {turbo_confirm: "Send this recording's audio to Fotheidil for a fresh transcription? Nothing changes until you accept a line."}} %>
+  <% end %>
+</div>
