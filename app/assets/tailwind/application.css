@@ -19,7 +19,7 @@
    Tailwind 3's for the families it didn't set. Tailwind 4's own palette is
    brighter, and white text on its green-600 buttons falls below readable
    contrast (about 3:1). Delete this block to switch to Tailwind 4's colours. */
-@theme {
+/* @theme {
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -150,7 +150,7 @@
   --color-violet-700: #6d28d9;
   --color-violet-800: #5b21b6;
   --color-violet-900: #4c1d95;
-}
+} */
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
