@@ -14,7 +14,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   test "sets a password and signs this device in for good" do
     patch password_url, params: {user: {password: "focal-faire-fada", password_confirmation: "focal-faire-fada"}}
 
-    assert_redirected_to new_question_path
+    assert_redirected_to root_path
     assert @user.reload.authenticate("focal-faire-fada")
     assert cookies[:remember_token].present?
   end

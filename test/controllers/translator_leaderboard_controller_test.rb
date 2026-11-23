@@ -107,4 +107,15 @@ class TranslatorLeaderboardControllerTest < ActionDispatch::IntegrationTest
     # Should not show users without translations
     assert_select "div", text: /#{user_no_translations.name}/, count: 0
   end
+
+  test "language level is not shown on the list or a translator's page" do
+    translator = users(:one)
+    DictionaryEntry.create!(word_or_phrase: "focal", translation: "word", owner: translator, translator: translator)
+
+    get translator_leaderboard_index_url
+    assert_no_match(/level/i, response.body)
+
+    get translator_leaderboard_url(translator)
+    assert_no_match(/level/i, response.body)
+  end
 end

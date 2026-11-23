@@ -14,7 +14,7 @@ class SessionsControllerPasswordTest < ActionDispatch::IntegrationTest
   test "signs in with an email and password" do
     post login_url, params: {email: @user.email, password: "sruthan-gaeilge"}
 
-    assert_redirected_to new_question_path
+    assert_redirected_to root_path
     assert_equal @user.id, session[:user_id]
   end
 

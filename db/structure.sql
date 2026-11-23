@@ -254,6 +254,7 @@ CREATE INDEX "index_transcription_candidates_on_resolved_by_id" ON "transcriptio
 CREATE UNIQUE INDEX "index_transcription_candidates_on_run_entry_and_kind" ON "transcription_candidates" ("transcription_run_id", "dictionary_entry_id", "kind");
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261124090000'),
+('20261123222228'),
 ('20261123180000'),
 ('20261123090100'),
 ('20261123090000'),

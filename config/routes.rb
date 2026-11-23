@@ -231,8 +231,9 @@ Rails.application.routes.draw do
   # health
   get "up" => "health#show"
   
-  # Service status
-  get "status" => "status#index"
+  # Speech service status lives on ABAIR's own status page.
+  direct(:abair_status) { "https://status.abair.ie/status/main" }
+  get "status", to: redirect("https://status.abair.ie/status/main")
 
   root to: 'application#root_redirect'
 end
