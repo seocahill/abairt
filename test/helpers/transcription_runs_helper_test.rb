@@ -4,9 +4,9 @@ class TranscriptionRunsHelperTest < ActionView::TestCase
   test "marks the words that go and the words that come in" do
     current, fresh = word_diff("one two three", "one too three four")
 
-    assert_equal 'one <del class="bg-red-100 text-red-800 rounded px-0.5">two</del> three', current
-    assert_equal 'one <ins class="bg-green-100 text-green-800 rounded px-0.5 no-underline">too</ins> three ' \
-      '<ins class="bg-green-100 text-green-800 rounded px-0.5 no-underline">four</ins>', fresh
+    assert_equal 'one <del class="bg-red-100 text-red-800 rounded-sm px-0.5">two</del> three', current
+    assert_equal 'one <ins class="bg-green-100 text-green-800 rounded-sm px-0.5 no-underline">too</ins> three ' \
+      '<ins class="bg-green-100 text-green-800 rounded-sm px-0.5 no-underline">four</ins>', fresh
   end
 
   test "escapes the text" do

@@ -36,6 +36,6 @@ module TranscriptionRunsHelper
   def word_marked(word, tag_name, changed:)
     return word unless changed
 
-    content_tag(tag_name, word, class: (tag_name == :del) ? "bg-red-100 text-red-800 rounded px-0.5" : "bg-green-100 text-green-800 rounded px-0.5 no-underline")
+    content_tag(tag_name, word, class: (tag_name == :del) ? "bg-red-100 text-red-800 rounded-sm px-0.5" : "bg-green-100 text-green-800 rounded-sm px-0.5 no-underline")
   end
 end
