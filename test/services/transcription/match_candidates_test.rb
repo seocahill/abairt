@@ -95,12 +95,33 @@ class Transcription::MatchCandidatesTest < ActiveSupport::TestCase
     assert_equal "blip", candidate.word_or_phrase
   end
 
-  test "of two segments over one entry, the one covering most of it is the match" do
+  test "an uneven split is listed as new segments, not guessed at" do
+    place(@entries[0], 0.0, 10.0, "one to ten")
+    candidates = candidates_for(segment(0.0, 6.0, "one to six"), segment(6.0, 10.0, "seven to ten"))
+
+    assert candidates.all?(&:new_segment?)
+  end
+
+  test "an uneven merge is listed as a new segment, not guessed at" do
+    place(@entries[0], 0.0, 6.0, "one to three")
+    place(@entries[1], 6.0, 10.0, "four and five")
+
+    assert candidates_for(segment(0.0, 10.0, "one to five")).sole.new_segment?
+  end
+
+  test "a sliver left over at the edge of an entry does not stop the match" do
     entry = place(@entries[0], 0.0, 10.0, "current long text")
-    candidates = candidates_for(segment(0.0, 7.0, "most of it"), segment(7.0, 10.0, "the rest"))
+    candidates = candidates_for(segment(0.0, 8.5, "most of it"), segment(8.5, 10.0, "tail"))
 
     assert_equal [entry, nil], candidates.map(&:dictionary_entry)
-    assert_equal [:differs, :new_segment], candidates.map { |c| c.kind.to_sym }
+  end
+
+  test "two speakers over the same span are not paired up crosswise" do
+    place(@entries[0], 0.0, 5.0, "alpha")
+    place(@entries[1], 0.0, 5.0, "bravo")
+    candidates = candidates_for(segment(0.0, 5.0, "bravo", speaker: "SPEAKER_01"), segment(0.0, 5.0, "alpha"))
+
+    assert candidates.none?(&:differs?)
   end
 
   test "a segment over no entry is a new segment" do

@@ -9,30 +9,39 @@ module Transcription
   # - a segment that lines up with no entry is a `new_segment` candidate;
   # - a segment that lines up with an entry and says the same thing is left out.
   #
-  # A segment and an entry line up when each is the other's best overlap and
-  # they share more than half of the time they cover together (overlap over
-  # union). Measuring against the union rather than the shorter span keeps a
-  # short interjection inside a long turn (common in Fotheidil output, where
-  # speakers overlap) from claiming the long entry, and means an even split or
-  # merge has no clean match and is listed as new segments rather than guessed
-  # at. Entries no segment lines up with are left alone.
+  # A segment and an entry line up when:
+  # - they share more than half of the time they cover together (overlap over
+  #   union), so a short interjection inside a long turn (common in Fotheidil
+  #   output, where speakers overlap) doesn't claim the long entry;
+  # - each is the other's best overlap (identical text wins a tie);
+  # - neither has a rival: another segment lying mostly inside the entry,
+  #   covering more than a fifth of it and lining up with nothing better (a
+  #   split), or the same the other way round (a merge). Splits and merges are
+  #   listed as new segments rather than guessed at; someone talking over a
+  #   turn has their own entry and is no rival.
   #
-  # Nothing here writes to an entry, its translation or the recording.
+  # Entries no segment lines up with are left alone. Nothing here writes to an
+  # entry, its translation or the recording.
   #
   #   Transcription::MatchCandidates.new(run).candidates  # unsaved, to inspect
   #   Transcription::MatchCandidates.call(run)             # saves them
   class MatchCandidates
     MIN_SHARED = 0.5
+    RIVAL_COVERAGE = 0.2
 
-    Span = Data.define(:start, :finish) do
-      def length = finish - start
+    # The time a segment and an entry have in common, both by index.
+    Overlap = Data.define(:segment, :entry, :seconds, :segment_length, :entry_length) do
+      def shared = seconds / (segment_length + entry_length - seconds)
 
-      def shared_with(other)
-        overlap = [finish, other.finish].min - [start, other.start].max
-        return 0.0 unless overlap.positive?
+      def of_segment = seconds / segment_length
 
-        overlap / ([finish, other.finish].max - [start, other.start].min)
-      end
+      def of_entry = seconds / entry_length
+
+      # This entry is a second piece within the segment (a merge).
+      def merges? = of_entry > MIN_SHARED && of_segment > RIVAL_COVERAGE
+
+      # This segment is a second piece within the entry (a split).
+      def splits? = of_segment > MIN_SHARED && of_entry > RIVAL_COVERAGE
     end
 
     def self.call(run)
@@ -43,9 +52,9 @@ module Transcription
       @run = run
     end
 
-    # Saves the candidates once, under a lock on the run. A run that already
-    # has candidates keeps them, so calling it again never duplicates or resets
-    # a person's decisions.
+    # Saves the candidates once, under a lock on the run (so save the run's
+    # segments first). A run that already has candidates keeps them, so
+    # calling it again never duplicates or resets a person's decisions.
     def call
       @run.with_lock do
         next @run.transcription_candidates.to_a if @run.transcription_candidates.exists?
@@ -55,8 +64,7 @@ module Transcription
     end
 
     def candidates
-      segments.each_index.filter_map do |index|
-        segment = segments[index]
+      segments.each_with_index.filter_map do |segment, index|
         entry = matches[index]
         next build(segment, kind: :new_segment) if entry.nil?
         next if same_text?(entry.word_or_phrase, segment["text"])
@@ -90,53 +98,85 @@ module Transcription
         .to_a
     end
 
-    def entry_spans
-      @entry_spans ||= entries.map { |entry| Span.new(entry.region_start.to_f, entry.region_end.to_f) }
-    end
-
-    def segment_span(index)
-      Span.new(segments[index]["start"], segments[index]["finish"])
-    end
-
-    # segment index => entry, for pairs that are each other's best overlap.
+    # segment index => entry, for the clean one-to-one pairs.
     def matches
-      @matches ||= best_entry_for_segment.select { |segment, entry| best_segment_for_entry[entry] == segment }
-        .transform_values { |entry| entries[entry] }
+      @matches ||= overlaps.select { |o| clean?(o) }.to_h { |o| [o.segment, entries[o.entry]] }
     end
 
-    def best_entry_for_segment
-      @best_entry_for_segment ||= shared.group_by(&:first).transform_values { |pairs| pairs.max_by(&:last)[1] }
+    def clean?(overlap)
+      overlap.shared > MIN_SHARED &&
+        best_for_segment[overlap.segment] == overlap &&
+        best_for_entry[overlap.entry] == overlap &&
+        by_segment[overlap.segment].none? { |o| merged_in?(o, overlap) } &&
+        by_entry[overlap.entry].none? { |o| split_off?(o, overlap) }
     end
 
-    def best_segment_for_entry
-      @best_segment_for_entry ||= shared.group_by { |pair| pair[1] }.transform_values { |pairs| pairs.max_by(&:last).first }
+    # Another entry lies mostly inside the segment and has no better segment:
+    # the segment merges it with the match.
+    def merged_in?(other, overlap)
+      other != overlap && other.merges? && best_for_entry[other.entry].segment == overlap.segment
     end
 
-    # [segment index, entry index, share] for every pair sharing enough time.
-    # Entries are sorted by start, so only those starting within the longest
-    # entry's length before a segment ends can overlap it.
-    def shared
-      @shared ||= segments.each_index.flat_map do |index|
-        span = segment_span(index)
-        nearby_entries(span).filter_map do |entry|
-          share = span.shared_with(entry_spans[entry])
-          [index, entry, share] if share > MIN_SHARED
-        end
+    # Another segment lies mostly inside the entry and has no better entry: the
+    # entry was split between them. A segment from someone talking over the
+    # entry has its own entry and isn't a split.
+    def split_off?(other, overlap)
+      other != overlap && other.splits? && best_for_segment[other.segment].entry == overlap.entry
+    end
+
+    def best(overlaps)
+      overlaps.max_by { |o| [o.shared, same_text?(entries[o.entry].word_or_phrase, segments[o.segment]["text"]) ? 1 : 0] }
+    end
+
+    def best_for_segment
+      @best_for_segment ||= by_segment.transform_values { |group| best(group) }
+    end
+
+    def best_for_entry
+      @best_for_entry ||= by_entry.transform_values { |group| best(group) }
+    end
+
+    def by_segment
+      @by_segment ||= overlaps.group_by(&:segment)
+    end
+
+    def by_entry
+      @by_entry ||= overlaps.group_by(&:entry)
+    end
+
+    # Every segment-entry pair with time in common. Entries are sorted by
+    # start, so only those starting within the longest entry's length before a
+    # segment ends can overlap it.
+    def overlaps
+      @overlaps ||= segments.each_with_index.flat_map do |segment, index|
+        nearby_entries(segment).filter_map { |entry| overlap(segment, index, entry) }
       end
     end
 
-    def nearby_entries(span)
-      first = entry_starts.bsearch_index { |start| start > span.start - longest_entry } || entry_starts.size
-      last = entry_starts.bsearch_index { |start| start >= span.finish } || entry_starts.size
+    def overlap(segment, index, entry)
+      entry_start, entry_end = entry_spans[entry]
+      seconds = [segment["finish"], entry_end].min - [segment["start"], entry_start].max
+      return unless seconds.positive?
+
+      Overlap.new(segment: index, entry:, seconds:, segment_length: segment["finish"] - segment["start"], entry_length: entry_end - entry_start)
+    end
+
+    def nearby_entries(segment)
+      first = entry_starts.bsearch_index { |start| start > segment["start"] - longest_entry } || entry_starts.size
+      last = entry_starts.bsearch_index { |start| start >= segment["finish"] } || entry_starts.size
       (first...last)
     end
 
+    def entry_spans
+      @entry_spans ||= entries.map { |entry| [entry.region_start.to_f, entry.region_end.to_f] }
+    end
+
     def entry_starts
-      @entry_starts ||= entry_spans.map(&:start)
+      @entry_starts ||= entry_spans.map(&:first)
     end
 
     def longest_entry
-      @longest_entry ||= entry_spans.map(&:length).max.to_f
+      @longest_entry ||= entry_spans.map { |start, finish| finish - start }.max.to_f
     end
 
     # Whitespace and how a fada is encoded don't count as a difference;
