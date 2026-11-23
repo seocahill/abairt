@@ -25,6 +25,15 @@ class TranscriptionRerunJobTest < ActiveJob::TestCase
     end
   end
 
+  test "a run that already finished is not run again or reported as failed" do
+    @run.update!(status: :ready, fotheidil_video_id: "9001", finished_at: Time.current)
+    Transcription::RerunOperation.expects(:call).never
+
+    assert_no_enqueued_emails do
+      TranscriptionRerunJob.perform_now(@run.id)
+    end
+  end
+
   test "a deleted run is dropped quietly" do
     Transcription::RerunOperation.expects(:call).never
 

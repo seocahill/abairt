@@ -27,13 +27,45 @@ class Fotheidil::MediaSubmissionServiceTest < ActiveSupport::TestCase
     assert_equal "9001", submit
   end
 
-  test "uploads the media when there is no audio track, without adding one" do
+  test "downsamples an mp3 with no audio track into a temporary file, without adding a track" do
+    Fotheidil::MediaSubmissionService.any_instance.expects(:system).with do |*args, **|
+      args.first == "ffmpeg" && args.each_cons(2).include?(["-b:a", "128k"]) && File.write(args[-1], "small bytes")
+    end.returns(true)
+    uploads = capture_upload
+
+    submit
+
+    assert_equal "small bytes", uploads.sole[:bytes]
+    assert_not @recording.reload.audio_track.attached?
+  end
+
+  test "downsamples for real with ffmpeg" do
+    uploads = capture_upload
+
+    submit
+
+    assert uploads.sole[:bytes].bytesize.positive?
+    assert_not_equal file_fixture("deasaigh.mp3").binread, uploads.sole[:bytes]
+  end
+
+  test "uploads the original mp3 if it can't be downsampled" do
+    Fotheidil::MediaSubmissionService.any_instance.stubs(:system).returns(false)
     uploads = capture_upload
 
     submit
 
     assert_equal file_fixture("deasaigh.mp3").binread, uploads.sole[:bytes]
-    assert_not @recording.reload.audio_track.attached?
+  end
+
+  test "uploads other audio as it is" do
+    @recording.media.attach(io: StringIO.new("wav bytes"), filename: "clip.wav", content_type: "audio/wav")
+    Fotheidil::MediaSubmissionService.any_instance.expects(:system).never
+    uploads = capture_upload
+
+    submit
+
+    assert_equal "wav bytes", uploads.sole[:bytes]
+    assert_match(/\Aclip-\h{8}\.wav\z/, uploads.sole[:file_name])
   end
 
   test "uploads the downsampled audio track when the recording has one" do

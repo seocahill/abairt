@@ -6,8 +6,9 @@ module Fotheidil
   # unique each time, because the API rejects a name it already holds.
   #
   # Video is cut down to its audio first (timestamps are kept 1:1); a recording
-  # with a downsampled audio_track uploads that instead of the full media.
-  # Nothing on the recording is changed.
+  # with a downsampled audio_track uploads that instead of the full media, and
+  # an MP3 without one is downsampled into a temporary file. Nothing on the
+  # recording is changed.
   #
   #   Fotheidil::MediaSubmissionService.new(voice_recording).call # => "1234"
   class MediaSubmissionService
@@ -41,11 +42,21 @@ module Fotheidil
       return download(@voice_recording.audio_track, File.join(dir, "#{safe_base}_track.mp3")) if use_audio_track?
 
       media_path = download(@voice_recording.media, File.join(dir, "#{safe_base}.#{extension}"))
-      blob.content_type.start_with?("video/") ? extract_audio(media_path, dir) : media_path
+      if video?
+        extract_audio(media_path, dir)
+      elsif blob.content_type == "audio/mpeg"
+        downsample(media_path, dir)
+      else
+        media_path
+      end
+    end
+
+    def video?
+      blob.content_type.start_with?("video/")
     end
 
     def use_audio_track?
-      !blob.content_type.start_with?("video/") && @voice_recording.audio_track.attached?
+      !video? && @voice_recording.audio_track.attached?
     end
 
     def download(attachment, path)
@@ -55,12 +66,24 @@ module Fotheidil
 
     # Falls back to the original file if ffmpeg can't extract the audio.
     def extract_audio(video_path, dir)
-      audio_path = File.join(dir, "#{safe_base}.mp3")
-      system("ffmpeg", "-i", video_path, "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-y", audio_path, err: File::NULL)
+      audio_path = File.join(dir, "#{safe_base}_audio.mp3")
+      system("ffmpeg", "-i", video_path, "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-y", audio_path)
       return audio_path if File.size?(audio_path)
 
       Rails.logger.warn "Audio extraction failed for VoiceRecording##{@voice_recording.id}, uploading the video"
       video_path
+    end
+
+    # An MP3 with no audio_track yet is cut down the way ProcessVideoOperation
+    # makes the track (128kbps mono 16kHz) to stay under the API's 100MB limit,
+    # into a temporary file only. Falls back to the original if ffmpeg fails.
+    def downsample(mp3_path, dir)
+      track_path = File.join(dir, "#{safe_base}_track.mp3")
+      system("ffmpeg", "-i", mp3_path, "-vn", "-acodec", "libmp3lame", "-b:a", "128k", "-ac", "1", "-ar", "16000", "-y", track_path, err: File::NULL)
+      return track_path if File.size?(track_path)
+
+      Rails.logger.warn "Downsampling failed for VoiceRecording##{@voice_recording.id}, uploading the original"
+      mp3_path
     end
 
     def extension

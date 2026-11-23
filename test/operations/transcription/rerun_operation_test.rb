@@ -40,7 +40,8 @@ class Transcription::RerunOperationTest < ActiveSupport::TestCase
   def snapshot
     @recording.reload
     entries = @recording.dictionary_entries.order(:id).map { |e| e.attributes.slice("word_or_phrase", "translation", "accuracy_status", "updated_at") }
-    {recording: @recording.attributes.except("updated_at"), entries:, versions: PaperTrail::Version.count, recordings: VoiceRecording.count}
+    attachments = ActiveStorage::Attachment.where(record: @recording).order(:id).pluck(:name, :blob_id)
+    {recording: @recording.attributes.except("updated_at"), entries:, attachments:, versions: PaperTrail::Version.count, recordings: VoiceRecording.count}
   end
 
   test "submits the audio as a new job and never reuses the recording's job" do
@@ -65,16 +66,17 @@ class Transcription::RerunOperationTest < ActiveSupport::TestCase
     assert_equal %w[9001 9002], TranscriptionRun.order(:id).pluck(:fotheidil_video_id)
   end
 
-  test "a finished run keeps the raw segments and its candidates" do
+  test "a finished run keeps the transcript exactly as returned, and its candidates" do
+    raw = fresh_transcript + [{"id" => "x", "text" => "no timings"}]
     @api.stubs(:submit).returns(9001)
-    @api.stubs(:transcript).returns(fresh_transcript)
+    @api.stubs(:transcript).returns(raw)
 
     freeze_time do
       assert rerun.success?
 
       @run.reload
       assert @run.ready?
-      assert_equal fresh_transcript, @run.segments
+      assert_equal raw, @run.segments
       assert_equal Time.current, @run.started_at
       assert_equal Time.current, @run.finished_at
     end
@@ -151,7 +153,17 @@ class Transcription::RerunOperationTest < ActiveSupport::TestCase
     assert_not rerun.success?
     assert @run.reload.failed?
     assert_nil @run.fotheidil_video_id
+    assert_includes @run.error, "Fotheidil returned job 9001"
     assert_includes @run.error, "new Fotheidil job"
+  end
+
+  test "a run can still be closed after a recording takes its job id" do
+    @api.stubs(:submit).returns(9001)
+    @api.stubs(:transcript).with { voice_recordings(:one).update!(fotheidil_video_id: "9001") }.returns([])
+
+    assert_not rerun.success?
+    assert @run.reload.failed?
+    assert_equal "9001", @run.fotheidil_video_id
   end
 
   test "a failure while matching keeps the segments, saves no candidates and fails the run" do

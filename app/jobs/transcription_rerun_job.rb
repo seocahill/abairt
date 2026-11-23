@@ -14,6 +14,8 @@ class TranscriptionRerunJob < ApplicationJob
 
   def perform(transcription_run_id)
     run = TranscriptionRun.find(transcription_run_id)
+    return unless run.pending? # enqueued twice, or already finished
+
     result = Transcription::RerunOperation.call(transcription_run: run)
     return if result.success?
 

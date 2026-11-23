@@ -44,12 +44,15 @@ module Transcription
     def start(ctx, transcription_run:, **)
       transcription_run.update!(started_at: Time.current) if transcription_run.started_at.nil?
       true
+    rescue => e
+      ctx[:error] = "Failed to start the run: #{e.message}"
+      false
     end
 
     def submit_audio(ctx, transcription_run:, **)
       if transcription_run.fotheidil_video_id.blank?
         job_id = Fotheidil::MediaSubmissionService.new(transcription_run.voice_recording).call
-        transcription_run.update!(fotheidil_video_id: job_id)
+        return keep_job_id(ctx, transcription_run, job_id)
       end
 
       ctx[:fotheidil_video_id] = transcription_run.fotheidil_video_id
@@ -59,8 +62,20 @@ module Transcription
       false
     end
 
-    def save_segments(ctx, transcription_run:, segments:, **)
-      transcription_run.update!(segments:)
+    # Keeps the run's new job, unless a recording already holds that id (an
+    # old job, or one the old retranscribe button copied).
+    def keep_job_id(ctx, transcription_run, job_id)
+      ctx[:fotheidil_video_id] = job_id
+      return true if transcription_run.update(fotheidil_video_id: job_id)
+
+      ctx[:error] = "Fotheidil returned job #{job_id}, which can't be kept: #{transcription_run.errors.full_messages.to_sentence}"
+      false
+    end
+
+    # Keeps the transcript exactly as returned; MatchCandidates skips any
+    # segment it can't use.
+    def save_segments(ctx, transcription_run:, transcript:, **)
+      transcription_run.update!(segments: transcript)
       true
     rescue => e
       ctx[:error] = "Failed to save segments: #{e.message}"
