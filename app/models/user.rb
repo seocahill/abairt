@@ -39,6 +39,9 @@ class User < ApplicationRecord
   # translate any recording in the web app.
   has_many :claimed_voice_recordings, foreign_key: :claimed_by_id, class_name: "VoiceRecording"
   has_many :segment_prompts, foreign_key: :speaker_id
+  # Kept for the record of who re-transcribed and who chose (#133).
+  has_many :requested_transcription_runs, class_name: "TranscriptionRun", foreign_key: :requested_by_id, dependent: :restrict_with_error
+  has_many :resolved_transcription_candidates, class_name: "TranscriptionCandidate", foreign_key: :resolved_by_id, dependent: :restrict_with_error
 
   enum :role, {student: 0, speaker: 1, teacher: 2, admin: 3, ai: 4, place: 5, temporary: 6, api_user: 7}
   # The kinds of person the roles add up to, so admin can treat each on its
