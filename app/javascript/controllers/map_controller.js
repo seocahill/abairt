@@ -5,18 +5,9 @@ import feather from "feather-icons"
 // Expose L globally so leaflet.markercluster plugin can extend it
 window.L = L
 
-// Load markercluster plugin once, returns a promise
-const markerClusterReady = new Promise((resolve) => {
-  if (typeof L.markerClusterGroup === 'function') {
-    resolve()
-    return
-  }
-  const script = document.createElement('script')
-  script.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
-  script.onload = () => resolve()
-  script.onerror = () => resolve() // graceful fallback without clustering
-  document.head.appendChild(script)
-})
+// Load the markercluster plugin once, after L is global (it extends window.L).
+// A failed load falls back to plain markers.
+const markerClusterReady = import("leaflet.markercluster").catch(() => {})
 
 export default class extends Controller {
   static targets = ["desktopContainer", "modalContainer", "modal"]

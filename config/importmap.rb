@@ -7,21 +7,19 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "service_worker_registration"
 
-pin "process", to: "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/process-production.js"
-pin "util", to: "https://ga.jspm.io/npm:@jspm/core@2.0.0-beta.12/nodelibs/browser/util.js"
-pin "wavesurferjs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/wavesurfer.js"
-pin "wavesurferregionsjs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/plugin/wavesurfer.regions.min.js"
-pin "wavesurfertimelinejs", to: "https://ga.jspm.io/npm:wavesurfer.js@6.2.0/dist/plugin/wavesurfer.timeline.min.js"
-pin "@rails/activestorage", to: "https://ga.jspm.io/npm:@rails/activestorage@6.1.4-1/app/assets/javascripts/activestorage.js"
-pin "@rails/actioncable", to: "https://ga.jspm.io/npm:@rails/actioncable@6.1.4-1/app/assets/javascripts/action_cable.js"
+# Third-party modules are served from vendor/javascript, not a CDN (#188). Each
+# is the npm package's file at the version noted, bundled to one ES module:
+#   npx esbuild <package file> --bundle --format=esm --minify --legal-comments=inline --outfile=vendor/javascript/<name>.js
+pin "wavesurferjs", to: "wavesurfer.js" # @6.2.0
+pin "wavesurferregionsjs", to: "wavesurfer.regions.js" # @6.2.0
+pin "wavesurfertimelinejs", to: "wavesurfer.timeline.js" # @6.2.0
+pin "@rails/activestorage", to: "activestorage.esm.js"
 pin "jitsi" # @2.1.5
-pin "popper", to: "https://cdn.skypack.dev/@popperjs/core"
-pin "autocomplete", to: "https://ga.jspm.io/npm:@tarekraafat/autocomplete.js@10.2.6/dist/autoComplete.js"
-pin "soundtouchjs", to: "https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/soundtouch.js"
-pin "leaflet", to: "https://ga.jspm.io/npm:leaflet@1.8.0/dist/leaflet-src.js"
-pin "lamejs", to: "https://ga.jspm.io/npm:lamejs@1.2.1/src/js/index.js"
-pin "feather-icons", to: "https://ga.jspm.io/npm:feather-icons@4.29.0/dist/feather.js"
-pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.7/lib/index.js"
+pin "popper" # @popperjs/core@2.11.8
+pin "autocomplete" # @tarekraafat/autocomplete.js@10.2.6
+pin "leaflet" # @1.8.0
+pin "leaflet.markercluster" # @1.5.3
+pin "feather-icons" # @4.29.0
 pin "trix"
 pin "@rails/actiontext", to: "actiontext.js"
-pin "recordrtc", to: "https://ga.jspm.io/npm:recordrtc@5.6.2/RecordRTC.js"
+pin "recordrtc" # @5.6.2

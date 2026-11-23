@@ -11,6 +11,20 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "recording cards play straight from storage, not through the Rails redirect" do
+    @voice_recording.media.attach(io: StringIO.new("fake audio"), filename: "test.mp3", content_type: "audio/mpeg")
+    @voice_recording.update!(created_at: 1.minute.from_now)
+
+    get voice_recordings_url(view: "list")
+
+    assert_response :success
+    urls = css_select("[data-controller='card-player']").pluck("data-card-player-url-value")
+    assert_equal 1, urls.size
+    # The test service is Disk, so the storage URL is its signed disk URL.
+    assert_match %r{\Ahttp://localhost:3000/rails/active_storage/disk/.+/test\.mp3\z}, urls.first
+    assert_no_match %r{/blobs/redirect/}, urls.first
+  end
+
   test "should get new" do
     get new_voice_recording_url
     assert_response :success
