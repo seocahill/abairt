@@ -126,4 +126,51 @@ class Transcription::AcceptCandidateTest < ActiveSupport::TestCase
     assert_equal "a correction meanwhile", @entry.reload.word_or_phrase
     assert candidate.reload.pending?
   end
+
+  def timing(entry: @entry, **attrs)
+    @run.transcription_candidates.create!({kind: :timing, dictionary_entry: entry, region_start: 12.5, region_end: 17.25, word_or_phrase: entry.word_or_phrase}.merge(attrs))
+  end
+
+  def untimed_entry(**attrs)
+    DictionaryEntry.create!({voice_recording: @recording, owner: @owner, word_or_phrase: "copied line", translation: "its translation"}.merge(attrs))
+  end
+
+  test "setting times gives a line without times the times found, and nothing else" do
+    entry = untimed_entry
+    candidate = timing(entry:)
+
+    assert_no_difference -> { entry.versions.count } do
+      assert Transcription::AcceptCandidate.call(candidate, by: @owner)
+    end
+
+    entry.reload
+    assert_equal [12.5, 17.25], [entry.region_start, entry.region_end]
+    assert_equal ["copied line", "its translation"], [entry.word_or_phrase, entry.translation]
+    assert candidate.reload.accepted?
+    assert_equal @owner, candidate.resolved_by
+    assert_nil candidate.translation_at_acceptance
+  end
+
+  test "setting times cuts the audio clip in a job" do
+    candidate = timing(entry: untimed_entry)
+    assert_enqueued_with(job: EntryAudioSnippetJob) { Transcription::AcceptCandidate.call(candidate, by: @owner) }
+  end
+
+  test "setting times is allowed on a confirmed line, since nothing is replaced" do
+    entry = untimed_entry(accuracy_status: :confirmed)
+    assert Transcription::AcceptCandidate.call(timing(entry:), by: @owner)
+    assert_equal 12.5, entry.reload.region_start
+    assert entry.confirmed?
+  end
+
+  test "a line that has times by now is not given others" do
+    candidate = timing(entry: @entry)
+    service = Transcription::AcceptCandidate.new(candidate, by: @owner)
+
+    refute service.call
+    assert_match(/has times already/, service.error)
+    assert_equal [1, 3], [@entry.reload.region_start, @entry.region_end]
+    assert candidate.reload.pending?
+    assert_no_enqueued_jobs only: EntryAudioSnippetJob
+  end
 end

@@ -45,6 +45,8 @@ class TranscriptionRunsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     post transcription_run_dismissal_url(run)
     assert_response :not_found
+    post transcription_run_timing_url(run)
+    assert_response :not_found
     assert_equal "old words here", @entry.reload.word_or_phrase
   end
 
@@ -321,5 +323,99 @@ class TranscriptionRunsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
     get voice_recording_url(@recording)
     assert_select "#transcription_run_status button", "Re-transcribe"
+  end
+
+  # A run with a line that has no times (text typed in or copied from
+  # elsewhere), a line that differs only in case, and a line not heard.
+  def run_with_copied_lines
+    run = TranscriptionRun.create!(voice_recording: @recording, requested_by: @owner)
+    run.update!(status: :ready, fotheidil_video_id: "rerun-2", started_at: 1.minute.ago, finished_at: Time.current)
+    @copied = DictionaryEntry.create!(voice_recording: @recording, owner: @owner, word_or_phrase: "copied line", translation: "its translation")
+    @silent = DictionaryEntry.create!(voice_recording: @recording, owner: @owner, word_or_phrase: "nobody said this", region_start: 20, region_end: 22)
+    @cosmetic = DictionaryEntry.create!(voice_recording: @recording, owner: @owner, word_or_phrase: "tá sé go maith", region_start: 30, region_end: 32)
+    @timing = run.transcription_candidates.create!(kind: :timing, dictionary_entry: @copied, region_start: 12.5, region_end: 17.25, word_or_phrase: "copied line")
+    @cosmetic_candidate = run.transcription_candidates.create!(dictionary_entry: @cosmetic, region_start: 30, region_end: 32, word_or_phrase: "Tá sé go maith.")
+    run.update!(unheard_entry_ids: [@silent.id])
+    run
+  end
+
+  test "the review page offers to set times, with the text left alone, and lists the lines not heard" do
+    run = run_with_copied_lines
+    get transcription_run_url(run)
+    assert_response :success
+
+    assert_select "[data-testid=rerun-counts]", /1 line differs, 0 new, 1 needs times/
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@timing)}" do
+      assert_select "[data-testid=timing-text]", "copied line"
+      assert_select "button", "Set times"
+      assert_select "button", "Dismiss"
+      assert_select "button[data-controller=audio-player][data-audio-player-start-value='12.5'][data-audio-player-end-value='17.25']"
+    end
+    assert_select "button", "Set all times (1)"
+    assert_select "[data-testid=unheard]" do
+      assert_select "li", text: /nobody said this/
+      assert_select "li", text: /copied line/, count: 0
+    end
+  end
+
+  test "setting times on a line gives it times and leaves its text" do
+    run = run_with_copied_lines
+    patch transcription_candidate_url(@timing), params: {transcription_candidate: {status: "accepted"}, seen_at: Time.current.to_r.to_s}, as: :turbo_stream
+
+    assert_response :success
+    assert_equal [12.5, 17.25, "copied line", "its translation"], @copied.reload.slice(:region_start, :region_end, :word_or_phrase, :translation).values.map { it.is_a?(BigDecimal) ? it.to_f : it }
+    assert_includes response.body, "Times set"
+    assert_not_includes response.body, "Irish text changed since this translation was made"
+    assert_includes response.body, %(id="transcription_run_summary")
+    assert run.reload.transcription_candidates.timing.sole.accepted?
+  end
+
+  test "set all times gives times to every line without them and changes no text" do
+    run = run_with_copied_lines
+    assert_enqueued_with(job: EntryAudioSnippetJob) do
+      post transcription_run_timing_url(run), params: {seen_at: Time.current.to_r.to_s}
+    end
+
+    assert_redirected_to transcription_run_url(run)
+    assert_match(/Gave times to 1 line/, flash[:notice])
+    assert_equal 12.5, @copied.reload.region_start
+    assert_equal "copied line", @copied.word_or_phrase
+    assert_equal "tá sé go maith", @cosmetic.reload.word_or_phrase
+  end
+
+  test "only an admin or the owner may set all times" do
+    run = run_with_copied_lines
+    sign_in_as users(:one)
+    post transcription_run_timing_url(run)
+    assert_response :redirect
+    assert_nil @copied.reload.region_start
+  end
+
+  test "lines that differ only in case or punctuation can be hidden, and are left by accept all while hidden" do
+    run = run_with_copied_lines
+    get transcription_run_url(run)
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@cosmetic_candidate)}", /Case or punctuation only/
+    assert_select "a", /Hide lines that differ only in case or punctuation/
+
+    get transcription_run_url(run, hide_cosmetic: 1)
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@cosmetic_candidate)}", count: 0
+    assert_select "a", "Show them"
+    assert_select "button", text: /Accept all/, count: 0
+    assert_select "input[name=hide_cosmetic][value='1']"
+
+    post transcription_run_acceptance_url(run), params: {seen_at: 1.minute.from_now.to_r.to_s, hide_cosmetic: "1"}
+    assert_redirected_to transcription_run_url(run, hide_cosmetic: "1")
+    assert_equal "tá sé go maith", @cosmetic.reload.word_or_phrase
+
+    post transcription_run_acceptance_url(run), params: {seen_at: 1.minute.from_now.to_r.to_s}
+    assert_equal "Tá sé go maith.", @cosmetic.reload.word_or_phrase
+  end
+
+  test "a line decided while hidden stays on the page" do
+    run = run_with_copied_lines
+    patch transcription_candidate_url(@cosmetic_candidate), params: {transcription_candidate: {status: "dismissed"}, hide_cosmetic: "1", seen_at: Time.current.to_r.to_s}
+    assert_redirected_to transcription_run_url(run, hide_cosmetic: "1")
+    get transcription_run_url(run, hide_cosmetic: 1)
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@cosmetic_candidate)}", /Kept current/
   end
 end

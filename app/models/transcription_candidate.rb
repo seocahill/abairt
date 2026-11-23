@@ -7,6 +7,9 @@
 # `new_segment`: it lines up with no current entry. It keeps the segment's
 # Fotheidil id and speaker label so it can later be added as an entry the same
 # way the import pipeline does.
+# `timing`: the entry has no times (its text was typed in or copied from
+# elsewhere) and the new transcription says where it is spoken. The region is
+# the proposed time; the text stays the entry's own.
 #
 # Nothing here changes an entry: accepting goes through the entry's own
 # versioned update.
@@ -15,14 +18,14 @@ class TranscriptionCandidate < ApplicationRecord
   belongs_to :dictionary_entry, optional: true
   belongs_to :resolved_by, class_name: "User", optional: true
 
-  enum :kind, {differs: 0, new_segment: 1}
+  enum :kind, {differs: 0, new_segment: 1, timing: 2}
   enum :status, {pending: 0, accepted: 1, dismissed: 2}
 
   validates :word_or_phrase, presence: true
   validates :region_start, numericality: {greater_than_or_equal_to: 0}
   validates :region_end, numericality: true
-  validates :dictionary_entry, presence: true, if: :differs?
-  validates :dictionary_entry_id, uniqueness: {scope: :transcription_run_id}, allow_nil: true
+  validates :dictionary_entry, presence: true, if: -> { differs? || timing? }
+  validates :dictionary_entry_id, uniqueness: {scope: [:transcription_run_id, :kind]}, allow_nil: true
   validates :resolved_by, :resolved_at, presence: true, unless: :pending?
   validates :resolved_by, :resolved_at, absence: true, if: :pending?
   validate :ends_after_it_starts
@@ -31,6 +34,8 @@ class TranscriptionCandidate < ApplicationRecord
   scope :in_time_order, -> { order(:region_start, :id) }
   # What "Accept all" covers: differing lines on entries nobody has confirmed.
   scope :acceptable_in_bulk, -> { pending.differs.joins(:dictionary_entry).merge(DictionaryEntry.unconfirmed_accuracy) }
+
+  scope :timing_in_bulk, -> { pending.timing }
 
   # The ids, among `entries`, of those whose Irish was replaced by an accepted
   # candidate and still reads so, while their translation has stayed as it was
@@ -45,6 +50,11 @@ class TranscriptionCandidate < ApplicationRecord
       .distinct
       .pluck(:dictionary_entry_id)
       .to_set
+  end
+
+  # The new text reads the same as the entry's, but for case or punctuation.
+  def cosmetic?
+    differs? && Transcription::Text.cosmetic_difference?(dictionary_entry.word_or_phrase, word_or_phrase)
   end
 
   def dismiss(by:)

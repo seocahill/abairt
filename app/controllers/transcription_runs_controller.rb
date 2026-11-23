@@ -25,8 +25,20 @@ class TranscriptionRunsController < ApplicationController
     @run = TranscriptionRun.includes(:voice_recording).find(params[:id])
     authorize @run
     @recording = @run.voice_recording
-    @candidates = @run.transcription_candidates.includes(dictionary_entry: {media_attachment: :blob}).in_time_order
+    @hide_cosmetic = params[:hide_cosmetic] == "1"
+    @candidates = visible(@run.transcription_candidates.includes(dictionary_entry: {media_attachment: :blob}).in_time_order.to_a)
+    @unheard_entries = @run.unheard_entries.includes(media_attachment: :blob)
     @seen_at = Time.current
     @stale_translation_ids = TranscriptionCandidate.stale_translation_entry_ids(@candidates.filter_map(&:dictionary_entry))
+  end
+
+  private
+
+  # Lines that differ only in case or punctuation can be hidden while they
+  # wait; once decided they stay on the page.
+  def visible(candidates)
+    return candidates unless @hide_cosmetic
+
+    candidates.reject { |candidate| candidate.pending? && candidate.cosmetic? }
   end
 end

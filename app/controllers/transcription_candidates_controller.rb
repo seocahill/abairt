@@ -14,10 +14,11 @@ class TranscriptionCandidatesController < ApplicationController
     @run = @candidate.transcription_run
     @error = resolve
     @seen_at = seen_at
+    @hide_cosmetic = params[:hide_cosmetic] == "1"
 
     respond_to do |format|
       format.turbo_stream { render status: (@error ? :unprocessable_content : :ok) }
-      format.html { redirect_to transcription_run_path(@run), @error ? {alert: @error} : {} }
+      format.html { redirect_to transcription_run_path(@run, hide_cosmetic: params[:hide_cosmetic].presence), @error ? {alert: @error} : {} }
     end
   end
 

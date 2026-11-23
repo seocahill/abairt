@@ -50,6 +50,11 @@ class TranscriptionRun < ApplicationRecord
     @pending_counts ||= transcription_candidates.pending.group(:kind).count
   end
 
+  # Current lines nothing in the new transcription lined up with.
+  def unheard_entries
+    voice_recording.dictionary_entries.where(id: unheard_entry_ids).order(:region_start, :id)
+  end
+
   def awaiting_review?
     ready? && pending_counts.values.sum.positive?
   end

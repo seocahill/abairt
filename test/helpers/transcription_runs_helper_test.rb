@@ -23,4 +23,12 @@ class TranscriptionRunsHelperTest < ActionView::TestCase
     run.stubs(:pending_counts).returns({"differs" => 2, "new_segment" => 1})
     assert_equal "2 lines differ, 1 new", pending_candidates_summary(run)
   end
+
+  test "says how many lines need times" do
+    run = TranscriptionRun.new
+    run.stubs(:pending_counts).returns({"differs" => 1, "new_segment" => 2, "timing" => 3})
+    assert_equal "1 line differs, 2 new, 3 need times", pending_candidates_summary(run)
+    run.stubs(:pending_counts).returns({"timing" => 1})
+    assert_equal "0 lines differ, 0 new, 1 needs times", pending_candidates_summary(run)
+  end
 end

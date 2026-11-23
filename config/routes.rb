@@ -105,6 +105,7 @@ Rails.application.routes.draw do
     resources :transcription_runs, only: [:create, :show], shallow: true do
       resource :acceptance, only: :create, module: :transcription_runs
       resource :dismissal, only: :create, module: :transcription_runs
+      resource :timing, only: :create, module: :transcription_runs
     end
   end
   resources :transcription_candidates, only: :update

@@ -8,6 +8,9 @@ module Transcription
   #   The translation is kept as it was, and remembered on the candidate so the
   #   entry can say it may now be out of date. A confirmed entry is never
   #   changed: it has to be deconfirmed first.
+  # - A `timing` candidate gives an entry that has no times the times found for
+  #   it, and nothing else. An entry that has times is left alone, confirmed or
+  #   not, since nothing is being replaced. Its audio clip follows in a job.
   # - A `new_segment` candidate becomes a new unconfirmed entry, set up the way
   #   the import pipeline sets one up: its audio clip, translation and tags
   #   follow in PostProcessEntryJob. Its speaker is left for a person to choose,
@@ -36,15 +39,34 @@ module Transcription
       @candidate.with_lock do
         next fail_with("This line has already been #{@candidate.status}.") unless @candidate.pending?
 
-        @candidate.new_segment? ? add_entry : replace_text
+        apply
       end
       @added_entry&.post_process
+      EntryAudioSnippetJob.perform_later(@timed_entry) if @timed_entry
       @error.nil?
     rescue ActiveRecord::RecordInvalid => e
       fail_with(e.record.errors.full_messages.to_sentence)
     end
 
     private
+
+    def apply
+      case @candidate.kind
+      when "new_segment" then add_entry
+      when "timing" then set_timing
+      else replace_text
+      end
+    end
+
+    def set_timing
+      entry = @candidate.dictionary_entry
+      entry.lock!
+      return fail_with("This line has times already. Nothing was changed.") if entry.region_start.present? || entry.region_end.present?
+
+      entry.update!(region_start: @candidate.region_start, region_end: @candidate.region_end)
+      resolve!
+      @timed_entry = entry
+    end
 
     def replace_text
       entry = @candidate.dictionary_entry

@@ -11,10 +11,10 @@ module TranscriptionRuns
       run = TranscriptionRun.find(params[:transcription_run_id])
       authorize run, :update?
 
-      result = Transcription::AcceptAll.call(run, by: current_user, seen_at:)
+      result = Transcription::AcceptAll.call(run, by: current_user, seen_at:, hide_cosmetic: params[:hide_cosmetic] == "1")
       notice = "Used the new text on #{helpers.pluralize(result[:accepted], "line")}."
       notice += " #{helpers.pluralize(result[:skipped], "line")} changed since you opened the page, so #{(result[:skipped] == 1) ? "it was" : "they were"} left for you to look at." if result[:skipped].positive?
-      redirect_to transcription_run_path(run), notice:
+      redirect_to transcription_run_path(run, hide_cosmetic: params[:hide_cosmetic].presence), notice:
     end
   end
 end
