@@ -18,7 +18,7 @@ gem 'ostruct'
 gem 'acts-as-taggable-on'
 gem 'aws-sdk-s3', '~> 1.245'
 gem 'diff-lcs', '~> 1.6'
-gem 'dotenv', '~> 2.8'
+gem 'dotenv', '~> 3.2'
 gem 'geocoder', '~> 1.8'
 gem 'groupdate', '~> 6.8'
 gem 'hotwire-rails', '~> 0.1.3'
@@ -56,7 +56,7 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # Development gems
 group :development do
-  gem 'dotenv-rails', '~> 2.7'
+  gem 'dotenv-rails', '~> 3.2'
   gem 'listen', '~> 3.10'
   gem 'web-console', '>= 4.1.0'
 end
