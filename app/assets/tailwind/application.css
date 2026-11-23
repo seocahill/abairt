@@ -1,0 +1,301 @@
+@import 'tailwindcss' source(none);
+
+/* The files whose class names make up the stylesheet (the old content list). */
+@source '../../../public/*.html';
+@source '../../helpers';
+@source '../../javascript';
+@source '../../views';
+
+/* Both ship inside the standalone Tailwind executable: no npm packages needed. */
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* dark: applies only under a .dark class, as it did before (the old flowbite
+   plugin set this). Nothing sets that class, so the site stays light: a page
+   that half follows the phone's dark mode looks broken. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* The colours the site has always had: the old flowbite plugin's palette, and
+   Tailwind 3's for the families it didn't set. Tailwind 4's own palette is
+   brighter, and white text on its green-600 buttons falls below readable
+   contrast (about 3:1). Delete this block to switch to Tailwind 4's colours. */
+@theme {
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-blue-50: #ebf5ff;
+  --color-blue-100: #e1effe;
+  --color-blue-200: #c3ddfd;
+  --color-blue-300: #a4cafe;
+  --color-blue-400: #76a9fa;
+  --color-blue-500: #3f83f8;
+  --color-blue-600: #1c64f2;
+  --color-blue-700: #1a56db;
+  --color-blue-800: #1e429f;
+  --color-blue-900: #233876;
+  --color-green-50: #f3faf7;
+  --color-green-100: #def7ec;
+  --color-green-200: #bcf0da;
+  --color-green-300: #84e1bc;
+  --color-green-400: #31c48d;
+  --color-green-500: #0e9f6e;
+  --color-green-600: #057a55;
+  --color-green-700: #046c4e;
+  --color-green-800: #03543f;
+  --color-green-900: #014737;
+  --color-red-50: #fdf2f2;
+  --color-red-100: #fde8e8;
+  --color-red-200: #fbd5d5;
+  --color-red-300: #f8b4b4;
+  --color-red-400: #f98080;
+  --color-red-500: #f05252;
+  --color-red-600: #e02424;
+  --color-red-700: #c81e1e;
+  --color-red-800: #9b1c1c;
+  --color-red-900: #771d1d;
+  --color-yellow-50: #fdfdea;
+  --color-yellow-100: #fdf6b2;
+  --color-yellow-200: #fce96a;
+  --color-yellow-300: #faca15;
+  --color-yellow-400: #e3a008;
+  --color-yellow-500: #c27803;
+  --color-yellow-600: #9f580a;
+  --color-yellow-700: #8e4b10;
+  --color-yellow-800: #723b13;
+  --color-yellow-900: #633112;
+  --color-indigo-50: #f0f5ff;
+  --color-indigo-100: #e5edff;
+  --color-indigo-200: #cddbfe;
+  --color-indigo-300: #b4c6fc;
+  --color-indigo-400: #8da2fb;
+  --color-indigo-500: #6875f5;
+  --color-indigo-600: #5850ec;
+  --color-indigo-700: #5145cd;
+  --color-indigo-800: #42389d;
+  --color-indigo-900: #362f78;
+  --color-purple-50: #f6f5ff;
+  --color-purple-100: #edebfe;
+  --color-purple-200: #dcd7fe;
+  --color-purple-300: #cabffd;
+  --color-purple-400: #ac94fa;
+  --color-purple-500: #9061f9;
+  --color-purple-600: #7e3af2;
+  --color-purple-700: #6c2bd9;
+  --color-purple-800: #5521b5;
+  --color-purple-900: #4a1d96;
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-orange-50: #fff8f1;
+  --color-orange-100: #feecdc;
+  --color-orange-200: #fcd9bd;
+  --color-orange-300: #fdba8c;
+  --color-orange-400: #ff8a4c;
+  --color-orange-500: #ff5a1f;
+  --color-orange-600: #d03801;
+  --color-orange-700: #b43403;
+  --color-orange-800: #8a2c0d;
+  --color-orange-900: #771d1d;
+  --color-pink-50: #fdf2f8;
+  --color-pink-100: #fce8f3;
+  --color-pink-200: #fad1e8;
+  --color-pink-300: #f8b4d9;
+  --color-pink-400: #f17eb8;
+  --color-pink-500: #e74694;
+  --color-pink-600: #d61f69;
+  --color-pink-700: #bf125d;
+  --color-pink-800: #99154b;
+  --color-pink-900: #751a3d;
+  --color-cyan-50: #ecfeff;
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+  --color-cyan-700: #0e7490;
+  --color-cyan-800: #155e75;
+  --color-cyan-900: #164e63;
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  /* v4 gives buttons the default cursor; keep the pointer the site had. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Admin tables: one look on every admin page. The wrapper scrolls sideways on
+   a phone, so the page itself never does. :where() keeps these at the weight
+   of a utility, so a cell's own classes (font-medium, text-right) still win. */
+@utility admin-table-wrap {
+  @apply bg-white shadow-sm rounded-lg overflow-x-auto;
+}
+
+@utility admin-table {
+  @apply min-w-full divide-y divide-gray-200 text-sm;
+
+  & :where(thead) {
+    @apply bg-gray-50;
+  }
+
+  & :where(th) {
+    @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap;
+  }
+
+  & :where(tbody) {
+    @apply bg-white divide-y divide-gray-200;
+  }
+
+  & :where(td) {
+    @apply px-4 py-3 text-gray-700;
+  }
+}
+
+@layer utilities {
+  .pagy-nav,
+  .pagy-nav-js,
+  .pagy-combo-nav-js {
+    @apply inline-flex shadow-md;
+  }
+
+  .pagy-nav.pagination,
+  .pagy-nav-js.pagination,
+  .pagy-combo-nav-js.pagination {
+    @apply border border-gray-600 rounded-xs;
+  }
+
+  .pagy-nav .page,
+  .pagy-nav-js .page,
+  .pagy-combo-nav-js .page,
+  .pagy-combo-nav-js .pagy-combo-input {
+    @apply text-gray-700 border-r border-gray-600 px-3 py-2 text-sm leading-tight font-medium;
+  }
+
+  .pagy-nav .page:hover,
+  .pagy-nav-js .page:hover {
+    @apply text-gray-900;
+  }
+
+  .pagy-nav .disabled,
+  .pagy-nav-js .disabled,
+  .pagy-combo-nav-js .disabled {
+    @apply cursor-not-allowed;
+  }
+
+  .pagy-nav .active,
+  .pagy-nav-js .active {
+    @apply text-blue-500;
+  }
+
+  .pagy-nav .prev,
+  .pagy-nav-js .prev,
+  .pagy-combo-nav-js .prev {
+    @apply text-gray-900;
+  }
+
+  .pagy-nav .next,
+  .pagy-nav-js .next,
+  .pagy-combo-nav-js .next {
+    @apply text-gray-900 border-r border-transparent;
+  }
+}
+
+/* Tailwind 3 let a few form rules beat plain utilities on specificity, and the
+   site relied on it: select arrows clear of the text, checked boxes without a
+   grey rim, the blue border on the field you're typing in. Tailwind 4 puts
+   those rules in a lower layer, so they are restated here. Each selector
+   weighs just more than a plain utility (border-gray-300, px-4) and less than
+   a state one (focus:border-indigo-500), as before. */
+@layer utilities {
+  select:not([size]) {
+    padding-right: 2.5rem;
+  }
+
+  input:where([type='checkbox'], [type='radio']):checked {
+    border-color: transparent;
+  }
+
+  :where(
+      input:is(
+          [type='text'],
+          [type='email'],
+          [type='url'],
+          [type='password'],
+          [type='number'],
+          [type='date'],
+          [type='datetime-local'],
+          [type='month'],
+          [type='search'],
+          [type='tel'],
+          [type='time'],
+          [type='week']
+        ),
+      textarea,
+      select
+    ):focus {
+    border-color: var(--color-blue-600);
+  }
+}
+
+/* Installed to the home screen, the app is only the asking half: tap the icon,
+   hold the button, let go. The site's own navigation — Transcriptions,
+   Dictionary, Speakers — belongs to the browser, where there is a keyboard and
+   a screen worth having. In a browser tab this rule does nothing, so one
+   codebase serves both. */
+@media (display-mode: standalone) {
+  .site-chrome {
+    display: none;
+  }
+}

@@ -5,7 +5,7 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <% @speakers.each do |speaker| %>
       <% outstanding = QuestionQueue.new(speaker).outstanding %>
-      <div class="bg-white shadow rounded-lg p-4">
+      <div class="bg-white shadow-sm rounded-lg p-4">
         <p class="font-medium"><%= speaker.name %></p>
         <p class="text-sm mt-2">
           <% if outstanding %>

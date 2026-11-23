@@ -9,7 +9,7 @@
     <%= button_to "Delete", admin_user_path(@user), method: :delete, class: admin_button_class(:danger), form: { data: { turbo_confirm: "Are you sure?" } } %>
   <% end %>
 
-  <div class="bg-white shadow rounded-lg overflow-hidden">
+  <div class="bg-white shadow-sm rounded-lg overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-wrap gap-2">
       <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800"><%= admin_user_kind_label(@user.kind) %></span>
       <%= render "role_badge", user: @user %>
@@ -28,7 +28,7 @@
           <p class="text-sm text-blue-800 mb-2">
             Not connected yet. Send them this link — one tap connects them, and it stops working once used.
           </p>
-          <code class="block text-sm bg-white border border-blue-200 rounded px-3 py-2 break-all"><%= @user.telegram_invite_link %></code>
+          <code class="block text-sm bg-white border border-blue-200 rounded-sm px-3 py-2 break-all"><%= @user.telegram_invite_link %></code>
           <%= button_to "Issue a new link", telegram_invite_admin_user_path(@user), method: :post,
                 class: "mt-2 text-sm text-blue-700 underline",
                 form: { data: { turbo_confirm: "The link you already sent will stop working." } } %>
@@ -39,7 +39,7 @@
         <% else %>
           <p class="text-sm text-blue-800 mb-2">Not connected, and no invite link yet.</p>
           <%= button_to "Create an invite link", telegram_invite_admin_user_path(@user), method: :post,
-                class: "px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700" %>
+                class: "px-3 py-2 bg-blue-600 text-white rounded-sm text-sm hover:bg-blue-700" %>
         <% end %>
       </div>
     <% end %>
@@ -122,7 +122,7 @@
           <% if @user.api_token.present? %>
             <div class="bg-gray-50 rounded-lg p-4">
               <p class="text-sm text-gray-600 mb-2">Token (first 8 characters):</p>
-              <code class="bg-white px-3 py-2 rounded border border-gray-300 text-sm font-mono"><%= @user.api_token.first(8) %>...</code>
+              <code class="bg-white px-3 py-2 rounded-sm border border-gray-300 text-sm font-mono"><%= @user.api_token.first(8) %>...</code>
               <p class="text-xs text-gray-500 mt-2">Full token is stored securely and only shown partially for security.</p>
             </div>
           <% else %>

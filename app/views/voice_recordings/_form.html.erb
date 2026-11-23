@@ -13,22 +13,22 @@
 
   <div class="my-5">
     <%= form.label :title %>
-    <%= form.text_field :title, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full", required: true %>
+    <%= form.text_field :title, class: "block shadow-sm rounded-md border border-gray-200 outline-hidden px-3 py-2 mt-2 w-full", required: true %>
   </div>
 
   <div class="my-5">
     <%= form.label :description %>
-    <%= form.text_area :description, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full", required: true %>
+    <%= form.text_area :description, rows: 4, class: "block shadow-sm rounded-md border border-gray-200 outline-hidden px-3 py-2 mt-2 w-full", required: true %>
   </div>
 
   <div class="my-5">
     <%= form.label :transcription %>
-    <%= form.text_area :transcription, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full", placeholder: "Optionally add an existing transcription" %>
+    <%= form.text_area :transcription, rows: 4, class: "block shadow-sm rounded-md border border-gray-200 outline-hidden px-3 py-2 mt-2 w-full", placeholder: "Optionally add an existing transcription" %>
   </div>
 
   <div class="my-5">
     <%= form.label :transcription_en %>
-    <%= form.text_area :transcription_en, rows: 4, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full", placeholder: "Optionally add an existing English transcription" %>
+    <%= form.text_area :transcription_en, rows: 4, class: "block shadow-sm rounded-md border border-gray-200 outline-hidden px-3 py-2 mt-2 w-full", placeholder: "Optionally add an existing English transcription" %>
   </div>
 
   <% if Current.user&.admin? && action_name == "new" %>
@@ -38,7 +38,7 @@
       <div class="mb-4">
         <%= form.label :fotheidil_video_id, "Fotheidil Video ID (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
         <%= form.text_field :fotheidil_video_id,
-            class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 w-full",
+            class: "block shadow-sm rounded-md border border-gray-200 outline-hidden px-3 py-2 w-full",
             placeholder: "e.g., 1141" %>
         <p class="text-xs text-gray-500 mt-1">
           If this recording already exists on fotheidil.abair.ie, enter the video ID from the URL

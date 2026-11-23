@@ -17,7 +17,7 @@
               <td><%= row[:lines_to_check] %> of <%= row[:lines_total] %></td>
               <% %i[tts_progress_percent asr_progress_percent].each do |key| %>
                 <td class="w-40">
-                  <div class="h-2 rounded bg-gray-200"><div class="h-2 rounded bg-blue-600" style="width: <%= row[key] %>%"></div></div>
+                  <div class="h-2 rounded-sm bg-gray-200"><div class="h-2 rounded-sm bg-blue-600" style="width: <%= row[key] %>%"></div></div>
                   <span class="text-xs text-gray-500"><%= row[key] %>%</span>
                 </td>
               <% end %>

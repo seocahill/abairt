@@ -425,12 +425,12 @@ export default class extends Controller {
     buttonContainer.className = 'flex gap-2';
     
     const saveButton = document.createElement('button');
-    saveButton.className = 'bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm';
+    saveButton.className = 'bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-sm text-sm';
     saveButton.textContent = 'Save';
     saveButton.onclick = () => this.saveRegion(region);
     
     const cancelButton = document.createElement('button');
-    cancelButton.className = 'bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm';
+    cancelButton.className = 'bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded-sm text-sm';
     cancelButton.textContent = 'Cancel';
     cancelButton.onclick = () => {
       this.hideSaveButton();

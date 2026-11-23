@@ -1,7 +1,7 @@
 <div class="max-w-4xl">
   <%= admin_page_header "Edit user", back: [@user.name, admin_user_path(@user)] %>
 
-  <div class="bg-white shadow rounded-lg overflow-hidden">
+  <div class="bg-white shadow-sm rounded-lg overflow-hidden">
 
     <%= render "form", user: @user, submit_label: "Update User" %>
   </div>

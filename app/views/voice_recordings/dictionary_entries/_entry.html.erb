@@ -1,5 +1,5 @@
 <% listening_controls = local_assigns[:listening_controls] && entry.region_start && entry.region_end %>
-<div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-all duration-300 scroll-mt-20" id="dictionary_entry_<%= entry.id %>"
+<div class="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-all duration-300 scroll-mt-20" id="dictionary_entry_<%= entry.id %>"
      data-controller="inline-edit<%= " line-seek" if listening_controls %>"
      <% if listening_controls %>
        data-line-seek-start-value="<%= entry.region_start.to_f %>"
@@ -14,9 +14,9 @@
       <div class="mb-2" data-inline-edit-target="display">
         <div class="group relative">
         <% if policy(entry).update? && !entry.confirmed? %>
-          <p class="text-lg font-medium text-gray-900 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded"
+          <p class="text-lg font-medium text-gray-900 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-sm"
              data-action="click->inline-edit#edit"><%= entry.word_or_phrase %></p>
-          <p class="text-gray-600 italic cursor-pointer hover:bg-gray-50 px-2 py-1 rounded"
+          <p class="text-gray-600 italic cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-sm"
              data-action="click->inline-edit#edit"><%= entry.translation %></p>
             <button class="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-600 p-1"
                     data-action="click->inline-edit#edit"
@@ -42,20 +42,20 @@
           <div class="space-y-2">
             <%= form.text_area :word_or_phrase,
                 rows: 2,
-                class: "w-full text-lg font-medium border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[3rem]",
+                class: "w-full text-lg font-medium border border-gray-300 rounded-sm px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-12",
                 placeholder: "Word or phrase" %>
             <%= form.text_area :translation,
                 rows: 2,
-                class: "w-full text-gray-600 border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[3rem]",
+                class: "w-full text-gray-600 border border-gray-300 rounded-sm px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-12",
                 placeholder: "Translation" %>
             <%= form.select :speaker_id,
                 options_from_collection_for_select(entry.voice_recording.users, :id, :name, entry.speaker_id),
                 { include_blank: "— select speaker —" },
-                class: "w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-700" %>
+                class: "w-full border border-gray-300 rounded-sm px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-700" %>
             <div class="flex gap-2 mt-2">
-              <%= form.submit "Save", class: "bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors" %>
+              <%= form.submit "Save", class: "bg-blue-600 text-white px-3 py-1 rounded-sm text-sm hover:bg-blue-700 transition-colors" %>
               <button type="button"
-                      class="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400 transition-colors"
+                      class="bg-gray-300 text-gray-700 px-3 py-1 rounded-sm text-sm hover:bg-gray-400 transition-colors"
                       data-action="click->inline-edit#cancel">Cancel</button>
             </div>
           </div>
@@ -75,7 +75,7 @@
           <% if policy(entry).deconfirm? %>
             <%= button_to "Deconfirm", deconfirm_voice_recording_dictionary_entry_path(entry.voice_recording, entry),
                 method: :post,
-                class: "text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors",
+                class: "text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-sm hover:bg-yellow-200 transition-colors",
                 data: { turbo: true } %>
           <% end %>
         <% else %>
@@ -85,7 +85,7 @@
           <% if policy(entry).confirm? %>
             <%= button_to "Confirm", confirm_voice_recording_dictionary_entry_path(entry.voice_recording, entry),
                 method: :post,
-                class: "text-xs px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors",
+                class: "text-xs px-2 py-1 bg-green-100 text-green-800 rounded-sm hover:bg-green-200 transition-colors",
                 data: { turbo: true } %>
           <% end %>
         <% end %>
@@ -132,7 +132,7 @@
     </div>
 
     <!-- Play Button -->
-    <button class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200<%= " min-w-[44px] min-h-[44px] flex items-center justify-center" if listening_controls %>"
+    <button class="shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200<%= " min-w-[44px] min-h-[44px] flex items-center justify-center" if listening_controls %>"
             <% if listening_controls %>
               aria-label="Play this line"
               data-action="line-seek#play"

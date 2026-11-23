@@ -1,19 +1,7 @@
 {
-  "devDependencies": {
-    "@tailwindcss/aspect-ratio": "^0.4.2",
-    "@tailwindcss/forms": "~0.3.4",
-    "@tailwindcss/typography": "~0.4.1",
-    "autoprefixer": "^10.7.0",
-    "tailwindcss": "^2.0.2",
-    "tailwindcss-cli": "^0.1.2"
-  },
-  "scripts": {
-    "tailwindcss:build": "tailwindcss-cli build ./app/assets/tailwind/tailwind_custom_base.css -o ./app/assets/stylesheets/tailwind_custom.css"
-  },
   "dependencies": {
     "@rails/actiontext": "^8.1.401",
     "csso-cli": "^4.0.2",
-    "flowbite": "^1.6.5",
     "trix": "^2.1.19",
     "wavesurfer": "^1.3.4"
   }

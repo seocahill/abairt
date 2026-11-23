@@ -2,13 +2,13 @@
 
 # The shared pieces of an admin page, so every admin page looks like one set:
 # the page header, the filter tabs and the buttons. The table style is the
-# .admin-table class in application.tailwind.css.
+# .admin-table utility in app/assets/tailwind/application.css.
 module AdminPageHelper
-  FILTER_CLASS = "inline-flex items-center min-h-9 px-3 rounded text-sm"
+  FILTER_CLASS = "inline-flex items-center min-h-9 px-3 rounded-sm text-sm"
   FILTER_CURRENT_CLASS = "bg-blue-600 text-white"
   FILTER_OTHER_CLASS = "bg-gray-200 text-gray-700 hover:bg-gray-300"
 
-  BUTTON_CLASS = "inline-flex items-center justify-center min-h-9 px-4 rounded text-sm font-medium whitespace-nowrap"
+  BUTTON_CLASS = "inline-flex items-center justify-center min-h-9 px-4 rounded-sm text-sm font-medium whitespace-nowrap"
   BUTTON_COLORS = {
     primary: "bg-blue-600 text-white hover:bg-blue-700",
     secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",

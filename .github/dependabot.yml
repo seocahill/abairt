@@ -26,13 +26,6 @@ updates:
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
-    ignore:
-      # These versions need tailwindcss 3+, and we're on 2 (#131). Lift this
-      # with the Tailwind upgrade (#181).
-      - dependency-name: "@tailwindcss/forms"
-        versions: [">=0.4.0"]
-      - dependency-name: "@tailwindcss/typography"
-        versions: [">=0.5.0"]
   - package-ecosystem: docker
     directory: "/"
     schedule:

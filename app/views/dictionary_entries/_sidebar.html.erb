@@ -59,15 +59,15 @@
             </div>
           </div>
           <div class="mt-1">
-            <ul class="rounded p-2 max-w-md" id="selectedTags"></ul>
+            <ul class="rounded-sm p-2 max-w-md" id="selectedTags"></ul>
           </div>
           <%= content_tag :div, data: { controller: 'recorder' }, class: "mt-1 w-full text-center mx-auto" do %>
             <%= form.file_field :media, hidden: true, direct_upload: true, data: { target: 'recorder.input' } %>
             <%= content_tag :div, "Déan Taifead",
-                              class: 'bg-green-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                              class: 'bg-green-500 text-white rounded-sm font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
                               data: { target: 'recorder.recordButton', action: 'click->recorder#record' } %>
             <%= content_tag :div, "Stop",
-                              class: 'bg-red-500 text-white rounded font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
+                              class: 'bg-red-500 text-white rounded-sm font-lg mt-5 mr-1 mb-1 px-1 py-2 font-semibold',
                               data: { target: 'recorder.stopButton', action: 'click->recorder#stop' } %>
           <% end %>
           <div class="w-full text-center mx-auto mt-1">

@@ -1,20 +1,20 @@
-<div class="container mx-auto px-6 py-8 h-full flex-grow">
+<div class="container mx-auto px-6 py-8 h-full grow">
   <div class="flex flex-col sm:flex-row sm:items-center mb-6">
-    <form action="/dictionary_entries" class="relative flex-1"><input type="search" name="search" placeholder="focail i mBearla nó i nGaeilge" class="p-4 text-gray-700 w-full bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400">
-      <button type="submit" class="bg-green-400 text-white rounded font-lg absolute top-0 right-0 bottom-0 mt-1 mr-1 mb-1 px-8 font-semibold">Cuardaigh</button>
+    <form action="/dictionary_entries" class="relative flex-1"><input type="search" name="search" placeholder="focail i mBearla nó i nGaeilge" class="p-4 text-gray-700 w-full bg-white border border-gray-300 rounded-lg focus:outline-hidden focus:border-gray-400">
+      <button type="submit" class="bg-green-400 text-white rounded-sm font-lg absolute top-0 right-0 bottom-0 mt-1 mr-1 mb-1 px-8 font-semibold">Cuardaigh</button>
     </form>
   </div>
   <div class="flex flex-row items-center flex-wrap content-start">
     <% tag_cloud(@tags, %w(css1 css2 css3 css4)) do |tag, css_class| %>
       <div class="p-2">
-        <%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded" %>
+        <%= link_to tag.name, dictionary_entries_path(tag: tag.name), class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded-sm" %>
       </div>
     <% end %>
     <div class="p-2">
-      <%= link_to "foghraíocht", dictionary_entries_path(media: true), class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded" %>
+      <%= link_to "foghraíocht", dictionary_entries_path(media: true), class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded-sm" %>
     </div>
     <div class="p-2">
-      <%= link_to "uile", dictionary_entries_path, class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded" %>
+      <%= link_to "uile", dictionary_entries_path, class: "bg-transparent hover:bg-gray-600 text-gray-600 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded-sm" %>
     </div>
   </div>
 </div>

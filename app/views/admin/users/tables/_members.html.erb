@@ -6,7 +6,7 @@
   <table class="admin-table">
     <thead>
       <tr>
-        <th><input type="checkbox" id="select-all" class="rounded" aria-label="Select all"></th>
+        <th><input type="checkbox" id="select-all" class="rounded-sm" aria-label="Select all"></th>
         <th>Name</th>
         <th>Email</th>
         <th>Role</th>
@@ -19,7 +19,7 @@
       <% users.each do |user| %>
         <tr>
           <td class="whitespace-nowrap">
-            <%= check_box_tag "user_ids[]", user.id, false, id: "user_ids_#{user.id}", form: "bulk-users-form", class: "user-checkbox rounded", aria: {label: "Select #{user.name}"} %>
+            <%= check_box_tag "user_ids[]", user.id, false, id: "user_ids_#{user.id}", form: "bulk-users-form", class: "user-checkbox rounded-sm", aria: {label: "Select #{user.name}"} %>
           </td>
           <td class="whitespace-nowrap font-medium text-gray-900">
             <%= link_to user.name, admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
