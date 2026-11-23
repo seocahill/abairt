@@ -17,6 +17,8 @@ module Fotheidil
   #     result[:error] # Error message
   #   end
   class ProcessVideoOperation < Trailblazer::Operation
+    include TranscriptSteps
+
     # Override call to show wtf? output in development
     # def self.call(options = {})
     #   if Rails.env.development?
@@ -37,7 +39,7 @@ module Fotheidil
     step :create_entries
     step :wait_for_entries
     step :publish
-    fail :mark_as_failed
+    left :mark_as_failed
 
     # Validate voice recording exists and has media
     def validate_voice_recording(ctx, voice_recording:, **)
@@ -124,142 +126,12 @@ module Fotheidil
 
     # Submit media to the Abair API and record the job id
     def submit_media(ctx, voice_recording)
-      Rails.logger.info "Uploading new video to Fotheidil..."
-
-      # Use Active Storage's filename methods
-      blob = voice_recording.media.blob
-      extension = blob.filename.extension.presence
-
-      # If no extension, infer from content type
-      unless extension
-        extension = case blob.content_type
-        when /audio\/mpeg/, /audio\/mp3/
-          "mp3"
-        when /video\/mp4/
-          "mp4"
-        when /audio\/wav/
-          "wav"
-        else
-          "mp3" # Default fallback
-        end
-        Rails.logger.info "Inferred extension .#{extension} from content_type #{blob.content_type}"
-      end
-
-      # Use blob filename base, sanitize for filesystem, fallback to voice recording name
-      base_name = blob.filename.base.presence || voice_recording.name.to_s
-      safe_base = base_name
-        .gsub(/[:\/\\]/, "_")  # Replace invalid filesystem chars
-        .gsub(/[^\w\s\-_.]/, "")  # Remove other special chars
-        .strip
-        .truncate(200)  # Limit length
-
-      temp_path = "/tmp/#{safe_base}.#{extension}"
-      audio_path = nil
-      Rails.logger.info "Creating temp file: #{temp_path}"
-
-      File.open(temp_path, "wb") do |file|
-        voice_recording.media.download do |chunk|
-          file.write(chunk)
-        end
-      end
-
-      # Always submit audio - extract from video if needed. Audio timestamps are
-      # preserved 1:1 so video playback alignment is unaffected.
-      upload_path = if blob.content_type.start_with?("video/")
-        audio_path = "/tmp/#{safe_base}.mp3"
-        Rails.logger.info "Extracting audio track from video for Fotheidil upload: #{audio_path}"
-        system("ffmpeg", "-i", temp_path, "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-y", audio_path)
-
-        if File.exist?(audio_path) && File.size(audio_path) > 0
-          Rails.logger.info "Audio extraction successful, uploading audio instead of video"
-          audio_path
-        else
-          Rails.logger.warn "Audio extraction failed, falling back to original file"
-          temp_path
-        end
-      elsif voice_recording.audio_track.attached?
-        audio_path = "/tmp/#{safe_base}_track.mp3"
-        File.open(audio_path, "wb") do |f|
-          voice_recording.audio_track.download { |chunk| f.write(chunk) }
-        end
-        Rails.logger.info "Using downsampled audio_track for upload: #{audio_path}"
-        audio_path
-      else
-        temp_path
-      end
-
-      # The API derives its stored media name from file_name and rejects one it
-      # already holds, so keep the readable base and make it unique per submission.
-      file_name = "#{safe_base}-#{SecureRandom.hex(4)}#{File.extname(upload_path)}"
-      job_id = Fotheidil::ApiService.new.submit(upload_path, file_name: file_name)
-
-      ctx[:fotheidil_video_id] = job_id.to_s
-      Rails.logger.info "Submission successful - job ID: #{job_id}"
+      ctx[:fotheidil_video_id] = Fotheidil::MediaSubmissionService.new(voice_recording).call
       true
     rescue => e
       ctx[:error] = "Upload error: #{e.message}"
-      Rails.logger.error "Upload error: #{e.message}"
-      false
-    ensure
-      File.delete(temp_path) if temp_path && File.exist?(temp_path)
-      File.delete(audio_path) if audio_path && File.exist?(audio_path)
-    end
-
-    # Wait for the Abair API to finish transcribing (can take several minutes)
-    def wait_for_transcription(ctx, timeout: 1800, interval: 30, **)
-      fotheidil_video_id = ctx[:fotheidil_video_id]
-
-      unless fotheidil_video_id
-        ctx[:error] = "No fotheidil_video_id available"
-        return false
-      end
-
-      Rails.logger.info "Waiting for Fotheidil transcription (job #{fotheidil_video_id}, timeout: #{timeout}s)..."
-
-      service = Fotheidil::ApiService.new
-      start_time = Time.current
-
-      loop do
-        transcript = service.transcript(fotheidil_video_id)
-
-        # nil means recognition is still running; an empty array means it
-        # finished with nothing, which parse_segments reports straight away
-        unless transcript.nil?
-          Rails.logger.info "Transcription ready after #{(Time.current - start_time).round}s"
-          ctx[:transcript] = transcript
-          return true
-        end
-
-        if Time.current - start_time > timeout
-          ctx[:error] = "Timeout waiting for transcription to appear on Fotheidil"
-          Rails.logger.error ctx[:error]
-          return false
-        end
-
-        Rails.logger.debug { "Not transcribed yet, checking again in #{interval}s..." }
-        sleep interval
-      end
-    rescue => e
-      ctx[:error] = "Error waiting for transcription: #{e.message}"
       Rails.logger.error ctx[:error]
       false
-    end
-
-    # Keep only well-formed segments - a segment missing its timings cannot be
-    # turned into a dictionary entry downstream
-    def parse_segments(ctx, **)
-      segments = Array(ctx[:transcript]).select do |segment|
-        segment["startTimeSeconds"].present? && segment["endTimeSeconds"].present? && segment["text"].present?
-      end
-
-      if segments.blank?
-        ctx[:error] = "No segments found"
-        return false
-      end
-
-      ctx[:segments] = segments
-      Rails.logger.info "Parsed #{segments.length} segments"
-      true
     end
 
     # Save segments to voice recording

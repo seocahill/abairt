@@ -18,7 +18,7 @@ class TranscriptionRun < ApplicationRecord
   validates :fotheidil_video_id, presence: true, if: :ready?
   validates :finished_at, presence: true, unless: :pending?
   validate :segments_is_a_list
-  validate :new_fotheidil_job
+  validate :new_fotheidil_job, if: :fotheidil_video_id_changed?
   validate :finished_after_started
 
   scope :newest_first, -> { order(created_at: :desc) }
@@ -30,7 +30,8 @@ class TranscriptionRun < ApplicationRecord
   end
 
   # Recordings copied by the old retranscribe button share the original's id,
-  # so any recording holding it counts, not only this one.
+  # so any recording holding it counts, not only this one. Checked when the id
+  # is set, so the run can still be closed if a recording takes the id later.
   def new_fotheidil_job
     return if fotheidil_video_id.blank?
     return unless VoiceRecording.where("json_extract(diarization_data, '$.fotheidil_video_id') = ?", fotheidil_video_id.to_s).exists?

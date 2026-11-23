@@ -193,6 +193,19 @@ module Fotheidil
       assert_equal "processing", @voice_recording.diarization_status
     end
 
+    # Why the old retranscribe button doesn't run the model again (#133): given
+    # a job id, nothing is submitted and the old transcript is fetched.
+    test "an existing video id re-fetches that job's transcript without submitting the audio" do
+      ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
+
+      api_service = mock("api_service")
+      api_service.expects(:submit).never
+      api_service.expects(:transcript).with("1141").returns([])
+      Fotheidil::ApiService.stubs(:new).returns(api_service)
+
+      ProcessVideoOperation.call(voice_recording: @voice_recording, fotheidil_video_id: "1141")
+    end
+
     test "marks as failed when the api rejects the key" do
       ProcessVideoOperation.any_instance.stubs(:prepare_audio_track).returns(true)
 
