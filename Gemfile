@@ -36,7 +36,7 @@ gem 'mcp', '~> 1.11' # Model Context Protocol server for Claude web
 gem 'has_scope', '~> 0.9'
 gem 'mini_portile2', '~> 2.8.5'
 gem 'multi_json', '~> 1.21'
-gem 'pagy', '~> 5.2.1'
+gem 'pagy', '~> 43.8.5'
 gem 'paper_trail', '~> 17.0'
 gem 'pdf-reader', '~> 2.16'
 gem 'sqlite-vec'
