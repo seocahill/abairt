@@ -5,10 +5,10 @@
     <p class="text-sm text-gray-600 mb-2">These lines are left as they are. The new transcription may have missed them, or they may have been said differently.</p>
     <ul class="space-y-2">
       <% entries.each do |entry| %>
-        <li class="bg-white rounded-lg shadow p-3 flex items-center gap-3" id="<%= dom_id(entry, :unheard) %>">
+        <li class="bg-white rounded-lg shadow-sm p-3 flex items-center gap-3" id="<%= dom_id(entry, :unheard) %>">
           <% if entry.region_start.present? && entry.region_end.present? %>
             <button type="button"
-                    class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    class="shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
                     aria-label="Play this line"
                     data-controller="audio-player"
                     data-action="audio-player#play"

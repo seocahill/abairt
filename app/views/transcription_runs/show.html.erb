@@ -7,12 +7,12 @@
   <% if @run.pending? %>
     <p class="text-sm text-gray-600">Still re-transcribing. Come back when it has finished.</p>
   <% elsif @run.failed? %>
-    <p class="mb-3 rounded bg-red-100 text-red-800 px-3 py-2 text-sm">This re-transcription didn't finish: <%= @run.error %>. The recording was not changed.</p>
+    <p class="mb-3 rounded-sm bg-red-100 text-red-800 px-3 py-2 text-sm">This re-transcription didn't finish: <%= @run.error %>. The recording was not changed.</p>
   <% else %>
     <%= render "transcription_runs/summary", run: @run, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic %>
 
     <% if @candidates.empty? %>
-      <div class="bg-white rounded-lg shadow p-6 text-center">
+      <div class="bg-white rounded-lg shadow-sm p-6 text-center">
         <p class="text-lg font-medium text-gray-900"><%= @hide_cosmetic ? "Nothing here but case and punctuation." : "The new transcription says the same as the current lines." %></p>
       </div>
     <% else %>

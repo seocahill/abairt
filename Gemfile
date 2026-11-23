@@ -49,7 +49,7 @@ gem 'sentry-ruby', '~> 6.7'
 gem 'sequel', '~> 5.110'
 gem 'sprockets-rails'
 gem 'sqlite3', '~> 2.10'
-gem 'tailwindcss-rails'
+gem 'tailwindcss-rails', '~> 4.7'
 gem 'tiktoken_ruby', '~> 0.0.18'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # gem 'yui-compressor', '~> 0.12.0'
