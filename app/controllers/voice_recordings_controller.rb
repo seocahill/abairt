@@ -49,7 +49,7 @@ class VoiceRecordingsController < ApplicationController
     end
 
     @total_count = records.distinct.count
-    @pagy, @recordings = pagy(records.distinct.includes(:tags, :users), items: PAGE_SIZE)
+    @pagy, @recordings = pagy(records.distinct.includes(:tags, :users).with_attached_media, items: PAGE_SIZE)
     @line_matches = matching_lines(@recordings) if search_to_moment? && params[:search].present?
     # @regions = set_regions if @voice_recording
     @tags = VoiceRecording.tag_counts_on(:tags).most_used(15)

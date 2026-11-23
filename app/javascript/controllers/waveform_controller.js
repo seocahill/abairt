@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
-import WaveSurfer from "wavesurferjs"
-import RegionsPlugin from 'wavesurferregionsjs';
-import TimelinePlugin from 'wavesurfertimelinejs';
+import WaveSurfer from "wavesurfer.js"
+import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.js";
+import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.js";
 
 export default class extends Controller {
   static targets = ["waveform", "playButton", "timeDisplay", "transcription", "translation",
