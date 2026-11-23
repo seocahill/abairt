@@ -255,9 +255,10 @@
 /* Tailwind 3 let a few form rules beat plain utilities on specificity, and the
    site relied on it: select arrows clear of the text, checked boxes without a
    grey rim, the blue border on the field you're typing in. Tailwind 4 puts
-   those rules in a lower layer, so they are restated here. Each selector
-   weighs just more than a plain utility (border-gray-300, px-4) and less than
-   a state one (focus:border-indigo-500), as before. */
+   those rules in a lower layer, so they are restated here, after the
+   generated utilities. Each one beats a plain utility (border-gray-300, px-4):
+   the first two by specificity, the :focus one by coming later. Each loses to
+   a state utility (focus:border-indigo-500), as before. */
 @layer utilities {
   select:not([size]) {
     padding-right: 2.5rem;
