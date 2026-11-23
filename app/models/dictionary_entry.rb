@@ -19,6 +19,7 @@ class DictionaryEntry < ApplicationRecord
   has_many :fts_dictionary_entries, class_name: "FtsDictionaryEntry", foreign_key: "rowid"
   has_many :segment_prompts, dependent: :destroy
   has_many :asr_hypotheses, dependent: :destroy
+  has_many :transcription_candidates, dependent: :destroy
   has_many :asr_eval_set_entries, dependent: :restrict_with_error
 
   acts_as_taggable_on :tags

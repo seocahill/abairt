@@ -13,6 +13,7 @@ class VoiceRecording < ApplicationRecord
   belongs_to :claimed_by, class_name: "User", optional: true
 
   has_many :voice_recording_locations, dependent: :destroy
+  has_many :transcription_runs, dependent: :destroy
   has_many :locations, through: :voice_recording_locations
 
   acts_as_taggable_on :tags
