@@ -6,13 +6,14 @@
 # goes through Transcription::AcceptCandidate, so a confirmed entry is never
 # changed and every change is a normal versioned update.
 class TranscriptionCandidatesController < ApplicationController
-  include RetranscribeFlag
+  include TranscriptionReview
 
   def update
     @candidate = TranscriptionCandidate.includes(transcription_run: :voice_recording).find(params[:id])
     authorize @candidate
     @run = @candidate.transcription_run
     @error = resolve
+    @seen_at = seen_at
 
     respond_to do |format|
       format.turbo_stream { render status: (@error ? :unprocessable_content : :ok) }

@@ -9,7 +9,7 @@
   <% elsif @run.failed? %>
     <p class="mb-3 rounded bg-red-100 text-red-800 px-3 py-2 text-sm">This re-transcription didn't finish: <%= @run.error %>. The recording was not changed.</p>
   <% else %>
-    <%= render "transcription_runs/summary", run: @run %>
+    <%= render "transcription_runs/summary", run: @run, seen_at: @seen_at %>
 
     <% if @candidates.empty? %>
       <div class="bg-white rounded-lg shadow p-6 text-center">
@@ -19,7 +19,7 @@
       <% audio_url = transcription_run_audio_url(@recording) %>
       <div class="space-y-3 md:space-y-4">
         <%= render partial: "transcription_candidates/candidate", collection: @candidates,
-              locals: {audio_url: audio_url, stale_translation_ids: @stale_translation_ids} %>
+              locals: {audio_url: audio_url, stale_translation_ids: @stale_translation_ids, seen_at: @seen_at} %>
       </div>
     <% end %>
   <% end %>

@@ -147,4 +147,17 @@ class TranscriptionRunTest < ActiveSupport::TestCase
     assert_equal users(:two), done.reload.resolved_by
     assert_not run.reload.awaiting_review?
   end
+
+  test "a run lost while pending stops blocking the recording and can be closed" do
+    lost = build_run(created_at: 3.hours.ago)
+    lost.save!
+    assert lost.abandoned?
+    assert_includes TranscriptionRun.abandoned, lost
+    assert build_run.valid?
+
+    lost.abandon!
+    assert lost.reload.failed?
+    assert_match(/job was lost/, lost.error)
+    assert_not build_run(created_at: 1.hour.ago).tap(&:save!).abandoned?
+  end
 end

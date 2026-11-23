@@ -33,10 +33,13 @@ class TranscriptionCandidate < ApplicationRecord
   scope :acceptable_in_bulk, -> { pending.differs.joins(:dictionary_entry).merge(DictionaryEntry.unconfirmed_accuracy) }
 
   # The ids, among `entries`, of those whose Irish was replaced by an accepted
-  # candidate while their translation has stayed as it was then.
+  # candidate and still reads so, while their translation has stayed as it was
+  # then and nobody has confirmed the line since.
   def self.stale_translation_entry_ids(entries)
     accepted.differs.where(dictionary_entry: entries)
       .joins(:dictionary_entry)
+      .merge(DictionaryEntry.unconfirmed_accuracy)
+      .where("dictionary_entries.word_or_phrase = transcription_candidates.word_or_phrase")
       .where("dictionary_entries.translation = transcription_candidates.translation_at_acceptance")
       .where.not(translation_at_acceptance: [nil, ""])
       .distinct

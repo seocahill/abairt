@@ -90,7 +90,7 @@ class Transcription::AcceptCandidateTest < ActiveSupport::TestCase
     entry = candidate.reload.dictionary_entry
     assert candidate.accepted?
     assert entry.unconfirmed?
-    assert_equal ["a new line", 5, 7, "seg-9", @recording.owner, nil],
+    assert_equal ["a new line", 5, 7, nil, @recording.owner, nil],
       [entry.word_or_phrase, entry.region_start, entry.region_end, entry.region_id, entry.owner, entry.speaker]
     assert_equal ["a new line"], entry.asr_hypotheses.pluck(:text)
   end
@@ -110,10 +110,20 @@ class Transcription::AcceptCandidateTest < ActiveSupport::TestCase
     @run.transcription_candidates.create!(dictionary_entry: confirmed, region_start: 10, region_end: 12, word_or_phrase: "would replace it")
     added = new_segment
 
-    assert_equal 1, Transcription::AcceptAll.call(@run, by: @owner)
+    assert_equal({accepted: 1, skipped: 0}, Transcription::AcceptAll.call(@run, by: @owner, seen_at: 1.minute.from_now))
     assert_equal "new words here", @entry.reload.word_or_phrase
     assert_equal "kept as is", confirmed.reload.word_or_phrase
     assert added.reload.pending?
     assert_equal 2, @run.transcription_candidates.pending.count
+  end
+
+  test "accept all leaves a line changed since the page was loaded" do
+    seen_at = 1.minute.ago
+    candidate = differs
+    @entry.update!(word_or_phrase: "a correction meanwhile")
+
+    assert_equal({accepted: 0, skipped: 1}, Transcription::AcceptAll.call(@run, by: @owner, seen_at:))
+    assert_equal "a correction meanwhile", @entry.reload.word_or_phrase
+    assert candidate.reload.pending?
   end
 end

@@ -5,14 +5,16 @@ module TranscriptionRuns
   # differing line whose entry is unconfirmed. Confirmed lines and new lines
   # are left for a person to look at one by one.
   class AcceptancesController < ApplicationController
-    include RetranscribeFlag
+    include TranscriptionReview
 
     def create
       run = TranscriptionRun.find(params[:transcription_run_id])
       authorize run, :update?
 
-      accepted = Transcription::AcceptAll.call(run, by: current_user)
-      redirect_to transcription_run_path(run), notice: "Used the new text on #{helpers.pluralize(accepted, "line")}."
+      result = Transcription::AcceptAll.call(run, by: current_user, seen_at:)
+      notice = "Used the new text on #{helpers.pluralize(result[:accepted], "line")}."
+      notice += " #{helpers.pluralize(result[:skipped], "line")} changed since you opened the page, so #{(result[:skipped] == 1) ? "it was" : "they were"} left for you to look at." if result[:skipped].positive?
+      redirect_to transcription_run_path(run), notice:
     end
   end
 end

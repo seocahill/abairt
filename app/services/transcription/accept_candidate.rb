@@ -56,9 +56,8 @@ module Transcription
       resolve!(translation_at_acceptance: entry.translation)
     end
 
-    # The recording's segment count comes from its import, so a line the
-    # import didn't have would always be over it; that limit is for the
-    # pipeline, not for a person adding a line they have listened to.
+    # The segment id is left off: the new job numbers its segments afresh, so
+    # it could match an imported entry's id (the pipeline's idempotency key).
     def add_entry
       recording = @candidate.transcription_run.voice_recording
       entry = DictionaryEntry.new(
@@ -66,10 +65,10 @@ module Transcription
         owner: recording.owner,
         region_start: @candidate.region_start,
         region_end: @candidate.region_end,
-        region_id: @candidate.region_id,
-        word_or_phrase: @candidate.word_or_phrase
+        word_or_phrase: @candidate.word_or_phrase,
+        added_in_review: true
       )
-      entry.save!(context: :transcription_review)
+      entry.save!
       AsrHypothesis.record(entry, provider: "fotheidil", text: @candidate.word_or_phrase)
       resolve!(dictionary_entry: entry)
       @added_entry = entry

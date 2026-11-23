@@ -65,13 +65,13 @@
         <% if candidate.new_segment? || entry.unconfirmed? %>
           <%= button_to (candidate.new_segment? ? "Add as line" : "Use new"), transcription_candidate_path(candidate),
               method: :patch,
-              params: {transcription_candidate: {status: "accepted", current_text: entry&.word_or_phrase}.compact},
+              params: {transcription_candidate: {status: "accepted", current_text: entry&.word_or_phrase}.compact, seen_at: seen_at.to_r.to_s},
               class: "w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px]",
               form_class: "flex-1" %>
         <% end %>
         <%= button_to (candidate.new_segment? ? "Dismiss" : "Keep current"), transcription_candidate_path(candidate),
             method: :patch,
-            params: {transcription_candidate: {status: "dismissed"}},
+            params: {transcription_candidate: {status: "dismissed"}, seen_at: seen_at.to_r.to_s},
             class: "w-full bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400 transition-colors min-h-[44px]",
             form_class: "flex-1" %>
       </div>

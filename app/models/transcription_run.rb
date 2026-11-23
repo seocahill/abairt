@@ -22,7 +22,23 @@ class TranscriptionRun < ApplicationRecord
   validate :finished_after_started
   validate :one_open_run_per_recording, on: :create
 
+  # The job waits at most half an hour for its transcript and holds its slot
+  # for an hour; a run still pending well after that was lost (a deploy or a
+  # killed worker) and will never finish.
+  ABANDONED_AFTER = 2.hours
+
   scope :newest_first, -> { order(created_at: :desc, id: :desc) }
+  scope :abandoned, -> { pending.where(created_at: ...ABANDONED_AFTER.ago) }
+
+  def abandoned?
+    pending? && created_at.present? && created_at < ABANDONED_AFTER.ago
+  end
+
+  # Closes a lost run as failed so the recording can be re-transcribed again.
+  # Its recording and entries are untouched, as with any failed run.
+  def abandon!
+    update!(status: :failed, error: "No result after #{ABANDONED_AFTER.inspect}; the job was lost", finished_at: Time.current)
+  end
 
   # Dismisses every candidate still waiting ("Dismiss run"). Returns how many.
   def dismiss_pending(by:)
@@ -60,7 +76,7 @@ class TranscriptionRun < ApplicationRecord
     return if voice_recording.blank?
 
     others = voice_recording.transcription_runs.where.not(id: id)
-    if others.pending.exists?
+    if others.pending.where(created_at: ABANDONED_AFTER.ago..).exists?
       errors.add(:base, "A re-transcription of this recording is already running")
     elsif others.ready.joins(:transcription_candidates).merge(TranscriptionCandidate.pending).exists?
       errors.add(:base, "Review or dismiss the last re-transcription of this recording first")

@@ -103,6 +103,10 @@ class VoiceRecordingsController < ApplicationController
   end
 
   def show
+    # Turbo follows a form's redirect here asking for a stream too; only the
+    # infinite scroll's next-page requests (which carry a page) want one.
+    request.format = :html if request.format.turbo_stream? && params[:page].blank?
+
     @recording = VoiceRecording.includes(voice_recording_locations: :location).find(params[:id])
     @regions = set_regions
     if current_user
@@ -131,10 +135,6 @@ class VoiceRecordingsController < ApplicationController
     )
 
     set_transcription_review if @retranscribe
-
-    # Turbo follows a form's redirect here asking for a stream too; only the
-    # infinite scroll's next-page requests (which carry a page) want one.
-    request.format = :html if request.format.turbo_stream? && params[:page].blank?
 
     respond_to do |format|
       format.html

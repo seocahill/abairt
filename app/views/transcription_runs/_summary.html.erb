@@ -12,6 +12,7 @@
     <div class="flex gap-2 mt-3">
       <% if bulk.positive? %>
         <%= button_to "Accept all (#{bulk})", transcription_run_acceptance_path(run),
+            params: {seen_at: seen_at.to_r.to_s},
             class: "w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px]",
             form_class: "flex-1",
             form: {data: {turbo_confirm: "Use the new text on #{pluralize(bulk, "unconfirmed line")}? Confirmed lines and new lines are left for you. Each change can be undone from the line's versions."}} %>

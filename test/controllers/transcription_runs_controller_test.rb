@@ -203,13 +203,49 @@ class TranscriptionRunsControllerTest < ActionDispatch::IntegrationTest
 
   test "accept all uses the new text on unconfirmed lines only" do
     run = ready_run
-    post transcription_run_acceptance_url(run)
+    post transcription_run_acceptance_url(run), params: {seen_at: 1.minute.from_now.to_r.to_s}
 
     assert_redirected_to transcription_run_url(run)
     assert_match(/1 line/, flash[:notice])
     assert_equal "new words here", @entry.reload.word_or_phrase
     assert_equal "checked line", @confirmed.reload.word_or_phrase
     assert @added.reload.pending?
+  end
+
+  test "accept all leaves lines changed since the page was loaded, and says so" do
+    run = ready_run
+    get transcription_run_url(run)
+    seen_at = css_select("form[action='#{transcription_run_acceptance_path(run)}'] input[name=seen_at]").first["value"]
+    travel 1.second
+    @entry.update!(word_or_phrase: "a correction meanwhile")
+
+    post transcription_run_acceptance_url(run), params: {seen_at:}
+    assert_equal "a correction meanwhile", @entry.reload.word_or_phrase
+    assert_match(/1 line changed since you opened the page/, flash[:notice])
+  end
+
+  test "accept all without a page time changes nothing" do
+    run = ready_run
+    post transcription_run_acceptance_url(run), params: {seen_at: "garbage"}
+    assert_equal "old words here", @entry.reload.word_or_phrase
+  end
+
+  test "resolving one line keeps the page's load time on accept all" do
+    ready_run
+    seen_at = 5.minutes.ago.to_r.to_s
+    patch transcription_candidate_url(@added), params: {transcription_candidate: {status: "dismissed"}, seen_at:}, as: :turbo_stream
+    assert_includes response.body, %(name="seen_at" value="#{seen_at}")
+  end
+
+  test "a run lost while pending is closed when a new one starts" do
+    lost = TranscriptionRun.create!(voice_recording: @recording, requested_by: @owner, created_at: 3.hours.ago)
+    get voice_recording_url(@recording)
+    assert_select "#transcription_run_status", /never finished/
+    assert_select "#transcription_run_status button", "Re-transcribe"
+
+    post voice_recording_transcription_runs_url(@recording)
+    assert lost.reload.failed?
+    assert_equal 1, @recording.transcription_runs.pending.count
   end
 
   test "dismiss run dismisses what is left and changes nothing" do
