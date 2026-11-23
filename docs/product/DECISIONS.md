@@ -31,10 +31,21 @@ directly to state standing preferences.
   lists, progress tracking) belong in the course, not here.
 
 - No analytics or tracking of listeners, of any kind, including first-party and cookieless (owner, 2026-11-14, #74). Do not re-propose; use the corpus, Sentry and the code as evidence instead.
+- Compression and static asset caching are Cloudflare's job: production already serves gzip/br/zstd and caches fingerprinted assets at the edge (owner, 2026-11-22, #123). Don't propose app-level compression or asset caching again.
+- Sign-in stays magic link; a password is optional on top (owner, 2026-11-22, #121). New accounts still wait for admin approval.
+- Major front-end upgrades (Tailwind and the like) must follow the upgrade guide and be checked page by page for visual or functional regressions. Modernising the layout to current primitives is welcome if it stays as functional (owner, 2026-11-22, #181).
+- Tidy-up phase: retire features with no residual value rather than polish them (owner, 2026-11-23, #203).
+- The "never write Irish forms" rule was read too strictly for language rules the app needs, such as the mutation table in #171: the owner let the builder encode it for review in the PR and may narrow the rule's wording (owner, 2026-11-22, #171). Corpus content (transcriptions, translations, glosses, dictionary entries) is still never written by agents.
 
 ## Log
 
 <!-- - YYYY-MM-DD #<issue> <title> — approved | rejected: <reason> -->
+- 2026-11-23 #203 Retire features (media imports, data dashboard, ASR quality, island context playground, status) — approved (owner's own issue)
+- 2026-11-22 #188 Recording cards play direct from storage, and vendor the CDN JavaScript — approved (owner's follow-up to #123)
+- 2026-11-22 #121 Simplify users: minimal listener signup, listener/speaker/admin split — approved (steps 1, 2 and 4 shipped; step 3 waits on the owner's A/B answer)
+- 2026-11-22 #133 Re-transcribe a recording safely, never overwrite — approved
+- 2026-11-22 #124 Waveform peaks out of the recording row, served as a cached file — approved
+- 2026-11-22 #123 Asset caching: compression, vendored JavaScript, long-lived media — rejected: "Cloudflare already handles compression and asset caching (checked against production on 2026-11-22)"
 - 2026-11-15 #74 Privacy-first usage analytics, in our own database (Ahoy, cookieless) — rejected: "no tracking please" (owner, 2026-11-14)
 - 2026-11-15 #75 ASR evaluation set and WER/CER report by speaker and dialect — approved (shipped, PR #139)
 - 2026-11-15 #130 Remove flowbite lib — approved (blocked on the owner's answer about form and accordion styling)
