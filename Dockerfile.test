@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Use a Ruby base image suitable for development
-ARG RUBY_VERSION=3.4.1
+ARG RUBY_VERSION=3.4.13
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Set the working directory
