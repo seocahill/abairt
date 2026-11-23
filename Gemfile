@@ -17,6 +17,7 @@ gem 'ostruct'
 # Other gems
 gem 'acts-as-taggable-on'
 gem 'aws-sdk-s3', '~> 1.245'
+gem 'diff-lcs', '~> 1.6'
 gem 'dotenv', '~> 2.8'
 gem 'geocoder', '~> 1.8'
 gem 'groupdate', '~> 6.8'

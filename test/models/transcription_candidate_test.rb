@@ -95,4 +95,41 @@ class TranscriptionCandidateTest < ActiveSupport::TestCase
       @entry.destroy
     end
   end
+
+  test "dismissing records who and when, once" do
+    candidate = build_candidate(dictionary_entry: @entry)
+    candidate.save!
+
+    assert candidate.dismiss(by: users(:admin))
+    assert candidate.reload.dismissed?
+    assert_equal users(:admin), candidate.resolved_by
+    assert_not candidate.dismiss(by: users(:two))
+    assert_equal users(:admin), candidate.reload.resolved_by
+  end
+
+  test "an entry's translation is stale while it is the one kept when new Irish was used" do
+    @entry.update_columns(translation: "kept translation")
+    candidate = build_candidate(dictionary_entry: @entry)
+    candidate.save!
+    assert_empty TranscriptionCandidate.stale_translation_entry_ids([@entry])
+
+    @entry.update_columns(word_or_phrase: "x")
+    candidate.update!(status: :accepted, resolved_by: users(:admin), resolved_at: Time.current, translation_at_acceptance: "kept translation")
+    assert_equal Set[@entry.id], TranscriptionCandidate.stale_translation_entry_ids([@entry])
+
+    @entry.update_columns(translation: "rechecked translation")
+    assert_empty TranscriptionCandidate.stale_translation_entry_ids([@entry])
+  end
+
+  test "the marker goes when the old Irish is restored or the line is confirmed" do
+    @entry.update_columns(translation: "kept translation", word_or_phrase: "x")
+    build_candidate(dictionary_entry: @entry, status: :accepted, resolved_by: users(:admin), resolved_at: Time.current, translation_at_acceptance: "kept translation").save!
+    assert_equal Set[@entry.id], TranscriptionCandidate.stale_translation_entry_ids([@entry])
+
+    @entry.update_columns(word_or_phrase: "restored")
+    assert_empty TranscriptionCandidate.stale_translation_entry_ids([@entry])
+
+    @entry.update_columns(word_or_phrase: "x", accuracy_status: DictionaryEntry.accuracy_statuses[:confirmed])
+    assert_empty TranscriptionCandidate.stale_translation_entry_ids([@entry])
+  end
 end

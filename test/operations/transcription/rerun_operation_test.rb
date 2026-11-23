@@ -60,6 +60,7 @@ class Transcription::RerunOperationTest < ActiveSupport::TestCase
     @api.stubs(:transcript).returns(fresh_transcript)
 
     rerun
+    @run.dismiss_pending(by: users(:admin)) # a recording has one open run at a time
     @run = TranscriptionRun.create!(voice_recording: @recording, requested_by: users(:admin))
     rerun
 

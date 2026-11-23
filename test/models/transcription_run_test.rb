@@ -78,7 +78,7 @@ class TranscriptionRunTest < ActiveSupport::TestCase
 
   test "several runs can wait for a job id" do
     build_run.save!
-    assert build_run.valid?
+    assert TranscriptionRun.new(voice_recording: voice_recordings(:one), requested_by: users(:admin)).valid?
   end
 
   test "cannot finish before it started" do
@@ -117,5 +117,47 @@ class TranscriptionRunTest < ActiveSupport::TestCase
     assert_difference -> { TranscriptionRun.count } => -1, -> { TranscriptionCandidate.count } => -1 do
       @recording.destroy
     end
+  end
+
+  test "a recording has one open re-transcription at a time" do
+    first = build_run
+    first.save!
+    second = build_run
+    assert_not second.valid?
+    assert_match(/already running/, second.errors.full_messages.to_sentence)
+
+    first.update!(status: :ready, fotheidil_video_id: "new-job", finished_at: Time.current)
+    candidate = first.transcription_candidates.create!(kind: :new_segment, region_start: 0, region_end: 1, word_or_phrase: "x")
+    assert_not second.valid?
+    assert_match(/Review or dismiss/, second.errors.full_messages.to_sentence)
+
+    candidate.dismiss(by: users(:admin))
+    assert second.valid?, second.errors.full_messages.to_sentence
+  end
+
+  test "dismissing a run dismisses only what is still waiting" do
+    run = build_run(fotheidil_video_id: "new-job", status: :ready, finished_at: Time.current)
+    run.save!
+    waiting = 2.times.map { |n| run.transcription_candidates.create!(kind: :new_segment, region_start: n, region_end: n + 1, word_or_phrase: "x") }
+    done = run.transcription_candidates.create!(kind: :new_segment, region_start: 5, region_end: 6, word_or_phrase: "x")
+    done.dismiss(by: users(:two))
+
+    assert_equal 2, run.dismiss_pending(by: users(:admin))
+    assert waiting.all? { |c| c.reload.dismissed? && c.resolved_by == users(:admin) }
+    assert_equal users(:two), done.reload.resolved_by
+    assert_not run.reload.awaiting_review?
+  end
+
+  test "a run lost while pending stops blocking the recording and can be closed" do
+    lost = build_run(created_at: 3.hours.ago)
+    lost.save!
+    assert lost.abandoned?
+    assert_includes TranscriptionRun.abandoned, lost
+    assert build_run.valid?
+
+    lost.abandon!
+    assert lost.reload.failed?
+    assert_match(/job was lost/, lost.error)
+    assert_not build_run(created_at: 1.hour.ago).tap(&:save!).abandoned?
   end
 end

@@ -239,7 +239,7 @@ FOREIGN KEY ("requested_by_id")
 CREATE INDEX "index_transcription_runs_on_voice_recording_id" ON "transcription_runs" ("voice_recording_id");
 CREATE INDEX "index_transcription_runs_on_requested_by_id" ON "transcription_runs" ("requested_by_id");
 CREATE UNIQUE INDEX "index_transcription_runs_on_fotheidil_video_id" ON "transcription_runs" ("fotheidil_video_id");
-CREATE TABLE IF NOT EXISTS "transcription_candidates" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "transcription_run_id" integer NOT NULL, "dictionary_entry_id" integer, "kind" integer DEFAULT 0 NOT NULL, "region_start" decimal NOT NULL, "region_end" decimal NOT NULL, "region_id" varchar, "speaker_label" varchar, "word_or_phrase" text NOT NULL, "status" integer DEFAULT 0 NOT NULL, "resolved_by_id" integer, "resolved_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_78bc00d373"
+CREATE TABLE IF NOT EXISTS "transcription_candidates" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "transcription_run_id" integer NOT NULL, "dictionary_entry_id" integer, "kind" integer DEFAULT 0 NOT NULL, "region_start" decimal NOT NULL, "region_end" decimal NOT NULL, "region_id" varchar, "speaker_label" varchar, "word_or_phrase" text NOT NULL, "status" integer DEFAULT 0 NOT NULL, "resolved_by_id" integer, "resolved_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "translation_at_acceptance" text, CONSTRAINT "fk_rails_78bc00d373"
 FOREIGN KEY ("transcription_run_id")
   REFERENCES "transcription_runs" ("id")
 , CONSTRAINT "fk_rails_b93afde71b"
@@ -253,6 +253,7 @@ CREATE INDEX "index_transcription_candidates_on_dictionary_entry_id" ON "transcr
 CREATE INDEX "index_transcription_candidates_on_resolved_by_id" ON "transcription_candidates" ("resolved_by_id");
 CREATE UNIQUE INDEX "index_transcription_candidates_on_run_and_entry" ON "transcription_candidates" ("transcription_run_id", "dictionary_entry_id");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261123180000'),
 ('20261123090100'),
 ('20261123090000'),
 ('20261122200000'),
