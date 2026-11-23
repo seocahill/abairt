@@ -207,6 +207,19 @@ class VoiceRecordingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to voice_recording_url(duplicate)
   end
 
+  # Documents the old button (#133): the copy is processed with the original's
+  # Fotheidil job, so it re-fetches the old transcript instead of running the
+  # model again. Transcription::RerunOperation is the replacement.
+  test "retranscribe hands the copy the original's Fotheidil job instead of a new one" do
+    ApplicationController.any_instance.stubs(:current_user).returns(users(:admin))
+    @voice_recording.media.attach(io: StringIO.new("fake audio"), filename: "test.mp3", content_type: "audio/mpeg")
+    @voice_recording.update!(diarization_data: {"fotheidil_video_id" => "123"})
+
+    post retranscribe_voice_recording_url(@voice_recording)
+
+    assert_enqueued_with(job: ProcessFotheidilVideoJob, args: [VoiceRecording.last.id, "123"])
+  end
+
   test "retranscribe denied for non-admin user" do
     non_admin = users(:two)
     ApplicationController.any_instance.stubs(:current_user).returns(non_admin)
