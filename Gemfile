@@ -9,7 +9,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'puma', '~> 8.1'
 gem 'rails', '~> 8.1.0'
 gem 'minitest', '~> 6.1'
-gem 'redis', '~> 4.0'
+gem 'redis', '~> 6.0'
 gem 'sassc-rails'
 gem 'bootsnap', '>= 1.4.4', require: false
 gem 'ostruct'

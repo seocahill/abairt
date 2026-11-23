@@ -108,7 +108,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.26.1)
       msgpack (~> 1.5)
-    brakeman (8.1.0)
+    brakeman (8.1.1)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -365,7 +365,10 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
-    redis (4.8.1)
+    redis (6.0.0)
+      redis-client (= 0.30.1)
+    redis-client (0.30.1)
+      connection_pool
     regexp_parser (2.13.4)
     reline (0.7.0)
       io-console (~> 0.5)
@@ -556,7 +559,7 @@ DEPENDENCIES
   rails (~> 8.1.0)
   rails-controller-testing
   rb_sys (~> 0.9.130)
-  redis (~> 4.0)
+  redis (~> 6.0)
   ruby-openai (~> 8.3.0)
   sassc-rails
   sentry-rails (~> 7.3)
@@ -576,7 +579,7 @@ DEPENDENCIES
   web-console (>= 4.1.0)
 
 RUBY VERSION
-   ruby 3.4.1p0
+   ruby 3.4.13p195
 
 BUNDLED WITH
    2.5.5
