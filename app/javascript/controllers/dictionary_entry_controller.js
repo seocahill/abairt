@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import autoComplete from "autocomplete";
+import autoComplete from "@tarekraafat/autocomplete.js";
 
 export default class extends Controller {
   static targets = ["wordSearch"]
