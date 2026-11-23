@@ -20,8 +20,23 @@ class TranscriptionRun < ApplicationRecord
   validate :segments_is_a_list
   validate :new_fotheidil_job, if: :fotheidil_video_id_changed?
   validate :finished_after_started
+  validate :one_open_run_per_recording, on: :create
 
-  scope :newest_first, -> { order(created_at: :desc) }
+  scope :newest_first, -> { order(created_at: :desc, id: :desc) }
+
+  # Dismisses every candidate still waiting ("Dismiss run"). Returns how many.
+  def dismiss_pending(by:)
+    transaction { transcription_candidates.pending.to_a.count { |candidate| candidate.dismiss(by:) } }
+  end
+
+  # Pending candidates by kind, e.g. {"differs" => 3, "new_segment" => 1}.
+  def pending_counts
+    @pending_counts ||= transcription_candidates.pending.group(:kind).count
+  end
+
+  def awaiting_review?
+    ready? && pending_counts.values.sum.positive?
+  end
 
   private
 
@@ -37,6 +52,19 @@ class TranscriptionRun < ApplicationRecord
     return unless VoiceRecording.where("json_extract(diarization_data, '$.fotheidil_video_id') = ?", fotheidil_video_id.to_s).exists?
 
     errors.add(:fotheidil_video_id, "must be a new Fotheidil job, not one a recording already has")
+  end
+
+  # A recording has one re-transcription at a time: a new one waits until the
+  # last has finished and been reviewed, so no candidate is left unseen.
+  def one_open_run_per_recording
+    return if voice_recording.blank?
+
+    others = voice_recording.transcription_runs.where.not(id: id)
+    if others.pending.exists?
+      errors.add(:base, "A re-transcription of this recording is already running")
+    elsif others.ready.joins(:transcription_candidates).merge(TranscriptionCandidate.pending).exists?
+      errors.add(:base, "Review or dismiss the last re-transcription of this recording first")
+    end
   end
 
   def finished_after_started

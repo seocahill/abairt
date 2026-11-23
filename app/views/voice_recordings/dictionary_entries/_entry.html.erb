@@ -62,6 +62,10 @@
         <% end %>
       </div>
 
+      <% if local_assigns[:stale_translation_ids]&.include?(entry.id) %>
+        <div class="mb-2"><%= render "transcription_candidates/stale_translation" %></div>
+      <% end %>
+
       <!-- Confirmation Status and Actions -->
       <div class="flex items-center gap-2 mb-2">
         <% if entry.confirmed? %>

@@ -5,7 +5,14 @@ export default class extends Controller {
   static values = {
     url: String,
     transcription: String,
-    translation: String
+    translation: String,
+    // Optional: play only this stretch of a longer recording (in seconds).
+    start: Number,
+    end: Number
+  }
+
+  get clipped() {
+    return this.endValue > this.startValue
   }
 
   // The clip is only created, and so only downloaded, on the first tap.
@@ -21,6 +28,7 @@ export default class extends Controller {
     this.audio.mozPreservesPitch = true;
     this.audio.webkitPreservesPitch = true;
     if (this.playbackRate) this.audio.playbackRate = this.playbackRate;
+    if (this.clipped) this.audio.addEventListener('timeupdate', () => this.stopAtEnd());
     return this.audio;
   }
 
@@ -41,6 +49,10 @@ export default class extends Controller {
     }
 
     if (this.audio.paused) {
+      this.button = button;
+      if (this.clipped && (this.audio.currentTime < this.startValue || this.audio.currentTime >= this.endValue)) {
+        this.audio.currentTime = this.startValue;
+      }
       button.classList.add('text-blue-800', 'bg-blue-200');
       this.audio.play().catch(error => {
         console.error('Error playing audio:', error);
@@ -55,6 +67,14 @@ export default class extends Controller {
     this.audio.addEventListener('ended', () => {
       button.classList.remove('text-blue-800', 'bg-blue-200');
     }, { once: true }); // Use once: true to automatically remove the listener after it fires
+  }
+
+  stopAtEnd() {
+    // The line may have been replaced (and this controller disconnected) mid-clip.
+    if (!this.audio || this.audio.paused || this.audio.currentTime < this.endValue) return;
+
+    this.audio.pause();
+    this.button?.classList.remove('text-blue-800', 'bg-blue-200');
   }
 
   changeSpeed(event) {

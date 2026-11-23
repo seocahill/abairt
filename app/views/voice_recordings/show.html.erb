@@ -88,7 +88,7 @@
                       </svg>
                     <% end %>
                   <% end %>
-                  <% if current_user&.admin? && @recording.media.attached? %>
+                  <% if current_user&.admin? && @recording.media.attached? && !@retranscribe %>
                     <%= button_to retranscribe_voice_recording_path(@recording),
                         class: "text-gray-400 hover:text-orange-600 transition-colors flex-shrink-0",
                         title: "Retranscribe (create duplicate with fresh transcription)",
@@ -262,6 +262,9 @@
         <%= link_to "Check this recording", voice_recording_check_path(@recording),
             class: "mb-3 md:mb-4 w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center" %>
       <% end %>
+      <% if @can_retranscribe %>
+        <%= render "transcription_runs/status", recording: @recording, run: @transcription_run %>
+      <% end %>
       <% if search_to_moment? %>
         <%= form_with url: voice_recording_path(@recording), method: :get, class: "mb-3 md:mb-4 flex gap-2" do %>
           <%= search_field_tag :q, params[:q], placeholder: "Search this recording", "aria-label": "Search this recording",
@@ -277,7 +280,7 @@
       <% end %>
       <div id="entries-container" class="space-y-3 md:space-y-4" data-infinite-scroll-target="container">
         <%= render partial: "voice_recordings/dictionary_entries/entry", collection: @entries,
-                  locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording} %>
+                  locals: {moment_links: @moment_links, listening_controls: @listening_controls, recording: @recording, stale_translation_ids: @stale_translation_ids} %>
       </div>
 
       <!-- Pagination -->

@@ -1,0 +1,25 @@
+<div id="transcription_run_summary" class="mb-4">
+  <% counts = run.pending_counts %>
+  <p class="text-sm text-gray-600" data-testid="rerun-counts">
+    <% if counts.values.sum.zero? %>
+      Every line has been reviewed.
+    <% else %>
+      <%= pending_candidates_summary(run) %>, waiting for you. Lines where the new text is the same are not shown.
+    <% end %>
+  </p>
+  <% if counts.values.sum.positive? %>
+    <% bulk = run.transcription_candidates.acceptable_in_bulk.count %>
+    <div class="flex gap-2 mt-3">
+      <% if bulk.positive? %>
+        <%= button_to "Accept all (#{bulk})", transcription_run_acceptance_path(run),
+            class: "w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px]",
+            form_class: "flex-1",
+            form: {data: {turbo_confirm: "Use the new text on #{pluralize(bulk, "unconfirmed line")}? Confirmed lines and new lines are left for you. Each change can be undone from the line's versions."}} %>
+      <% end %>
+      <%= button_to "Dismiss run", transcription_run_dismissal_path(run),
+          class: "w-full bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400 transition-colors min-h-[44px]",
+          form_class: "flex-1",
+          form: {data: {turbo_confirm: "Dismiss every line still waiting? Nothing on the recording changes."}} %>
+    </div>
+  <% end %>
+</div>

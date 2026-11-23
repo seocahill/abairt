@@ -9,4 +9,4 @@ f140_check_mode: "Check mode on recordings: step through unchecked lines with au
 f170_search_to_moment: "Search results open the recording at the matching line; search inside one recording; the recordings search also lists matching lines."
 f172_place_pages: "Place pages: tapping a place on the map or in a recording opens a page with its recordings, speakers and a small map."
 f121_simple_signup: "Sign-up asks for name and email only (no About, no Google reCAPTCHA box), shows what went wrong if it fails, and your own profile page links to setting a password."
-f133_retranscribe: "Re-transcribe a recording without losing anyone's work: a fresh ASR run is shown beside the current lines to accept or dismiss one by one. Being built: nothing to see yet."
+f133_retranscribe: "Re-transcribe a recording without losing anyone's work: a fresh Fotheidil run is shown beside the current lines, to use or keep one by one (admins and the recording's owner)."

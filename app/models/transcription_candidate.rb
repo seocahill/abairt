@@ -28,6 +28,28 @@ class TranscriptionCandidate < ApplicationRecord
   validate :ends_after_it_starts
   validate :entry_from_the_same_recording
 
+  scope :in_time_order, -> { order(:region_start, :id) }
+  # What "Accept all" covers: differing lines on entries nobody has confirmed.
+  scope :acceptable_in_bulk, -> { pending.differs.joins(:dictionary_entry).merge(DictionaryEntry.unconfirmed_accuracy) }
+
+  # The ids, among `entries`, of those whose Irish was replaced by an accepted
+  # candidate while their translation has stayed as it was then.
+  def self.stale_translation_entry_ids(entries)
+    accepted.differs.where(dictionary_entry: entries)
+      .joins(:dictionary_entry)
+      .where("dictionary_entries.translation = transcription_candidates.translation_at_acceptance")
+      .where.not(translation_at_acceptance: [nil, ""])
+      .distinct
+      .pluck(:dictionary_entry_id)
+      .to_set
+  end
+
+  def dismiss(by:)
+    return false unless pending?
+
+    update(status: :dismissed, resolved_by: by, resolved_at: Time.current)
+  end
+
   private
 
   def ends_after_it_starts
