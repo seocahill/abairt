@@ -59,17 +59,48 @@ class Transcription::MatchCandidatesTest < ActiveSupport::TestCase
     assert_equal 10.4, candidate.region_start
   end
 
-  test "an overlap under half the shorter span is not a match" do
+  test "sharing half the time they cover together or less is not a match" do
     place(@entries[0], 0.0, 4.0, "current text")
-    candidate = candidates_for(segment(2.5, 8.0, "fresh text")).sole
-
-    assert candidate.new_segment?
-    assert_nil candidate.dictionary_entry
+    assert candidates_for(segment(2.5, 8.0, "fresh text")).sole.new_segment?
+    assert candidates_for(segment(0.0, 8.0, "fresh text")).sole.new_segment?
   end
 
-  test "half the shorter span is enough" do
+  test "sharing more than half the time they cover together is a match" do
     entry = place(@entries[0], 0.0, 4.0, "current text")
-    assert_equal entry, candidates_for(segment(2.0, 6.0, "fresh text")).sole.dictionary_entry
+    assert_equal entry, candidates_for(segment(0.5, 4.5, "fresh text")).sole.dictionary_entry
+  end
+
+  test "a short fragment inside a long entry does not claim it" do
+    place(@entries[0], 0.0, 10.0, "current long text")
+    assert candidates_for(segment(4.0, 4.5, "word")).sole.new_segment?
+  end
+
+  test "a short interjection inside a long turn matches its own entry, not the turn" do
+    turn = place(@entries[0], 0.0, 10.0, "long turn")
+    interjection = place(@entries[1], 4.0, 4.6, "yes")
+
+    assert_empty candidates_for(segment(0.0, 10.0, "long turn"), segment(4.0, 4.6, "yes", speaker: "SPEAKER_01"))
+
+    candidates = candidates_for(segment(0.1, 10.0, "long turn changed"), segment(4.05, 4.6, "yes changed", speaker: "SPEAKER_01"))
+    assert_equal [turn, interjection], candidates.map(&:dictionary_entry)
+    assert candidates.all?(&:differs?)
+  end
+
+  test "a brief segment across two neighbours leaves both matches alone" do
+    place(@entries[0], 0.0, 5.0, "first")
+    place(@entries[1], 5.0, 10.0, "second")
+    candidate = candidates_for(segment(0.0, 5.0, "first"), segment(4.9, 5.1, "blip"), segment(5.0, 10.0, "second")).sole
+
+    assert candidate.new_segment?
+    assert_equal "blip", candidate.word_or_phrase
+  end
+
+  test "of two segments over one entry, the one covering most of it is the match" do
+    entry = place(@entries[0], 0.0, 10.0, "current long text")
+    candidates = candidates_for(segment(0.0, 7.0, "most of it"), segment(7.0, 10.0, "the rest"))
+
+    assert_equal [entry, nil], candidates.map(&:dictionary_entry)
+    assert_equal [:differs, :new_segment], candidates.map { |c| c.kind.to_sym }
   end
 
   test "a segment over no entry is a new segment" do
@@ -132,6 +163,9 @@ class Transcription::MatchCandidatesTest < ActiveSupport::TestCase
   test "segments missing timings or text, or running backwards, are skipped" do
     candidates = candidates_for(
       segment(0.0, 5.0, "kept"),
+      segment("1.5", "2.5", "kept from strings"),
+      segment("", 5.0, "blank start"),
+      segment("abc", 5.0, "garbled start"),
       segment(nil, 5.0, "no start"),
       segment(1.0, nil, "no end"),
       segment(6.0, 6.0, "no length"),
@@ -141,7 +175,7 @@ class Transcription::MatchCandidatesTest < ActiveSupport::TestCase
       "not a segment"
     )
 
-    assert_equal ["kept"], candidates.map(&:word_or_phrase)
+    assert_equal ["kept", "kept from strings"], candidates.map(&:word_or_phrase)
   end
 
   test "an empty run has no candidates" do
@@ -200,17 +234,63 @@ class Transcription::MatchCandidatesTest < ActiveSupport::TestCase
     assert_equal recording_before, @recording.reload.diarization_data
   end
 
-  test "a long recording is matched without a query per segment" do
-    300.times { |i| @entries[0].dup.tap { |e| e.assign_attributes(voice_recording_id: @recording.id, region_start: i * 5, region_end: i * 5 + 5, word_or_phrase: "line #{i}") }.save!(validate: false) }
-    @run.update!(segments: 300.times.map { |i| segment(i * 5.0, i * 5.0 + 5, i.even? ? "line #{i}" : "fresh #{i}") })
+  # Real Fotheidil timings (395 segments, speakers overlapping), with the
+  # text replaced by placeholders.
+  def real_timings
+    JSON.parse(file_fixture("fotheidil_video_1141_segments.json").read).each_with_index.map do |raw, i|
+      raw.slice("id", "speaker", "startTimeSeconds", "endTimeSeconds").merge("text" => "line #{i}")
+    end
+  end
+
+  def place_entries_for(timings)
+    rows = timings.map do |raw|
+      {voice_recording_id: @recording.id, speaker_id: @entries[0].speaker_id, user_id: @entries[0].user_id,
+       region_start: raw["startTimeSeconds"], region_end: raw["endTimeSeconds"], region_id: raw["id"],
+       word_or_phrase: raw["text"], created_at: Time.current, updated_at: Time.current}
+    end
+    DictionaryEntry.insert_all!(rows)
+  end
+
+  test "re-running a real recording with the same output finds nothing to review" do
+    timings = real_timings
+    place_entries_for(timings)
+    assert_empty candidates_for(*timings)
+  end
+
+  test "re-running a real recording with every line changed lines each up with its own entry" do
+    timings = real_timings
+    place_entries_for(timings)
+    candidates = candidates_for(*timings.map { |raw| raw.merge("text" => "#{raw["text"]} changed") })
+
+    assert_equal timings.size, candidates.size
+    assert candidates.all?(&:differs?)
+    assert_equal timings.pluck("id"), candidates.map { |c| c.dictionary_entry.region_id }
+  end
+
+  test "small boundary shifts on a real recording still line up nearly everything" do
+    timings = real_timings
+    place_entries_for(timings)
+    random = Random.new(133)
+    shifted = timings.map do |raw|
+      start = [raw["startTimeSeconds"] + random.rand(-0.2..0.2), 0].max
+      raw.merge("startTimeSeconds" => start, "endTimeSeconds" => [raw["endTimeSeconds"] + random.rand(-0.2..0.2), start + 0.1].max, "text" => "fresh")
+    end
+
+    candidates = candidates_for(*shifted)
+    assert_operator candidates.count(&:differs?), :>=, (timings.size * 0.9).ceil
+  end
+
+  test "a real recording is matched in two queries, without a query per segment" do
+    timings = real_timings
+    place_entries_for(timings)
+    @run.update!(segments: timings)
 
     queries = 0
     counter = ->(*, payload) { queries += 1 unless payload[:name] == "SCHEMA" }
-    candidates = ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
       Transcription::MatchCandidates.new(@run).candidates
     end
 
-    assert_equal 150, candidates.size
     assert_operator queries, :<=, 2
   end
 end
