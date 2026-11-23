@@ -9,7 +9,7 @@
 
 # Must match .ruby-version (test/config/ruby_version_pins_test.rb checks it)
 ARG RUBY_VERSION=3.4.13
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM docker.io/library/ruby:$RUBY_VERSION-slim-bookworm AS base
 
 # Rails app lives here
 WORKDIR /rails
