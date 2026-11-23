@@ -9,18 +9,19 @@
   <% elsif @run.failed? %>
     <p class="mb-3 rounded bg-red-100 text-red-800 px-3 py-2 text-sm">This re-transcription didn't finish: <%= @run.error %>. The recording was not changed.</p>
   <% else %>
-    <%= render "transcription_runs/summary", run: @run, seen_at: @seen_at %>
+    <%= render "transcription_runs/summary", run: @run, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic %>
 
     <% if @candidates.empty? %>
       <div class="bg-white rounded-lg shadow p-6 text-center">
-        <p class="text-lg font-medium text-gray-900">The new transcription says the same as the current lines.</p>
+        <p class="text-lg font-medium text-gray-900"><%= @hide_cosmetic ? "Nothing here but case and punctuation." : "The new transcription says the same as the current lines." %></p>
       </div>
     <% else %>
       <% audio_url = transcription_run_audio_url(@recording) %>
       <div class="space-y-3 md:space-y-4">
         <%= render partial: "transcription_candidates/candidate", collection: @candidates,
-              locals: {audio_url: audio_url, stale_translation_ids: @stale_translation_ids, seen_at: @seen_at} %>
+              locals: {audio_url: audio_url, stale_translation_ids: @stale_translation_ids, seen_at: @seen_at, hide_cosmetic: @hide_cosmetic} %>
       </div>
     <% end %>
+    <%= render "transcription_runs/unheard", entries: @unheard_entries, audio_url: transcription_run_audio_url(@recording) %>
   <% end %>
 </div>

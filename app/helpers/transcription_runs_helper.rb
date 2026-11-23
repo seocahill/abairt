@@ -15,10 +15,13 @@ module TranscriptionRunsHelper
     [safe_join(before, " "), safe_join(after, " ")]
   end
 
-  # "2 lines differ, 1 new" for a run's pending candidates.
+  # "2 lines differ, 1 new, 3 need times" for a run's pending candidates.
   def pending_candidates_summary(run)
-    differs = run.pending_counts.fetch("differs", 0)
-    "#{pluralize(differs, "line")} #{(differs == 1) ? "differs" : "differ"}, #{run.pending_counts.fetch("new_segment", 0)} new"
+    counts = run.pending_counts
+    differs = counts.fetch("differs", 0)
+    parts = ["#{pluralize(differs, "line")} #{(differs == 1) ? "differs" : "differ"}", "#{counts.fetch("new_segment", 0)} new"]
+    parts << "#{counts["timing"]} #{(counts["timing"] == 1) ? "needs" : "need"} times" if counts["timing"].to_i.positive?
+    parts.to_sentence(two_words_connector: ", ", last_word_connector: ", ")
   end
 
   # The recording's audio, which the candidate's play button clips to its time.

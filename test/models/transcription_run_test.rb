@@ -160,4 +160,16 @@ class TranscriptionRunTest < ActiveSupport::TestCase
     assert_match(/job was lost/, lost.error)
     assert_not build_run(created_at: 1.hour.ago).tap(&:save!).abandoned?
   end
+
+  test "the lines a run did not hear are looked up from their ids, in time order" do
+    recording = voice_recordings(:two)
+    run = TranscriptionRun.create!(voice_recording: recording, requested_by: users(:admin))
+    later, earlier = dictionary_entries(:one), dictionary_entries(:two)
+    later.update_columns(voice_recording_id: recording.id, region_start: 9, region_end: 10)
+    earlier.update_columns(voice_recording_id: recording.id, region_start: 1, region_end: 2)
+
+    assert_empty run.unheard_entries
+    run.update!(unheard_entry_ids: [later.id, earlier.id])
+    assert_equal [earlier, later], run.unheard_entries.to_a
+  end
 end

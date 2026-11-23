@@ -229,7 +229,7 @@ CREATE TRIGGER update_users_search AFTER UPDATE ON users BEGIN
   INSERT INTO fts_users(fts_users, rowid, name) VALUES('delete', old.id, old.name);
   INSERT INTO fts_users(rowid, name) VALUES (new.id, new.name);
 END;
-CREATE TABLE IF NOT EXISTS "transcription_runs" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "voice_recording_id" integer NOT NULL, "requested_by_id" integer NOT NULL, "fotheidil_video_id" varchar, "status" integer DEFAULT 0 NOT NULL, "segments" json DEFAULT '[]' NOT NULL, "error" text, "started_at" datetime(6), "finished_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_6f30324a69"
+CREATE TABLE IF NOT EXISTS "transcription_runs" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "voice_recording_id" integer NOT NULL, "requested_by_id" integer NOT NULL, "fotheidil_video_id" varchar, "status" integer DEFAULT 0 NOT NULL, "segments" json DEFAULT '[]' NOT NULL, "error" text, "started_at" datetime(6), "finished_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "unheard_entry_ids" json DEFAULT '[]' NOT NULL, CONSTRAINT "fk_rails_6f30324a69"
 FOREIGN KEY ("voice_recording_id")
   REFERENCES "voice_recordings" ("id")
 , CONSTRAINT "fk_rails_ad230eef0c"
@@ -251,8 +251,9 @@ FOREIGN KEY ("resolved_by_id")
 );
 CREATE INDEX "index_transcription_candidates_on_dictionary_entry_id" ON "transcription_candidates" ("dictionary_entry_id");
 CREATE INDEX "index_transcription_candidates_on_resolved_by_id" ON "transcription_candidates" ("resolved_by_id");
-CREATE UNIQUE INDEX "index_transcription_candidates_on_run_and_entry" ON "transcription_candidates" ("transcription_run_id", "dictionary_entry_id");
+CREATE UNIQUE INDEX "index_transcription_candidates_on_run_entry_and_kind" ON "transcription_candidates" ("transcription_run_id", "dictionary_entry_id", "kind");
 INSERT INTO "schema_migrations" (version) VALUES
+('20261124090000'),
 ('20261123180000'),
 ('20261123090100'),
 ('20261123090000'),

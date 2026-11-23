@@ -132,4 +132,18 @@ class TranscriptionCandidateTest < ActiveSupport::TestCase
     @entry.update_columns(word_or_phrase: "x", accuracy_status: DictionaryEntry.accuracy_statuses[:confirmed])
     assert_empty TranscriptionCandidate.stale_translation_entry_ids([@entry])
   end
+
+  test "a timing candidate needs its entry, and a line can have a timing and a differing candidate in one run" do
+    assert build_candidate(kind: :timing).invalid?
+    assert build_candidate(kind: :timing, dictionary_entry: @entry).save
+    assert build_candidate(kind: :differs, dictionary_entry: @entry).save
+    refute build_candidate(kind: :timing, dictionary_entry: @entry).save
+  end
+
+  test "a differing candidate is cosmetic when only case or punctuation differ" do
+    @entry.update_columns(word_or_phrase: "tá sé go maith")
+    assert build_candidate(dictionary_entry: @entry, word_or_phrase: "Tá sé go maith.").cosmetic?
+    refute build_candidate(dictionary_entry: @entry, word_or_phrase: "Tá sé go dona.").cosmetic?
+    refute build_candidate(kind: :timing, dictionary_entry: @entry, word_or_phrase: "tá sé go maith").cosmetic?
+  end
 end

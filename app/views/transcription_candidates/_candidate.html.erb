@@ -1,16 +1,19 @@
 <%# One line of a re-transcription (#133), beside the current entry it would replace. %>
 <% entry = candidate.dictionary_entry %>
 <% error = local_assigns[:error] %>
+<% hide_cosmetic = local_assigns.fetch(:hide_cosmetic, false) %>
+<% carried = {seen_at: seen_at.to_r.to_s, hide_cosmetic: (1 if hide_cosmetic)}.compact %>
 <div class="bg-white rounded-lg shadow p-4" id="<%= dom_id(candidate) %>" data-testid="candidate">
   <div class="flex items-center gap-3 mb-3">
-    <% clip_url = entry&.media&.attached? ? url_for(entry.media) : audio_url %>
+    <% own_clip = entry&.media&.attached? && !candidate.timing? %>
+    <% clip_url = own_clip ? url_for(entry.media) : audio_url %>
     <button type="button"
             class="flex-shrink-0 bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-full transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Play this line"
             data-controller="audio-player"
             data-action="audio-player#play"
             data-audio-player-url-value="<%= clip_url %>"
-            <% unless entry&.media&.attached? %>
+            <% unless own_clip %>
               data-audio-player-start-value="<%= candidate.region_start.to_f %>"
               data-audio-player-end-value="<%= candidate.region_end.to_f %>"
             <% end %>>
@@ -20,13 +23,26 @@
     </button>
     <span class="text-sm text-gray-500"><%= format_duration(candidate.region_start) %> - <%= format_duration(candidate.region_end) %></span>
     <% if candidate.new_segment? %>
-      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">New line</span>
-    <% elsif entry.confirmed? %>
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Heard, not in your text</span>
+    <% elsif candidate.timing? %>
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">No times yet</span>
+    <% end %>
+    <% if candidate.pending? && candidate.cosmetic? %>
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Case or punctuation only</span>
+    <% end %>
+    <% if candidate.differs? && entry.confirmed? %>
       <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">✓ Confirmed</span>
     <% end %>
   </div>
 
-  <% if candidate.differs? && candidate.accepted? %>
+  <% if candidate.timing? %>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Your line, with no times yet</p>
+    <p class="text-lg text-gray-900" data-testid="timing-text"><%= entry.word_or_phrase %></p>
+    <% if entry.translation.present? %>
+      <p class="text-gray-600 italic"><%= entry.translation %></p>
+    <% end %>
+    <p class="text-xs text-gray-500 mt-1">The times are an estimate from where the words fall in the new transcription. The text stays as it is.</p>
+  <% elsif candidate.differs? && candidate.accepted? %>
     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Now</p>
     <p class="text-lg text-gray-900" data-testid="new-text"><%= entry.word_or_phrase %></p>
     <% if entry.translation.present? %>
@@ -48,7 +64,7 @@
       </div>
     </div>
   <% else %>
-    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">New, where there is no current line</p>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Heard in the new transcription, with no line in your text</p>
     <p class="text-lg text-gray-900" data-testid="new-text"><%= candidate.word_or_phrase %></p>
   <% end %>
 
@@ -62,25 +78,25 @@
         <p class="text-xs text-gray-500 mb-2">Confirmed - this flow can't replace it. Deconfirm it first to use the new text.</p>
       <% end %>
       <div class="flex gap-2">
-        <% if candidate.new_segment? || entry.unconfirmed? %>
-          <%= button_to (candidate.new_segment? ? "Add as line" : "Use new"), transcription_candidate_path(candidate),
+        <% if candidate.new_segment? || candidate.timing? || entry.unconfirmed? %>
+          <%= button_to (candidate.new_segment? ? "Add as line" : (candidate.timing? ? "Set times" : "Use new")), transcription_candidate_path(candidate),
               method: :patch,
-              params: {transcription_candidate: {status: "accepted", current_text: entry&.word_or_phrase}.compact, seen_at: seen_at.to_r.to_s},
+              params: {transcription_candidate: {status: "accepted", current_text: (entry&.word_or_phrase unless candidate.timing?)}.compact, **carried},
               class: "w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors min-h-[44px]",
               form_class: "flex-1" %>
         <% end %>
-        <%= button_to (candidate.new_segment? ? "Dismiss" : "Keep current"), transcription_candidate_path(candidate),
+        <%= button_to ((candidate.new_segment? || candidate.timing?) ? "Dismiss" : "Keep current"), transcription_candidate_path(candidate),
             method: :patch,
-            params: {transcription_candidate: {status: "dismissed"}, seen_at: seen_at.to_r.to_s},
+            params: {transcription_candidate: {status: "dismissed"}, **carried},
             class: "w-full bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400 transition-colors min-h-[44px]",
             form_class: "flex-1" %>
       </div>
     <% else %>
       <div class="flex flex-wrap items-center gap-2 text-sm">
         <% if candidate.dismissed? %>
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><%= candidate.new_segment? ? "Dismissed" : "Kept current" %></span>
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><%= (candidate.new_segment? || candidate.timing?) ? "Dismissed" : "Kept current" %></span>
         <% else %>
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"><%= candidate.new_segment? ? "Added as a line" : "Used new text" %></span>
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"><%= candidate.new_segment? ? "Added as a line" : (candidate.timing? ? "Times set" : "Used new text") %></span>
           <% if entry %>
             <%= link_to "Versions", dictionary_entry_path(entry), class: "text-gray-500 hover:text-gray-700" %>
           <% end %>
