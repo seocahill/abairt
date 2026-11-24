@@ -365,9 +365,9 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
-    redis (6.0.0)
-      redis-client (= 0.30.1)
-    redis-client (0.30.1)
+    redis (6.1.0)
+      redis-client (= 0.31.0)
+    redis-client (0.31.0)
       connection_pool
     regexp_parser (2.13.4)
     reline (0.7.0)
@@ -417,10 +417,10 @@ GEM
       sprockets-rails
       tilt
     securerandom (0.4.1)
-    sentry-rails (6.7.0)
+    sentry-rails (7.3.0)
       railties (>= 5.2.0)
-      sentry-ruby (~> 6.7.0)
-    sentry-ruby (6.7.0)
+      sentry-ruby (~> 7.3.0)
+    sentry-ruby (7.3.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
@@ -559,11 +559,11 @@ DEPENDENCIES
   rails (~> 8.1.0)
   rails-controller-testing
   rb_sys (~> 0.9.130)
-  redis (~> 6.0)
+  redis (~> 6.1)
   ruby-openai (~> 8.3.0)
   sassc-rails
-  sentry-rails (~> 6.7)
-  sentry-ruby (~> 6.7)
+  sentry-rails (~> 7.3)
+  sentry-ruby (~> 7.3)
   sequel (~> 5.110)
   solid_queue (~> 1.7)
   sprockets-rails
