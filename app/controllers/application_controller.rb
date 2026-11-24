@@ -57,6 +57,18 @@ class ApplicationController < ActionController::Base
     @search_to_moment = Flipper.enabled?(:f170_search_to_moment, current_user)
   end
 
+  # Search also finds mutated Irish spellings and half-typed words (flag f171).
+  def mutation_search?
+    return @mutation_search if defined?(@mutation_search)
+    @mutation_search = Flipper.enabled?(:f171_mutation_search, current_user)
+  end
+
+  # Simpler sign-up and a password link on your own profile (flag f121).
+  def simple_signup?
+    return @simple_signup if defined?(@simple_signup)
+    @simple_signup = Flipper.enabled?(:f121_simple_signup, current_user)
+  end
+
   private
 
   def rails_engine_controller?

@@ -70,12 +70,13 @@ class DictionaryEntry < ApplicationRecord
   }
 
   # Full-text search of Irish and English, best match first. Safe for any typed text.
-  scope :search, ->(text) {
+  # forms: true also finds mutated Irish spellings and half-typed words (flag f171).
+  scope :search, ->(text, forms: false) {
     search = DictionarySearch.new(text)
     next none if search.blank?
 
     joins(:fts_dictionary_entries)
-      .where("fts_dictionary_entries MATCH ?", search.expression)
+      .where("fts_dictionary_entries MATCH ?", search.expression(forms: forms))
       .distinct
       .reorder("rank")
   }

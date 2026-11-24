@@ -8,4 +8,6 @@ f126_android_version: "The Android download button shows the latest app version,
 f140_check_mode: "Check mode on recordings: step through unchecked lines with audio, edit, and confirm and move on."
 f170_search_to_moment: "Search results open the recording at the matching line; search inside one recording; the recordings search also lists matching lines."
 f172_place_pages: "Place pages: tapping a place on the map or in a recording opens a page with its recordings, speakers and a small map."
+f121_simple_signup: "Sign-up asks for name and email only (no About, no Google reCAPTCHA box), shows what went wrong if it fails, and your own profile page links to setting a password."
+f171_mutation_search: "Dictionary and recording search find a word however its start is mutated (search bean, also find bhean and mbean), and a half-typed last word finds the whole word. The rules are in config/irish_mutations.yml."
 f133_retranscribe: "Re-transcribe a recording without losing anyone's work: a fresh Fotheidil run is shown beside the current lines, to use or keep one by one (admins and the recording's owner)."
